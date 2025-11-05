@@ -1,0 +1,25 @@
+name = "WRF-Diagnostic-Tool"
+version = "0.0.1"
+license = "MIT"
+maintainer = "htang23@ncsu.edu"
+author = "Han Tang"
+copyright = "Copyright 2019-2025 Han Tang"
+description = "WRF Post-processing / diagnostic tool kit."
+keywords = ["fortran", "modern-fortran", "WRF", "WRF post processing"]
+# homepage = "https://github.com/han190/PE-Fortran"
+
+[build]
+external-modules = ["netcdf"]
+link = ["netcdf"]
+
+[dependencies]
+netcdf = "*"
+# openmp = "*"
+
+[library]
+source-dir = "src"
+
+[[test]]
+name = "test_netcdf"
+source-dir = "test"
+main = "test_netcdf.f90"
