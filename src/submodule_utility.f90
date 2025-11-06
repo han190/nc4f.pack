@@ -63,24 +63,29 @@ module elemental function get_buffer_size(data_type, length) result(buffer_size)
   integer(int64), intent(in) :: length
   integer(int64) :: buffer_size
   character(len=NC_MAX_NAME) :: data_name
+  integer(int64) :: st_size
 
   select case (data_type)
-  case (NC_BYTE, NC_CHAR)
-    buffer_size = length
+  case (NC_BYTE)
+    st_size = storage_size(0_int8)
   case (NC_SHORT)
-    buffer_size = length*storage_size(0_int16)/8
+    st_size = storage_size(0_int16)
   case (NC_INT)
-    buffer_size = length*storage_size(0_int32)/8
-  case (NC_FLOAT)
-    buffer_size = length*storage_size(0._real32)/8
-  case (NC_DOUBLE)
-    buffer_size = length*storage_size(0._real64)/8
+    st_size = storage_size(0_int32)
   case (NC_INT64)
-    buffer_size = length*storage_size(0_int64)/8
+    st_size = storage_size(0_int64)
+  case (NC_FLOAT)
+    st_size = storage_size(0.0_real32)
+  case (NC_DOUBLE)
+    st_size = storage_size(0.0_real64)
+  case (NC_CHAR)
+    st_size = storage_size("a")
   case default
     write (data_name, "(i0)") data_type
-    error stop "[get_buffer_size] Unsupported type: "//trim(data_name)//"."
+    error stop "[get_buffer_size] Unsupported type."// &
+      & " Data type: "//trim(data_name)//"."
   end select
+  buffer_size = length*st_size/8
 end function get_buffer_size
 
 end submodule submodule_utility

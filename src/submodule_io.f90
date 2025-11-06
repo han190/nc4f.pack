@@ -20,15 +20,19 @@ module subroutine write_formatted_variable(var, unit, iotype, v_list, iostat, io
     fmt = "(2a)"
     select case (var%data_type)
     case (NC_FLOAT)
-      write (title_str, fmt) 'real(real32)::', var%name
+      title_str = 'real(real32)::'//var%name
     case (NC_DOUBLE)
-      write (title_str, fmt) 'real(real64)::', var%name
+      title_str = 'real(real64)::'//var%name
+    case (NC_BYTE)
+      title_str = 'integer(int8)::'//var%name
+    case (NC_SHORT)
+      title_str = 'integer(int16)::'//var%name
     case (NC_INT)
-      write (title_str, fmt) 'integer(int32)::', var%name
+      title_str = 'integer(int32)::'//var%name
     case (NC_INT64)
-      write (title_str, fmt) 'integer(int64)::', var%name
+      title_str = 'integer(int64)::'//var%name
     case (NC_CHAR)
-      write (title_str, fmt) 'character(len=*)::',var%name
+      title_str = 'character(len=*)::'//var%name
     case default
       error stop "[write_formatted_variable] Unsupported type."
     end select
@@ -69,22 +73,6 @@ module subroutine write_formatted_attribute(att, unit, iotype, v_list, iostat, i
 
   if (iotype == 'LISTDIRECTED' .or. iotype == 'DT') then
     select case (att%data_type)
-    case (NC_INT)
-      block
-      integer(int32), pointer :: fptr(:) => null()
-      call c_f_pointer(ptr, fptr, [att%length])
-      write (unit, "(2(a), 1x, '=', *(1x, i0))") &
-        & 'integer(int32)::', att%name, fptr
-      nullify (fptr)
-      end block
-    case (NC_INT64)
-      block
-      integer(int64), pointer :: fptr(:) => null()
-      call c_f_pointer(ptr, fptr, [att%length])
-      write (unit, "(2(a), 1x, '=', *(1x, i0))") &
-        & 'integer(int64)::', att%name, fptr
-      nullify (fptr)
-      end block
     case (NC_FLOAT)
       block
       real(real32), pointer :: fptr(:) => null()
@@ -99,6 +87,38 @@ module subroutine write_formatted_attribute(att, unit, iotype, v_list, iostat, i
       call c_f_pointer(ptr, fptr, [att%length])
       write (unit, "(2(a), 1x, '=', *(1x, g0.6))") &
         & 'real(real64)::', att%name, fptr
+      nullify (fptr)
+      end block
+    case (NC_BYTE)
+      block
+      integer(int8), pointer :: fptr(:) => null()
+      call c_f_pointer(ptr, fptr, [att%length])
+      write (unit, "(2(a), 1x, '=', *(1x, i0))") &
+        & 'integer(int8)::', att%name, fptr
+      nullify (fptr)
+      end block
+    case (NC_SHORT)
+      block
+      integer(int16), pointer :: fptr(:) => null()
+      call c_f_pointer(ptr, fptr, [att%length])
+      write (unit, "(2(a), 1x, '=', *(1x, i0))") &
+        & 'integer(int16)::', att%name, fptr
+      nullify (fptr)
+      end block
+    case (NC_INT)
+      block
+      integer(int32), pointer :: fptr(:) => null()
+      call c_f_pointer(ptr, fptr, [att%length])
+      write (unit, "(2(a), 1x, '=', *(1x, i0))") &
+        & 'integer(int32)::', att%name, fptr
+      nullify (fptr)
+      end block
+    case (NC_INT64)
+      block
+      integer(int64), pointer :: fptr(:) => null()
+      call c_f_pointer(ptr, fptr, [att%length])
+      write (unit, "(2(a), 1x, '=', *(1x, i0))") &
+        & 'integer(int64)::', att%name, fptr
       nullify (fptr)
       end block
     case (NC_CHAR)

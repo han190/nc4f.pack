@@ -23,12 +23,12 @@ integer(c_int), parameter :: NC_INT = 4_c_int
 integer(c_int), parameter :: NC_LONG = NC_INT
 integer(c_int), parameter :: NC_FLOAT = 5_c_int
 integer(c_int), parameter :: NC_DOUBLE = 6_c_int
-integer(c_int), parameter :: NC_UBYTE = 7_c_int
-integer(c_int), parameter :: NC_USHORT = 8_c_int
-integer(c_int), parameter :: NC_UINT = 9_c_int
+integer(c_int), parameter :: NC_UBYTE = 7_c_int ! NA
+integer(c_int), parameter :: NC_USHORT = 8_c_int ! NA
+integer(c_int), parameter :: NC_UINT = 9_c_int ! NA
 integer(c_int), parameter :: NC_INT64 = 10_c_int
-integer(c_int), parameter :: NC_UINT64 = 11_c_int
-integer(c_int), parameter :: NC_STRING = 12_c_int
+integer(c_int), parameter :: NC_UINT64 = 11_c_int ! NA
+integer(c_int), parameter :: NC_STRING = 12_c_int ! NA
 
 interface
   !> Dataset
