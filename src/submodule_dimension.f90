@@ -95,4 +95,18 @@ impure elemental module function define_dimension(nc, dim) result(new_dim)
   new_dim = dimension_type(dimid, dim%name, dim%length, dim%is_unlimited)
 end function define_dimension
 
+elemental module logical function equal_dimension(x, y)
+  type(dimension_type), intent(in) :: x, y
+
+  equal_dimension = x%is_unlimited .eqv. y%is_unlimited .and. &
+    & x%length == y%length .and. x%name == y%name
+end function equal_dimension
+
+elemental module logical function unequal_dimension(x, y)
+  type(dimension_type), intent(in) :: x, y
+
+  unequal_dimension = x%is_unlimited .neqv. y%is_unlimited .or. &
+    & x%length /= y%length .or. x%name /= y%name
+end function unequal_dimension
+
 end submodule submodule_dimension

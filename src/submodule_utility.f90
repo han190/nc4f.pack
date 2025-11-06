@@ -53,9 +53,13 @@ logical module function reallocation_required(buffer, buf_size)
   integer(int8), allocatable, intent(inout) :: buffer(:)
   integer(int64), intent(in) :: buf_size
 
-  reallocation_required = (.not. allocated(buffer)) &
-    & .or. (size(buffer) < buf_size)
-  if (allocated(buffer) .and. reallocation_required) deallocate (buffer)
+  reallocation_required = .false.
+  if (.not. allocated(buffer)) then
+    reallocation_required = .true.
+  else if (size(buffer) /= buf_size) then
+    deallocate (buffer)
+    reallocation_required = .true.
+  end if
 end function reallocation_required
 
 module elemental function get_buffer_size(data_type, length) result(buffer_size)
@@ -66,20 +70,18 @@ module elemental function get_buffer_size(data_type, length) result(buffer_size)
   integer(int64) :: st_size
 
   select case (data_type)
-  case (NC_BYTE)
-    st_size = storage_size(0_int8)
+  case (NC_BYTE, NC_CHAR)
+    st_size = storage_size(0_int8, kind=int64)
   case (NC_SHORT)
-    st_size = storage_size(0_int16)
+    st_size = storage_size(0_int16, kind=int64)
   case (NC_INT)
-    st_size = storage_size(0_int32)
+    st_size = storage_size(0_int32, kind=int64)
   case (NC_INT64)
-    st_size = storage_size(0_int64)
+    st_size = storage_size(0_int64, kind=int64)
   case (NC_FLOAT)
-    st_size = storage_size(0.0_real32)
+    st_size = storage_size(0.0_real32, kind=int64)
   case (NC_DOUBLE)
-    st_size = storage_size(0.0_real64)
-  case (NC_CHAR)
-    st_size = storage_size("a")
+    st_size = storage_size(0.0_real64, kind=int64)
   case default
     write (data_name, "(i0)") data_type
     error stop "[get_buffer_size] Unsupported type."// &

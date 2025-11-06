@@ -1,0 +1,46 @@
+#: set ops = ['+', '-', '*', '/', '**']
+#: set op_names = ['add', 'sub', 'mul', 'div', 'pow']
+#: set kinds = ['real32', 'real64', 'int32', 'int64']
+#: set types = ['real', 'real', 'integer', 'integer']
+#: set cases = ['NC_FLOAT', 'NC_DOUBLE', 'NC_INT', 'NC_INT64']
+#: for O, N in zip(ops, op_names)
+interface operator(${O}$)
+  module procedure :: ${N}$_vars
+  #: for C1, T1, K1 in zip(cases, types, kinds)
+  module procedure :: ${N}$_var_${K1}$
+  module procedure :: ${N}$_${K1}$_var
+  #: endfor
+end interface operator(${O}$)
+
+#: endfor
+interface sum
+  module procedure :: sum_vars
+end interface sum
+
+interface
+  #: for O, N in zip(ops, op_names)
+  module function ${N}$_vars(x, y) result(res)
+    type(variable_type), target, intent(in) :: x, y
+    type(variable_type), target :: res
+  end function ${N}$_vars
+
+  #: for C1, T1, K1 in zip(cases, types, kinds)
+  module function ${N}$_var_${K1}$(x, y) result(res)
+    type(variable_type), target, intent(in) :: x
+    ${T1}$(${K1}$), intent(in) :: y
+    type(variable_type), target :: res
+  end function ${N}$_var_${K1}$
+
+  module function ${N}$_${K1}$_var(x, y) result(res)
+  ${T1}$(${K1}$), intent(in) :: x
+  type(variable_type), target, intent(in) :: y
+  type(variable_type), target :: res
+  end function ${N}$_${K1}$_var
+
+  #: endfor
+  #: endfor
+  module function sum_vars(vars) result(s)
+    type(variable_type), intent(in) :: vars(:)
+    type(variable_type) :: s
+  end function sum_vars
+end interface
