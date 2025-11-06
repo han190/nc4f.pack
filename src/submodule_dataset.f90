@@ -19,7 +19,7 @@ module function open_dataset(filename, mode, &
   select case (mode)
   case ("r", "read")
     nc%filename = trim(adjustl(filename))
-    call handle_error(nc_open(cstr(nc%filename), NC_NOWRITE, nc%id), &
+    call handle_error(nc_open(f2cstr(nc%filename), NC_NOWRITE, nc%id), &
       & "[open_dataset] File not found.")
     nc%mode = NC_NOWRITE
   case default

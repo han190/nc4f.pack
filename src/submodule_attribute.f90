@@ -63,7 +63,7 @@ impure elemental module function get_attribute(nc, name) result(att)
   character(len=*), intent(in) :: name
   type(attribute_type) :: att
 
-  att = get_attribute_(nc%id, NC_GLOBAL, cstr(trim(adjustl(name))))
+  att = get_attribute_(nc%id, NC_GLOBAL, f2cstr(trim(adjustl(name))))
 end function get_attribute
 
 module function get_attributes_global(nc) result(atts)
@@ -98,7 +98,7 @@ module function get_attributes_(ncid, varid) result(atts)
 
   do i = 0, natts - 1
     call handle_error(nc_inq_attname(ncid, varid, i, name))
-    atts(i + 1) = get_attribute_(ncid, varid, fstr(name))
+    atts(i + 1) = get_attribute_(ncid, varid, c2fstr(name))
   end do
 end function get_attributes_
 
@@ -112,7 +112,7 @@ impure elemental function get_attribute_(ncid, varid, name) result(att)
 
   att%name = trim(adjustl(name))
   call handle_error(nc_inq_att(ncid, varid, &
-    & cstr(att%name), xtypep=data_type, lenp=length), &
+    & f2cstr(att%name), xtypep=data_type, lenp=length), &
     & "[get_attribute_] Invalid attribute: "//att%name//".")
   att%length = length
   att%data_type = data_type
@@ -122,21 +122,11 @@ impure elemental function get_attribute_(ncid, varid, name) result(att)
     return
   end if zero_size_attr
 
-  select case (data_type)
-  case (NC_INT)
-    buffer_size = length*storage_size(1_c_int)/8
-  case (NC_FLOAT)
-    buffer_size = length*storage_size(1.0_c_float)/8
-  case (NC_CHAR)
-    buffer_size = length
-  case default
-    error stop "[get_attribute_] Unsupported type."
-  end select
-
+  buffer_size = get_buffer_size(data_type, length)
   if (reallocation_required(att%buffer, buffer_size)) &
     & allocate (att%buffer(buffer_size))
   call handle_error(nc_get_att(ncid, varid, &
-    & cstr(att%name), c_loc(att%buffer(1))), &
+    & f2cstr(att%name), c_loc(att%buffer(1))), &
     & "[get_attribute_] Invalid attribute.")
 end function get_attribute_
 

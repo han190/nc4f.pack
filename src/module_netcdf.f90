@@ -1,6 +1,6 @@
 module module_netcdf
 
-use, intrinsic :: iso_fortran_env, only: int8, int32, int64, real32, real64
+use, intrinsic :: iso_fortran_env, only: int8, int16, int32, int64, real32, real64
 use, intrinsic :: iso_c_binding
 use, non_intrinsic :: module_c_interface
 implicit none (type, external)
@@ -210,20 +210,26 @@ interface
     character(*), intent(in), optional :: error_message
   end subroutine handle_error
 
-  pure module function fstr(cstring) result(string)
-    character(kind=c_char, len=*), intent(in) :: cstring
+  pure module function c2fstr(f2cstring) result(string)
+    character(kind=c_char, len=*), intent(in) :: f2cstring
     character(len=:), allocatable :: string
-  end function fstr
+  end function c2fstr
 
-  pure module function cstr(string) result(cstring)
+  pure module function f2cstr(string) result(f2cstring)
     character(len=*), intent(in) :: string
-    character(kind=c_char, len=:), allocatable :: cstring
-  end function cstr
+    character(kind=c_char, len=:), allocatable :: f2cstring
+  end function f2cstr
   
   logical module function reallocation_required(buffer, buf_size)
     integer(int8), allocatable, intent(inout) :: buffer(:)
     integer(int64), intent(in) :: buf_size
   end function reallocation_required
+
+  module elemental function get_buffer_size(data_type, length) result(buffer_size)
+    integer(int32), intent(in) :: data_type
+    integer(int64), intent(in) :: length
+    integer(int64) :: buffer_size
+  end function get_buffer_size
 
   !> submodule_variable.f90
   module impure elemental function get_variable(nc, name, exist) result(var)

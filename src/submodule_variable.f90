@@ -24,15 +24,7 @@ impure elemental function get_variable_(ncid, name, exist) result(var)
     return
   end if zero_size_var
 
-  select case (var%data_type)
-  case (NC_INT)
-    buffer_size = var%length*storage_size(1_c_int)/8
-  case (NC_FLOAT)
-    buffer_size = var%length*storage_size(1.0_c_float)/8
-  case default
-    error stop "[get_variable_] Unsupported type."
-  end select
-
+  buffer_size = get_buffer_size(var%data_type, var%length)
   if (reallocation_required(var%buffer, buffer_size)) &
     & allocate (var%buffer(buffer_size))
   call handle_error(nc_get_var(ncid, var%id, c_loc(var%buffer(1))), &
@@ -57,7 +49,7 @@ impure elemental function inquire_variable_(ncid, name, exist) result(var)
   integer :: i
 
   var%name = trim(adjustl(name))
-  stat = nc_inq_varid(ncid, cstr(var%name), var%id)
+  stat = nc_inq_varid(ncid, f2cstr(var%name), var%id)
   if (present(exist)) then
     exist = stat == NC_NOERR
     if (.not. exist) return

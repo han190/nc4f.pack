@@ -69,7 +69,7 @@ module function inquire_dimensions_(ncid, varid) result(dims)
     dims(j)%id = dimids(i)
     call handle_error(nc_inq_dimname(ncid, dimids(i), dim_name))
     call handle_error(nc_inq_dimlen(ncid, dimids(i), dims(j)%length))
-    dims(j)%name = trim(adjustl(fstr(dim_name)))
+    dims(j)%name = trim(adjustl(c2fstr(dim_name)))
     dims(j)%is_unlimited = dimids(i) == unlimdimidp
     if (dims(j)%is_unlimited) nunlim = nunlim + 1
   end do
