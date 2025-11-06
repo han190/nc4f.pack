@@ -1,6 +1,45 @@
 submodule(module_netcdf) submodule_variable
 implicit none
+integer(int8), parameter :: BYTE = 0_int8
 contains
+
+module function new_variable_real32(name, values, dims, atts) result(var)
+  character(len=*), intent(in) :: name
+  real(real32), intent(in) :: values(:)
+  type(dimension_type), intent(in) :: dims(:)
+  type(attribute_type), intent(in), optional :: atts(:)
+  type(variable_type) :: var
+  integer(int64) :: buffer_size
+
+  if (size(values) == 0) error stop &
+    & "[new_variable_real32] Invalid values."  
+  var%name = name
+  var%data_type = NC_FLOAT
+  var%length = size(values, kind=int64)
+  var%buffer = transfer(values, BYTE, &
+    & get_buffer_size(var%data_type, var%length))
+  var%dimensions = dims
+  if (present(atts)) var%attributes = atts
+end function new_variable_real32
+
+module function new_variable_int32(name, values, dims, atts) result(var)
+  character(len=*), intent(in) :: name
+  integer(int32), intent(in) :: values(:)
+  type(dimension_type), intent(in) :: dims(:)
+  type(attribute_type), intent(in), optional :: atts(:)
+  type(variable_type) :: var
+  integer(int64) :: buffer_size
+
+  if (size(values) == 0) error stop &
+    & "[new_variable_int32] Invalid values."  
+  var%name = name
+  var%data_type = NC_INT
+  var%length = size(values, kind=int64)
+  var%buffer = transfer(values, BYTE, &
+    & get_buffer_size(var%data_type, var%length))
+  var%dimensions = dims
+  if (present(atts)) var%attributes = atts
+end function new_variable_int32
 
 module impure elemental function get_variable(nc, name, exist) result(var)
   type(netcdf_type), intent(in) :: nc
@@ -100,5 +139,54 @@ impure elemental function define_variable(nc, var) result(new_var)
   new_var%attributes = var%attributes
   new_var%id = varid
 end function define_variable
+
+pure module function get_size(var, dim) result(n)
+  type(variable_type), intent(in) :: var
+  integer, intent(in), optional :: dim
+  integer(int64) :: n
+  integer :: dim_, i
+
+  if (.not. allocated(var%dimensions)) &
+    & error stop "[get_size] Invalid dimensions."
+
+  if (present(dim)) then
+    dim_ = dim
+  else
+    dim_ = 0
+  end if
+
+  n = 1
+  select case (dim_)
+  case (0)
+    do i = 1, size(var%dimensions)
+      n = n * var%dimensions(i)%length
+    end do
+  case (1:)
+    i = size(var%dimensions) - dim_ + 1
+    n = var%dimensions(i)%length
+  case default
+    error stop "[get_size] Invalid dim."
+  end select
+end function get_size
+
+pure module function get_shape(var) result(n)
+  type(variable_type), intent(in) :: var
+  integer(int64), allocatable :: n(:)
+  integer :: ndims, i
+
+  if (.not. allocated(var%dimensions)) &
+    & error stop "[get_size] Invalid dimensions."
+  ndims = size(var%dimensions)
+  if (.not. allocated(n)) then
+    allocate (n(ndims))
+  else if (size(n) /= ndims) then
+    deallocate (n)
+    allocate (n(ndims))
+  end if
+
+  do i = 1, ndims
+    n(ndims - i + 1) = var%dimensions(i)%length
+  end do
+end function get_shape
 
 end submodule submodule_variable

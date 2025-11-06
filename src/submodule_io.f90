@@ -38,7 +38,7 @@ module subroutine write_formatted_variable(var, unit, iotype, v_list, iostat, io
     else if (ndim == 0) then
       error stop "[write_formatted_variable] Invalid dimension."
     end if
-    write (dim_str, trim(adjustl(fmt))) (var%dimensions(i), i=1, ndim)
+    write (dim_str, trim(adjustl(fmt))) (var%dimensions(ndim - i + 1), i=1, ndim)
     write (unit, "(a)") trim(title_str)//trim(dim_str)
     if (allocated(var%attributes)) &
       & write (unit, "(/, *(4x, DT, /))") var%attributes

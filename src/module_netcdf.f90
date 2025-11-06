@@ -21,11 +21,14 @@ public :: inquire_variable
 !> I/O
 public :: open_dataset
 public :: close_dataset
+public :: data_array
 !> Overrided intrinsic
 public :: write(formatted)
 public :: operator(.att.)
 public :: operator(.dim.)
 public :: operator(.and.)
+public :: size
+public :: shape
 private
 
 type :: netcdf_type
@@ -86,6 +89,11 @@ interface inquire_dimensions
   module procedure :: inquire_dimensions_global
 end interface inquire_dimensions
 
+interface data_array
+  module procedure :: new_variable_int32
+  module procedure :: new_variable_real32
+end interface data_array
+
 interface operator(.att.)
   module procedure :: new_attribute_int32
   module procedure :: new_attribute_arr_int32
@@ -102,6 +110,14 @@ end interface operator(.dim.)
 interface operator(.and.)
   module procedure :: new_dimension_argument
 end interface operator(.and.)
+
+interface size
+  module procedure :: get_size
+end interface size
+
+interface shape
+  module procedure :: get_shape
+end interface shape
 
 interface
   !> submodule_attribute.f90
@@ -265,6 +281,22 @@ interface
   end function get_buffer_size
 
   !> submodule_variable.f90
+  module function new_variable_real32(name, values, dims, atts) result(var)
+    character(len=*), intent(in) :: name
+    real(real32), intent(in) :: values(:)
+    type(dimension_type), intent(in) :: dims(:)
+    type(attribute_type), intent(in), optional :: atts(:)
+    type(variable_type) :: var
+  end function new_variable_real32
+
+  module function new_variable_int32(name, values, dims, atts) result(var)
+    character(len=*), intent(in) :: name
+    integer(int32), intent(in) :: values(:)
+    type(dimension_type), intent(in) :: dims(:)
+    type(attribute_type), intent(in), optional :: atts(:)
+    type(variable_type) :: var
+  end function new_variable_int32
+
   module impure elemental function get_variable(nc, name, exist) result(var)
     type(netcdf_type), intent(in) :: nc
     character(len=*), intent(in) :: name
@@ -283,6 +315,17 @@ interface
     type(netcdf_type), intent(in) :: nc
     type(variable_type), target, intent(in) :: var
   end subroutine put_variable
+
+  pure module function get_size(var, dim) result(n)
+    type(variable_type), intent(in) :: var
+    integer, intent(in), optional :: dim
+    integer(int64) :: n
+  end function get_size
+
+  pure module function get_shape(var) result(n)
+    type(variable_type), intent(in) :: var
+    integer(int64), allocatable :: n(:)
+  end function get_shape
 end interface
 
 end module module_netcdf
