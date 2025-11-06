@@ -154,6 +154,13 @@ interface
     integer(c_int), intent(out) :: ndimsp
     integer(c_int) :: nc_inq_varndims
   end function nc_inq_varndims
+
+  function nc_get_var(ncid, varid, ip) bind(c, name="nc_get_var")
+    import :: c_int, c_ptr
+    integer(c_int), value :: ncid, varid
+    type(c_ptr), value :: ip
+    integer(c_int) :: nc_get_var
+  end function nc_get_var
 end interface
 
 end module module_c_interface

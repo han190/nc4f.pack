@@ -130,7 +130,7 @@ impure elemental function get_attribute_(ncid, varid, name) result(att)
   case (NC_CHAR)
     buffer_size = length
   case default
-    error stop "Unsupported type."
+    error stop "[get_attribute_] Unsupported type."
   end select
 
   if (reallocation_required(att%buffer, buffer_size)) &

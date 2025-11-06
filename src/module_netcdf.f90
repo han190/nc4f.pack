@@ -11,6 +11,7 @@ public :: attribute_type
 public :: dimension_type
 public :: get_attribute
 public :: get_attributes
+public :: get_variable
 public :: inquire_dimensions
 public :: inquire_variable
 public :: open_dataset
@@ -21,22 +22,25 @@ public :: operator(.and.)
 private
 
 type :: netcdf_type
+  integer(c_int), private :: id = -1
   character(len=:), allocatable :: filename
-  integer(c_int) :: id, mode
+  integer(c_int) :: mode
   type(attribute_type), allocatable :: attributes(:)
   type(dimension_type), allocatable :: dimensions(:)
 end type netcdf_type
 
 type :: variable_type
-  integer(c_int) :: id = -1
-  integer(int32) :: data_type = -1
+  integer(c_int), private :: id = -1
   character(len=:), allocatable :: name
+  integer(int32) :: data_type = -1
+  integer(int64) :: length = -1
   type(dimension_type), allocatable :: dimensions(:)
   type(attribute_type), allocatable :: attributes(:)
   integer(int8), allocatable :: buffer(:)
 end type variable_type
 
 type :: attribute_type
+  integer(c_int), private :: id = -1
   character(len=:), allocatable :: name
   integer(int32) :: data_type = 0
   integer(int64) :: length = 0
@@ -44,7 +48,7 @@ type :: attribute_type
 end type attribute_type
 
 type :: dimension_type
-  integer(c_int) :: id
+  integer(c_int), private :: id = -1
   character(len=:), allocatable :: name
   integer(int64) :: length = -1
   logical :: is_unlimited = .false.
@@ -222,6 +226,13 @@ interface
   end function reallocation_required
 
   !> submodule_variable.f90
+  module impure elemental function get_variable(nc, name, exist) result(var)
+    type(netcdf_type), intent(in) :: nc
+    character(len=*), intent(in) :: name
+    logical, intent(out), optional :: exist
+    type(variable_type) :: var
+  end function get_variable
+
   module impure elemental function inquire_variable(nc, name, exist) result(var)
     type(netcdf_type), intent(in) :: nc
     character(len=*), intent(in) :: name

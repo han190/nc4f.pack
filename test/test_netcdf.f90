@@ -10,11 +10,12 @@ type(dimension_type), allocatable :: dims(:)
 type(variable_type) :: var
 logical, parameter :: unlimited = .true.
 
-path = "/Users/htang/Data/wrf/wrfout_d01_2016-08-14_12_00_00"
+! path = "/Users/htang/Data/wrf/wrfout_d01_2016-08-14_12_00_00"
+path = "/Users/Han/Data/WRF/wrfout_d01_2016-08-14_12_00_00"
 nc = open_dataset(path, "r")
 atts = get_attributes(nc)
 dims = inquire_dimensions(nc)
-var = inquire_variable(nc, "T")
+var = get_variable(nc, "T")
 print "(dt)", atts
 print *, ""
 print "(dt)", dims
