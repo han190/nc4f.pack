@@ -31,8 +31,10 @@ module function ${N}$_vars(x, y) result(res)
     block
     ${T}$(${K}$), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     y_cptr = c_loc(y%buffer(1))
@@ -70,8 +72,10 @@ module function ${N}$_var_${K1}$(x, y) result(res)
 
     res%data_type = max(${C}$, ${C1}$)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -106,8 +110,10 @@ module function ${N}$_${K1}$_var(x, y) result(res)
 
     res%data_type = max(${C}$, ${C1}$)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -124,7 +130,6 @@ end function ${N}$_${K1}$_var
 
 #: endfor
 #: endfor
-
 module function sum_vars(vars) result(s)
   type(variable_type), intent(in) :: vars(:)
   type(variable_type) :: s

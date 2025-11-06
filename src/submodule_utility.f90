@@ -49,18 +49,12 @@ pure module function f2cstr(string) result(f2cstring)
   f2cstring = trim(string)//c_null_char
 end function f2cstr
 
-logical module function reallocation_required(buffer, buf_size)
-  integer(int8), allocatable, intent(inout) :: buffer(:)
+pure logical module function allocation_required(buffer, buf_size)
+  integer(int8), allocatable, intent(in) :: buffer(:)
   integer(int64), intent(in) :: buf_size
 
-  reallocation_required = .false.
-  if (.not. allocated(buffer)) then
-    reallocation_required = .true.
-  else if (size(buffer) /= buf_size) then
-    deallocate (buffer)
-    reallocation_required = .true.
-  end if
-end function reallocation_required
+  allocation_required = .not. allocated(buffer) .or. size(buffer) /= buf_size
+end function allocation_required
 
 module elemental function get_buffer_size(data_type, length) result(buffer_size)
   integer(int32), intent(in) :: data_type

@@ -24,8 +24,10 @@ module function add_vars(x, y) result(res)
     block
     real(real32), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     y_cptr = c_loc(y%buffer(1))
@@ -42,8 +44,10 @@ module function add_vars(x, y) result(res)
     block
     real(real64), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     y_cptr = c_loc(y%buffer(1))
@@ -60,8 +64,10 @@ module function add_vars(x, y) result(res)
     block
     integer(int32), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     y_cptr = c_loc(y%buffer(1))
@@ -78,8 +84,10 @@ module function add_vars(x, y) result(res)
     block
     integer(int64), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     y_cptr = c_loc(y%buffer(1))
@@ -114,8 +122,10 @@ module function add_var_real32(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -132,8 +142,10 @@ module function add_var_real32(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -150,8 +162,10 @@ module function add_var_real32(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -168,8 +182,10 @@ module function add_var_real32(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -202,8 +218,10 @@ module function add_real32_var(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -220,8 +238,10 @@ module function add_real32_var(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -238,8 +258,10 @@ module function add_real32_var(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -256,8 +278,10 @@ module function add_real32_var(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -290,8 +314,10 @@ module function add_var_real64(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -308,8 +334,10 @@ module function add_var_real64(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -326,8 +354,10 @@ module function add_var_real64(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -344,8 +374,10 @@ module function add_var_real64(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -378,8 +410,10 @@ module function add_real64_var(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -396,8 +430,10 @@ module function add_real64_var(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -414,8 +450,10 @@ module function add_real64_var(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -432,8 +470,10 @@ module function add_real64_var(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -466,8 +506,10 @@ module function add_var_int32(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -484,8 +526,10 @@ module function add_var_int32(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -502,8 +546,10 @@ module function add_var_int32(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -520,8 +566,10 @@ module function add_var_int32(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -554,8 +602,10 @@ module function add_int32_var(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -572,8 +622,10 @@ module function add_int32_var(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -590,8 +642,10 @@ module function add_int32_var(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -608,8 +662,10 @@ module function add_int32_var(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -642,8 +698,10 @@ module function add_var_int64(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -660,8 +718,10 @@ module function add_var_int64(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -678,8 +738,10 @@ module function add_var_int64(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -696,8 +758,10 @@ module function add_var_int64(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -730,8 +794,10 @@ module function add_int64_var(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -748,8 +814,10 @@ module function add_int64_var(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -766,8 +834,10 @@ module function add_int64_var(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -784,8 +854,10 @@ module function add_int64_var(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -821,8 +893,10 @@ module function sub_vars(x, y) result(res)
     block
     real(real32), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     y_cptr = c_loc(y%buffer(1))
@@ -839,8 +913,10 @@ module function sub_vars(x, y) result(res)
     block
     real(real64), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     y_cptr = c_loc(y%buffer(1))
@@ -857,8 +933,10 @@ module function sub_vars(x, y) result(res)
     block
     integer(int32), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     y_cptr = c_loc(y%buffer(1))
@@ -875,8 +953,10 @@ module function sub_vars(x, y) result(res)
     block
     integer(int64), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     y_cptr = c_loc(y%buffer(1))
@@ -911,8 +991,10 @@ module function sub_var_real32(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -929,8 +1011,10 @@ module function sub_var_real32(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -947,8 +1031,10 @@ module function sub_var_real32(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -965,8 +1051,10 @@ module function sub_var_real32(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -999,8 +1087,10 @@ module function sub_real32_var(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1017,8 +1107,10 @@ module function sub_real32_var(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1035,8 +1127,10 @@ module function sub_real32_var(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1053,8 +1147,10 @@ module function sub_real32_var(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1087,8 +1183,10 @@ module function sub_var_real64(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1105,8 +1203,10 @@ module function sub_var_real64(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1123,8 +1223,10 @@ module function sub_var_real64(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1141,8 +1243,10 @@ module function sub_var_real64(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1175,8 +1279,10 @@ module function sub_real64_var(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1193,8 +1299,10 @@ module function sub_real64_var(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1211,8 +1319,10 @@ module function sub_real64_var(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1229,8 +1339,10 @@ module function sub_real64_var(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1263,8 +1375,10 @@ module function sub_var_int32(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1281,8 +1395,10 @@ module function sub_var_int32(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1299,8 +1415,10 @@ module function sub_var_int32(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1317,8 +1435,10 @@ module function sub_var_int32(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1351,8 +1471,10 @@ module function sub_int32_var(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1369,8 +1491,10 @@ module function sub_int32_var(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1387,8 +1511,10 @@ module function sub_int32_var(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1405,8 +1531,10 @@ module function sub_int32_var(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1439,8 +1567,10 @@ module function sub_var_int64(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1457,8 +1587,10 @@ module function sub_var_int64(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1475,8 +1607,10 @@ module function sub_var_int64(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1493,8 +1627,10 @@ module function sub_var_int64(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1527,8 +1663,10 @@ module function sub_int64_var(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1545,8 +1683,10 @@ module function sub_int64_var(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1563,8 +1703,10 @@ module function sub_int64_var(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1581,8 +1723,10 @@ module function sub_int64_var(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1618,8 +1762,10 @@ module function mul_vars(x, y) result(res)
     block
     real(real32), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     y_cptr = c_loc(y%buffer(1))
@@ -1636,8 +1782,10 @@ module function mul_vars(x, y) result(res)
     block
     real(real64), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     y_cptr = c_loc(y%buffer(1))
@@ -1654,8 +1802,10 @@ module function mul_vars(x, y) result(res)
     block
     integer(int32), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     y_cptr = c_loc(y%buffer(1))
@@ -1672,8 +1822,10 @@ module function mul_vars(x, y) result(res)
     block
     integer(int64), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     y_cptr = c_loc(y%buffer(1))
@@ -1708,8 +1860,10 @@ module function mul_var_real32(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1726,8 +1880,10 @@ module function mul_var_real32(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1744,8 +1900,10 @@ module function mul_var_real32(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1762,8 +1920,10 @@ module function mul_var_real32(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1796,8 +1956,10 @@ module function mul_real32_var(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1814,8 +1976,10 @@ module function mul_real32_var(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1832,8 +1996,10 @@ module function mul_real32_var(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1850,8 +2016,10 @@ module function mul_real32_var(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1884,8 +2052,10 @@ module function mul_var_real64(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1902,8 +2072,10 @@ module function mul_var_real64(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1920,8 +2092,10 @@ module function mul_var_real64(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1938,8 +2112,10 @@ module function mul_var_real64(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1972,8 +2148,10 @@ module function mul_real64_var(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -1990,8 +2168,10 @@ module function mul_real64_var(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2008,8 +2188,10 @@ module function mul_real64_var(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2026,8 +2208,10 @@ module function mul_real64_var(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2060,8 +2244,10 @@ module function mul_var_int32(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2078,8 +2264,10 @@ module function mul_var_int32(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2096,8 +2284,10 @@ module function mul_var_int32(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2114,8 +2304,10 @@ module function mul_var_int32(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2148,8 +2340,10 @@ module function mul_int32_var(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2166,8 +2360,10 @@ module function mul_int32_var(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2184,8 +2380,10 @@ module function mul_int32_var(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2202,8 +2400,10 @@ module function mul_int32_var(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2236,8 +2436,10 @@ module function mul_var_int64(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2254,8 +2456,10 @@ module function mul_var_int64(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2272,8 +2476,10 @@ module function mul_var_int64(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2290,8 +2496,10 @@ module function mul_var_int64(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2324,8 +2532,10 @@ module function mul_int64_var(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2342,8 +2552,10 @@ module function mul_int64_var(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2360,8 +2572,10 @@ module function mul_int64_var(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2378,8 +2592,10 @@ module function mul_int64_var(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2415,8 +2631,10 @@ module function div_vars(x, y) result(res)
     block
     real(real32), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     y_cptr = c_loc(y%buffer(1))
@@ -2433,8 +2651,10 @@ module function div_vars(x, y) result(res)
     block
     real(real64), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     y_cptr = c_loc(y%buffer(1))
@@ -2451,8 +2671,10 @@ module function div_vars(x, y) result(res)
     block
     integer(int32), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     y_cptr = c_loc(y%buffer(1))
@@ -2469,8 +2691,10 @@ module function div_vars(x, y) result(res)
     block
     integer(int64), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     y_cptr = c_loc(y%buffer(1))
@@ -2505,8 +2729,10 @@ module function div_var_real32(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2523,8 +2749,10 @@ module function div_var_real32(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2541,8 +2769,10 @@ module function div_var_real32(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2559,8 +2789,10 @@ module function div_var_real32(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2593,8 +2825,10 @@ module function div_real32_var(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2611,8 +2845,10 @@ module function div_real32_var(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2629,8 +2865,10 @@ module function div_real32_var(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2647,8 +2885,10 @@ module function div_real32_var(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2681,8 +2921,10 @@ module function div_var_real64(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2699,8 +2941,10 @@ module function div_var_real64(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2717,8 +2961,10 @@ module function div_var_real64(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2735,8 +2981,10 @@ module function div_var_real64(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2769,8 +3017,10 @@ module function div_real64_var(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2787,8 +3037,10 @@ module function div_real64_var(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2805,8 +3057,10 @@ module function div_real64_var(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2823,8 +3077,10 @@ module function div_real64_var(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2857,8 +3113,10 @@ module function div_var_int32(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2875,8 +3133,10 @@ module function div_var_int32(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2893,8 +3153,10 @@ module function div_var_int32(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2911,8 +3173,10 @@ module function div_var_int32(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2945,8 +3209,10 @@ module function div_int32_var(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2963,8 +3229,10 @@ module function div_int32_var(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2981,8 +3249,10 @@ module function div_int32_var(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -2999,8 +3269,10 @@ module function div_int32_var(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3033,8 +3305,10 @@ module function div_var_int64(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3051,8 +3325,10 @@ module function div_var_int64(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3069,8 +3345,10 @@ module function div_var_int64(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3087,8 +3365,10 @@ module function div_var_int64(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3121,8 +3401,10 @@ module function div_int64_var(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3139,8 +3421,10 @@ module function div_int64_var(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3157,8 +3441,10 @@ module function div_int64_var(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3175,8 +3461,10 @@ module function div_int64_var(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3212,8 +3500,10 @@ module function pow_vars(x, y) result(res)
     block
     real(real32), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     y_cptr = c_loc(y%buffer(1))
@@ -3230,8 +3520,10 @@ module function pow_vars(x, y) result(res)
     block
     real(real64), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     y_cptr = c_loc(y%buffer(1))
@@ -3248,8 +3540,10 @@ module function pow_vars(x, y) result(res)
     block
     integer(int32), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     y_cptr = c_loc(y%buffer(1))
@@ -3266,8 +3560,10 @@ module function pow_vars(x, y) result(res)
     block
     integer(int64), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     y_cptr = c_loc(y%buffer(1))
@@ -3302,8 +3598,10 @@ module function pow_var_real32(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3320,8 +3618,10 @@ module function pow_var_real32(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3338,8 +3638,10 @@ module function pow_var_real32(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3356,8 +3658,10 @@ module function pow_var_real32(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3390,8 +3694,10 @@ module function pow_real32_var(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3408,8 +3714,10 @@ module function pow_real32_var(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3426,8 +3734,10 @@ module function pow_real32_var(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3444,8 +3754,10 @@ module function pow_real32_var(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_FLOAT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3478,8 +3790,10 @@ module function pow_var_real64(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3496,8 +3810,10 @@ module function pow_var_real64(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3514,8 +3830,10 @@ module function pow_var_real64(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3532,8 +3850,10 @@ module function pow_var_real64(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3566,8 +3886,10 @@ module function pow_real64_var(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3584,8 +3906,10 @@ module function pow_real64_var(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3602,8 +3926,10 @@ module function pow_real64_var(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3620,8 +3946,10 @@ module function pow_real64_var(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_DOUBLE)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3654,8 +3982,10 @@ module function pow_var_int32(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3672,8 +4002,10 @@ module function pow_var_int32(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3690,8 +4022,10 @@ module function pow_var_int32(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3708,8 +4042,10 @@ module function pow_var_int32(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3742,8 +4078,10 @@ module function pow_int32_var(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3760,8 +4098,10 @@ module function pow_int32_var(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3778,8 +4118,10 @@ module function pow_int32_var(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3796,8 +4138,10 @@ module function pow_int32_var(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_INT)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3830,8 +4174,10 @@ module function pow_var_int64(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3848,8 +4194,10 @@ module function pow_var_int64(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3866,8 +4214,10 @@ module function pow_var_int64(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3884,8 +4234,10 @@ module function pow_var_int64(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     x_cptr = c_loc(x%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3918,8 +4270,10 @@ module function pow_int64_var(x, y) result(res)
 
     res%data_type = max(NC_FLOAT, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3936,8 +4290,10 @@ module function pow_int64_var(x, y) result(res)
 
     res%data_type = max(NC_DOUBLE, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3954,8 +4310,10 @@ module function pow_int64_var(x, y) result(res)
 
     res%data_type = max(NC_INT, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))
@@ -3972,8 +4330,10 @@ module function pow_int64_var(x, y) result(res)
 
     res%data_type = max(NC_INT64, NC_INT64)
     buffer_size = get_buffer_size(res%data_type, res%length)
-    if (reallocation_required(res%buffer, buffer_size)) &
-      & allocate (res%buffer(buffer_size))
+    if (allocation_required(res%buffer, buffer_size)) then
+      if (allocated(res%buffer)) deallocate (res%buffer)
+      allocate (res%buffer(buffer_size))
+    end if
 
     y_cptr = c_loc(y%buffer(1))
     r_cptr = c_loc(res%buffer(1))

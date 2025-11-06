@@ -7,18 +7,29 @@ module function new_variable_real32(name, values, dims, atts) result(var)
   real(real32), intent(in) :: values(:)
   type(dimension_type), intent(in) :: dims(:)
   type(attribute_type), intent(in), optional :: atts(:)
-  type(variable_type) :: var
-  integer(int64) :: buffer_size
+  type(variable_type), target :: var
+  type(c_ptr) :: cptr
+  real(c_float), pointer :: fptr(:)
+  integer(int64) :: buffer_size, nvals
 
   if (size(values) == 0) error stop &
     & "[new_variable_real32] Invalid values."  
   var%name = name
   var%data_type = NC_FLOAT
   var%length = size(values, kind=int64)
-  var%buffer = transfer(values, BYTE, &
-    & get_buffer_size(var%data_type, var%length))
   var%dimensions = dims
   if (present(atts)) var%attributes = atts
+
+  buffer_size = get_buffer_size(NC_FLOAT, var%length)
+  if (allocation_required(var%buffer, buffer_size)) then
+    if (allocated(var%buffer)) deallocate (var%buffer)
+    allocate (var%buffer(buffer_size))
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, fptr, [var%length])
+  fptr = values
+  nullify (fptr)
 end function new_variable_real32
 
 module function new_variable_int32(name, values, dims, atts) result(var)
@@ -26,18 +37,29 @@ module function new_variable_int32(name, values, dims, atts) result(var)
   integer(int32), intent(in) :: values(:)
   type(dimension_type), intent(in) :: dims(:)
   type(attribute_type), intent(in), optional :: atts(:)
-  type(variable_type) :: var
-  integer(int64) :: buffer_size
+  type(variable_type), target :: var
+  type(c_ptr) :: cptr
+  integer(c_int), pointer :: fptr(:)
+  integer(int64) :: buffer_size, nvals
 
   if (size(values) == 0) error stop &
     & "[new_variable_int32] Invalid values."  
   var%name = name
   var%data_type = NC_INT
   var%length = size(values, kind=int64)
-  var%buffer = transfer(values, BYTE, &
-    & get_buffer_size(var%data_type, var%length))
   var%dimensions = dims
   if (present(atts)) var%attributes = atts
+
+  buffer_size = get_buffer_size(NC_INT, var%length)
+  if (allocation_required(var%buffer, buffer_size)) then
+    if (allocated(var%buffer)) deallocate (var%buffer)
+    allocate (var%buffer(buffer_size))
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, fptr, [var%length])
+  fptr = values
+  nullify (fptr)
 end function new_variable_int32
 
 module impure elemental function get_variable(nc, name, exist) result(var)
@@ -63,8 +85,10 @@ impure elemental function get_variable_(ncid, name, exist) result(var)
   end if zero_size_var
 
   buffer_size = get_buffer_size(var%data_type, var%length)
-  if (reallocation_required(var%buffer, buffer_size)) &
-    & allocate (var%buffer(buffer_size))
+  if (allocation_required(var%buffer, buffer_size)) then
+    if (allocated(var%buffer)) deallocate (var%buffer)
+    allocate (var%buffer(buffer_size))
+  end if
   call handle_error(nc_get_var(ncid, var%id, c_loc(var%buffer(1))), &
     & "[get_variable_] Invalid variable.")
 end function get_variable_

@@ -141,33 +141,58 @@ integer(int8), parameter :: BYTE = 0_int8
 
 interface
   !> submodule_attribute.f90
-  pure module function new_attribute_int32(name, value) result(att)
+  module function new_attribute_arr_int32(name, values) result(att)
     character(len=*), intent(in) :: name
-    integer, intent(in) :: value
+    integer(int32), intent(in) :: values(:)
+    type(attribute_type), target :: att
+  end function new_attribute_arr_int32
+
+  module function new_attribute_int32(name, value) result(att)
+    character(len=*), intent(in) :: name
+    integer(int32), intent(in) :: value
     type(attribute_type) :: att
   end function new_attribute_int32
 
-  pure module function new_attribute_arr_int32(name, values) result(att)
+  module function new_attribute_arr_int64(name, values) result(att)
     character(len=*), intent(in) :: name
-    integer, intent(in) :: values(:)
-    type(attribute_type) :: att
-  end function new_attribute_arr_int32
+    integer(int64), intent(in) :: values(:)
+    type(attribute_type), target :: att
+  end function new_attribute_arr_int64
 
-  pure module function new_attribute_real32(name, value) result(att)
+  module function new_attribute_int64(name, value) result(att)
     character(len=*), intent(in) :: name
-    real, intent(in) :: value
+    integer(int64), intent(in) :: value
+    type(attribute_type) :: att
+  end function new_attribute_int64
+
+  module function new_attribute_arr_real32(name, values) result(att)
+    character(len=*), intent(in) :: name
+    real(real32), intent(in) :: values(:)
+    type(attribute_type), target :: att
+  end function new_attribute_arr_real32
+
+  module function new_attribute_real32(name, value) result(att)
+    character(len=*), intent(in) :: name
+    real(real32), intent(in) :: value
     type(attribute_type) :: att
   end function new_attribute_real32
 
-  pure module function new_attribute_arr_real32(name, values) result(att)
+  module function new_attribute_arr_real64(name, values) result(att)
     character(len=*), intent(in) :: name
-    real, intent(in) :: values(:)
-    type(attribute_type) :: att
-  end function new_attribute_arr_real32
+    real(real64), intent(in) :: values(:)
+    type(attribute_type), target :: att
+  end function new_attribute_arr_real64
 
-  pure module function new_attribute_character(name, value) result(att)
-    character(len=*), intent(in) :: name, value
+  module function new_attribute_real64(name, value) result(att)
+    character(len=*), intent(in) :: name
+    real(real64), intent(in) :: value
     type(attribute_type) :: att
+  end function new_attribute_real64
+
+  module function new_attribute_character(name, value) result(att)
+    character(len=*), intent(in) :: name
+    character(len=*), intent(in) :: value
+    type(attribute_type), target :: att
   end function new_attribute_character
 
   impure elemental module function get_attribute_name(nc, name) result(att)
@@ -297,10 +322,10 @@ interface
     character(kind=c_char, len=:), allocatable :: f2cstring
   end function f2cstr
   
-  logical module function reallocation_required(buffer, buf_size)
-    integer(int8), allocatable, intent(inout) :: buffer(:)
+  pure logical module function allocation_required(buffer, buf_size)
+    integer(int8), allocatable, intent(in) :: buffer(:)
     integer(int64), intent(in) :: buf_size
-  end function reallocation_required
+  end function allocation_required
 
   module elemental function get_buffer_size(data_type, length) result(buffer_size)
     integer(int32), intent(in) :: data_type
