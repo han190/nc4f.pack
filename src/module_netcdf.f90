@@ -6,11 +6,13 @@ use, non_intrinsic :: module_c_interface
 implicit none (type, external)
 
 public :: netcdf_type
+public :: variable_type
 public :: attribute_type
 public :: dimension_type
 public :: get_attribute
 public :: get_attributes
-public :: get_dimensions
+public :: inquire_dimensions
+public :: inquire_variable
 public :: open_dataset
 public :: write(formatted)
 public :: operator(.att.)
@@ -29,7 +31,7 @@ type :: variable_type
   integer(c_int) :: id = -1
   integer(int32) :: data_type = -1
   character(len=:), allocatable :: name
-  type(dimension_pointer_type), allocatable :: dimensions(:)
+  type(dimension_type), allocatable :: dimensions(:)
   type(attribute_type), allocatable :: attributes(:)
   integer(int8), allocatable :: buffer(:)
 end type variable_type
@@ -53,11 +55,8 @@ type :: dimension_argument_type
   logical :: is_unlimited = .false.
 end type dimension_argument_type
 
-type :: dimension_pointer_type
-  type(dimension_type), pointer :: dimension_pointer => null()
-end type dimension_pointer_type
-
 interface write(formatted)
+  module procedure :: write_formatted_variable
   module procedure :: write_formatted_attribute
   module procedure :: write_formatted_dimension
 end interface write(formatted)
@@ -66,9 +65,9 @@ interface get_attributes
   module procedure :: get_attributes_global
 end interface get_attributes
 
-interface get_dimensions
-  module procedure :: get_dimensions_global
-end interface get_dimensions
+interface inquire_dimensions
+  module procedure :: inquire_dimensions_global
+end interface inquire_dimensions
 
 interface operator(.att.)
   module procedure :: new_attribute_int32
@@ -129,6 +128,11 @@ interface
     type(attribute_type), allocatable :: atts(:)
   end function get_attributes_global
 
+  module function get_attributes_(ncid, varid) result(atts)
+    integer(c_int), intent(in) :: ncid, varid
+    type(attribute_type), allocatable :: atts(:)
+  end function get_attributes_
+
   !> submodule_dataset.f90
   module function open_dataset(filename, mode, &
     & inquire_attribute) result(nc)
@@ -157,17 +161,27 @@ interface
     type(dimension_type) :: dim
   end function new_dimension_arguments
 
-  module function get_dimensions_global(nc) result(dims)
+  module function inquire_dimensions_global(nc) result(dims)
     type(netcdf_type), intent(in) :: nc
     type(dimension_type), allocatable :: dims(:)
-  end function get_dimensions_global
+  end function inquire_dimensions_global
 
-  module function get_dimensions_(ncid) result(dims)
+  module function inquire_dimensions_(ncid, varid) result(dims)
     integer(c_int), intent(in) :: ncid
+    integer(c_int), intent(in), optional :: varid
     type(dimension_type), allocatable :: dims(:)
-  end function get_dimensions_
+  end function inquire_dimensions_
 
   !> submodule_io.f90
+  module subroutine write_formatted_variable(var, unit, iotype, v_list, iostat, iomsg)
+    class(variable_type), intent(in) :: var
+    integer, intent(in) :: unit
+    character(len=*), intent(in) :: iotype
+    integer, intent(in) :: v_list(:)
+    integer, intent(out) :: iostat
+    character(len=*), intent(inout) :: iomsg
+  end subroutine write_formatted_variable
+
   module subroutine write_formatted_attribute(att, unit, iotype, v_list, iostat, iomsg)
     class(attribute_type), intent(in) :: att
     integer, intent(in) :: unit
@@ -206,6 +220,14 @@ interface
     integer(int8), allocatable, intent(inout) :: buffer(:)
     integer(int64), intent(in) :: buf_size
   end function reallocation_required
+
+  !> submodule_variable.f90
+  module impure elemental function inquire_variable(nc, name, exist) result(var)
+    type(netcdf_type), intent(in) :: nc
+    character(len=*), intent(in) :: name
+    logical, intent(out), optional :: exist
+    type(variable_type) :: var
+  end function inquire_variable
 end interface
 
 end module module_netcdf

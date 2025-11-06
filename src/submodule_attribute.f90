@@ -72,7 +72,7 @@ module function get_attributes_global(nc) result(atts)
   atts = get_attributes_(nc%id, NC_GLOBAL)
 end function get_attributes_global
 
-function get_attributes_(ncid, varid) result(atts)
+module function get_attributes_(ncid, varid) result(atts)
   integer(c_int), intent(in) :: ncid, varid
   type(attribute_type), allocatable :: atts(:)
   integer(c_int) :: natts, i

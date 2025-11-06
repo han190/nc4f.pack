@@ -125,6 +125,35 @@ interface
     integer(c_int), intent(out) :: unlimdimidp
     integer(c_int) :: nc_inq_unlimdim
   end function nc_inq_unlimdim
+
+  function nc_inq_varid(ncid, name, varidp) bind(c, name="nc_inq_varid")
+    import :: c_int, c_char
+    integer(c_int), value :: ncid
+    character(kind=c_char), intent(in) :: name(*)
+    integer(c_int), intent(out) :: varidp
+    integer(c_int) :: nc_inq_varid
+  end function nc_inq_varid
+
+  function nc_inq_vartype(ncid, varid, typep) bind(c, name="nc_inq_vartype")
+    import :: c_int
+    integer(c_int), value :: ncid, varid
+    integer(c_int), intent(out) :: typep
+    integer(c_int) :: nc_inq_vartype
+  end function nc_inq_vartype
+
+  function nc_inq_vardimid(ncid, varid, dimidsp) bind(c, name="nc_inq_vardimid")
+    import :: c_int
+    integer(c_int), value :: ncid, varid
+    integer(c_int), intent(out) :: dimidsp(*)
+    integer(c_int) :: nc_inq_vardimid
+  end function nc_inq_vardimid
+
+  function nc_inq_varndims(ncid, varid, ndimsp) bind(c, name="nc_inq_varndims")
+    import :: c_int
+    integer(c_int), value :: ncid, varid
+    integer(c_int), intent(out) :: ndimsp
+    integer(c_int) :: nc_inq_varndims
+  end function nc_inq_varndims
 end interface
 
 end module module_c_interface

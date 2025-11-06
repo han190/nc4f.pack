@@ -10,6 +10,12 @@ module function open_dataset(filename, mode, &
   type(netcdf_type) :: nc
   logical :: inq_att
 
+  if (present(inquire_attribute)) then
+    inq_att = inquire_attribute
+  else
+    inq_att = .false.
+  end if
+
   select case (mode)
   case ("r", "read")
     nc%filename = trim(adjustl(filename))
@@ -20,12 +26,7 @@ module function open_dataset(filename, mode, &
     error stop "[open_dataset] Invalid mode."
   end select
 
-  nc%dimensions = get_dimensions_global(nc)
-  if (present(inquire_attribute)) then
-    inq_att = inquire_attribute
-  else
-    inq_att = .false.
-  end if
+  nc%dimensions = inquire_dimensions_global(nc)
   if (inq_att) nc%attributes = get_attributes_global(nc)
 end function open_dataset
 
