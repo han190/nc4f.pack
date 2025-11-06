@@ -32,9 +32,9 @@ interface
   end function ${N}$_var_${K1}$
 
   module function ${N}$_${K1}$_var(x, y) result(res)
-  ${T1}$(${K1}$), intent(in) :: x
-  type(variable_type), target, intent(in) :: y
-  type(variable_type), target :: res
+    ${T1}$(${K1}$), intent(in) :: x
+    type(variable_type), target, intent(in) :: y
+    type(variable_type), target :: res
   end function ${N}$_${K1}$_var
 
   #: endfor

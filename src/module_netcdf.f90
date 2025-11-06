@@ -433,9 +433,9 @@ interface
   end function add_var_real32
 
   module function add_real32_var(x, y) result(res)
-  real(real32), intent(in) :: x
-  type(variable_type), target, intent(in) :: y
-  type(variable_type), target :: res
+    real(real32), intent(in) :: x
+    type(variable_type), target, intent(in) :: y
+    type(variable_type), target :: res
   end function add_real32_var
 
   module function add_var_real64(x, y) result(res)
@@ -445,9 +445,9 @@ interface
   end function add_var_real64
 
   module function add_real64_var(x, y) result(res)
-  real(real64), intent(in) :: x
-  type(variable_type), target, intent(in) :: y
-  type(variable_type), target :: res
+    real(real64), intent(in) :: x
+    type(variable_type), target, intent(in) :: y
+    type(variable_type), target :: res
   end function add_real64_var
 
   module function add_var_int32(x, y) result(res)
@@ -457,9 +457,9 @@ interface
   end function add_var_int32
 
   module function add_int32_var(x, y) result(res)
-  integer(int32), intent(in) :: x
-  type(variable_type), target, intent(in) :: y
-  type(variable_type), target :: res
+    integer(int32), intent(in) :: x
+    type(variable_type), target, intent(in) :: y
+    type(variable_type), target :: res
   end function add_int32_var
 
   module function add_var_int64(x, y) result(res)
@@ -469,9 +469,9 @@ interface
   end function add_var_int64
 
   module function add_int64_var(x, y) result(res)
-  integer(int64), intent(in) :: x
-  type(variable_type), target, intent(in) :: y
-  type(variable_type), target :: res
+    integer(int64), intent(in) :: x
+    type(variable_type), target, intent(in) :: y
+    type(variable_type), target :: res
   end function add_int64_var
 
   module function sub_vars(x, y) result(res)
@@ -486,9 +486,9 @@ interface
   end function sub_var_real32
 
   module function sub_real32_var(x, y) result(res)
-  real(real32), intent(in) :: x
-  type(variable_type), target, intent(in) :: y
-  type(variable_type), target :: res
+    real(real32), intent(in) :: x
+    type(variable_type), target, intent(in) :: y
+    type(variable_type), target :: res
   end function sub_real32_var
 
   module function sub_var_real64(x, y) result(res)
@@ -498,9 +498,9 @@ interface
   end function sub_var_real64
 
   module function sub_real64_var(x, y) result(res)
-  real(real64), intent(in) :: x
-  type(variable_type), target, intent(in) :: y
-  type(variable_type), target :: res
+    real(real64), intent(in) :: x
+    type(variable_type), target, intent(in) :: y
+    type(variable_type), target :: res
   end function sub_real64_var
 
   module function sub_var_int32(x, y) result(res)
@@ -510,9 +510,9 @@ interface
   end function sub_var_int32
 
   module function sub_int32_var(x, y) result(res)
-  integer(int32), intent(in) :: x
-  type(variable_type), target, intent(in) :: y
-  type(variable_type), target :: res
+    integer(int32), intent(in) :: x
+    type(variable_type), target, intent(in) :: y
+    type(variable_type), target :: res
   end function sub_int32_var
 
   module function sub_var_int64(x, y) result(res)
@@ -522,9 +522,9 @@ interface
   end function sub_var_int64
 
   module function sub_int64_var(x, y) result(res)
-  integer(int64), intent(in) :: x
-  type(variable_type), target, intent(in) :: y
-  type(variable_type), target :: res
+    integer(int64), intent(in) :: x
+    type(variable_type), target, intent(in) :: y
+    type(variable_type), target :: res
   end function sub_int64_var
 
   module function mul_vars(x, y) result(res)
@@ -539,9 +539,9 @@ interface
   end function mul_var_real32
 
   module function mul_real32_var(x, y) result(res)
-  real(real32), intent(in) :: x
-  type(variable_type), target, intent(in) :: y
-  type(variable_type), target :: res
+    real(real32), intent(in) :: x
+    type(variable_type), target, intent(in) :: y
+    type(variable_type), target :: res
   end function mul_real32_var
 
   module function mul_var_real64(x, y) result(res)
@@ -551,9 +551,9 @@ interface
   end function mul_var_real64
 
   module function mul_real64_var(x, y) result(res)
-  real(real64), intent(in) :: x
-  type(variable_type), target, intent(in) :: y
-  type(variable_type), target :: res
+    real(real64), intent(in) :: x
+    type(variable_type), target, intent(in) :: y
+    type(variable_type), target :: res
   end function mul_real64_var
 
   module function mul_var_int32(x, y) result(res)
@@ -563,9 +563,9 @@ interface
   end function mul_var_int32
 
   module function mul_int32_var(x, y) result(res)
-  integer(int32), intent(in) :: x
-  type(variable_type), target, intent(in) :: y
-  type(variable_type), target :: res
+    integer(int32), intent(in) :: x
+    type(variable_type), target, intent(in) :: y
+    type(variable_type), target :: res
   end function mul_int32_var
 
   module function mul_var_int64(x, y) result(res)
@@ -575,9 +575,9 @@ interface
   end function mul_var_int64
 
   module function mul_int64_var(x, y) result(res)
-  integer(int64), intent(in) :: x
-  type(variable_type), target, intent(in) :: y
-  type(variable_type), target :: res
+    integer(int64), intent(in) :: x
+    type(variable_type), target, intent(in) :: y
+    type(variable_type), target :: res
   end function mul_int64_var
 
   module function div_vars(x, y) result(res)
@@ -592,9 +592,9 @@ interface
   end function div_var_real32
 
   module function div_real32_var(x, y) result(res)
-  real(real32), intent(in) :: x
-  type(variable_type), target, intent(in) :: y
-  type(variable_type), target :: res
+    real(real32), intent(in) :: x
+    type(variable_type), target, intent(in) :: y
+    type(variable_type), target :: res
   end function div_real32_var
 
   module function div_var_real64(x, y) result(res)
@@ -604,9 +604,9 @@ interface
   end function div_var_real64
 
   module function div_real64_var(x, y) result(res)
-  real(real64), intent(in) :: x
-  type(variable_type), target, intent(in) :: y
-  type(variable_type), target :: res
+    real(real64), intent(in) :: x
+    type(variable_type), target, intent(in) :: y
+    type(variable_type), target :: res
   end function div_real64_var
 
   module function div_var_int32(x, y) result(res)
@@ -616,9 +616,9 @@ interface
   end function div_var_int32
 
   module function div_int32_var(x, y) result(res)
-  integer(int32), intent(in) :: x
-  type(variable_type), target, intent(in) :: y
-  type(variable_type), target :: res
+    integer(int32), intent(in) :: x
+    type(variable_type), target, intent(in) :: y
+    type(variable_type), target :: res
   end function div_int32_var
 
   module function div_var_int64(x, y) result(res)
@@ -628,9 +628,9 @@ interface
   end function div_var_int64
 
   module function div_int64_var(x, y) result(res)
-  integer(int64), intent(in) :: x
-  type(variable_type), target, intent(in) :: y
-  type(variable_type), target :: res
+    integer(int64), intent(in) :: x
+    type(variable_type), target, intent(in) :: y
+    type(variable_type), target :: res
   end function div_int64_var
 
   module function pow_vars(x, y) result(res)
@@ -645,9 +645,9 @@ interface
   end function pow_var_real32
 
   module function pow_real32_var(x, y) result(res)
-  real(real32), intent(in) :: x
-  type(variable_type), target, intent(in) :: y
-  type(variable_type), target :: res
+    real(real32), intent(in) :: x
+    type(variable_type), target, intent(in) :: y
+    type(variable_type), target :: res
   end function pow_real32_var
 
   module function pow_var_real64(x, y) result(res)
@@ -657,9 +657,9 @@ interface
   end function pow_var_real64
 
   module function pow_real64_var(x, y) result(res)
-  real(real64), intent(in) :: x
-  type(variable_type), target, intent(in) :: y
-  type(variable_type), target :: res
+    real(real64), intent(in) :: x
+    type(variable_type), target, intent(in) :: y
+    type(variable_type), target :: res
   end function pow_real64_var
 
   module function pow_var_int32(x, y) result(res)
@@ -669,9 +669,9 @@ interface
   end function pow_var_int32
 
   module function pow_int32_var(x, y) result(res)
-  integer(int32), intent(in) :: x
-  type(variable_type), target, intent(in) :: y
-  type(variable_type), target :: res
+    integer(int32), intent(in) :: x
+    type(variable_type), target, intent(in) :: y
+    type(variable_type), target :: res
   end function pow_int32_var
 
   module function pow_var_int64(x, y) result(res)
@@ -681,9 +681,9 @@ interface
   end function pow_var_int64
 
   module function pow_int64_var(x, y) result(res)
-  integer(int64), intent(in) :: x
-  type(variable_type), target, intent(in) :: y
-  type(variable_type), target :: res
+    integer(int64), intent(in) :: x
+    type(variable_type), target, intent(in) :: y
+    type(variable_type), target :: res
   end function pow_int64_var
 
   module function sum_vars(vars) result(s)
