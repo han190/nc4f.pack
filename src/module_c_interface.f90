@@ -1,7 +1,7 @@
 module module_c_interface
 
 use, intrinsic :: iso_c_binding, only: c_int, c_ptr, c_char, c_size_t, c_long
-implicit none(type, external)
+implicit none (type, external)
 public
 
 integer(c_int), parameter :: NC_NOWRITE = int(z'0000', kind=c_int)
@@ -14,6 +14,7 @@ integer(c_int), parameter :: NC_MAX_DIMS = 1024_c_int
 integer(c_int), parameter :: NC_GLOBAL = -1_c_int
 integer(c_long), parameter :: NC_UNLIMITED = 0_c_long
 
+!> Data types
 integer(c_int), parameter :: NC_NAT = 0_c_int
 integer(c_int), parameter :: NC_BYTE = 1_c_int
 integer(c_int), parameter :: NC_CHAR = 2_c_int

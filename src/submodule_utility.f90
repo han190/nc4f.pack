@@ -8,7 +8,7 @@ impure elemental module subroutine handle_error(status, error_message)
   character(:), pointer :: fptr => null()
   type(c_ptr) :: cptr
   integer :: inull, iptr
-  character(len=500) :: message
+  character(len=MAX_CHAR_LEN) :: message
 
   if (status /= NC_NOERR) then
     allocate (character(len=NC_MAX_NAME + 1) :: fptr)
@@ -62,6 +62,7 @@ module elemental function get_buffer_size(data_type, length) result(buffer_size)
   integer(int32), intent(in) :: data_type
   integer(int64), intent(in) :: length
   integer(int64) :: buffer_size
+  character(len=NC_MAX_NAME) :: data_name
 
   select case (data_type)
   case (NC_BYTE, NC_CHAR)
@@ -74,8 +75,11 @@ module elemental function get_buffer_size(data_type, length) result(buffer_size)
     buffer_size = length*storage_size(0._real32)/8
   case (NC_DOUBLE)
     buffer_size = length*storage_size(0._real64)/8
+  case (NC_INT64)
+    buffer_size = length*storage_size(0_int64)/8
   case default
-    error stop "[get_buffer_size] Unsupported type."
+    write (data_name, "(i0)") data_type
+    error stop "[get_buffer_size] Unsupported type: "//trim(data_name)//"."
   end select
 end function get_buffer_size
 

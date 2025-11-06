@@ -1,6 +1,5 @@
 submodule(module_netcdf) submodule_variable
 implicit none
-integer(int8), parameter :: BYTE = 0_int8
 contains
 
 module function new_variable_real32(name, values, dims, atts) result(var)

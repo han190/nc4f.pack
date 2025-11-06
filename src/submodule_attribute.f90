@@ -1,6 +1,5 @@
 submodule(module_netcdf) submodule_attribute
 implicit none
-integer(int8), parameter :: BYTE = 0_int8
 contains
 
 pure module function new_attribute_int32(name, value) result(att)

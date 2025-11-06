@@ -119,6 +119,10 @@ interface shape
   module procedure :: get_shape
 end interface shape
 
+!> Constants
+integer, parameter :: MAX_CHAR_LEN = 1024
+integer(int8), parameter :: BYTE = 0_int8
+
 interface
   !> submodule_attribute.f90
   pure module function new_attribute_int32(name, value) result(att)
@@ -177,10 +181,10 @@ interface
   end subroutine put_attribute_global
 
   !> submodule_dataset.f90
-  module function open_dataset(filename, mode, &
-    & inquire_attribute) result(nc)
+  module function open_dataset(filename, mode, inquire_dimension, inquire_attribute) result(nc)
     character(len=*), intent(in) :: filename
     character(len=*), intent(in) :: mode
+    logical, intent(in), optional :: inquire_dimension
     logical, intent(in), optional :: inquire_attribute
     type(netcdf_type) :: nc
   end function open_dataset
@@ -236,7 +240,7 @@ interface
   end subroutine write_formatted_variable
 
   module subroutine write_formatted_attribute(att, unit, iotype, v_list, iostat, iomsg)
-    class(attribute_type), intent(in) :: att
+    class(attribute_type), target, intent(in) :: att
     integer, intent(in) :: unit
     character(len=*), intent(in) :: iotype
     integer, intent(in) :: v_list(:)
