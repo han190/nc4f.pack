@@ -6,41 +6,21 @@ implicit none
 character(len=:), allocatable :: path
 type(netcdf_type) :: nc
 type(attribute_type), allocatable :: atts(:)
-type(dimension_type), allocatable :: dims(:)
-type(variable_type) :: var
+type(variable_type) :: vars(4)
 logical, parameter :: unlimited = .true.
 
 ! path = "/Users/htang/Data/wrf/wrfout_d01_2016-08-14_12_00_00"
 path = "/Users/Han/Data/WRF/wrfout_d01_2016-08-14_12_00_00"
 nc = open_dataset(path, "r")
-atts = get_attributes(nc)
-dims = inquire_dimensions(nc)
-var = get_variable(nc, "T")
-print "(dt)", atts
-print *, ""
-print "(dt)", dims
-print *, ""
-print "(dt)", var
+atts = get_attribute(nc)
+vars = get_variable(nc, [character(len=10) :: "T", "XLONG", "XLAT", "XTIME"])
+call close_dataset(nc)
 
-! atts = [ &
-! 	& "name" .att. "T", &
-! 	& "description" .att. "air temperature", &
-! 	& "units" .att. "degC", &
-! 	& "scale_factor" .att. 1, &
-! 	& "offset" .att. 1.0, &
-! 	& "weights" .att. [1., 2., 3., 4.], &
-! 	& "indices" .att. [1, 2, 3, 4] &
-! ]
-! print "(dt)", atts
-! print *, ""
+print "(dt)", vars
 
-! dims = [ &
-! 	& "west_east" .dim. 800, &
-! 	& "south_north" .dim. 800, &
-! 	& "bottom_top" .dim. 37, &
-! 	& "time" .dim. (10 .and. unlimited) &
-! ]
-! print "(dt)", dims
-! print *, ""
+nc = open_dataset("test.nc", "w")
+call put_attribute(nc, atts)
+call put_variable(nc, vars)
+call close_dataset(nc)
 
 end program main

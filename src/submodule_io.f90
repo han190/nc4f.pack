@@ -19,11 +19,11 @@ module subroutine write_formatted_variable(var, unit, iotype, v_list, iostat, io
   if (iotype == 'LISTDIRECTED' .or. iotype == 'DT') then
     select case (var%data_type)
     case (NC_FLOAT)
-      write (title_str, "('real ::', 1x, a)") var%name
+      write (title_str, "('real::', a)") var%name
     case (NC_INT)
-      write (title_str, "('integer ::', 1x, a)") var%name
+      write (title_str, "('integer::', a)") var%name
     case (NC_CHAR)
-      write (title_str, "('character ::', 1x, a)") var%name
+      write (title_str, "('character::', a)") var%name
     case default
       error stop "[write_formatted_variable] Unsupported type."
     end select
@@ -31,10 +31,10 @@ module subroutine write_formatted_variable(var, unit, iotype, v_list, iostat, io
     ndim = size(var%dimensions)
     if (ndim > 1) then
       write (ndim_str, "(i0)") ndim - 1
-      fmt = "('(', "//trim(ndim_str)//"(DT, ',', 1x), DT, ')')"
+      fmt = "(1x, '(', "//trim(ndim_str)//"(DT, ',', 1x), DT, ')')"
     else if (ndim == 1) then
       write (ndim_str, "(i0)") ndim
-      fmt = "('(', DT, ')')"
+      fmt = "(1x, '(', DT, ')')"
     else if (ndim == 0) then
       error stop "[write_formatted_variable] Invalid dimension."
     end if

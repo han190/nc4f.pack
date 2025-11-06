@@ -66,4 +66,39 @@ impure elemental function inquire_variable_(ncid, name, exist) result(var)
   end do
 end function inquire_variable_
 
+module impure elemental subroutine put_variable(nc, var)
+  type(netcdf_type), intent(in) :: nc
+  type(variable_type), target, intent(in) :: var
+  type(variable_type) :: tmp
+
+  tmp = define_variable(nc, var)
+  call put_attribute_variable(nc, tmp)
+  call handle_error(nc_put_var(nc%id, tmp%id, c_loc(var%buffer(1))))
+end subroutine put_variable
+
+impure elemental function define_variable(nc, var) result(new_var)
+  type(netcdf_type), intent(in) :: nc
+  type(variable_type), target, intent(in) :: var
+  type(variable_type) :: new_var
+  integer(c_int) :: varid
+  integer(c_int), allocatable :: new_dimids(:)
+  type(dimension_type), allocatable :: new_dims(:)
+  integer :: n, i
+
+  n = size(var%dimensions)
+  allocate (new_dims(n), new_dimids(n))
+  new_dims = define_dimension(nc, var%dimensions)
+  do i = 1, n
+    new_dimids(i) = new_dims(i)%id
+  end do
+
+  call handle_error(nc_def_var(nc%id, f2cstr(var%name), &
+    & var%data_type, size(new_dims), new_dimids, varid))
+
+  !> Since we only need variable ID and attributes,
+  !> we only copy these two.
+  new_var%attributes = var%attributes
+  new_var%id = varid
+end function define_variable
+
 end submodule submodule_variable

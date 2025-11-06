@@ -58,13 +58,13 @@ pure subroutine new_attribute_(att, name, data_type, length)
   att%length = length
 end subroutine new_attribute_
 
-impure elemental module function get_attribute(nc, name) result(att)
+impure elemental module function get_attribute_name(nc, name) result(att)
   type(netcdf_type), intent(in) :: nc
   character(len=*), intent(in) :: name
   type(attribute_type) :: att
 
   att = get_attribute_(nc%id, NC_GLOBAL, f2cstr(trim(adjustl(name))))
-end function get_attribute
+end function get_attribute_name
 
 module function get_attributes_global(nc) result(atts)
   type(netcdf_type), intent(in) :: nc
@@ -129,5 +129,28 @@ impure elemental function get_attribute_(ncid, varid, name) result(att)
     & f2cstr(att%name), c_loc(att%buffer(1))), &
     & "[get_attribute_] Invalid attribute.")
 end function get_attribute_
+
+module impure elemental subroutine put_attribute_variable(nc, var)
+  type(netcdf_type), intent(in) :: nc
+  type(variable_type), target, intent(in) :: var
+  integer :: i
+
+  do i = 1, size(var%attributes)
+    associate (att => var%attributes(i))
+      call handle_error(nc_put_att(nc%id, var%id, f2cstr(att%name), &
+        & att%data_type, att%length, c_loc(att%buffer(1))), &
+        & "[put_attribute_] Invalid attribute.")
+    end associate
+  end do
+end subroutine put_attribute_variable
+
+module impure elemental subroutine put_attribute_global(nc, att)
+  type(netcdf_type), intent(in) :: nc
+  type(attribute_type), target, intent(in) :: att
+
+  call handle_error(nc_put_att(nc%id, NC_GLOBAL, f2cstr(att%name), &
+    & att%data_type, att%length, c_loc(att%buffer(1))), &
+    & "[put_attribute_] Invalid attribute.")
+end subroutine put_attribute_global
 
 end submodule submodule_attribute

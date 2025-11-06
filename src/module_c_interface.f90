@@ -1,14 +1,18 @@
 module module_c_interface
 
-use, intrinsic :: iso_c_binding, only: c_int, c_ptr, c_char, c_size_t
+use, intrinsic :: iso_c_binding, only: c_int, c_ptr, c_char, c_size_t, c_long
 implicit none(type, external)
 public
 
 integer(c_int), parameter :: NC_NOWRITE = int(z'0000', kind=c_int)
+integer(c_int), parameter :: NC_CLOBBER = int(z'0000', kind=c_int)
+integer(c_int), parameter :: NC_NETCDF4 = int(z'1000', kind=c_int)
+
 integer(c_int), parameter :: NC_NOERR = 0_c_int
 integer(c_int), parameter :: NC_MAX_NAME = 256_c_int
 integer(c_int), parameter :: NC_MAX_DIMS = 1024_c_int
 integer(c_int), parameter :: NC_GLOBAL = -1_c_int
+integer(c_long), parameter :: NC_UNLIMITED = 0_c_long
 
 integer(c_int), parameter :: NC_NAT = 0_c_int
 integer(c_int), parameter :: NC_BYTE = 1_c_int
@@ -40,6 +44,14 @@ interface
     integer(c_int) :: ncidp
     integer(c_int) :: nc_open
   end function nc_open
+
+  function nc_create(path, cmode, ncidp) bind(c, name="nc_create")
+    import :: c_char, c_int
+    character(kind=c_char), intent(in) :: path(*)
+    integer(c_int), value :: cmode
+    integer(c_int), intent(out) :: ncidp
+    integer(c_int) :: nc_create
+  end function nc_create
 
   function nc_close(ncid) bind(c, name="nc_close")
     import :: c_int
@@ -97,6 +109,16 @@ interface
     integer(c_int) :: nc_inq_varnatts
   end function nc_inq_varnatts
 
+  function nc_put_att(ncid, varid, name, xtype, len, value) bind(c, name="nc_put_att")
+    import :: c_int, c_char, c_size_t, c_ptr
+    integer(c_int), value :: ncid, varid
+    character(kind=c_char), intent(in) :: name(*)
+    integer(c_int), value :: xtype
+    integer(c_size_t), value :: len
+    type(c_ptr), value :: value
+    integer(c_int) :: nc_put_att
+  end function nc_put_att
+
   function nc_inq_dimlen(ncid, dimid, lenp) bind(c, name="nc_inq_dimlen")
     import :: c_int, c_size_t
     integer(c_int), value :: ncid, dimid
@@ -112,6 +134,14 @@ interface
     integer(c_int) :: nc_inq_dimids
   end function nc_inq_dimids
 
+  function nc_inq_dimid(ncid, name, idp) bind(c, name="nc_inq_dimid")
+    import :: c_int, c_char
+    integer(c_int), value :: ncid
+    character(kind=c_char), intent(in) :: name(*)
+    integer(c_int), intent(out) :: idp
+    integer(c_int) :: nc_inq_dimid
+  end function nc_inq_dimid
+
   function nc_inq_dimname(ncid, dimid, name) bind(c, name="nc_inq_dimname")
     import :: c_int, c_char
     integer(c_int), value :: ncid, dimid
@@ -125,6 +155,15 @@ interface
     integer(c_int), intent(out) :: unlimdimidp
     integer(c_int) :: nc_inq_unlimdim
   end function nc_inq_unlimdim
+
+  function nc_def_dim(ncid, name, len, idp) bind(c, name="nc_def_dim")
+    import :: c_int, c_char, c_size_t
+    integer(c_int), value :: ncid
+    character(kind=c_char), intent(in) :: name
+    integer(c_size_t), value :: len
+    integer(c_int), intent(inout) :: idp
+    integer(c_int) :: nc_def_dim
+  end function nc_def_dim
 
   function nc_inq_varid(ncid, name, varidp) bind(c, name="nc_inq_varid")
     import :: c_int, c_char
@@ -161,6 +200,24 @@ interface
     type(c_ptr), value :: ip
     integer(c_int) :: nc_get_var
   end function nc_get_var
+
+  function nc_def_var(ncid, name, xtype, ndims, dimidsp, varidp) bind(c, name="nc_def_var")
+    import :: c_int, c_char
+    integer(c_int), value :: ncid
+    character(kind=c_char), intent(in) :: name(*)
+    integer(c_int), value :: xtype
+    integer(c_int), value :: ndims
+    integer(c_int), intent(in) :: dimidsp(*)
+    integer(c_int), intent(out) :: varidp
+    integer(c_int) :: nc_def_var
+  end function nc_def_var
+
+  function nc_put_var(ncid, varid, op) bind(c, name="nc_put_var")
+    import :: c_int, c_ptr
+    integer(c_int), value :: ncid, varid
+    type(c_ptr), value :: op
+    integer(c_int) :: nc_put_var
+  end function nc_put_var
 end interface
 
 end module module_c_interface

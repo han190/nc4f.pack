@@ -9,12 +9,19 @@ public :: netcdf_type
 public :: variable_type
 public :: attribute_type
 public :: dimension_type
+!> Get functions
 public :: get_attribute
-public :: get_attributes
 public :: get_variable
+!> Put functions
+public :: put_attribute
+public :: put_variable
+!> Inquire functions
 public :: inquire_dimensions
 public :: inquire_variable
+!> I/O
 public :: open_dataset
+public :: close_dataset
+!> Overrided intrinsic
 public :: write(formatted)
 public :: operator(.att.)
 public :: operator(.dim.)
@@ -42,8 +49,8 @@ end type variable_type
 type :: attribute_type
   integer(c_int), private :: id = -1
   character(len=:), allocatable :: name
-  integer(int32) :: data_type = 0
-  integer(int64) :: length = 0
+  integer(int32) :: data_type = -1
+  integer(int64) :: length = -1
   integer(int8), allocatable :: buffer(:)
 end type attribute_type
 
@@ -65,9 +72,15 @@ interface write(formatted)
   module procedure :: write_formatted_dimension
 end interface write(formatted)
 
-interface get_attributes
+interface get_attribute
   module procedure :: get_attributes_global
-end interface get_attributes
+  module procedure :: get_attribute_name
+end interface get_attribute
+
+interface put_attribute
+  module procedure :: put_attribute_global
+  module procedure :: put_attribute_variable
+end interface put_attribute
 
 interface inquire_dimensions
   module procedure :: inquire_dimensions_global
@@ -121,11 +134,11 @@ interface
     type(attribute_type) :: att
   end function new_attribute_character
 
-  impure elemental module function get_attribute(nc, name) result(att)
+  impure elemental module function get_attribute_name(nc, name) result(att)
     type(netcdf_type), intent(in) :: nc
     character(len=*), intent(in) :: name
     type(attribute_type) :: att
-  end function get_attribute
+  end function get_attribute_name
 
   module function get_attributes_global(nc) result(atts)
     type(netcdf_type), intent(in) :: nc
@@ -137,6 +150,16 @@ interface
     type(attribute_type), allocatable :: atts(:)
   end function get_attributes_
 
+  module impure elemental subroutine put_attribute_variable(nc, var)
+    type(netcdf_type), intent(in) :: nc
+    type(variable_type), target, intent(in) :: var
+  end subroutine put_attribute_variable
+
+  module impure elemental subroutine put_attribute_global(nc, att)
+    type(netcdf_type), intent(in) :: nc
+    type(attribute_type), target, intent(in) :: att
+  end subroutine put_attribute_global
+
   !> submodule_dataset.f90
   module function open_dataset(filename, mode, &
     & inquire_attribute) result(nc)
@@ -145,6 +168,10 @@ interface
     logical, intent(in), optional :: inquire_attribute
     type(netcdf_type) :: nc
   end function open_dataset
+
+  module subroutine close_dataset(nc)
+    type(netcdf_type), intent(inout) :: nc
+  end subroutine close_dataset
 
   !> submodule_dimension.f90
   module elemental function new_dimension_argument(length, is_unlimited) result(arg)
@@ -175,6 +202,12 @@ interface
     integer(c_int), intent(in), optional :: varid
     type(dimension_type), allocatable :: dims(:)
   end function inquire_dimensions_
+
+  impure elemental module function define_dimension(nc, dim) result(new_dim)
+    type(netcdf_type), intent(in) :: nc
+    type(dimension_type), intent(in) :: dim
+    type(dimension_type) :: new_dim
+  end function define_dimension
 
   !> submodule_io.f90
   module subroutine write_formatted_variable(var, unit, iotype, v_list, iostat, iomsg)
@@ -245,6 +278,11 @@ interface
     logical, intent(out), optional :: exist
     type(variable_type) :: var
   end function inquire_variable
+
+  module impure elemental subroutine put_variable(nc, var)
+    type(netcdf_type), intent(in) :: nc
+    type(variable_type), target, intent(in) :: var
+  end subroutine put_variable
 end interface
 
 end module module_netcdf

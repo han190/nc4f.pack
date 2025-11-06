@@ -44,7 +44,7 @@ module function inquire_dimensions_(ncid, varid) result(dims)
   type(dimension_type), allocatable :: dims(:)
   integer(c_int) :: dimids(NC_MAX_DIMS)
   character(len=NC_MAX_NAME, kind=c_char) :: dim_name
-  integer(c_int) :: i, j, unlimdimidp, nunlim, ndims
+  integer(c_int) :: i, unlimdimidp, nunlim, ndims
   integer(c_int), parameter :: include_parents = 0_c_int
 
   if (present(varid)) then
@@ -65,16 +65,34 @@ module function inquire_dimensions_(ncid, varid) result(dims)
 
   nunlim = 0
   do i = 1, ndims
-    j = ndims - i + 1
-    dims(j)%id = dimids(i)
+    dims(i)%id = dimids(i)
     call handle_error(nc_inq_dimname(ncid, dimids(i), dim_name))
-    call handle_error(nc_inq_dimlen(ncid, dimids(i), dims(j)%length))
-    dims(j)%name = trim(adjustl(c2fstr(dim_name)))
-    dims(j)%is_unlimited = dimids(i) == unlimdimidp
-    if (dims(j)%is_unlimited) nunlim = nunlim + 1
+    call handle_error(nc_inq_dimlen(ncid, dimids(i), dims(i)%length))
+    dims(i)%name = trim(adjustl(c2fstr(dim_name)))
+    dims(i)%is_unlimited = dimids(i) == unlimdimidp
+    if (dims(i)%is_unlimited) nunlim = nunlim + 1
   end do
   if (nunlim > 1) error stop &
     & "[inquire_dimensions_] Too many unlimited dimensions."
 end function inquire_dimensions_
+
+impure elemental module function define_dimension(nc, dim) result(new_dim)
+  type(netcdf_type), intent(in) :: nc
+  type(dimension_type), intent(in) :: dim
+  type(dimension_type) :: new_dim
+  integer(c_int) :: stat, dimid
+  integer(c_size_t) :: length
+
+  stat = nc_inq_dimid(nc%id, dim%name, dimid)
+  dimension_exists: if (stat == NC_NOERR) then
+    new_dim = dimension_type(dimid, dim%name, &
+      & dim%length, dim%is_unlimited)
+    return
+  end if dimension_exists
+
+  length = merge(NC_UNLIMITED, dim%length, dim%is_unlimited)
+  call handle_error(nc_def_dim(nc%id, f2cstr(dim%name), dim%length, dimid))
+  new_dim = dimension_type(dimid, dim%name, dim%length, dim%is_unlimited)
+end function define_dimension
 
 end submodule submodule_dimension
