@@ -53,7 +53,7 @@ pure logical module function allocation_required(buffer, buf_size)
   integer(int8), allocatable, intent(in) :: buffer(:)
   integer(int64), intent(in) :: buf_size
 
-  allocation_required = .not. allocated(buffer) .or. size(buffer) /= buf_size
+  allocation_required = .not. allocated(buffer) .or. size(buffer) < buf_size
 end function allocation_required
 
 module elemental function get_buffer_size(data_type, length) result(buffer_size)
