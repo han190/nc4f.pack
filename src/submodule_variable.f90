@@ -132,13 +132,15 @@ impure elemental function define_variable(nc, var) result(new_var)
   integer(c_int) :: varid
   integer(c_int), allocatable :: new_dimids(:)
   type(dimension_type), allocatable :: new_dims(:)
-  integer :: n, i
+  integer :: n, i, j
 
   n = size(var%dimensions)
   allocate (new_dims(n), new_dimids(n))
   new_dims = define_dimension(nc, var%dimensions)
+  !> Reverse dimension since we use C APIs.
   do i = 1, n
-    new_dimids(i) = new_dims(i)%id
+    j = n - i + 1 
+    new_dimids(j) = new_dims(i)%id
   end do
 
   call handle_error(nc_def_var(nc%id, f2cstr(var%name), &
@@ -195,7 +197,7 @@ pure module function get_shape(var) result(n)
   end if
 
   do i = 1, ndims
-    n(ndims - i + 1) = var%dimensions(i)%length
+    n(i) = var%dimensions(i)%length
   end do
 end function get_shape
 

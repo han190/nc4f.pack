@@ -1,43 +1,40 @@
-submodule(module_netcdf) submodule_extract
-implicit none
-contains
-
 #: set kinds = ['real32', 'real64', 'int32', 'int64']
 #: set types = ['real', 'real', 'integer', 'integer']
+#: set newline = "\n"
+submodule(module_netcdf) submodule_extract
+implicit none
+contains${newline}$
 #: for T, K in zip(types, kinds)
 #: for R in range(1, 5)
 #: if R == 1
 module subroutine extract_att_${K}$_${R}$d(att, ptr)
-	type(attribute_type), target, intent(in) :: att
-	${T}$(${K}$), pointer, intent(out) :: ptr(:)
-	type(c_ptr) :: cptr
+  type(attribute_type), target, intent(in) :: att
+  ${T}$(${K}$), pointer, intent(out) :: ptr(:)
+  type(c_ptr) :: cptr
 
-	cptr = c_loc(att%buffer(1))
-	call c_f_pointer(cptr, ptr, [att%length])
-end subroutine extract_att_${K}$_${R}$d
-
+  cptr = c_loc(att%buffer(1))
+  call c_f_pointer(cptr, ptr, [att%length])
+end subroutine extract_att_${K}$_${R}$d${newline}$
 module subroutine extract_att_${K}$_scalar(att, val)
-	type(attribute_type), target, intent(in) :: att
-	${T}$(${K}$), intent(out) :: val
-	${T}$(${K}$), pointer :: ptr(:)
-	type(c_ptr) :: cptr
+  type(attribute_type), target, intent(in) :: att
+  ${T}$(${K}$), intent(out) :: val
+  ${T}$(${K}$), pointer :: ptr(:)
+  type(c_ptr) :: cptr
 
-	if (att%length > 1) error stop "Attribute value is a vector."
-	cptr = c_loc(att%buffer(1))
-	call c_f_pointer(cptr, ptr, [att%length])
-	val = ptr(1)
-end subroutine extract_att_${K}$_scalar
-
+  if (att%length > 1) error stop "Attribute value is a vector."
+  cptr = c_loc(att%buffer(1))
+  call c_f_pointer(cptr, ptr, [att%length])
+  val = ptr(1)
+end subroutine extract_att_${K}$_scalar${newline}$
 #: endif
 module subroutine extract_var_${K}$_${R}$d(var, ptr)
-	type(variable_type), target, intent(in) :: var
-	${T}$(${K}$), pointer, intent(out) :: ptr(#{for _ in range(R-1)}#:,#{endfor}#:)
-	type(c_ptr) :: cptr
+  type(variable_type), target, intent(in) :: var
+  ${T}$(${K}$), pointer, intent(out) :: ptr(:#{for _ in range(R-1)}#, :#{endfor}#)
+  type(c_ptr) :: cptr
 
-	cptr = c_loc(var%buffer(1))
-	call c_f_pointer(cptr, ptr, shape(var))
-end subroutine extract_var_${K}$_${R}$d
-
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_${K}$_${R}$d${newline}$
 #: endfor
 #: endfor
-end submodule submodule_extract
+end submodule submodule_extract${newline}$

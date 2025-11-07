@@ -4347,7 +4347,6 @@ module function pow_int64_var(x, y) result(res)
   end select
 end function pow_int64_var
 
-
 module function sum_vars(vars) result(s)
   type(variable_type), intent(in) :: vars(:)
   type(variable_type) :: s

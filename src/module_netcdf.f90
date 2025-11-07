@@ -248,14 +248,14 @@ interface
 
   !> submodule_dimension.f90
   module elemental function new_dimension_argument(length, is_unlimited) result(arg)
-    integer, intent(in) :: length
+    integer(int64), intent(in) :: length
     logical, intent(in) :: is_unlimited
     type(dimension_argument_type) :: arg
   end function new_dimension_argument
 
   module elemental function new_dimension_length(name, length) result(dim)
     character(len=*), intent(in) :: name
-    integer, intent(in) :: length
+    integer(int64), intent(in) :: length
     type(dimension_type) :: dim
   end function new_dimension_length
 

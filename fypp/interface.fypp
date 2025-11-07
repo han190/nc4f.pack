@@ -1,0 +1,78 @@
+#: set ops = ['+', '-', '*', '/', '**']
+#: set op_names = ['add', 'sub', 'mul', 'div', 'pow']
+#: set kinds = ['real32', 'real64', 'int32', 'int64']
+#: set types = ['real', 'real', 'integer', 'integer']
+#: set cases = ['NC_FLOAT', 'NC_DOUBLE', 'NC_INT', 'NC_INT64']
+#: set newline = "\n"
+#! operators
+#: for O, N in zip(ops, op_names)
+interface operator(${O}$)
+  module procedure :: ${N}$_vars
+  #: for C1, T1, K1 in zip(cases, types, kinds)
+  module procedure :: ${N}$_var_${K1}$
+  module procedure :: ${N}$_${K1}$_var
+  #: endfor
+end interface operator(${O}$)${newline}$
+#: endfor
+#! sum
+interface sum
+  module procedure :: sum_vars
+end interface sum${newline}$
+#! operator interface
+interface
+  #: for O, N in zip(ops, op_names)
+  module function ${N}$_vars(x, y) result(res)
+    type(variable_type), target, intent(in) :: x, y
+    type(variable_type), target :: res
+  end function ${N}$_vars${newline}$
+  #: for C1, T1, K1 in zip(cases, types, kinds)
+  module function ${N}$_var_${K1}$(x, y) result(res)
+    type(variable_type), target, intent(in) :: x
+    ${T1}$(${K1}$), intent(in) :: y
+    type(variable_type), target :: res
+  end function ${N}$_var_${K1}$${newline}$
+  module function ${N}$_${K1}$_var(x, y) result(res)
+    ${T1}$(${K1}$), intent(in) :: x
+    type(variable_type), target, intent(in) :: y
+    type(variable_type), target :: res
+  end function ${N}$_${K1}$_var${newline}$
+  #: endfor
+  #: endfor
+  module function sum_vars(vars) result(s)
+    type(variable_type), intent(in) :: vars(:)
+    type(variable_type) :: s
+  end function sum_vars
+end interface${newline}$
+#! extract
+interface extract
+#: for K in kinds
+	module procedure :: extract_att_${K}$_1d
+	module procedure :: extract_att_${K}$_scalar
+#: endfor
+#: for T, K in zip(types, kinds)
+#: for R in range(1, 5)
+	module procedure :: extract_var_${K}$_${R}$d
+#: endfor
+#: endfor
+end interface extract${newline}$
+#! extract interface
+interface
+#: for T, K in zip(types, kinds)
+#: for R in range(1, 5)
+	#: if R == 1
+	module subroutine extract_att_${K}$_${R}$d(att, ptr)
+		type(attribute_type), target, intent(in) :: att
+		${T}$(${K}$), pointer, intent(out) :: ptr(:)
+	end subroutine extract_att_${K}$_${R}$d${newline}$
+	module subroutine extract_att_${K}$_scalar(att, val)
+		type(attribute_type), target, intent(in) :: att
+		${T}$(${K}$), intent(out) :: val
+	end subroutine extract_att_${K}$_scalar${newline}$
+	#: endif
+	module subroutine extract_var_${K}$_${R}$d(var, ptr)
+		type(variable_type), target, intent(in) :: var
+		${T}$(${K}$), pointer, intent(out) :: ptr(#{for _ in range(R-1)}#:,#{endfor}#:)
+	end subroutine extract_var_${K}$_${R}$d${newline}$
+#: endfor
+#: endfor
+end interface

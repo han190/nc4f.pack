@@ -3,7 +3,7 @@ implicit none
 contains
 
 module elemental function new_dimension_argument(length, is_unlimited) result(arg)
-  integer, intent(in) :: length
+  integer(int64), intent(in) :: length
   logical, intent(in) :: is_unlimited
   type(dimension_argument_type) :: arg
 
@@ -13,7 +13,7 @@ end function new_dimension_argument
 
 module elemental function new_dimension_length(name, length) result(dim)
   character(len=*), intent(in) :: name
-  integer, intent(in) :: length
+  integer(int64), intent(in) :: length
   type(dimension_type) :: dim
 
   dim%name = trim(adjustl(name))
@@ -44,7 +44,7 @@ module function inquire_dimensions_(ncid, varid) result(dims)
   type(dimension_type), allocatable :: dims(:)
   integer(c_int) :: dimids(NC_MAX_DIMS)
   character(len=NC_MAX_NAME, kind=c_char) :: dim_name
-  integer(c_int) :: i, unlimdimidp, nunlim, ndims
+  integer(c_int) :: i, j, unlimdimidp, nunlim, ndims
   integer(c_int), parameter :: include_parents = 0_c_int
 
   if (present(varid)) then
@@ -63,14 +63,17 @@ module function inquire_dimensions_(ncid, varid) result(dims)
     allocate (dims(ndims))
   end if
 
+  !> Since we use C APIs, the dimension order should
+  !> be reversed when read into a Fortran program.
   nunlim = 0
   do i = 1, ndims
-    dims(i)%id = dimids(i)
+    j = ndims - i + 1
+    dims(j)%id = dimids(i)
     call handle_error(nc_inq_dimname(ncid, dimids(i), dim_name))
-    call handle_error(nc_inq_dimlen(ncid, dimids(i), dims(i)%length))
-    dims(i)%name = trim(adjustl(c2fstr(dim_name)))
-    dims(i)%is_unlimited = dimids(i) == unlimdimidp
-    if (dims(i)%is_unlimited) nunlim = nunlim + 1
+    call handle_error(nc_inq_dimlen(ncid, dimids(i), dims(j)%length))
+    dims(j)%name = trim(adjustl(c2fstr(dim_name)))
+    dims(j)%is_unlimited = dimids(i) == unlimdimidp
+    if (dims(j)%is_unlimited) nunlim = nunlim + 1
   end do
   if (nunlim > 1) error stop &
     & "[inquire_dimensions_] Too many unlimited dimensions."
