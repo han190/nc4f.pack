@@ -18,6 +18,8 @@ public :: put_variable
 !> Inquire functions
 public :: inquire_dimensions
 public :: inquire_variable
+!> Extract functions
+public :: extract
 !> I/O
 public :: open_dataset
 public :: close_dataset
@@ -37,6 +39,7 @@ public :: operator(**)
 public :: size
 public :: shape
 public :: sum
+public :: allocate_buffer
 private
 
 type :: netcdf_type
@@ -135,6 +138,11 @@ interface shape
   module procedure :: get_shape
 end interface shape
 
+interface allocate_buffer
+  module procedure :: allocate_buffer_attribute
+  module procedure :: allocate_buffer_variable
+end interface allocate_buffer
+
 !> Constants
 integer, parameter :: MAX_CHAR_LEN = 1024
 integer(int8), parameter :: BYTE = 0_int8
@@ -220,6 +228,10 @@ interface
     type(netcdf_type), intent(in) :: nc
     type(attribute_type), target, intent(in) :: att
   end subroutine put_attribute_global
+
+  pure module subroutine allocate_buffer_attribute(att)
+    type(attribute_type), intent(inout) :: att
+  end subroutine allocate_buffer_attribute
 
   !> submodule_dataset.f90
   module function open_dataset(filename, mode, inquire_dimension, inquire_attribute) result(nc)
@@ -321,7 +333,7 @@ interface
     character(len=*), intent(in) :: string
     character(kind=c_char, len=:), allocatable :: f2cstring
   end function f2cstr
-  
+
   pure logical module function allocation_required(buffer, buf_size)
     integer(int8), allocatable, intent(in) :: buffer(:)
     integer(int64), intent(in) :: buf_size
@@ -379,6 +391,10 @@ interface
     type(variable_type), intent(in) :: var
     integer(int64), allocatable :: n(:)
   end function get_shape
+
+  pure module subroutine allocate_buffer_variable(var)
+    type(variable_type), intent(inout) :: var
+  end subroutine allocate_buffer_variable
 end interface
 
 interface operator(+)
@@ -715,6 +731,155 @@ interface
     type(variable_type), intent(in) :: vars(:)
     type(variable_type) :: s
   end function sum_vars
+end interface
+
+interface extract
+  module procedure :: extract_att_real32_1d
+  module procedure :: extract_att_real32_scalar
+  module procedure :: extract_att_real64_1d
+  module procedure :: extract_att_real64_scalar
+  module procedure :: extract_att_int32_1d
+  module procedure :: extract_att_int32_scalar
+  module procedure :: extract_att_int64_1d
+  module procedure :: extract_att_int64_scalar
+  module procedure :: extract_var_real32_1d
+  module procedure :: extract_var_real32_2d
+  module procedure :: extract_var_real32_3d
+  module procedure :: extract_var_real32_4d
+  module procedure :: extract_var_real64_1d
+  module procedure :: extract_var_real64_2d
+  module procedure :: extract_var_real64_3d
+  module procedure :: extract_var_real64_4d
+  module procedure :: extract_var_int32_1d
+  module procedure :: extract_var_int32_2d
+  module procedure :: extract_var_int32_3d
+  module procedure :: extract_var_int32_4d
+  module procedure :: extract_var_int64_1d
+  module procedure :: extract_var_int64_2d
+  module procedure :: extract_var_int64_3d
+  module procedure :: extract_var_int64_4d
+end interface extract
+
+interface
+  module subroutine extract_att_real32_1d(att, ptr)
+    type(attribute_type), target, intent(in) :: att
+    real(real32), pointer, intent(out) :: ptr(:)
+  end subroutine extract_att_real32_1d
+
+  module subroutine extract_att_real32_scalar(att, val)
+    type(attribute_type), target, intent(in) :: att
+    real(real32), intent(out) :: val
+  end subroutine extract_att_real32_scalar
+
+  module subroutine extract_var_real32_1d(var, ptr)
+    type(variable_type), target, intent(in) :: var
+    real(real32), pointer, intent(out) :: ptr(:)
+  end subroutine extract_var_real32_1d
+
+  module subroutine extract_var_real32_2d(var, ptr)
+    type(variable_type), target, intent(in) :: var
+    real(real32), pointer, intent(out) :: ptr(:, :)
+  end subroutine extract_var_real32_2d
+
+  module subroutine extract_var_real32_3d(var, ptr)
+    type(variable_type), target, intent(in) :: var
+    real(real32), pointer, intent(out) :: ptr(:, :, :)
+  end subroutine extract_var_real32_3d
+
+  module subroutine extract_var_real32_4d(var, ptr)
+    type(variable_type), target, intent(in) :: var
+    real(real32), pointer, intent(out) :: ptr(:, :, :, :)
+  end subroutine extract_var_real32_4d
+
+  module subroutine extract_att_real64_1d(att, ptr)
+    type(attribute_type), target, intent(in) :: att
+    real(real64), pointer, intent(out) :: ptr(:)
+  end subroutine extract_att_real64_1d
+
+  module subroutine extract_att_real64_scalar(att, val)
+    type(attribute_type), target, intent(in) :: att
+    real(real64), intent(out) :: val
+  end subroutine extract_att_real64_scalar
+
+  module subroutine extract_var_real64_1d(var, ptr)
+    type(variable_type), target, intent(in) :: var
+    real(real64), pointer, intent(out) :: ptr(:)
+  end subroutine extract_var_real64_1d
+
+  module subroutine extract_var_real64_2d(var, ptr)
+    type(variable_type), target, intent(in) :: var
+    real(real64), pointer, intent(out) :: ptr(:, :)
+  end subroutine extract_var_real64_2d
+
+  module subroutine extract_var_real64_3d(var, ptr)
+    type(variable_type), target, intent(in) :: var
+    real(real64), pointer, intent(out) :: ptr(:, :, :)
+  end subroutine extract_var_real64_3d
+
+  module subroutine extract_var_real64_4d(var, ptr)
+    type(variable_type), target, intent(in) :: var
+    real(real64), pointer, intent(out) :: ptr(:, :, :, :)
+  end subroutine extract_var_real64_4d
+
+  module subroutine extract_att_int32_1d(att, ptr)
+    type(attribute_type), target, intent(in) :: att
+    integer(int32), pointer, intent(out) :: ptr(:)
+  end subroutine extract_att_int32_1d
+
+  module subroutine extract_att_int32_scalar(att, val)
+    type(attribute_type), target, intent(in) :: att
+    integer(int32), intent(out) :: val
+  end subroutine extract_att_int32_scalar
+
+  module subroutine extract_var_int32_1d(var, ptr)
+    type(variable_type), target, intent(in) :: var
+    integer(int32), pointer, intent(out) :: ptr(:)
+  end subroutine extract_var_int32_1d
+
+  module subroutine extract_var_int32_2d(var, ptr)
+    type(variable_type), target, intent(in) :: var
+    integer(int32), pointer, intent(out) :: ptr(:, :)
+  end subroutine extract_var_int32_2d
+
+  module subroutine extract_var_int32_3d(var, ptr)
+    type(variable_type), target, intent(in) :: var
+    integer(int32), pointer, intent(out) :: ptr(:, :, :)
+  end subroutine extract_var_int32_3d
+
+  module subroutine extract_var_int32_4d(var, ptr)
+    type(variable_type), target, intent(in) :: var
+    integer(int32), pointer, intent(out) :: ptr(:, :, :, :)
+  end subroutine extract_var_int32_4d
+
+  module subroutine extract_att_int64_1d(att, ptr)
+    type(attribute_type), target, intent(in) :: att
+    integer(int64), pointer, intent(out) :: ptr(:)
+  end subroutine extract_att_int64_1d
+
+  module subroutine extract_att_int64_scalar(att, val)
+    type(attribute_type), target, intent(in) :: att
+    integer(int64), intent(out) :: val
+  end subroutine extract_att_int64_scalar
+
+  module subroutine extract_var_int64_1d(var, ptr)
+    type(variable_type), target, intent(in) :: var
+    integer(int64), pointer, intent(out) :: ptr(:)
+  end subroutine extract_var_int64_1d
+
+  module subroutine extract_var_int64_2d(var, ptr)
+    type(variable_type), target, intent(in) :: var
+    integer(int64), pointer, intent(out) :: ptr(:, :)
+  end subroutine extract_var_int64_2d
+
+  module subroutine extract_var_int64_3d(var, ptr)
+    type(variable_type), target, intent(in) :: var
+    integer(int64), pointer, intent(out) :: ptr(:, :, :)
+  end subroutine extract_var_int64_3d
+
+  module subroutine extract_var_int64_4d(var, ptr)
+    type(variable_type), target, intent(in) :: var
+    integer(int64), pointer, intent(out) :: ptr(:, :, :, :)
+  end subroutine extract_var_int64_4d
 end interface
 
 end module module_netcdf

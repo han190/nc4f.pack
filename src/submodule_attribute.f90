@@ -6,22 +6,13 @@ module function new_attribute_arr_int32(name, values) result(att)
   character(len=*), intent(in) :: name
   integer(int32), intent(in) :: values(:)
   type(attribute_type), target :: att
-  type(c_ptr) :: cptr
-  integer(c_int), pointer :: fptr(:)
-  integer(int64) :: buffer_size, nvals
+  integer(c_int), pointer :: ptr(:)
 
-  nvals = size(values, kind=int64)
-  call new_attribute_(att, name, NC_INT, nvals)
-  buffer_size = get_buffer_size(NC_INT, nvals)
-  if (allocation_required(att%buffer, buffer_size)) then
-    if (allocated(att%buffer)) deallocate (att%buffer)
-    allocate (att%buffer(buffer_size))
-  end if
-  
-  cptr = c_loc(att%buffer(1))
-  call c_f_pointer(cptr, fptr, [nvals])
-  fptr = values
-  nullify (fptr)
+  call new_attribute_(att, name, NC_INT, size(values, kind=int64))
+  call allocate_buffer(att)
+  call extract(att, ptr)
+  ptr = values
+  nullify (ptr)
 end function new_attribute_arr_int32
 
 module function new_attribute_int32(name, value) result(att)
@@ -36,22 +27,13 @@ module function new_attribute_arr_int64(name, values) result(att)
   character(len=*), intent(in) :: name
   integer(int64), intent(in) :: values(:)
   type(attribute_type), target :: att
-  type(c_ptr) :: cptr
-  integer(c_int64_t), pointer :: fptr(:)
-  integer(int64) :: buffer_size, nvals
+  integer(c_int64_t), pointer :: ptr(:)
 
-  nvals = size(values, kind=int64)
-  call new_attribute_(att, name, NC_INT64, nvals)
-  buffer_size = get_buffer_size(NC_INT64, nvals)
-  if (allocation_required(att%buffer, buffer_size)) then
-    if (allocated(att%buffer)) deallocate (att%buffer)
-    allocate (att%buffer(buffer_size))
-  end if
-  
-  cptr = c_loc(att%buffer(1))
-  call c_f_pointer(cptr, fptr, [nvals])
-  fptr = values
-  nullify (fptr)
+  call new_attribute_(att, name, NC_INT64, size(values, kind=int64))
+  call allocate_buffer(att)
+  call extract(att, ptr)
+  ptr = values
+  nullify (ptr)
 end function new_attribute_arr_int64
 
 module function new_attribute_int64(name, value) result(att)
@@ -66,22 +48,13 @@ module function new_attribute_arr_real32(name, values) result(att)
   character(len=*), intent(in) :: name
   real(real32), intent(in) :: values(:)
   type(attribute_type), target :: att
-  type(c_ptr) :: cptr
-  real(c_float), pointer :: fptr(:)
-  integer(int64) :: buffer_size, nvals
+  real(c_float), pointer :: ptr(:)
 
-  nvals = size(values, kind=int64)
-  call new_attribute_(att, name, NC_FLOAT, nvals)
-  buffer_size = get_buffer_size(NC_FLOAT, nvals)
-  if (allocation_required(att%buffer, buffer_size)) then
-    if (allocated(att%buffer)) deallocate (att%buffer)
-    allocate (att%buffer(buffer_size))
-  end if
-  
-  cptr = c_loc(att%buffer(1))
-  call c_f_pointer(cptr, fptr, [nvals])
-  fptr = values
-  nullify (fptr)
+  call new_attribute_(att, name, NC_FLOAT, size(values, kind=int64))
+  call allocate_buffer(att)
+  call extract(att, ptr)
+  ptr = values
+  nullify (ptr)
 end function new_attribute_arr_real32
 
 module function new_attribute_real32(name, value) result(att)
@@ -96,22 +69,13 @@ module function new_attribute_arr_real64(name, values) result(att)
   character(len=*), intent(in) :: name
   real(real64), intent(in) :: values(:)
   type(attribute_type), target :: att
-  type(c_ptr) :: cptr
-  real(c_double), pointer :: fptr(:)
-  integer(int64) :: buffer_size, nvals
+  real(c_double), pointer :: ptr(:)
 
-  nvals = size(values, kind=int64)
-  call new_attribute_(att, name, NC_DOUBLE, nvals)
-  buffer_size = get_buffer_size(NC_DOUBLE, nvals)
-  if (allocation_required(att%buffer, buffer_size)) then
-    if (allocated(att%buffer)) deallocate (att%buffer)
-    allocate (att%buffer(buffer_size))
-  end if
-  
-  cptr = c_loc(att%buffer(1))
-  call c_f_pointer(cptr, fptr, [nvals])
-  fptr = values
-  nullify (fptr)
+  call new_attribute_(att, name, NC_DOUBLE, size(values, kind=int64))
+  call allocate_buffer(att)
+  call extract(att, ptr)
+  ptr = values
+  nullify (ptr)
 end function new_attribute_arr_real64
 
 module function new_attribute_real64(name, value) result(att)
@@ -126,21 +90,15 @@ module function new_attribute_character(name, value) result(att)
   character(len=*), intent(in) :: name
   character(len=*), intent(in) :: value
   type(attribute_type), target :: att
-  type(c_ptr) :: cptr
   character(kind=c_char), pointer :: fptr(:)
-  integer(int64) :: buffer_size, nvals, i
+  type(c_ptr) :: cptr
+  integer(int64) :: i
 
-  nvals = len(value, kind=int64)
-  call new_attribute_(att, name, NC_CHAR, nvals)
-  buffer_size = get_buffer_size(NC_CHAR, nvals)
-  if (allocation_required(att%buffer, buffer_size)) then
-    if (allocated(att%buffer)) deallocate (att%buffer)
-    allocate (att%buffer(buffer_size))
-  end if
-  
+  call new_attribute_(att, name, NC_CHAR, len(value, kind=int64))
+  call allocate_buffer(att)
   cptr = c_loc(att%buffer(1))
-  call c_f_pointer(cptr, fptr, [nvals])
-  do i = 1, nvals
+  call c_f_pointer(cptr, fptr, [att%length])
+  do i = 1, att%length
     fptr(i) = value(i:i)
   end do
   nullify (fptr)
@@ -253,5 +211,17 @@ module impure elemental subroutine put_attribute_global(nc, att)
     & att%data_type, att%length, c_loc(att%buffer(1))), &
     & "[put_attribute_] Invalid attribute.")
 end subroutine put_attribute_global
+
+pure module subroutine allocate_buffer_attribute(att)
+  type(attribute_type), intent(inout) :: att
+  integer(int64) :: buffer_size
+
+  !> Assuming att%data_type and att%length is properly initialized.
+  buffer_size = get_buffer_size(att%data_type, att%length)
+  if (allocation_required(att%buffer, buffer_size)) then
+    if (allocated(att%buffer)) deallocate (att%buffer)
+    allocate (att%buffer(buffer_size))
+  end if
+end subroutine allocate_buffer_attribute
 
 end submodule submodule_attribute

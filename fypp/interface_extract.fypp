@@ -1,0 +1,38 @@
+#: set kinds = ['real32', 'real64', 'int32', 'int64']
+#: set types = ['real', 'real', 'integer', 'integer']
+
+interface extract
+#: for K in kinds
+	module procedure :: extract_att_${K}$_1d
+	module procedure :: extract_att_${K}$_scalar
+#: endfor
+#: for T, K in zip(types, kinds)
+#: for R in range(1, 5)
+	module procedure :: extract_var_${K}$_${R}$d
+#: endfor
+#: endfor
+end interface extract
+
+interface
+#: for T, K in zip(types, kinds)
+#: for R in range(1, 5)
+	#: if R == 1
+	module subroutine extract_att_${K}$_${R}$d(att, ptr)
+		type(attribute_type), target, intent(in) :: att
+		${T}$(${K}$), pointer, intent(out) :: ptr(:)
+	end subroutine extract_att_${K}$_${R}$d
+
+	module subroutine extract_att_${K}$_scalar(att, val)
+		type(attribute_type), target, intent(in) :: att
+		${T}$(${K}$), intent(out) :: val
+	end subroutine extract_att_${K}$_scalar
+	#: endif
+
+	module subroutine extract_var_${K}$_${R}$d(var, ptr)
+		type(variable_type), target, intent(in) :: var
+		${T}$(${K}$), pointer, intent(out) :: ptr(#{for _ in range(R-1)}#:,#{endfor}#:)
+	end subroutine extract_var_${K}$_${R}$d
+
+#: endfor
+#: endfor
+end interface

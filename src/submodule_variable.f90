@@ -8,28 +8,16 @@ module function new_variable_real32(name, values, dims, atts) result(var)
   type(dimension_type), intent(in) :: dims(:)
   type(attribute_type), intent(in), optional :: atts(:)
   type(variable_type), target :: var
-  type(c_ptr) :: cptr
-  real(c_float), pointer :: fptr(:)
-  integer(int64) :: buffer_size, nvals
+  real(c_float), pointer :: var_ptr(:)
 
   if (size(values) == 0) error stop &
-    & "[new_variable_real32] Invalid values."  
-  var%name = name
-  var%data_type = NC_FLOAT
-  var%length = size(values, kind=int64)
-  var%dimensions = dims
-  if (present(atts)) var%attributes = atts
-
-  buffer_size = get_buffer_size(NC_FLOAT, var%length)
-  if (allocation_required(var%buffer, buffer_size)) then
-    if (allocated(var%buffer)) deallocate (var%buffer)
-    allocate (var%buffer(buffer_size))
-  end if
-
-  cptr = c_loc(var%buffer(1))
-  call c_f_pointer(cptr, fptr, [var%length])
-  fptr = values
-  nullify (fptr)
+    & "[new_variable_real32] Invalid values."
+  call new_variable_(var, name, NC_FLOAT, &
+    & size(values, kind=int64), dims, atts)
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  var_ptr = values
+  nullify (var_ptr)
 end function new_variable_real32
 
 module function new_variable_int32(name, values, dims, atts) result(var)
@@ -38,29 +26,32 @@ module function new_variable_int32(name, values, dims, atts) result(var)
   type(dimension_type), intent(in) :: dims(:)
   type(attribute_type), intent(in), optional :: atts(:)
   type(variable_type), target :: var
-  type(c_ptr) :: cptr
-  integer(c_int), pointer :: fptr(:)
-  integer(int64) :: buffer_size, nvals
+  integer(c_int), pointer :: var_ptr(:)
 
   if (size(values) == 0) error stop &
-    & "[new_variable_int32] Invalid values."  
-  var%name = name
-  var%data_type = NC_INT
-  var%length = size(values, kind=int64)
+    & "[new_variable_int32] Invalid values."
+  call new_variable_(var, name, NC_INT, &
+    & size(values, kind=int64), dims, atts)
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int32
+
+pure subroutine new_variable_(var, name, data_type, length, dims, atts)
+  type(variable_type), intent(inout) :: var
+  character(len=*), intent(in) :: name
+  integer(int32), intent(in) :: data_type
+  integer(int64), intent(in) :: length
+  type(dimension_type), intent(in) :: dims(:)
+  type(attribute_type), intent(in), optional :: atts(:)
+
+  var%name = trim(adjustl(name))
+  var%data_type = data_type
+  var%length = length
   var%dimensions = dims
   if (present(atts)) var%attributes = atts
-
-  buffer_size = get_buffer_size(NC_INT, var%length)
-  if (allocation_required(var%buffer, buffer_size)) then
-    if (allocated(var%buffer)) deallocate (var%buffer)
-    allocate (var%buffer(buffer_size))
-  end if
-
-  cptr = c_loc(var%buffer(1))
-  call c_f_pointer(cptr, fptr, [var%length])
-  fptr = values
-  nullify (fptr)
-end function new_variable_int32
+end subroutine new_variable_
 
 module impure elemental function get_variable(nc, name, exist) result(var)
   type(netcdf_type), intent(in) :: nc
@@ -84,11 +75,7 @@ impure elemental function get_variable_(ncid, name, exist) result(var)
     return
   end if zero_size_var
 
-  buffer_size = get_buffer_size(var%data_type, var%length)
-  if (allocation_required(var%buffer, buffer_size)) then
-    if (allocated(var%buffer)) deallocate (var%buffer)
-    allocate (var%buffer(buffer_size))
-  end if
+  call allocate_buffer(var)
   call handle_error(nc_get_var(ncid, var%id, c_loc(var%buffer(1))), &
     & "[get_variable_] Invalid variable.")
 end function get_variable_
@@ -211,5 +198,17 @@ pure module function get_shape(var) result(n)
     n(ndims - i + 1) = var%dimensions(i)%length
   end do
 end function get_shape
+
+pure module subroutine allocate_buffer_variable(var)
+  type(variable_type), intent(inout) :: var
+  integer(int64) :: buffer_size
+
+  !> Assuming var%data_type and var%length is properly initialized.
+  buffer_size = get_buffer_size(var%data_type, var%length)
+  if (allocation_required(var%buffer, buffer_size)) then
+    if (allocated(var%buffer)) deallocate (var%buffer)
+    allocate (var%buffer(buffer_size))
+  end if
+end subroutine allocate_buffer_variable
 
 end submodule submodule_variable
