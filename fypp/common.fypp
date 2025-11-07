@@ -1,0 +1,12 @@
+#: mute
+
+#: set ops = ['+', '-', '*', '/', '**']
+#: set op_names = ['add', 'sub', 'mul', 'div', 'pow']
+#: set kinds = ['real32', 'real64', 'int32', 'int64']
+#: set types = ['real', 'real', 'integer', 'integer']
+#: set cases = ['NC_FLOAT', 'NC_DOUBLE', 'NC_INT', 'NC_INT64']
+#: set ckinds = ['c_float', 'c_double', 'c_int', 'c_int64_t']
+#: set newline = "\n"
+#: set MAX_RANK = 5
+
+#: endmute

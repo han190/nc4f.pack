@@ -51,4 +51,28 @@ module subroutine close_dataset(nc)
   if (allocated(nc%dimensions)) deallocate (nc%dimensions)
 end subroutine close_dataset
 
+module subroutine to_netcdf_vars(filename, vars, atts)
+  character(len=*), intent(in) :: filename
+  type(variable_type), intent(in) :: vars(:)
+  type(attribute_type), intent(in), optional :: atts(:)
+  type(netcdf_type) :: nc
+
+  nc = open_dataset(filename, "w")
+  call put_variable(nc, vars)
+  if (present(atts)) call put_attribute(nc, atts)
+  call close_dataset(nc)
+end subroutine to_netcdf_vars
+
+module subroutine to_netcdf_var(filename, var, atts)
+  character(len=*), intent(in) :: filename
+  type(variable_type), intent(in) :: var
+  type(attribute_type), intent(in), optional :: atts(:)
+  type(netcdf_type) :: nc
+
+  nc = open_dataset(filename, "w")
+  call put_variable(nc, var)
+  if (present(atts)) call put_attribute(nc, atts)
+  call close_dataset(nc)
+end subroutine to_netcdf_var
+
 end submodule submodule_dataset

@@ -75,59 +75,59 @@ module subroutine write_formatted_attribute(att, unit, iotype, v_list, iostat, i
     select case (att%data_type)
     case (NC_FLOAT)
       block
-      real(real32), pointer :: fptr(:) => null()
-      call c_f_pointer(ptr, fptr, [att%length])
-      write (unit, "(2(a), 1x, '=', *(1x, g0.6))") &
-        & 'real(real32)::', att%name, fptr
-      nullify (fptr)
+        real(real32), pointer :: fptr(:) => null()
+        call c_f_pointer(ptr, fptr, [att%length])
+        write (unit, "(2(a), 1x, '=', *(1x, g0.6))") &
+          & 'real(real32)::', att%name, fptr
+        nullify (fptr)
       end block
     case (NC_DOUBLE)
       block
-      real(real64), pointer :: fptr(:) => null()
-      call c_f_pointer(ptr, fptr, [att%length])
-      write (unit, "(2(a), 1x, '=', *(1x, g0.6))") &
-        & 'real(real64)::', att%name, fptr
-      nullify (fptr)
+        real(real64), pointer :: fptr(:) => null()
+        call c_f_pointer(ptr, fptr, [att%length])
+        write (unit, "(2(a), 1x, '=', *(1x, g0.6))") &
+          & 'real(real64)::', att%name, fptr
+        nullify (fptr)
       end block
     case (NC_BYTE)
       block
-      integer(int8), pointer :: fptr(:) => null()
-      call c_f_pointer(ptr, fptr, [att%length])
-      write (unit, "(2(a), 1x, '=', *(1x, i0))") &
-        & 'integer(int8)::', att%name, fptr
-      nullify (fptr)
+        integer(int8), pointer :: fptr(:) => null()
+        call c_f_pointer(ptr, fptr, [att%length])
+        write (unit, "(2(a), 1x, '=', *(1x, i0))") &
+          & 'integer(int8)::', att%name, fptr
+        nullify (fptr)
       end block
     case (NC_SHORT)
       block
-      integer(int16), pointer :: fptr(:) => null()
-      call c_f_pointer(ptr, fptr, [att%length])
-      write (unit, "(2(a), 1x, '=', *(1x, i0))") &
-        & 'integer(int16)::', att%name, fptr
-      nullify (fptr)
+        integer(int16), pointer :: fptr(:) => null()
+        call c_f_pointer(ptr, fptr, [att%length])
+        write (unit, "(2(a), 1x, '=', *(1x, i0))") &
+          & 'integer(int16)::', att%name, fptr
+        nullify (fptr)
       end block
     case (NC_INT)
       block
-      integer(int32), pointer :: fptr(:) => null()
-      call c_f_pointer(ptr, fptr, [att%length])
-      write (unit, "(2(a), 1x, '=', *(1x, i0))") &
-        & 'integer(int32)::', att%name, fptr
-      nullify (fptr)
+        integer(int32), pointer :: fptr(:) => null()
+        call c_f_pointer(ptr, fptr, [att%length])
+        write (unit, "(2(a), 1x, '=', *(1x, i0))") &
+          & 'integer(int32)::', att%name, fptr
+        nullify (fptr)
       end block
     case (NC_INT64)
       block
-      integer(int64), pointer :: fptr(:) => null()
-      call c_f_pointer(ptr, fptr, [att%length])
-      write (unit, "(2(a), 1x, '=', *(1x, i0))") &
-        & 'integer(int64)::', att%name, fptr
-      nullify (fptr)
+        integer(int64), pointer :: fptr(:) => null()
+        call c_f_pointer(ptr, fptr, [att%length])
+        write (unit, "(2(a), 1x, '=', *(1x, i0))") &
+          & 'integer(int64)::', att%name, fptr
+        nullify (fptr)
       end block
     case (NC_CHAR)
       block
-      character(kind=c_char), pointer :: fptr(:) => null()
-      call c_f_pointer(ptr, fptr, [att%length])
-      write (unit, "(4(g0), 1x, '=', 1x, *(a))") &
-        & 'character(len=', att%length, ')::', att%name, fptr
-      nullify (fptr)
+        character(kind=c_char), pointer :: fptr(:) => null()
+        call c_f_pointer(ptr, fptr, [att%length])
+        write (unit, "(4(g0), 1x, '=', 1x, *(a))") &
+          & 'character(len=', att%length, ')::', att%name, fptr
+        nullify (fptr)
       end block
     case default
       error stop "[write_formatted_attribute] Invalid attribute type."

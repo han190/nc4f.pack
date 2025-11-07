@@ -2,16 +2,25 @@ submodule(module_netcdf) submodule_dimension
 implicit none
 contains
 
-module elemental function new_dimension_argument(length, is_unlimited) result(arg)
+module elemental function new_dimension_argument_int64(length, is_unlimited) result(arg)
   integer(int64), intent(in) :: length
   logical, intent(in) :: is_unlimited
   type(dimension_argument_type) :: arg
 
   arg%length = length
   arg%is_unlimited = is_unlimited
-end function new_dimension_argument
+end function new_dimension_argument_int64
 
-module elemental function new_dimension_length(name, length) result(dim)
+module elemental function new_dimension_argument_int32(length, is_unlimited) result(arg)
+  integer(int32), intent(in) :: length
+  logical, intent(in) :: is_unlimited
+  type(dimension_argument_type) :: arg
+
+  arg%length = length
+  arg%is_unlimited = is_unlimited
+end function new_dimension_argument_int32
+
+module elemental function new_dimension_length_int64(name, length) result(dim)
   character(len=*), intent(in) :: name
   integer(int64), intent(in) :: length
   type(dimension_type) :: dim
@@ -19,7 +28,17 @@ module elemental function new_dimension_length(name, length) result(dim)
   dim%name = trim(adjustl(name))
   dim%length = length
   dim%is_unlimited = .false.
-end function new_dimension_length
+end function new_dimension_length_int64
+
+module elemental function new_dimension_length_int32(name, length) result(dim)
+  character(len=*), intent(in) :: name
+  integer(int32), intent(in) :: length
+  type(dimension_type) :: dim
+
+  dim%name = trim(adjustl(name))
+  dim%length = length
+  dim%is_unlimited = .false.
+end function new_dimension_length_int32
 
 module elemental function new_dimension_arguments(name, args) result(dim)
   character(len=*), intent(in) :: name

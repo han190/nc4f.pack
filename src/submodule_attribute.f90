@@ -194,6 +194,7 @@ module impure elemental subroutine put_attribute_variable(nc, var)
   type(variable_type), target, intent(in) :: var
   integer :: i
 
+  if (.not. allocated(var%attributes) .or. size(var%attributes) == 0) return
   do i = 1, size(var%attributes)
     associate (att => var%attributes(i))
       call handle_error(nc_put_att(nc%id, var%id, f2cstr(att%name), &
@@ -207,6 +208,7 @@ module impure elemental subroutine put_attribute_global(nc, att)
   type(netcdf_type), intent(in) :: nc
   type(attribute_type), target, intent(in) :: att
 
+  if (.not. allocated(nc%attributes) .or. size(nc%attributes) == 0) return
   call handle_error(nc_put_att(nc%id, NC_GLOBAL, f2cstr(att%name), &
     & att%data_type, att%length, c_loc(att%buffer(1))), &
     & "[put_attribute_] Invalid attribute.")

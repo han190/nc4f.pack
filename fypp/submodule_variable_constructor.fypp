@@ -1,0 +1,52 @@
+#: include 'common.fypp'
+submodule(module_netcdf) submodule_variable_constructor
+implicit none
+contains${newline}$
+#: for C, T, K, CK in zip(cases, types, kinds, ckinds)
+#: for R in range(1, MAX_RANK)
+#: set COLS = ":" + "".join([", :" for _ in range(R-1)])
+module function new_variable_${K}$_${R}$d(name, values, dims) result(var)
+  character(len=*), intent(in) :: name
+  ${T}$(${K}$), target, intent(in) :: values(${COLS}$)
+  type(dimension_type), intent(in) :: dims(:)
+  type(variable_type), target :: var
+  ${T}$(${CK}$), pointer :: var_ptr(${COLS}$)
+
+  call new_variable_(var, name, ${C}$, size(values, kind=int64), dims)
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  if (allocated(var%attributes)) deallocate (var%attributes)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_${K}$_${R}$d${newline}$
+module function new_variable_${K}$_${R}$d_att(name, values, dims, atts) result(var)
+  character(len=*), intent(in) :: name
+  ${T}$(${K}$), target, intent(in) :: values(${COLS}$)
+  type(dimension_type), intent(in) :: dims(:)
+  type(attribute_type), intent(in) :: atts(:)
+  type(variable_type), target :: var
+  ${T}$(${CK}$), pointer :: var_ptr(${COLS}$)
+
+  call new_variable_(var, name, ${C}$, size(values, kind=int64), dims)
+  var%attributes = atts
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_${K}$_${R}$d_att${newline}$
+#: endfor
+#: endfor
+pure subroutine new_variable_(var, name, data_type, length, dims)
+  type(variable_type), intent(inout) :: var
+  character(len=*), intent(in) :: name
+  integer(int32), intent(in) :: data_type
+  integer(int64), intent(in) :: length
+  type(dimension_type), intent(in) :: dims(:)
+
+  var%name = trim(adjustl(name))
+  var%data_type = data_type
+  var%length = length
+  var%dimensions = dims
+end subroutine new_variable_
+
+end submodule submodule_variable_constructor

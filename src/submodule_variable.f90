@@ -2,57 +2,6 @@ submodule(module_netcdf) submodule_variable
 implicit none
 contains
 
-module function new_variable_real32(name, values, dims, atts) result(var)
-  character(len=*), intent(in) :: name
-  real(real32), intent(in) :: values(:)
-  type(dimension_type), intent(in) :: dims(:)
-  type(attribute_type), intent(in), optional :: atts(:)
-  type(variable_type), target :: var
-  real(c_float), pointer :: var_ptr(:)
-
-  if (size(values) == 0) error stop &
-    & "[new_variable_real32] Invalid values."
-  call new_variable_(var, name, NC_FLOAT, &
-    & size(values, kind=int64), dims, atts)
-  call allocate_buffer(var)
-  call extract(var, var_ptr)
-  var_ptr = values
-  nullify (var_ptr)
-end function new_variable_real32
-
-module function new_variable_int32(name, values, dims, atts) result(var)
-  character(len=*), intent(in) :: name
-  integer(int32), intent(in) :: values(:)
-  type(dimension_type), intent(in) :: dims(:)
-  type(attribute_type), intent(in), optional :: atts(:)
-  type(variable_type), target :: var
-  integer(c_int), pointer :: var_ptr(:)
-
-  if (size(values) == 0) error stop &
-    & "[new_variable_int32] Invalid values."
-  call new_variable_(var, name, NC_INT, &
-    & size(values, kind=int64), dims, atts)
-  call allocate_buffer(var)
-  call extract(var, var_ptr)
-  var_ptr = values
-  nullify (var_ptr)
-end function new_variable_int32
-
-pure subroutine new_variable_(var, name, data_type, length, dims, atts)
-  type(variable_type), intent(inout) :: var
-  character(len=*), intent(in) :: name
-  integer(int32), intent(in) :: data_type
-  integer(int64), intent(in) :: length
-  type(dimension_type), intent(in) :: dims(:)
-  type(attribute_type), intent(in), optional :: atts(:)
-
-  var%name = trim(adjustl(name))
-  var%data_type = data_type
-  var%length = length
-  var%dimensions = dims
-  if (present(atts)) var%attributes = atts
-end subroutine new_variable_
-
 module impure elemental function get_variable(nc, name, exist) result(var)
   type(netcdf_type), intent(in) :: nc
   character(len=*), intent(in) :: name
@@ -111,7 +60,7 @@ impure elemental function inquire_variable_(ncid, name, exist) result(var)
   var%dimensions = inquire_dimensions_(ncid, var%id)
   var%length = 1
   do i = 1, size(var%dimensions)
-    var%length = var%length * var%dimensions(i)%length
+    var%length = var%length*var%dimensions(i)%length
   end do
 end function inquire_variable_
 
@@ -139,7 +88,7 @@ impure elemental function define_variable(nc, var) result(new_var)
   new_dims = define_dimension(nc, var%dimensions)
   !> Reverse dimension since we use C APIs.
   do i = 1, n
-    j = n - i + 1 
+    j = n - i + 1
     new_dimids(j) = new_dims(i)%id
   end do
 
@@ -171,7 +120,7 @@ pure module function get_size(var, dim) result(n)
   select case (dim_)
   case (0)
     do i = 1, size(var%dimensions)
-      n = n * var%dimensions(i)%length
+      n = n*var%dimensions(i)%length
     end do
   case (1:)
     i = size(var%dimensions) - dim_ + 1

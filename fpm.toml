@@ -20,6 +20,6 @@ netcdf = "*"
 source-dir = "src"
 
 [[test]]
-name = "test_netcdf"
+name = "test_wr"
 source-dir = "test"
-main = "test_netcdf.f90"
+main = "test_wr.f90"
