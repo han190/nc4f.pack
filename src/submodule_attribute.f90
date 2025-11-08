@@ -204,7 +204,7 @@ module impure elemental subroutine put_attribute_variable(nc, var)
 end subroutine put_attribute_variable
 
 module impure elemental subroutine put_attribute_global(nc)
-  type(netcdf_type), intent(in) :: nc
+  type(netcdf_type), target, intent(in) :: nc
   integer(int64) :: i
 
   if (.not. allocated(nc%attributes)) return
