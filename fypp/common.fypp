@@ -9,7 +9,7 @@
 #: set cases = ['NC_BYTE', 'NC_SHORT', 'NC_INT', 'NC_INT64', 'NC_FLOAT', 'NC_DOUBLE']
 #: set ckinds = ['c_int8_t', 'c_int16_t', 'c_int32_t', 'c_int64_t', 'c_float', 'c_double']
 #: set newline = "\n"
-#: set MAX_RANK = 6
+#: set MAX_RANK = 7
 #: set integer_types = cases[:4]
 #: set real_types = cases[4:]
 

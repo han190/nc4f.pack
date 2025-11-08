@@ -1,4 +1,24 @@
-fypp ./fypp/module_netcdf.fypp > ./src/module_netcdf.inc
-fypp ./fypp/submodule_variable_constructor.fypp > ./src/submodule_variable_constructor.f90
-fypp ./fypp/submodule_extract.fypp > ./src/submodule_extract.f90
-fypp ./fypp/submodule_arithmetic.fypp > ./src/submodule_arithmetic.f90
+#!/usr/bin/env bash
+
+PREPROC_DIR="fypp"
+SRC_DIR="src"
+
+COMPONENTS=(
+  arithmetic
+  extract
+  variable_constructor
+)
+
+for name in "${COMPONENTS[@]}"; do
+  infile="$PREPROC_DIR/interface_${name}.fypp"
+  outfile="$SRC_DIR/interface_${name}.inc"
+  echo "$infile -> $outfile"
+  fypp $infile > $outfile
+
+  infile="$PREPROC_DIR/submodule_${name}.fypp"
+  outfile="$SRC_DIR/submodule_${name}.f90"
+  echo "$infile -> $outfile"
+  fypp $infile > $outfile
+done
+
+exit 0

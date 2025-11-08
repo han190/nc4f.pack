@@ -1,0 +1,34 @@
+#: include "common.fypp"
+#! ----------------------
+#! Interface (data_array)
+#! ----------------------
+interface data_array
+#: for T, K in zip(types, kinds)
+#: for R in range(1, MAX_RANK+1)
+  module procedure :: new_variable_${K}$_${R}$d
+  module procedure :: new_variable_${K}$_${R}$d_att
+#: endfor
+#: endfor
+end interface${newline}$
+#! ----------------
+#! Module interface
+#! ----------------
+interface
+#: for C, T, K, CK in zip(cases, types, kinds, ckinds)
+#: for R in range(1, MAX_RANK+1)
+  module function new_variable_${K}$_${R}$d(name, values, dims) result(var)
+    character(len=*), intent(in) :: name
+    ${T}$(${K}$), target, intent(in) :: values(:#{for _ in range(R-1)}#, :#{endfor}#)
+    type(dimension_type), intent(in) :: dims(:)
+    type(variable_type), target :: var
+  end function new_variable_${K}$_${R}$d${newline}$
+  module function new_variable_${K}$_${R}$d_att(name, values, dims, atts) result(var)
+    character(len=*), intent(in) :: name
+    ${T}$(${K}$), target, intent(in) :: values(:#{for _ in range(R-1)}#, :#{endfor}#)
+    type(dimension_type), intent(in) :: dims(:)
+    type(attribute_type), intent(in) :: atts(:)
+    type(variable_type), target :: var
+  end function new_variable_${K}$_${R}$d_att${newline}$
+#:endfor
+#:endfor
+end interface

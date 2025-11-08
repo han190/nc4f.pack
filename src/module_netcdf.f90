@@ -412,5 +412,8 @@ interface
   end subroutine allocate_buffer_variable
 end interface
 
-include "module_netcdf.inc"
+include "interface_arithmetic.inc"
+include "interface_extract.inc"
+include "interface_variable_constructor.inc"
+
 end module module_netcdf
