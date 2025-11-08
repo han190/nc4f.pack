@@ -23,11 +23,15 @@ module function ${N}$_vars(x, y) result(res)
   case (${C}$)
     block
       ${T}$(${K}$), pointer :: xp(:), yp(:), resp(:)
+      type(c_ptr) :: cptr
 
       call allocate_buffer(res)
-      call extract(res, resp)
-      call extract(x, xp)
-      call extract(y, yp)
+      cptr = c_loc(res%buffer(1))
+      call c_f_pointer(cptr, resp, [res%length])
+      cptr = c_loc(x%buffer(1))
+      call c_f_pointer(cptr, xp, [x%length])
+      cptr = c_loc(y%buffer(1))
+      call c_f_pointer(cptr, yp, [y%length])
       resp = xp ${O}$ yp
       nullify (xp, yp, resp)
     end block
@@ -53,12 +57,15 @@ module function ${N}$_var_${K1}$(x, y) result(res)
       #: set K_SEL = COMPARE_TYPES2(I1, I)
       ${T}$(${K}$), pointer :: xp(:)
       ${T_SEL}$(${K_SEL}$), pointer :: resp(:)
+      type(c_ptr) :: cptr
 
       #: set TYPE_SEL = COMPARE_TYPES3(I1, I)
       res%data_type = ${TYPE_SEL}$
       call allocate_buffer(res)
-      call extract(res, resp)
-      call extract(x, xp)
+      cptr = c_loc(res%buffer(1))
+      call c_f_pointer(cptr, resp, [res%length])
+      cptr = c_loc(x%buffer(1))
+      call c_f_pointer(cptr, xp, [x%length])
       #: set RESULT = COMPARE_TYPES4(I1, I)
       #: if RESULT == '1'
       resp = xp ${O}$ y
@@ -89,11 +96,14 @@ module function ${N}$_${K1}$_var(x, y) result(res)
       #: set K_SEL = COMPARE_TYPES2(I1, I)
       ${T}$(${K}$), pointer :: yp(:)
       ${T_SEL}$(${K_SEL}$), pointer :: resp(:)
+      type(c_ptr) :: cptr
 
       #: set TYPE_SEL = COMPARE_TYPES3(I1, I)
       call allocate_buffer(res)
-      call extract(res, resp)
-      call extract(y, yp)
+      cptr = c_loc(res%buffer(1))
+      call c_f_pointer(cptr, resp, [res%length])
+      cptr = c_loc(y%buffer(1))
+      call c_f_pointer(cptr, yp, [y%length])
       #: set RESULT = COMPARE_TYPES4(I1, I)
       #: if RESULT == '1'
       resp = x ${O}$ yp
