@@ -6,8 +6,6 @@ contains${newline}$
 module function ${N}$_vars(x, y) result(res)
   type(variable_type), target, intent(in) :: x, y
   type(variable_type), target :: res
-  type(c_ptr) :: x_cptr, y_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   if (any(x%dimensions /= y%dimensions)) &
     & error stop "[add_vars] Unequal dimensions."
@@ -24,34 +22,23 @@ module function ${N}$_vars(x, y) result(res)
   #: for C, T, K in zip(cases, types, kinds)
   case (${C}$)
     block
-    ${T}$(${K}$), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
-    buffer_size = get_buffer_size(res%data_type, res%length)
-    if (allocation_required(res%buffer, buffer_size)) then
-      if (allocated(res%buffer)) deallocate (res%buffer)
-      allocate (res%buffer(buffer_size))
-    end if
+      ${T}$(${K}$), pointer :: xp(:), yp(:), resp(:)
 
-    x_cptr = c_loc(x%buffer(1))
-    y_cptr = c_loc(y%buffer(1))
-    r_cptr = c_loc(res%buffer(1))
-
-    call c_f_pointer(x_cptr, x_fptr, [x%length])
-    call c_f_pointer(y_cptr, y_fptr, [y%length])
-    call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-    r_fptr = x_fptr ${O}$ y_fptr
-    nullify (x_fptr, y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      call extract(y, yp)
+      resp = xp ${O}$ yp
+      nullify (xp, yp, resp)
     end block
   #: endfor
   end select
 end function ${N}$_vars${newline}$
-#: for C1, T1, K1 in zip(cases, types, kinds)
+#: for I1, C1, T1, K1 in zip(indices, cases, types, kinds)
 module function ${N}$_var_${K1}$(x, y) result(res)
   type(variable_type), target, intent(in) :: x
   ${T1}$(${K1}$), intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: x_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = x%name
   res%length = x%length
@@ -59,26 +46,27 @@ module function ${N}$_var_${K1}$(x, y) result(res)
   res%attributes = x%attributes
 
   select case (x%data_type)
-  #: for C, T, K in zip(cases, types, kinds)
+  #: for I, C, T, K in zip(indices, cases, types, kinds)
   case (${C}$)
     block
-    ${T}$(${K}$), pointer :: x_fptr(:), r_fptr(:)
+      #: set T_SEL = COMPARE_TYPES1(I1, I)
+      #: set K_SEL = COMPARE_TYPES2(I1, I)
+      ${T}$(${K}$), pointer :: xp(:)
+      ${T_SEL}$(${K_SEL}$), pointer :: resp(:)
 
-    res%data_type = max(${C}$, ${C1}$)
-    buffer_size = get_buffer_size(res%data_type, res%length)
-    if (allocation_required(res%buffer, buffer_size)) then
-      if (allocated(res%buffer)) deallocate (res%buffer)
-      allocate (res%buffer(buffer_size))
-    end if
-
-    x_cptr = c_loc(x%buffer(1))
-    r_cptr = c_loc(res%buffer(1))
-
-    call c_f_pointer(x_cptr, x_fptr, [x%length])
-    call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-    r_fptr = x_fptr ${O}$ y
-    nullify (x_fptr, r_fptr)
+      #: set TYPE_SEL = COMPARE_TYPES3(I1, I)
+      res%data_type = ${TYPE_SEL}$
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      #: set RESULT = COMPARE_TYPES4(I1, I)
+      #: if RESULT == '1'
+      resp = xp ${O}$ y
+      #: else
+      resp = xp
+      resp = resp ${O}$ y
+      #: endif
+      nullify (xp, resp)
     end block
   #: endfor
   end select
@@ -87,8 +75,6 @@ module function ${N}$_${K1}$_var(x, y) result(res)
   ${T1}$(${K1}$), intent(in) :: x
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: y_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = y%name
   res%length = y%length
@@ -96,26 +82,26 @@ module function ${N}$_${K1}$_var(x, y) result(res)
   res%attributes = y%attributes
 
   select case (y%data_type)
-  #: for C, T, K in zip(cases, types, kinds)
+  #: for I, C, T, K in zip(indices, cases, types, kinds)
   case (${C}$)
     block
-    ${T}$(${K}$), pointer :: y_fptr(:), r_fptr(:)
+      #: set T_SEL = COMPARE_TYPES1(I1, I)
+      #: set K_SEL = COMPARE_TYPES2(I1, I)
+      ${T}$(${K}$), pointer :: yp(:)
+      ${T_SEL}$(${K_SEL}$), pointer :: resp(:)
 
-    res%data_type = max(${C}$, ${C1}$)
-    buffer_size = get_buffer_size(res%data_type, res%length)
-    if (allocation_required(res%buffer, buffer_size)) then
-      if (allocated(res%buffer)) deallocate (res%buffer)
-      allocate (res%buffer(buffer_size))
-    end if
-
-    y_cptr = c_loc(y%buffer(1))
-    r_cptr = c_loc(res%buffer(1))
-
-    call c_f_pointer(y_cptr, y_fptr, [y%length])
-    call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-    r_fptr = x ${O}$ y_fptr
-    nullify (y_fptr, r_fptr)
+      #: set TYPE_SEL = COMPARE_TYPES3(I1, I)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      #: set RESULT = COMPARE_TYPES4(I1, I)
+      #: if RESULT == '1'
+      resp = x ${O}$ yp
+      #: else
+      resp = x
+      resp = resp ${O}$ yp
+      #: endif
+      nullify (yp, resp)
     end block
   #: endfor
   end select

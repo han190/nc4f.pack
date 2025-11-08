@@ -2,11 +2,47 @@
 
 #: set ops = ['+', '-', '*', '/', '**']
 #: set op_names = ['add', 'sub', 'mul', 'div', 'pow']
-#: set kinds = ['real32', 'real64', 'int32', 'int64']
-#: set types = ['real', 'real', 'integer', 'integer']
-#: set cases = ['NC_FLOAT', 'NC_DOUBLE', 'NC_INT', 'NC_INT64']
-#: set ckinds = ['c_float', 'c_double', 'c_int', 'c_int64_t']
+
+#: set indices = [0, 1, 2, 3, 4, 5]
+#: set kinds = ['int8', 'int16', 'int32', 'int64', 'real32', 'real64']
+#: set types = ['integer', 'integer', 'integer', 'integer', 'real', 'real']
+#: set cases = ['NC_BYTE', 'NC_SHORT', 'NC_INT', 'NC_INT64', 'NC_FLOAT', 'NC_DOUBLE']
+#: set ckinds = ['c_int8_t', 'c_int16_t', 'c_int32_t', 'c_int64_t', 'c_float', 'c_double']
 #: set newline = "\n"
-#: set MAX_RANK = 5
+#: set MAX_RANK = 6
+#: set integer_types = cases[:4]
+#: set real_types = cases[4:]
+
+#: def COMPARE_TYPES1(i, j)
+#: if (i == 3 and j == 4) or (i == 4 and j == 3)
+real
+#: else
+${types[max(i, j)]}$
+#: endif
+#: enddef
+
+#: def COMPARE_TYPES2(i, j)
+#: if (i == 3 and j == 4) or (i == 4 and j == 3)
+real64
+#: else
+${kinds[max(i, j)]}$
+#: endif
+#: enddef
+
+#: def COMPARE_TYPES3(i, j)
+#: if (i == 3 and j == 4) or (i == 4 and j == 3)
+NC_DOUBLE
+#: else
+${cases[max(i, j)]}$
+#: endif
+#: enddef
+
+#: def COMPARE_TYPES4(i, j)
+#: if (i == 3 and j == 4) or (i == 4 and j == 3)
+2
+#: else
+1
+#: endif
+#: enddef
 
 #: endmute

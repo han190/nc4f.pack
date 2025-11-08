@@ -16,7 +16,6 @@ impure elemental function get_variable_(ncid, name, exist) result(var)
   character(len=*), intent(in) :: name
   logical, intent(out) :: exist
   type(variable_type), target :: var
-  integer(int64) :: buffer_size
 
   var = inquire_variable_(ncid, name, exist)
   zero_size_var: if (var%length == 0) then

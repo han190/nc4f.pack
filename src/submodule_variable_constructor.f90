@@ -2,6 +2,626 @@ submodule(module_netcdf) submodule_variable_constructor
 implicit none
 contains
 
+module function new_variable_int8_1d(name, values, dims) result(var)
+  character(len=*), intent(in) :: name
+  integer(int8), target, intent(in) :: values(:)
+  type(dimension_type), intent(in) :: dims(:)
+  type(variable_type), target :: var
+  integer(c_int8_t), pointer :: var_ptr(:)
+
+  call new_variable_(var, name, NC_BYTE, size(values, kind=int64), dims)
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  if (allocated(var%attributes)) deallocate (var%attributes)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int8_1d
+
+module function new_variable_int8_1d_att(name, values, dims, atts) result(var)
+  character(len=*), intent(in) :: name
+  integer(int8), target, intent(in) :: values(:)
+  type(dimension_type), intent(in) :: dims(:)
+  type(attribute_type), intent(in) :: atts(:)
+  type(variable_type), target :: var
+  integer(c_int8_t), pointer :: var_ptr(:)
+
+  call new_variable_(var, name, NC_BYTE, size(values, kind=int64), dims)
+  var%attributes = atts
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int8_1d_att
+
+module function new_variable_int8_2d(name, values, dims) result(var)
+  character(len=*), intent(in) :: name
+  integer(int8), target, intent(in) :: values(:, :)
+  type(dimension_type), intent(in) :: dims(:)
+  type(variable_type), target :: var
+  integer(c_int8_t), pointer :: var_ptr(:, :)
+
+  call new_variable_(var, name, NC_BYTE, size(values, kind=int64), dims)
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  if (allocated(var%attributes)) deallocate (var%attributes)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int8_2d
+
+module function new_variable_int8_2d_att(name, values, dims, atts) result(var)
+  character(len=*), intent(in) :: name
+  integer(int8), target, intent(in) :: values(:, :)
+  type(dimension_type), intent(in) :: dims(:)
+  type(attribute_type), intent(in) :: atts(:)
+  type(variable_type), target :: var
+  integer(c_int8_t), pointer :: var_ptr(:, :)
+
+  call new_variable_(var, name, NC_BYTE, size(values, kind=int64), dims)
+  var%attributes = atts
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int8_2d_att
+
+module function new_variable_int8_3d(name, values, dims) result(var)
+  character(len=*), intent(in) :: name
+  integer(int8), target, intent(in) :: values(:, :, :)
+  type(dimension_type), intent(in) :: dims(:)
+  type(variable_type), target :: var
+  integer(c_int8_t), pointer :: var_ptr(:, :, :)
+
+  call new_variable_(var, name, NC_BYTE, size(values, kind=int64), dims)
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  if (allocated(var%attributes)) deallocate (var%attributes)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int8_3d
+
+module function new_variable_int8_3d_att(name, values, dims, atts) result(var)
+  character(len=*), intent(in) :: name
+  integer(int8), target, intent(in) :: values(:, :, :)
+  type(dimension_type), intent(in) :: dims(:)
+  type(attribute_type), intent(in) :: atts(:)
+  type(variable_type), target :: var
+  integer(c_int8_t), pointer :: var_ptr(:, :, :)
+
+  call new_variable_(var, name, NC_BYTE, size(values, kind=int64), dims)
+  var%attributes = atts
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int8_3d_att
+
+module function new_variable_int8_4d(name, values, dims) result(var)
+  character(len=*), intent(in) :: name
+  integer(int8), target, intent(in) :: values(:, :, :, :)
+  type(dimension_type), intent(in) :: dims(:)
+  type(variable_type), target :: var
+  integer(c_int8_t), pointer :: var_ptr(:, :, :, :)
+
+  call new_variable_(var, name, NC_BYTE, size(values, kind=int64), dims)
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  if (allocated(var%attributes)) deallocate (var%attributes)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int8_4d
+
+module function new_variable_int8_4d_att(name, values, dims, atts) result(var)
+  character(len=*), intent(in) :: name
+  integer(int8), target, intent(in) :: values(:, :, :, :)
+  type(dimension_type), intent(in) :: dims(:)
+  type(attribute_type), intent(in) :: atts(:)
+  type(variable_type), target :: var
+  integer(c_int8_t), pointer :: var_ptr(:, :, :, :)
+
+  call new_variable_(var, name, NC_BYTE, size(values, kind=int64), dims)
+  var%attributes = atts
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int8_4d_att
+
+module function new_variable_int8_5d(name, values, dims) result(var)
+  character(len=*), intent(in) :: name
+  integer(int8), target, intent(in) :: values(:, :, :, :, :)
+  type(dimension_type), intent(in) :: dims(:)
+  type(variable_type), target :: var
+  integer(c_int8_t), pointer :: var_ptr(:, :, :, :, :)
+
+  call new_variable_(var, name, NC_BYTE, size(values, kind=int64), dims)
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  if (allocated(var%attributes)) deallocate (var%attributes)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int8_5d
+
+module function new_variable_int8_5d_att(name, values, dims, atts) result(var)
+  character(len=*), intent(in) :: name
+  integer(int8), target, intent(in) :: values(:, :, :, :, :)
+  type(dimension_type), intent(in) :: dims(:)
+  type(attribute_type), intent(in) :: atts(:)
+  type(variable_type), target :: var
+  integer(c_int8_t), pointer :: var_ptr(:, :, :, :, :)
+
+  call new_variable_(var, name, NC_BYTE, size(values, kind=int64), dims)
+  var%attributes = atts
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int8_5d_att
+
+module function new_variable_int16_1d(name, values, dims) result(var)
+  character(len=*), intent(in) :: name
+  integer(int16), target, intent(in) :: values(:)
+  type(dimension_type), intent(in) :: dims(:)
+  type(variable_type), target :: var
+  integer(c_int16_t), pointer :: var_ptr(:)
+
+  call new_variable_(var, name, NC_SHORT, size(values, kind=int64), dims)
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  if (allocated(var%attributes)) deallocate (var%attributes)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int16_1d
+
+module function new_variable_int16_1d_att(name, values, dims, atts) result(var)
+  character(len=*), intent(in) :: name
+  integer(int16), target, intent(in) :: values(:)
+  type(dimension_type), intent(in) :: dims(:)
+  type(attribute_type), intent(in) :: atts(:)
+  type(variable_type), target :: var
+  integer(c_int16_t), pointer :: var_ptr(:)
+
+  call new_variable_(var, name, NC_SHORT, size(values, kind=int64), dims)
+  var%attributes = atts
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int16_1d_att
+
+module function new_variable_int16_2d(name, values, dims) result(var)
+  character(len=*), intent(in) :: name
+  integer(int16), target, intent(in) :: values(:, :)
+  type(dimension_type), intent(in) :: dims(:)
+  type(variable_type), target :: var
+  integer(c_int16_t), pointer :: var_ptr(:, :)
+
+  call new_variable_(var, name, NC_SHORT, size(values, kind=int64), dims)
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  if (allocated(var%attributes)) deallocate (var%attributes)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int16_2d
+
+module function new_variable_int16_2d_att(name, values, dims, atts) result(var)
+  character(len=*), intent(in) :: name
+  integer(int16), target, intent(in) :: values(:, :)
+  type(dimension_type), intent(in) :: dims(:)
+  type(attribute_type), intent(in) :: atts(:)
+  type(variable_type), target :: var
+  integer(c_int16_t), pointer :: var_ptr(:, :)
+
+  call new_variable_(var, name, NC_SHORT, size(values, kind=int64), dims)
+  var%attributes = atts
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int16_2d_att
+
+module function new_variable_int16_3d(name, values, dims) result(var)
+  character(len=*), intent(in) :: name
+  integer(int16), target, intent(in) :: values(:, :, :)
+  type(dimension_type), intent(in) :: dims(:)
+  type(variable_type), target :: var
+  integer(c_int16_t), pointer :: var_ptr(:, :, :)
+
+  call new_variable_(var, name, NC_SHORT, size(values, kind=int64), dims)
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  if (allocated(var%attributes)) deallocate (var%attributes)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int16_3d
+
+module function new_variable_int16_3d_att(name, values, dims, atts) result(var)
+  character(len=*), intent(in) :: name
+  integer(int16), target, intent(in) :: values(:, :, :)
+  type(dimension_type), intent(in) :: dims(:)
+  type(attribute_type), intent(in) :: atts(:)
+  type(variable_type), target :: var
+  integer(c_int16_t), pointer :: var_ptr(:, :, :)
+
+  call new_variable_(var, name, NC_SHORT, size(values, kind=int64), dims)
+  var%attributes = atts
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int16_3d_att
+
+module function new_variable_int16_4d(name, values, dims) result(var)
+  character(len=*), intent(in) :: name
+  integer(int16), target, intent(in) :: values(:, :, :, :)
+  type(dimension_type), intent(in) :: dims(:)
+  type(variable_type), target :: var
+  integer(c_int16_t), pointer :: var_ptr(:, :, :, :)
+
+  call new_variable_(var, name, NC_SHORT, size(values, kind=int64), dims)
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  if (allocated(var%attributes)) deallocate (var%attributes)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int16_4d
+
+module function new_variable_int16_4d_att(name, values, dims, atts) result(var)
+  character(len=*), intent(in) :: name
+  integer(int16), target, intent(in) :: values(:, :, :, :)
+  type(dimension_type), intent(in) :: dims(:)
+  type(attribute_type), intent(in) :: atts(:)
+  type(variable_type), target :: var
+  integer(c_int16_t), pointer :: var_ptr(:, :, :, :)
+
+  call new_variable_(var, name, NC_SHORT, size(values, kind=int64), dims)
+  var%attributes = atts
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int16_4d_att
+
+module function new_variable_int16_5d(name, values, dims) result(var)
+  character(len=*), intent(in) :: name
+  integer(int16), target, intent(in) :: values(:, :, :, :, :)
+  type(dimension_type), intent(in) :: dims(:)
+  type(variable_type), target :: var
+  integer(c_int16_t), pointer :: var_ptr(:, :, :, :, :)
+
+  call new_variable_(var, name, NC_SHORT, size(values, kind=int64), dims)
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  if (allocated(var%attributes)) deallocate (var%attributes)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int16_5d
+
+module function new_variable_int16_5d_att(name, values, dims, atts) result(var)
+  character(len=*), intent(in) :: name
+  integer(int16), target, intent(in) :: values(:, :, :, :, :)
+  type(dimension_type), intent(in) :: dims(:)
+  type(attribute_type), intent(in) :: atts(:)
+  type(variable_type), target :: var
+  integer(c_int16_t), pointer :: var_ptr(:, :, :, :, :)
+
+  call new_variable_(var, name, NC_SHORT, size(values, kind=int64), dims)
+  var%attributes = atts
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int16_5d_att
+
+module function new_variable_int32_1d(name, values, dims) result(var)
+  character(len=*), intent(in) :: name
+  integer(int32), target, intent(in) :: values(:)
+  type(dimension_type), intent(in) :: dims(:)
+  type(variable_type), target :: var
+  integer(c_int32_t), pointer :: var_ptr(:)
+
+  call new_variable_(var, name, NC_INT, size(values, kind=int64), dims)
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  if (allocated(var%attributes)) deallocate (var%attributes)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int32_1d
+
+module function new_variable_int32_1d_att(name, values, dims, atts) result(var)
+  character(len=*), intent(in) :: name
+  integer(int32), target, intent(in) :: values(:)
+  type(dimension_type), intent(in) :: dims(:)
+  type(attribute_type), intent(in) :: atts(:)
+  type(variable_type), target :: var
+  integer(c_int32_t), pointer :: var_ptr(:)
+
+  call new_variable_(var, name, NC_INT, size(values, kind=int64), dims)
+  var%attributes = atts
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int32_1d_att
+
+module function new_variable_int32_2d(name, values, dims) result(var)
+  character(len=*), intent(in) :: name
+  integer(int32), target, intent(in) :: values(:, :)
+  type(dimension_type), intent(in) :: dims(:)
+  type(variable_type), target :: var
+  integer(c_int32_t), pointer :: var_ptr(:, :)
+
+  call new_variable_(var, name, NC_INT, size(values, kind=int64), dims)
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  if (allocated(var%attributes)) deallocate (var%attributes)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int32_2d
+
+module function new_variable_int32_2d_att(name, values, dims, atts) result(var)
+  character(len=*), intent(in) :: name
+  integer(int32), target, intent(in) :: values(:, :)
+  type(dimension_type), intent(in) :: dims(:)
+  type(attribute_type), intent(in) :: atts(:)
+  type(variable_type), target :: var
+  integer(c_int32_t), pointer :: var_ptr(:, :)
+
+  call new_variable_(var, name, NC_INT, size(values, kind=int64), dims)
+  var%attributes = atts
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int32_2d_att
+
+module function new_variable_int32_3d(name, values, dims) result(var)
+  character(len=*), intent(in) :: name
+  integer(int32), target, intent(in) :: values(:, :, :)
+  type(dimension_type), intent(in) :: dims(:)
+  type(variable_type), target :: var
+  integer(c_int32_t), pointer :: var_ptr(:, :, :)
+
+  call new_variable_(var, name, NC_INT, size(values, kind=int64), dims)
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  if (allocated(var%attributes)) deallocate (var%attributes)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int32_3d
+
+module function new_variable_int32_3d_att(name, values, dims, atts) result(var)
+  character(len=*), intent(in) :: name
+  integer(int32), target, intent(in) :: values(:, :, :)
+  type(dimension_type), intent(in) :: dims(:)
+  type(attribute_type), intent(in) :: atts(:)
+  type(variable_type), target :: var
+  integer(c_int32_t), pointer :: var_ptr(:, :, :)
+
+  call new_variable_(var, name, NC_INT, size(values, kind=int64), dims)
+  var%attributes = atts
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int32_3d_att
+
+module function new_variable_int32_4d(name, values, dims) result(var)
+  character(len=*), intent(in) :: name
+  integer(int32), target, intent(in) :: values(:, :, :, :)
+  type(dimension_type), intent(in) :: dims(:)
+  type(variable_type), target :: var
+  integer(c_int32_t), pointer :: var_ptr(:, :, :, :)
+
+  call new_variable_(var, name, NC_INT, size(values, kind=int64), dims)
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  if (allocated(var%attributes)) deallocate (var%attributes)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int32_4d
+
+module function new_variable_int32_4d_att(name, values, dims, atts) result(var)
+  character(len=*), intent(in) :: name
+  integer(int32), target, intent(in) :: values(:, :, :, :)
+  type(dimension_type), intent(in) :: dims(:)
+  type(attribute_type), intent(in) :: atts(:)
+  type(variable_type), target :: var
+  integer(c_int32_t), pointer :: var_ptr(:, :, :, :)
+
+  call new_variable_(var, name, NC_INT, size(values, kind=int64), dims)
+  var%attributes = atts
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int32_4d_att
+
+module function new_variable_int32_5d(name, values, dims) result(var)
+  character(len=*), intent(in) :: name
+  integer(int32), target, intent(in) :: values(:, :, :, :, :)
+  type(dimension_type), intent(in) :: dims(:)
+  type(variable_type), target :: var
+  integer(c_int32_t), pointer :: var_ptr(:, :, :, :, :)
+
+  call new_variable_(var, name, NC_INT, size(values, kind=int64), dims)
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  if (allocated(var%attributes)) deallocate (var%attributes)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int32_5d
+
+module function new_variable_int32_5d_att(name, values, dims, atts) result(var)
+  character(len=*), intent(in) :: name
+  integer(int32), target, intent(in) :: values(:, :, :, :, :)
+  type(dimension_type), intent(in) :: dims(:)
+  type(attribute_type), intent(in) :: atts(:)
+  type(variable_type), target :: var
+  integer(c_int32_t), pointer :: var_ptr(:, :, :, :, :)
+
+  call new_variable_(var, name, NC_INT, size(values, kind=int64), dims)
+  var%attributes = atts
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int32_5d_att
+
+module function new_variable_int64_1d(name, values, dims) result(var)
+  character(len=*), intent(in) :: name
+  integer(int64), target, intent(in) :: values(:)
+  type(dimension_type), intent(in) :: dims(:)
+  type(variable_type), target :: var
+  integer(c_int64_t), pointer :: var_ptr(:)
+
+  call new_variable_(var, name, NC_INT64, size(values, kind=int64), dims)
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  if (allocated(var%attributes)) deallocate (var%attributes)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int64_1d
+
+module function new_variable_int64_1d_att(name, values, dims, atts) result(var)
+  character(len=*), intent(in) :: name
+  integer(int64), target, intent(in) :: values(:)
+  type(dimension_type), intent(in) :: dims(:)
+  type(attribute_type), intent(in) :: atts(:)
+  type(variable_type), target :: var
+  integer(c_int64_t), pointer :: var_ptr(:)
+
+  call new_variable_(var, name, NC_INT64, size(values, kind=int64), dims)
+  var%attributes = atts
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int64_1d_att
+
+module function new_variable_int64_2d(name, values, dims) result(var)
+  character(len=*), intent(in) :: name
+  integer(int64), target, intent(in) :: values(:, :)
+  type(dimension_type), intent(in) :: dims(:)
+  type(variable_type), target :: var
+  integer(c_int64_t), pointer :: var_ptr(:, :)
+
+  call new_variable_(var, name, NC_INT64, size(values, kind=int64), dims)
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  if (allocated(var%attributes)) deallocate (var%attributes)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int64_2d
+
+module function new_variable_int64_2d_att(name, values, dims, atts) result(var)
+  character(len=*), intent(in) :: name
+  integer(int64), target, intent(in) :: values(:, :)
+  type(dimension_type), intent(in) :: dims(:)
+  type(attribute_type), intent(in) :: atts(:)
+  type(variable_type), target :: var
+  integer(c_int64_t), pointer :: var_ptr(:, :)
+
+  call new_variable_(var, name, NC_INT64, size(values, kind=int64), dims)
+  var%attributes = atts
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int64_2d_att
+
+module function new_variable_int64_3d(name, values, dims) result(var)
+  character(len=*), intent(in) :: name
+  integer(int64), target, intent(in) :: values(:, :, :)
+  type(dimension_type), intent(in) :: dims(:)
+  type(variable_type), target :: var
+  integer(c_int64_t), pointer :: var_ptr(:, :, :)
+
+  call new_variable_(var, name, NC_INT64, size(values, kind=int64), dims)
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  if (allocated(var%attributes)) deallocate (var%attributes)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int64_3d
+
+module function new_variable_int64_3d_att(name, values, dims, atts) result(var)
+  character(len=*), intent(in) :: name
+  integer(int64), target, intent(in) :: values(:, :, :)
+  type(dimension_type), intent(in) :: dims(:)
+  type(attribute_type), intent(in) :: atts(:)
+  type(variable_type), target :: var
+  integer(c_int64_t), pointer :: var_ptr(:, :, :)
+
+  call new_variable_(var, name, NC_INT64, size(values, kind=int64), dims)
+  var%attributes = atts
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int64_3d_att
+
+module function new_variable_int64_4d(name, values, dims) result(var)
+  character(len=*), intent(in) :: name
+  integer(int64), target, intent(in) :: values(:, :, :, :)
+  type(dimension_type), intent(in) :: dims(:)
+  type(variable_type), target :: var
+  integer(c_int64_t), pointer :: var_ptr(:, :, :, :)
+
+  call new_variable_(var, name, NC_INT64, size(values, kind=int64), dims)
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  if (allocated(var%attributes)) deallocate (var%attributes)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int64_4d
+
+module function new_variable_int64_4d_att(name, values, dims, atts) result(var)
+  character(len=*), intent(in) :: name
+  integer(int64), target, intent(in) :: values(:, :, :, :)
+  type(dimension_type), intent(in) :: dims(:)
+  type(attribute_type), intent(in) :: atts(:)
+  type(variable_type), target :: var
+  integer(c_int64_t), pointer :: var_ptr(:, :, :, :)
+
+  call new_variable_(var, name, NC_INT64, size(values, kind=int64), dims)
+  var%attributes = atts
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int64_4d_att
+
+module function new_variable_int64_5d(name, values, dims) result(var)
+  character(len=*), intent(in) :: name
+  integer(int64), target, intent(in) :: values(:, :, :, :, :)
+  type(dimension_type), intent(in) :: dims(:)
+  type(variable_type), target :: var
+  integer(c_int64_t), pointer :: var_ptr(:, :, :, :, :)
+
+  call new_variable_(var, name, NC_INT64, size(values, kind=int64), dims)
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  if (allocated(var%attributes)) deallocate (var%attributes)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int64_5d
+
+module function new_variable_int64_5d_att(name, values, dims, atts) result(var)
+  character(len=*), intent(in) :: name
+  integer(int64), target, intent(in) :: values(:, :, :, :, :)
+  type(dimension_type), intent(in) :: dims(:)
+  type(attribute_type), intent(in) :: atts(:)
+  type(variable_type), target :: var
+  integer(c_int64_t), pointer :: var_ptr(:, :, :, :, :)
+
+  call new_variable_(var, name, NC_INT64, size(values, kind=int64), dims)
+  var%attributes = atts
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_int64_5d_att
+
 module function new_variable_real32_1d(name, values, dims) result(var)
   character(len=*), intent(in) :: name
   real(real32), target, intent(in) :: values(:)
@@ -125,6 +745,37 @@ module function new_variable_real32_4d_att(name, values, dims, atts) result(var)
   var_ptr = values
   nullify (var_ptr)
 end function new_variable_real32_4d_att
+
+module function new_variable_real32_5d(name, values, dims) result(var)
+  character(len=*), intent(in) :: name
+  real(real32), target, intent(in) :: values(:, :, :, :, :)
+  type(dimension_type), intent(in) :: dims(:)
+  type(variable_type), target :: var
+  real(c_float), pointer :: var_ptr(:, :, :, :, :)
+
+  call new_variable_(var, name, NC_FLOAT, size(values, kind=int64), dims)
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  if (allocated(var%attributes)) deallocate (var%attributes)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_real32_5d
+
+module function new_variable_real32_5d_att(name, values, dims, atts) result(var)
+  character(len=*), intent(in) :: name
+  real(real32), target, intent(in) :: values(:, :, :, :, :)
+  type(dimension_type), intent(in) :: dims(:)
+  type(attribute_type), intent(in) :: atts(:)
+  type(variable_type), target :: var
+  real(c_float), pointer :: var_ptr(:, :, :, :, :)
+
+  call new_variable_(var, name, NC_FLOAT, size(values, kind=int64), dims)
+  var%attributes = atts
+  call allocate_buffer(var)
+  call extract(var, var_ptr)
+  var_ptr = values
+  nullify (var_ptr)
+end function new_variable_real32_5d_att
 
 module function new_variable_real64_1d(name, values, dims) result(var)
   character(len=*), intent(in) :: name
@@ -250,253 +901,36 @@ module function new_variable_real64_4d_att(name, values, dims, atts) result(var)
   nullify (var_ptr)
 end function new_variable_real64_4d_att
 
-module function new_variable_int32_1d(name, values, dims) result(var)
+module function new_variable_real64_5d(name, values, dims) result(var)
   character(len=*), intent(in) :: name
-  integer(int32), target, intent(in) :: values(:)
+  real(real64), target, intent(in) :: values(:, :, :, :, :)
   type(dimension_type), intent(in) :: dims(:)
   type(variable_type), target :: var
-  integer(c_int), pointer :: var_ptr(:)
+  real(c_double), pointer :: var_ptr(:, :, :, :, :)
 
-  call new_variable_(var, name, NC_INT, size(values, kind=int64), dims)
+  call new_variable_(var, name, NC_DOUBLE, size(values, kind=int64), dims)
   call allocate_buffer(var)
   call extract(var, var_ptr)
   if (allocated(var%attributes)) deallocate (var%attributes)
   var_ptr = values
   nullify (var_ptr)
-end function new_variable_int32_1d
+end function new_variable_real64_5d
 
-module function new_variable_int32_1d_att(name, values, dims, atts) result(var)
+module function new_variable_real64_5d_att(name, values, dims, atts) result(var)
   character(len=*), intent(in) :: name
-  integer(int32), target, intent(in) :: values(:)
+  real(real64), target, intent(in) :: values(:, :, :, :, :)
   type(dimension_type), intent(in) :: dims(:)
   type(attribute_type), intent(in) :: atts(:)
   type(variable_type), target :: var
-  integer(c_int), pointer :: var_ptr(:)
+  real(c_double), pointer :: var_ptr(:, :, :, :, :)
 
-  call new_variable_(var, name, NC_INT, size(values, kind=int64), dims)
+  call new_variable_(var, name, NC_DOUBLE, size(values, kind=int64), dims)
   var%attributes = atts
   call allocate_buffer(var)
   call extract(var, var_ptr)
   var_ptr = values
   nullify (var_ptr)
-end function new_variable_int32_1d_att
-
-module function new_variable_int32_2d(name, values, dims) result(var)
-  character(len=*), intent(in) :: name
-  integer(int32), target, intent(in) :: values(:, :)
-  type(dimension_type), intent(in) :: dims(:)
-  type(variable_type), target :: var
-  integer(c_int), pointer :: var_ptr(:, :)
-
-  call new_variable_(var, name, NC_INT, size(values, kind=int64), dims)
-  call allocate_buffer(var)
-  call extract(var, var_ptr)
-  if (allocated(var%attributes)) deallocate (var%attributes)
-  var_ptr = values
-  nullify (var_ptr)
-end function new_variable_int32_2d
-
-module function new_variable_int32_2d_att(name, values, dims, atts) result(var)
-  character(len=*), intent(in) :: name
-  integer(int32), target, intent(in) :: values(:, :)
-  type(dimension_type), intent(in) :: dims(:)
-  type(attribute_type), intent(in) :: atts(:)
-  type(variable_type), target :: var
-  integer(c_int), pointer :: var_ptr(:, :)
-
-  call new_variable_(var, name, NC_INT, size(values, kind=int64), dims)
-  var%attributes = atts
-  call allocate_buffer(var)
-  call extract(var, var_ptr)
-  var_ptr = values
-  nullify (var_ptr)
-end function new_variable_int32_2d_att
-
-module function new_variable_int32_3d(name, values, dims) result(var)
-  character(len=*), intent(in) :: name
-  integer(int32), target, intent(in) :: values(:, :, :)
-  type(dimension_type), intent(in) :: dims(:)
-  type(variable_type), target :: var
-  integer(c_int), pointer :: var_ptr(:, :, :)
-
-  call new_variable_(var, name, NC_INT, size(values, kind=int64), dims)
-  call allocate_buffer(var)
-  call extract(var, var_ptr)
-  if (allocated(var%attributes)) deallocate (var%attributes)
-  var_ptr = values
-  nullify (var_ptr)
-end function new_variable_int32_3d
-
-module function new_variable_int32_3d_att(name, values, dims, atts) result(var)
-  character(len=*), intent(in) :: name
-  integer(int32), target, intent(in) :: values(:, :, :)
-  type(dimension_type), intent(in) :: dims(:)
-  type(attribute_type), intent(in) :: atts(:)
-  type(variable_type), target :: var
-  integer(c_int), pointer :: var_ptr(:, :, :)
-
-  call new_variable_(var, name, NC_INT, size(values, kind=int64), dims)
-  var%attributes = atts
-  call allocate_buffer(var)
-  call extract(var, var_ptr)
-  var_ptr = values
-  nullify (var_ptr)
-end function new_variable_int32_3d_att
-
-module function new_variable_int32_4d(name, values, dims) result(var)
-  character(len=*), intent(in) :: name
-  integer(int32), target, intent(in) :: values(:, :, :, :)
-  type(dimension_type), intent(in) :: dims(:)
-  type(variable_type), target :: var
-  integer(c_int), pointer :: var_ptr(:, :, :, :)
-
-  call new_variable_(var, name, NC_INT, size(values, kind=int64), dims)
-  call allocate_buffer(var)
-  call extract(var, var_ptr)
-  if (allocated(var%attributes)) deallocate (var%attributes)
-  var_ptr = values
-  nullify (var_ptr)
-end function new_variable_int32_4d
-
-module function new_variable_int32_4d_att(name, values, dims, atts) result(var)
-  character(len=*), intent(in) :: name
-  integer(int32), target, intent(in) :: values(:, :, :, :)
-  type(dimension_type), intent(in) :: dims(:)
-  type(attribute_type), intent(in) :: atts(:)
-  type(variable_type), target :: var
-  integer(c_int), pointer :: var_ptr(:, :, :, :)
-
-  call new_variable_(var, name, NC_INT, size(values, kind=int64), dims)
-  var%attributes = atts
-  call allocate_buffer(var)
-  call extract(var, var_ptr)
-  var_ptr = values
-  nullify (var_ptr)
-end function new_variable_int32_4d_att
-
-module function new_variable_int64_1d(name, values, dims) result(var)
-  character(len=*), intent(in) :: name
-  integer(int64), target, intent(in) :: values(:)
-  type(dimension_type), intent(in) :: dims(:)
-  type(variable_type), target :: var
-  integer(c_int64_t), pointer :: var_ptr(:)
-
-  call new_variable_(var, name, NC_INT64, size(values, kind=int64), dims)
-  call allocate_buffer(var)
-  call extract(var, var_ptr)
-  if (allocated(var%attributes)) deallocate (var%attributes)
-  var_ptr = values
-  nullify (var_ptr)
-end function new_variable_int64_1d
-
-module function new_variable_int64_1d_att(name, values, dims, atts) result(var)
-  character(len=*), intent(in) :: name
-  integer(int64), target, intent(in) :: values(:)
-  type(dimension_type), intent(in) :: dims(:)
-  type(attribute_type), intent(in) :: atts(:)
-  type(variable_type), target :: var
-  integer(c_int64_t), pointer :: var_ptr(:)
-
-  call new_variable_(var, name, NC_INT64, size(values, kind=int64), dims)
-  var%attributes = atts
-  call allocate_buffer(var)
-  call extract(var, var_ptr)
-  var_ptr = values
-  nullify (var_ptr)
-end function new_variable_int64_1d_att
-
-module function new_variable_int64_2d(name, values, dims) result(var)
-  character(len=*), intent(in) :: name
-  integer(int64), target, intent(in) :: values(:, :)
-  type(dimension_type), intent(in) :: dims(:)
-  type(variable_type), target :: var
-  integer(c_int64_t), pointer :: var_ptr(:, :)
-
-  call new_variable_(var, name, NC_INT64, size(values, kind=int64), dims)
-  call allocate_buffer(var)
-  call extract(var, var_ptr)
-  if (allocated(var%attributes)) deallocate (var%attributes)
-  var_ptr = values
-  nullify (var_ptr)
-end function new_variable_int64_2d
-
-module function new_variable_int64_2d_att(name, values, dims, atts) result(var)
-  character(len=*), intent(in) :: name
-  integer(int64), target, intent(in) :: values(:, :)
-  type(dimension_type), intent(in) :: dims(:)
-  type(attribute_type), intent(in) :: atts(:)
-  type(variable_type), target :: var
-  integer(c_int64_t), pointer :: var_ptr(:, :)
-
-  call new_variable_(var, name, NC_INT64, size(values, kind=int64), dims)
-  var%attributes = atts
-  call allocate_buffer(var)
-  call extract(var, var_ptr)
-  var_ptr = values
-  nullify (var_ptr)
-end function new_variable_int64_2d_att
-
-module function new_variable_int64_3d(name, values, dims) result(var)
-  character(len=*), intent(in) :: name
-  integer(int64), target, intent(in) :: values(:, :, :)
-  type(dimension_type), intent(in) :: dims(:)
-  type(variable_type), target :: var
-  integer(c_int64_t), pointer :: var_ptr(:, :, :)
-
-  call new_variable_(var, name, NC_INT64, size(values, kind=int64), dims)
-  call allocate_buffer(var)
-  call extract(var, var_ptr)
-  if (allocated(var%attributes)) deallocate (var%attributes)
-  var_ptr = values
-  nullify (var_ptr)
-end function new_variable_int64_3d
-
-module function new_variable_int64_3d_att(name, values, dims, atts) result(var)
-  character(len=*), intent(in) :: name
-  integer(int64), target, intent(in) :: values(:, :, :)
-  type(dimension_type), intent(in) :: dims(:)
-  type(attribute_type), intent(in) :: atts(:)
-  type(variable_type), target :: var
-  integer(c_int64_t), pointer :: var_ptr(:, :, :)
-
-  call new_variable_(var, name, NC_INT64, size(values, kind=int64), dims)
-  var%attributes = atts
-  call allocate_buffer(var)
-  call extract(var, var_ptr)
-  var_ptr = values
-  nullify (var_ptr)
-end function new_variable_int64_3d_att
-
-module function new_variable_int64_4d(name, values, dims) result(var)
-  character(len=*), intent(in) :: name
-  integer(int64), target, intent(in) :: values(:, :, :, :)
-  type(dimension_type), intent(in) :: dims(:)
-  type(variable_type), target :: var
-  integer(c_int64_t), pointer :: var_ptr(:, :, :, :)
-
-  call new_variable_(var, name, NC_INT64, size(values, kind=int64), dims)
-  call allocate_buffer(var)
-  call extract(var, var_ptr)
-  if (allocated(var%attributes)) deallocate (var%attributes)
-  var_ptr = values
-  nullify (var_ptr)
-end function new_variable_int64_4d
-
-module function new_variable_int64_4d_att(name, values, dims, atts) result(var)
-  character(len=*), intent(in) :: name
-  integer(int64), target, intent(in) :: values(:, :, :, :)
-  type(dimension_type), intent(in) :: dims(:)
-  type(attribute_type), intent(in) :: atts(:)
-  type(variable_type), target :: var
-  integer(c_int64_t), pointer :: var_ptr(:, :, :, :)
-
-  call new_variable_(var, name, NC_INT64, size(values, kind=int64), dims)
-  var%attributes = atts
-  call allocate_buffer(var)
-  call extract(var, var_ptr)
-  var_ptr = values
-  nullify (var_ptr)
-end function new_variable_int64_4d_att
+end function new_variable_real64_5d_att
 
 pure subroutine new_variable_(var, name, data_type, length, dims)
   type(variable_type), intent(inout) :: var

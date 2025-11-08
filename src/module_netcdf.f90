@@ -77,7 +77,7 @@ type :: dimension_type
 end type dimension_type
 
 type :: dimension_argument_type
-  integer :: length = -1
+  integer(int64) :: length = -1
   logical :: is_unlimited = .false.
 end type dimension_argument_type
 

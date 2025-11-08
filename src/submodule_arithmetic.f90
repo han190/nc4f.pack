@@ -5,8 +5,6 @@ contains
 module function add_vars(x, y) result(res)
   type(variable_type), target, intent(in) :: x, y
   type(variable_type), target :: res
-  type(c_ptr) :: x_cptr, y_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   if (any(x%dimensions /= y%dimensions)) &
     & error stop "[add_vars] Unequal dimensions."
@@ -20,95 +18,79 @@ module function add_vars(x, y) result(res)
   res%attributes = x%attributes
 
   select case (x%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      integer(int8), pointer :: xp(:), yp(:), resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr + y_fptr
-      nullify (x_fptr, y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      call extract(y, yp)
+      resp = xp + yp
+      nullify (xp, yp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      integer(int16), pointer :: xp(:), yp(:), resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr + y_fptr
-      nullify (x_fptr, y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      call extract(y, yp)
+      resp = xp + yp
+      nullify (xp, yp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      integer(int32), pointer :: xp(:), yp(:), resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr + y_fptr
-      nullify (x_fptr, y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      call extract(y, yp)
+      resp = xp + yp
+      nullify (xp, yp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      integer(int64), pointer :: xp(:), yp(:), resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      call extract(y, yp)
+      resp = xp + yp
+      nullify (xp, yp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: xp(:), yp(:), resp(:)
 
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      call extract(y, yp)
+      resp = xp + yp
+      nullify (xp, yp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: xp(:), yp(:), resp(:)
 
-      r_fptr = x_fptr + y_fptr
-      nullify (x_fptr, y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      call extract(y, yp)
+      resp = xp + yp
+      nullify (xp, yp, resp)
     end block
   end select
 end function add_vars
 
-module function add_var_real32(x, y) result(res)
+module function add_var_int8(x, y) result(res)
   type(variable_type), target, intent(in) :: x
-  real(real32), intent(in) :: y
+  integer(int8), intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: x_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = x%name
   res%length = x%length
@@ -116,95 +98,85 @@ module function add_var_real32(x, y) result(res)
   res%attributes = x%attributes
 
   select case (x%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int8), pointer :: xp(:)
+      integer(int8), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr + y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_BYTE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp + y
+      nullify (xp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int16), pointer :: xp(:)
+      integer(int16), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr + y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_SHORT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp + y
+      nullify (xp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int32), pointer :: xp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr + y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp + y
+      nullify (xp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int64), pointer :: xp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      res%data_type = NC_INT64
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp + y
+      nullify (xp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: xp(:)
+      real(real32), pointer :: resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      res%data_type = NC_FLOAT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp + y
+      nullify (xp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr + y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp + y
+      nullify (xp, resp)
     end block
   end select
-end function add_var_real32
+end function add_var_int8
 
-module function add_real32_var(x, y) result(res)
-  real(real32), intent(in) :: x
+module function add_int8_var(x, y) result(res)
+  integer(int8), intent(in) :: x
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: y_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = y%name
   res%length = y%length
@@ -212,95 +184,79 @@ module function add_real32_var(x, y) result(res)
   res%attributes = y%attributes
 
   select case (y%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int8), pointer :: yp(:)
+      integer(int8), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x + y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x + yp
+      nullify (yp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int16), pointer :: yp(:)
+      integer(int16), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x + y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x + yp
+      nullify (yp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int32), pointer :: yp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x + y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x + yp
+      nullify (yp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int64), pointer :: yp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x + yp
+      nullify (yp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: yp(:)
+      real(real32), pointer :: resp(:)
 
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x + yp
+      nullify (yp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x + y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x + yp
+      nullify (yp, resp)
     end block
   end select
-end function add_real32_var
+end function add_int8_var
 
-module function add_var_real64(x, y) result(res)
+module function add_var_int16(x, y) result(res)
   type(variable_type), target, intent(in) :: x
-  real(real64), intent(in) :: y
+  integer(int16), intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: x_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = x%name
   res%length = x%length
@@ -308,95 +264,85 @@ module function add_var_real64(x, y) result(res)
   res%attributes = x%attributes
 
   select case (x%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int8), pointer :: xp(:)
+      integer(int16), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr + y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_SHORT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp + y
+      nullify (xp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int16), pointer :: xp(:)
+      integer(int16), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr + y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_SHORT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp + y
+      nullify (xp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int32), pointer :: xp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr + y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp + y
+      nullify (xp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int64), pointer :: xp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      res%data_type = NC_INT64
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp + y
+      nullify (xp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: xp(:)
+      real(real32), pointer :: resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      res%data_type = NC_FLOAT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp + y
+      nullify (xp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr + y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp + y
+      nullify (xp, resp)
     end block
   end select
-end function add_var_real64
+end function add_var_int16
 
-module function add_real64_var(x, y) result(res)
-  real(real64), intent(in) :: x
+module function add_int16_var(x, y) result(res)
+  integer(int16), intent(in) :: x
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: y_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = y%name
   res%length = y%length
@@ -404,95 +350,79 @@ module function add_real64_var(x, y) result(res)
   res%attributes = y%attributes
 
   select case (y%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int8), pointer :: yp(:)
+      integer(int16), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x + y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x + yp
+      nullify (yp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int16), pointer :: yp(:)
+      integer(int16), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x + y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x + yp
+      nullify (yp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int32), pointer :: yp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x + y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x + yp
+      nullify (yp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int64), pointer :: yp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x + yp
+      nullify (yp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: yp(:)
+      real(real32), pointer :: resp(:)
 
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x + yp
+      nullify (yp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x + y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x + yp
+      nullify (yp, resp)
     end block
   end select
-end function add_real64_var
+end function add_int16_var
 
 module function add_var_int32(x, y) result(res)
   type(variable_type), target, intent(in) :: x
   integer(int32), intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: x_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = x%name
   res%length = x%length
@@ -500,85 +430,77 @@ module function add_var_int32(x, y) result(res)
   res%attributes = x%attributes
 
   select case (x%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int8), pointer :: xp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr + y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp + y
+      nullify (xp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int16), pointer :: xp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr + y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp + y
+      nullify (xp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int32), pointer :: xp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr + y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp + y
+      nullify (xp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int64), pointer :: xp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      res%data_type = NC_INT64
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp + y
+      nullify (xp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: xp(:)
+      real(real32), pointer :: resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      res%data_type = NC_FLOAT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp + y
+      nullify (xp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr + y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp + y
+      nullify (xp, resp)
     end block
   end select
 end function add_var_int32
@@ -587,8 +509,6 @@ module function add_int32_var(x, y) result(res)
   integer(int32), intent(in) :: x
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: y_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = y%name
   res%length = y%length
@@ -596,85 +516,71 @@ module function add_int32_var(x, y) result(res)
   res%attributes = y%attributes
 
   select case (y%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int8), pointer :: yp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x + y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x + yp
+      nullify (yp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int16), pointer :: yp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x + y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x + yp
+      nullify (yp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int32), pointer :: yp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x + y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x + yp
+      nullify (yp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int64), pointer :: yp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x + yp
+      nullify (yp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: yp(:)
+      real(real32), pointer :: resp(:)
 
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x + yp
+      nullify (yp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x + y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x + yp
+      nullify (yp, resp)
     end block
   end select
 end function add_int32_var
@@ -683,8 +589,6 @@ module function add_var_int64(x, y) result(res)
   type(variable_type), target, intent(in) :: x
   integer(int64), intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: x_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = x%name
   res%length = x%length
@@ -692,85 +596,78 @@ module function add_var_int64(x, y) result(res)
   res%attributes = x%attributes
 
   select case (x%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int8), pointer :: xp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr + y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT64
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp + y
+      nullify (xp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int16), pointer :: xp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr + y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT64
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp + y
+      nullify (xp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int32), pointer :: xp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr + y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT64
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp + y
+      nullify (xp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int64), pointer :: xp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      res%data_type = NC_INT64
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp + y
+      nullify (xp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp
+      resp = resp + y
+      nullify (xp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr + y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp + y
+      nullify (xp, resp)
     end block
   end select
 end function add_var_int64
@@ -779,8 +676,6 @@ module function add_int64_var(x, y) result(res)
   integer(int64), intent(in) :: x
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: y_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = y%name
   res%length = y%length
@@ -788,94 +683,413 @@ module function add_int64_var(x, y) result(res)
   res%attributes = y%attributes
 
   select case (y%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int8), pointer :: yp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x + y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x + yp
+      nullify (yp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int16), pointer :: yp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x + y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x + yp
+      nullify (yp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int32), pointer :: yp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x + y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x + yp
+      nullify (yp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int64), pointer :: yp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x + yp
+      nullify (yp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
 
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x
+      resp = resp + yp
+      nullify (yp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x + y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x + yp
+      nullify (yp, resp)
     end block
   end select
 end function add_int64_var
 
+module function add_var_real32(x, y) result(res)
+  type(variable_type), target, intent(in) :: x
+  real(real32), intent(in) :: y
+  type(variable_type), target :: res
+
+  res%name = x%name
+  res%length = x%length
+  res%dimensions = x%dimensions
+  res%attributes = x%attributes
+
+  select case (x%data_type)
+  case (NC_BYTE)
+    block
+      integer(int8), pointer :: xp(:)
+      real(real32), pointer :: resp(:)
+
+      res%data_type = NC_FLOAT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp + y
+      nullify (xp, resp)
+    end block
+  case (NC_SHORT)
+    block
+      integer(int16), pointer :: xp(:)
+      real(real32), pointer :: resp(:)
+
+      res%data_type = NC_FLOAT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp + y
+      nullify (xp, resp)
+    end block
+  case (NC_INT)
+    block
+      integer(int32), pointer :: xp(:)
+      real(real32), pointer :: resp(:)
+
+      res%data_type = NC_FLOAT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp + y
+      nullify (xp, resp)
+    end block
+  case (NC_INT64)
+    block
+      integer(int64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp
+      resp = resp + y
+      nullify (xp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: xp(:)
+      real(real32), pointer :: resp(:)
+
+      res%data_type = NC_FLOAT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp + y
+      nullify (xp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp + y
+      nullify (xp, resp)
+    end block
+  end select
+end function add_var_real32
+
+module function add_real32_var(x, y) result(res)
+  real(real32), intent(in) :: x
+  type(variable_type), target, intent(in) :: y
+  type(variable_type), target :: res
+
+  res%name = y%name
+  res%length = y%length
+  res%dimensions = y%dimensions
+  res%attributes = y%attributes
+
+  select case (y%data_type)
+  case (NC_BYTE)
+    block
+      integer(int8), pointer :: yp(:)
+      real(real32), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x + yp
+      nullify (yp, resp)
+    end block
+  case (NC_SHORT)
+    block
+      integer(int16), pointer :: yp(:)
+      real(real32), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x + yp
+      nullify (yp, resp)
+    end block
+  case (NC_INT)
+    block
+      integer(int32), pointer :: yp(:)
+      real(real32), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x + yp
+      nullify (yp, resp)
+    end block
+  case (NC_INT64)
+    block
+      integer(int64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x
+      resp = resp + yp
+      nullify (yp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: yp(:)
+      real(real32), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x + yp
+      nullify (yp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x + yp
+      nullify (yp, resp)
+    end block
+  end select
+end function add_real32_var
+
+module function add_var_real64(x, y) result(res)
+  type(variable_type), target, intent(in) :: x
+  real(real64), intent(in) :: y
+  type(variable_type), target :: res
+
+  res%name = x%name
+  res%length = x%length
+  res%dimensions = x%dimensions
+  res%attributes = x%attributes
+
+  select case (x%data_type)
+  case (NC_BYTE)
+    block
+      integer(int8), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp + y
+      nullify (xp, resp)
+    end block
+  case (NC_SHORT)
+    block
+      integer(int16), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp + y
+      nullify (xp, resp)
+    end block
+  case (NC_INT)
+    block
+      integer(int32), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp + y
+      nullify (xp, resp)
+    end block
+  case (NC_INT64)
+    block
+      integer(int64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp + y
+      nullify (xp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp + y
+      nullify (xp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp + y
+      nullify (xp, resp)
+    end block
+  end select
+end function add_var_real64
+
+module function add_real64_var(x, y) result(res)
+  real(real64), intent(in) :: x
+  type(variable_type), target, intent(in) :: y
+  type(variable_type), target :: res
+
+  res%name = y%name
+  res%length = y%length
+  res%dimensions = y%dimensions
+  res%attributes = y%attributes
+
+  select case (y%data_type)
+  case (NC_BYTE)
+    block
+      integer(int8), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x + yp
+      nullify (yp, resp)
+    end block
+  case (NC_SHORT)
+    block
+      integer(int16), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x + yp
+      nullify (yp, resp)
+    end block
+  case (NC_INT)
+    block
+      integer(int32), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x + yp
+      nullify (yp, resp)
+    end block
+  case (NC_INT64)
+    block
+      integer(int64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x + yp
+      nullify (yp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x + yp
+      nullify (yp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x + yp
+      nullify (yp, resp)
+    end block
+  end select
+end function add_real64_var
+
 module function sub_vars(x, y) result(res)
   type(variable_type), target, intent(in) :: x, y
   type(variable_type), target :: res
-  type(c_ptr) :: x_cptr, y_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   if (any(x%dimensions /= y%dimensions)) &
     & error stop "[add_vars] Unequal dimensions."
@@ -889,95 +1103,79 @@ module function sub_vars(x, y) result(res)
   res%attributes = x%attributes
 
   select case (x%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      integer(int8), pointer :: xp(:), yp(:), resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr - y_fptr
-      nullify (x_fptr, y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      call extract(y, yp)
+      resp = xp - yp
+      nullify (xp, yp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      integer(int16), pointer :: xp(:), yp(:), resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr - y_fptr
-      nullify (x_fptr, y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      call extract(y, yp)
+      resp = xp - yp
+      nullify (xp, yp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      integer(int32), pointer :: xp(:), yp(:), resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr - y_fptr
-      nullify (x_fptr, y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      call extract(y, yp)
+      resp = xp - yp
+      nullify (xp, yp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      integer(int64), pointer :: xp(:), yp(:), resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      call extract(y, yp)
+      resp = xp - yp
+      nullify (xp, yp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: xp(:), yp(:), resp(:)
 
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      call extract(y, yp)
+      resp = xp - yp
+      nullify (xp, yp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: xp(:), yp(:), resp(:)
 
-      r_fptr = x_fptr - y_fptr
-      nullify (x_fptr, y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      call extract(y, yp)
+      resp = xp - yp
+      nullify (xp, yp, resp)
     end block
   end select
 end function sub_vars
 
-module function sub_var_real32(x, y) result(res)
+module function sub_var_int8(x, y) result(res)
   type(variable_type), target, intent(in) :: x
-  real(real32), intent(in) :: y
+  integer(int8), intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: x_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = x%name
   res%length = x%length
@@ -985,95 +1183,85 @@ module function sub_var_real32(x, y) result(res)
   res%attributes = x%attributes
 
   select case (x%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int8), pointer :: xp(:)
+      integer(int8), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr - y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_BYTE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp - y
+      nullify (xp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int16), pointer :: xp(:)
+      integer(int16), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr - y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_SHORT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp - y
+      nullify (xp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int32), pointer :: xp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr - y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp - y
+      nullify (xp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int64), pointer :: xp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      res%data_type = NC_INT64
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp - y
+      nullify (xp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: xp(:)
+      real(real32), pointer :: resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      res%data_type = NC_FLOAT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp - y
+      nullify (xp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr - y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp - y
+      nullify (xp, resp)
     end block
   end select
-end function sub_var_real32
+end function sub_var_int8
 
-module function sub_real32_var(x, y) result(res)
-  real(real32), intent(in) :: x
+module function sub_int8_var(x, y) result(res)
+  integer(int8), intent(in) :: x
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: y_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = y%name
   res%length = y%length
@@ -1081,95 +1269,79 @@ module function sub_real32_var(x, y) result(res)
   res%attributes = y%attributes
 
   select case (y%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int8), pointer :: yp(:)
+      integer(int8), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x - y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x - yp
+      nullify (yp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int16), pointer :: yp(:)
+      integer(int16), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x - y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x - yp
+      nullify (yp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int32), pointer :: yp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x - y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x - yp
+      nullify (yp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int64), pointer :: yp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x - yp
+      nullify (yp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: yp(:)
+      real(real32), pointer :: resp(:)
 
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x - yp
+      nullify (yp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x - y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x - yp
+      nullify (yp, resp)
     end block
   end select
-end function sub_real32_var
+end function sub_int8_var
 
-module function sub_var_real64(x, y) result(res)
+module function sub_var_int16(x, y) result(res)
   type(variable_type), target, intent(in) :: x
-  real(real64), intent(in) :: y
+  integer(int16), intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: x_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = x%name
   res%length = x%length
@@ -1177,95 +1349,85 @@ module function sub_var_real64(x, y) result(res)
   res%attributes = x%attributes
 
   select case (x%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int8), pointer :: xp(:)
+      integer(int16), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr - y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_SHORT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp - y
+      nullify (xp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int16), pointer :: xp(:)
+      integer(int16), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr - y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_SHORT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp - y
+      nullify (xp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int32), pointer :: xp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr - y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp - y
+      nullify (xp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int64), pointer :: xp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      res%data_type = NC_INT64
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp - y
+      nullify (xp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: xp(:)
+      real(real32), pointer :: resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      res%data_type = NC_FLOAT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp - y
+      nullify (xp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr - y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp - y
+      nullify (xp, resp)
     end block
   end select
-end function sub_var_real64
+end function sub_var_int16
 
-module function sub_real64_var(x, y) result(res)
-  real(real64), intent(in) :: x
+module function sub_int16_var(x, y) result(res)
+  integer(int16), intent(in) :: x
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: y_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = y%name
   res%length = y%length
@@ -1273,95 +1435,79 @@ module function sub_real64_var(x, y) result(res)
   res%attributes = y%attributes
 
   select case (y%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int8), pointer :: yp(:)
+      integer(int16), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x - y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x - yp
+      nullify (yp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int16), pointer :: yp(:)
+      integer(int16), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x - y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x - yp
+      nullify (yp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int32), pointer :: yp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x - y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x - yp
+      nullify (yp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int64), pointer :: yp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x - yp
+      nullify (yp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: yp(:)
+      real(real32), pointer :: resp(:)
 
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x - yp
+      nullify (yp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x - y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x - yp
+      nullify (yp, resp)
     end block
   end select
-end function sub_real64_var
+end function sub_int16_var
 
 module function sub_var_int32(x, y) result(res)
   type(variable_type), target, intent(in) :: x
   integer(int32), intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: x_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = x%name
   res%length = x%length
@@ -1369,85 +1515,77 @@ module function sub_var_int32(x, y) result(res)
   res%attributes = x%attributes
 
   select case (x%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int8), pointer :: xp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr - y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp - y
+      nullify (xp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int16), pointer :: xp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr - y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp - y
+      nullify (xp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int32), pointer :: xp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr - y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp - y
+      nullify (xp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int64), pointer :: xp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      res%data_type = NC_INT64
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp - y
+      nullify (xp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: xp(:)
+      real(real32), pointer :: resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      res%data_type = NC_FLOAT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp - y
+      nullify (xp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr - y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp - y
+      nullify (xp, resp)
     end block
   end select
 end function sub_var_int32
@@ -1456,8 +1594,6 @@ module function sub_int32_var(x, y) result(res)
   integer(int32), intent(in) :: x
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: y_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = y%name
   res%length = y%length
@@ -1465,85 +1601,71 @@ module function sub_int32_var(x, y) result(res)
   res%attributes = y%attributes
 
   select case (y%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int8), pointer :: yp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x - y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x - yp
+      nullify (yp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int16), pointer :: yp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x - y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x - yp
+      nullify (yp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int32), pointer :: yp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x - y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x - yp
+      nullify (yp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int64), pointer :: yp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x - yp
+      nullify (yp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: yp(:)
+      real(real32), pointer :: resp(:)
 
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x - yp
+      nullify (yp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x - y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x - yp
+      nullify (yp, resp)
     end block
   end select
 end function sub_int32_var
@@ -1552,8 +1674,6 @@ module function sub_var_int64(x, y) result(res)
   type(variable_type), target, intent(in) :: x
   integer(int64), intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: x_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = x%name
   res%length = x%length
@@ -1561,85 +1681,78 @@ module function sub_var_int64(x, y) result(res)
   res%attributes = x%attributes
 
   select case (x%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int8), pointer :: xp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr - y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT64
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp - y
+      nullify (xp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int16), pointer :: xp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr - y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT64
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp - y
+      nullify (xp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int32), pointer :: xp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr - y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT64
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp - y
+      nullify (xp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int64), pointer :: xp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      res%data_type = NC_INT64
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp - y
+      nullify (xp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp
+      resp = resp - y
+      nullify (xp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr - y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp - y
+      nullify (xp, resp)
     end block
   end select
 end function sub_var_int64
@@ -1648,8 +1761,6 @@ module function sub_int64_var(x, y) result(res)
   integer(int64), intent(in) :: x
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: y_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = y%name
   res%length = y%length
@@ -1657,94 +1768,413 @@ module function sub_int64_var(x, y) result(res)
   res%attributes = y%attributes
 
   select case (y%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int8), pointer :: yp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x - y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x - yp
+      nullify (yp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int16), pointer :: yp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x - y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x - yp
+      nullify (yp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int32), pointer :: yp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x - y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x - yp
+      nullify (yp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int64), pointer :: yp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x - yp
+      nullify (yp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
 
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x
+      resp = resp - yp
+      nullify (yp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x - y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x - yp
+      nullify (yp, resp)
     end block
   end select
 end function sub_int64_var
 
+module function sub_var_real32(x, y) result(res)
+  type(variable_type), target, intent(in) :: x
+  real(real32), intent(in) :: y
+  type(variable_type), target :: res
+
+  res%name = x%name
+  res%length = x%length
+  res%dimensions = x%dimensions
+  res%attributes = x%attributes
+
+  select case (x%data_type)
+  case (NC_BYTE)
+    block
+      integer(int8), pointer :: xp(:)
+      real(real32), pointer :: resp(:)
+
+      res%data_type = NC_FLOAT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp - y
+      nullify (xp, resp)
+    end block
+  case (NC_SHORT)
+    block
+      integer(int16), pointer :: xp(:)
+      real(real32), pointer :: resp(:)
+
+      res%data_type = NC_FLOAT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp - y
+      nullify (xp, resp)
+    end block
+  case (NC_INT)
+    block
+      integer(int32), pointer :: xp(:)
+      real(real32), pointer :: resp(:)
+
+      res%data_type = NC_FLOAT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp - y
+      nullify (xp, resp)
+    end block
+  case (NC_INT64)
+    block
+      integer(int64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp
+      resp = resp - y
+      nullify (xp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: xp(:)
+      real(real32), pointer :: resp(:)
+
+      res%data_type = NC_FLOAT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp - y
+      nullify (xp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp - y
+      nullify (xp, resp)
+    end block
+  end select
+end function sub_var_real32
+
+module function sub_real32_var(x, y) result(res)
+  real(real32), intent(in) :: x
+  type(variable_type), target, intent(in) :: y
+  type(variable_type), target :: res
+
+  res%name = y%name
+  res%length = y%length
+  res%dimensions = y%dimensions
+  res%attributes = y%attributes
+
+  select case (y%data_type)
+  case (NC_BYTE)
+    block
+      integer(int8), pointer :: yp(:)
+      real(real32), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x - yp
+      nullify (yp, resp)
+    end block
+  case (NC_SHORT)
+    block
+      integer(int16), pointer :: yp(:)
+      real(real32), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x - yp
+      nullify (yp, resp)
+    end block
+  case (NC_INT)
+    block
+      integer(int32), pointer :: yp(:)
+      real(real32), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x - yp
+      nullify (yp, resp)
+    end block
+  case (NC_INT64)
+    block
+      integer(int64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x
+      resp = resp - yp
+      nullify (yp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: yp(:)
+      real(real32), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x - yp
+      nullify (yp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x - yp
+      nullify (yp, resp)
+    end block
+  end select
+end function sub_real32_var
+
+module function sub_var_real64(x, y) result(res)
+  type(variable_type), target, intent(in) :: x
+  real(real64), intent(in) :: y
+  type(variable_type), target :: res
+
+  res%name = x%name
+  res%length = x%length
+  res%dimensions = x%dimensions
+  res%attributes = x%attributes
+
+  select case (x%data_type)
+  case (NC_BYTE)
+    block
+      integer(int8), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp - y
+      nullify (xp, resp)
+    end block
+  case (NC_SHORT)
+    block
+      integer(int16), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp - y
+      nullify (xp, resp)
+    end block
+  case (NC_INT)
+    block
+      integer(int32), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp - y
+      nullify (xp, resp)
+    end block
+  case (NC_INT64)
+    block
+      integer(int64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp - y
+      nullify (xp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp - y
+      nullify (xp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp - y
+      nullify (xp, resp)
+    end block
+  end select
+end function sub_var_real64
+
+module function sub_real64_var(x, y) result(res)
+  real(real64), intent(in) :: x
+  type(variable_type), target, intent(in) :: y
+  type(variable_type), target :: res
+
+  res%name = y%name
+  res%length = y%length
+  res%dimensions = y%dimensions
+  res%attributes = y%attributes
+
+  select case (y%data_type)
+  case (NC_BYTE)
+    block
+      integer(int8), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x - yp
+      nullify (yp, resp)
+    end block
+  case (NC_SHORT)
+    block
+      integer(int16), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x - yp
+      nullify (yp, resp)
+    end block
+  case (NC_INT)
+    block
+      integer(int32), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x - yp
+      nullify (yp, resp)
+    end block
+  case (NC_INT64)
+    block
+      integer(int64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x - yp
+      nullify (yp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x - yp
+      nullify (yp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x - yp
+      nullify (yp, resp)
+    end block
+  end select
+end function sub_real64_var
+
 module function mul_vars(x, y) result(res)
   type(variable_type), target, intent(in) :: x, y
   type(variable_type), target :: res
-  type(c_ptr) :: x_cptr, y_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   if (any(x%dimensions /= y%dimensions)) &
     & error stop "[add_vars] Unequal dimensions."
@@ -1758,95 +2188,79 @@ module function mul_vars(x, y) result(res)
   res%attributes = x%attributes
 
   select case (x%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      integer(int8), pointer :: xp(:), yp(:), resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr*y_fptr
-      nullify (x_fptr, y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      call extract(y, yp)
+      resp = xp * yp
+      nullify (xp, yp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      integer(int16), pointer :: xp(:), yp(:), resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr*y_fptr
-      nullify (x_fptr, y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      call extract(y, yp)
+      resp = xp * yp
+      nullify (xp, yp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      integer(int32), pointer :: xp(:), yp(:), resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr*y_fptr
-      nullify (x_fptr, y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      call extract(y, yp)
+      resp = xp * yp
+      nullify (xp, yp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      integer(int64), pointer :: xp(:), yp(:), resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      call extract(y, yp)
+      resp = xp * yp
+      nullify (xp, yp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: xp(:), yp(:), resp(:)
 
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      call extract(y, yp)
+      resp = xp * yp
+      nullify (xp, yp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: xp(:), yp(:), resp(:)
 
-      r_fptr = x_fptr*y_fptr
-      nullify (x_fptr, y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      call extract(y, yp)
+      resp = xp * yp
+      nullify (xp, yp, resp)
     end block
   end select
 end function mul_vars
 
-module function mul_var_real32(x, y) result(res)
+module function mul_var_int8(x, y) result(res)
   type(variable_type), target, intent(in) :: x
-  real(real32), intent(in) :: y
+  integer(int8), intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: x_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = x%name
   res%length = x%length
@@ -1854,95 +2268,85 @@ module function mul_var_real32(x, y) result(res)
   res%attributes = x%attributes
 
   select case (x%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int8), pointer :: xp(:)
+      integer(int8), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr*y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_BYTE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp * y
+      nullify (xp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int16), pointer :: xp(:)
+      integer(int16), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr*y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_SHORT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp * y
+      nullify (xp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int32), pointer :: xp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr*y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp * y
+      nullify (xp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int64), pointer :: xp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      res%data_type = NC_INT64
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp * y
+      nullify (xp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: xp(:)
+      real(real32), pointer :: resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      res%data_type = NC_FLOAT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp * y
+      nullify (xp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr*y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp * y
+      nullify (xp, resp)
     end block
   end select
-end function mul_var_real32
+end function mul_var_int8
 
-module function mul_real32_var(x, y) result(res)
-  real(real32), intent(in) :: x
+module function mul_int8_var(x, y) result(res)
+  integer(int8), intent(in) :: x
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: y_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = y%name
   res%length = y%length
@@ -1950,95 +2354,79 @@ module function mul_real32_var(x, y) result(res)
   res%attributes = y%attributes
 
   select case (y%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int8), pointer :: yp(:)
+      integer(int8), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x*y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x * yp
+      nullify (yp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int16), pointer :: yp(:)
+      integer(int16), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x*y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x * yp
+      nullify (yp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int32), pointer :: yp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x*y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x * yp
+      nullify (yp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int64), pointer :: yp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x * yp
+      nullify (yp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: yp(:)
+      real(real32), pointer :: resp(:)
 
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x * yp
+      nullify (yp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x*y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x * yp
+      nullify (yp, resp)
     end block
   end select
-end function mul_real32_var
+end function mul_int8_var
 
-module function mul_var_real64(x, y) result(res)
+module function mul_var_int16(x, y) result(res)
   type(variable_type), target, intent(in) :: x
-  real(real64), intent(in) :: y
+  integer(int16), intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: x_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = x%name
   res%length = x%length
@@ -2046,95 +2434,85 @@ module function mul_var_real64(x, y) result(res)
   res%attributes = x%attributes
 
   select case (x%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int8), pointer :: xp(:)
+      integer(int16), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr*y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_SHORT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp * y
+      nullify (xp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int16), pointer :: xp(:)
+      integer(int16), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr*y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_SHORT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp * y
+      nullify (xp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int32), pointer :: xp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr*y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp * y
+      nullify (xp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int64), pointer :: xp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      res%data_type = NC_INT64
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp * y
+      nullify (xp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: xp(:)
+      real(real32), pointer :: resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      res%data_type = NC_FLOAT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp * y
+      nullify (xp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr*y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp * y
+      nullify (xp, resp)
     end block
   end select
-end function mul_var_real64
+end function mul_var_int16
 
-module function mul_real64_var(x, y) result(res)
-  real(real64), intent(in) :: x
+module function mul_int16_var(x, y) result(res)
+  integer(int16), intent(in) :: x
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: y_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = y%name
   res%length = y%length
@@ -2142,95 +2520,79 @@ module function mul_real64_var(x, y) result(res)
   res%attributes = y%attributes
 
   select case (y%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int8), pointer :: yp(:)
+      integer(int16), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x*y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x * yp
+      nullify (yp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int16), pointer :: yp(:)
+      integer(int16), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x*y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x * yp
+      nullify (yp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int32), pointer :: yp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x*y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x * yp
+      nullify (yp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int64), pointer :: yp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x * yp
+      nullify (yp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: yp(:)
+      real(real32), pointer :: resp(:)
 
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x * yp
+      nullify (yp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x*y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x * yp
+      nullify (yp, resp)
     end block
   end select
-end function mul_real64_var
+end function mul_int16_var
 
 module function mul_var_int32(x, y) result(res)
   type(variable_type), target, intent(in) :: x
   integer(int32), intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: x_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = x%name
   res%length = x%length
@@ -2238,85 +2600,77 @@ module function mul_var_int32(x, y) result(res)
   res%attributes = x%attributes
 
   select case (x%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int8), pointer :: xp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr*y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp * y
+      nullify (xp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int16), pointer :: xp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr*y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp * y
+      nullify (xp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int32), pointer :: xp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr*y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp * y
+      nullify (xp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int64), pointer :: xp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      res%data_type = NC_INT64
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp * y
+      nullify (xp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: xp(:)
+      real(real32), pointer :: resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      res%data_type = NC_FLOAT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp * y
+      nullify (xp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr*y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp * y
+      nullify (xp, resp)
     end block
   end select
 end function mul_var_int32
@@ -2325,8 +2679,6 @@ module function mul_int32_var(x, y) result(res)
   integer(int32), intent(in) :: x
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: y_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = y%name
   res%length = y%length
@@ -2334,85 +2686,71 @@ module function mul_int32_var(x, y) result(res)
   res%attributes = y%attributes
 
   select case (y%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int8), pointer :: yp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x*y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x * yp
+      nullify (yp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int16), pointer :: yp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x*y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x * yp
+      nullify (yp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int32), pointer :: yp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x*y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x * yp
+      nullify (yp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int64), pointer :: yp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x * yp
+      nullify (yp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: yp(:)
+      real(real32), pointer :: resp(:)
 
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x * yp
+      nullify (yp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x*y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x * yp
+      nullify (yp, resp)
     end block
   end select
 end function mul_int32_var
@@ -2421,8 +2759,6 @@ module function mul_var_int64(x, y) result(res)
   type(variable_type), target, intent(in) :: x
   integer(int64), intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: x_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = x%name
   res%length = x%length
@@ -2430,85 +2766,78 @@ module function mul_var_int64(x, y) result(res)
   res%attributes = x%attributes
 
   select case (x%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int8), pointer :: xp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr*y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT64
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp * y
+      nullify (xp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int16), pointer :: xp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr*y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT64
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp * y
+      nullify (xp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int32), pointer :: xp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr*y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT64
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp * y
+      nullify (xp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int64), pointer :: xp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      res%data_type = NC_INT64
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp * y
+      nullify (xp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp
+      resp = resp * y
+      nullify (xp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr*y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp * y
+      nullify (xp, resp)
     end block
   end select
 end function mul_var_int64
@@ -2517,8 +2846,6 @@ module function mul_int64_var(x, y) result(res)
   integer(int64), intent(in) :: x
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: y_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = y%name
   res%length = y%length
@@ -2526,94 +2853,413 @@ module function mul_int64_var(x, y) result(res)
   res%attributes = y%attributes
 
   select case (y%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int8), pointer :: yp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x*y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x * yp
+      nullify (yp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int16), pointer :: yp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x*y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x * yp
+      nullify (yp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int32), pointer :: yp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x*y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x * yp
+      nullify (yp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int64), pointer :: yp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x * yp
+      nullify (yp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
 
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x
+      resp = resp * yp
+      nullify (yp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x*y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x * yp
+      nullify (yp, resp)
     end block
   end select
 end function mul_int64_var
 
+module function mul_var_real32(x, y) result(res)
+  type(variable_type), target, intent(in) :: x
+  real(real32), intent(in) :: y
+  type(variable_type), target :: res
+
+  res%name = x%name
+  res%length = x%length
+  res%dimensions = x%dimensions
+  res%attributes = x%attributes
+
+  select case (x%data_type)
+  case (NC_BYTE)
+    block
+      integer(int8), pointer :: xp(:)
+      real(real32), pointer :: resp(:)
+
+      res%data_type = NC_FLOAT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp * y
+      nullify (xp, resp)
+    end block
+  case (NC_SHORT)
+    block
+      integer(int16), pointer :: xp(:)
+      real(real32), pointer :: resp(:)
+
+      res%data_type = NC_FLOAT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp * y
+      nullify (xp, resp)
+    end block
+  case (NC_INT)
+    block
+      integer(int32), pointer :: xp(:)
+      real(real32), pointer :: resp(:)
+
+      res%data_type = NC_FLOAT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp * y
+      nullify (xp, resp)
+    end block
+  case (NC_INT64)
+    block
+      integer(int64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp
+      resp = resp * y
+      nullify (xp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: xp(:)
+      real(real32), pointer :: resp(:)
+
+      res%data_type = NC_FLOAT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp * y
+      nullify (xp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp * y
+      nullify (xp, resp)
+    end block
+  end select
+end function mul_var_real32
+
+module function mul_real32_var(x, y) result(res)
+  real(real32), intent(in) :: x
+  type(variable_type), target, intent(in) :: y
+  type(variable_type), target :: res
+
+  res%name = y%name
+  res%length = y%length
+  res%dimensions = y%dimensions
+  res%attributes = y%attributes
+
+  select case (y%data_type)
+  case (NC_BYTE)
+    block
+      integer(int8), pointer :: yp(:)
+      real(real32), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x * yp
+      nullify (yp, resp)
+    end block
+  case (NC_SHORT)
+    block
+      integer(int16), pointer :: yp(:)
+      real(real32), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x * yp
+      nullify (yp, resp)
+    end block
+  case (NC_INT)
+    block
+      integer(int32), pointer :: yp(:)
+      real(real32), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x * yp
+      nullify (yp, resp)
+    end block
+  case (NC_INT64)
+    block
+      integer(int64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x
+      resp = resp * yp
+      nullify (yp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: yp(:)
+      real(real32), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x * yp
+      nullify (yp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x * yp
+      nullify (yp, resp)
+    end block
+  end select
+end function mul_real32_var
+
+module function mul_var_real64(x, y) result(res)
+  type(variable_type), target, intent(in) :: x
+  real(real64), intent(in) :: y
+  type(variable_type), target :: res
+
+  res%name = x%name
+  res%length = x%length
+  res%dimensions = x%dimensions
+  res%attributes = x%attributes
+
+  select case (x%data_type)
+  case (NC_BYTE)
+    block
+      integer(int8), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp * y
+      nullify (xp, resp)
+    end block
+  case (NC_SHORT)
+    block
+      integer(int16), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp * y
+      nullify (xp, resp)
+    end block
+  case (NC_INT)
+    block
+      integer(int32), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp * y
+      nullify (xp, resp)
+    end block
+  case (NC_INT64)
+    block
+      integer(int64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp * y
+      nullify (xp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp * y
+      nullify (xp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp * y
+      nullify (xp, resp)
+    end block
+  end select
+end function mul_var_real64
+
+module function mul_real64_var(x, y) result(res)
+  real(real64), intent(in) :: x
+  type(variable_type), target, intent(in) :: y
+  type(variable_type), target :: res
+
+  res%name = y%name
+  res%length = y%length
+  res%dimensions = y%dimensions
+  res%attributes = y%attributes
+
+  select case (y%data_type)
+  case (NC_BYTE)
+    block
+      integer(int8), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x * yp
+      nullify (yp, resp)
+    end block
+  case (NC_SHORT)
+    block
+      integer(int16), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x * yp
+      nullify (yp, resp)
+    end block
+  case (NC_INT)
+    block
+      integer(int32), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x * yp
+      nullify (yp, resp)
+    end block
+  case (NC_INT64)
+    block
+      integer(int64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x * yp
+      nullify (yp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x * yp
+      nullify (yp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x * yp
+      nullify (yp, resp)
+    end block
+  end select
+end function mul_real64_var
+
 module function div_vars(x, y) result(res)
   type(variable_type), target, intent(in) :: x, y
   type(variable_type), target :: res
-  type(c_ptr) :: x_cptr, y_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   if (any(x%dimensions /= y%dimensions)) &
     & error stop "[add_vars] Unequal dimensions."
@@ -2627,95 +3273,79 @@ module function div_vars(x, y) result(res)
   res%attributes = x%attributes
 
   select case (x%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      integer(int8), pointer :: xp(:), yp(:), resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr/y_fptr
-      nullify (x_fptr, y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      call extract(y, yp)
+      resp = xp / yp
+      nullify (xp, yp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      integer(int16), pointer :: xp(:), yp(:), resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr/y_fptr
-      nullify (x_fptr, y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      call extract(y, yp)
+      resp = xp / yp
+      nullify (xp, yp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      integer(int32), pointer :: xp(:), yp(:), resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr/y_fptr
-      nullify (x_fptr, y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      call extract(y, yp)
+      resp = xp / yp
+      nullify (xp, yp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      integer(int64), pointer :: xp(:), yp(:), resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      call extract(y, yp)
+      resp = xp / yp
+      nullify (xp, yp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: xp(:), yp(:), resp(:)
 
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      call extract(y, yp)
+      resp = xp / yp
+      nullify (xp, yp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: xp(:), yp(:), resp(:)
 
-      r_fptr = x_fptr/y_fptr
-      nullify (x_fptr, y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      call extract(y, yp)
+      resp = xp / yp
+      nullify (xp, yp, resp)
     end block
   end select
 end function div_vars
 
-module function div_var_real32(x, y) result(res)
+module function div_var_int8(x, y) result(res)
   type(variable_type), target, intent(in) :: x
-  real(real32), intent(in) :: y
+  integer(int8), intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: x_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = x%name
   res%length = x%length
@@ -2723,95 +3353,85 @@ module function div_var_real32(x, y) result(res)
   res%attributes = x%attributes
 
   select case (x%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int8), pointer :: xp(:)
+      integer(int8), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr/y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_BYTE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp / y
+      nullify (xp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int16), pointer :: xp(:)
+      integer(int16), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr/y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_SHORT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp / y
+      nullify (xp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int32), pointer :: xp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr/y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp / y
+      nullify (xp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int64), pointer :: xp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      res%data_type = NC_INT64
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp / y
+      nullify (xp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: xp(:)
+      real(real32), pointer :: resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      res%data_type = NC_FLOAT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp / y
+      nullify (xp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr/y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp / y
+      nullify (xp, resp)
     end block
   end select
-end function div_var_real32
+end function div_var_int8
 
-module function div_real32_var(x, y) result(res)
-  real(real32), intent(in) :: x
+module function div_int8_var(x, y) result(res)
+  integer(int8), intent(in) :: x
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: y_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = y%name
   res%length = y%length
@@ -2819,95 +3439,79 @@ module function div_real32_var(x, y) result(res)
   res%attributes = y%attributes
 
   select case (y%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int8), pointer :: yp(:)
+      integer(int8), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x/y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x / yp
+      nullify (yp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int16), pointer :: yp(:)
+      integer(int16), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x/y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x / yp
+      nullify (yp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int32), pointer :: yp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x/y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x / yp
+      nullify (yp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int64), pointer :: yp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x / yp
+      nullify (yp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: yp(:)
+      real(real32), pointer :: resp(:)
 
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x / yp
+      nullify (yp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x/y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x / yp
+      nullify (yp, resp)
     end block
   end select
-end function div_real32_var
+end function div_int8_var
 
-module function div_var_real64(x, y) result(res)
+module function div_var_int16(x, y) result(res)
   type(variable_type), target, intent(in) :: x
-  real(real64), intent(in) :: y
+  integer(int16), intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: x_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = x%name
   res%length = x%length
@@ -2915,95 +3519,85 @@ module function div_var_real64(x, y) result(res)
   res%attributes = x%attributes
 
   select case (x%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int8), pointer :: xp(:)
+      integer(int16), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr/y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_SHORT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp / y
+      nullify (xp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int16), pointer :: xp(:)
+      integer(int16), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr/y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_SHORT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp / y
+      nullify (xp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int32), pointer :: xp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr/y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp / y
+      nullify (xp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int64), pointer :: xp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      res%data_type = NC_INT64
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp / y
+      nullify (xp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: xp(:)
+      real(real32), pointer :: resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      res%data_type = NC_FLOAT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp / y
+      nullify (xp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr/y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp / y
+      nullify (xp, resp)
     end block
   end select
-end function div_var_real64
+end function div_var_int16
 
-module function div_real64_var(x, y) result(res)
-  real(real64), intent(in) :: x
+module function div_int16_var(x, y) result(res)
+  integer(int16), intent(in) :: x
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: y_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = y%name
   res%length = y%length
@@ -3011,95 +3605,79 @@ module function div_real64_var(x, y) result(res)
   res%attributes = y%attributes
 
   select case (y%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int8), pointer :: yp(:)
+      integer(int16), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x/y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x / yp
+      nullify (yp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int16), pointer :: yp(:)
+      integer(int16), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x/y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x / yp
+      nullify (yp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int32), pointer :: yp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x/y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x / yp
+      nullify (yp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int64), pointer :: yp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x / yp
+      nullify (yp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: yp(:)
+      real(real32), pointer :: resp(:)
 
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x / yp
+      nullify (yp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x/y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x / yp
+      nullify (yp, resp)
     end block
   end select
-end function div_real64_var
+end function div_int16_var
 
 module function div_var_int32(x, y) result(res)
   type(variable_type), target, intent(in) :: x
   integer(int32), intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: x_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = x%name
   res%length = x%length
@@ -3107,85 +3685,77 @@ module function div_var_int32(x, y) result(res)
   res%attributes = x%attributes
 
   select case (x%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int8), pointer :: xp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr/y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp / y
+      nullify (xp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int16), pointer :: xp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr/y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp / y
+      nullify (xp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int32), pointer :: xp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr/y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp / y
+      nullify (xp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int64), pointer :: xp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      res%data_type = NC_INT64
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp / y
+      nullify (xp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: xp(:)
+      real(real32), pointer :: resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      res%data_type = NC_FLOAT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp / y
+      nullify (xp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr/y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp / y
+      nullify (xp, resp)
     end block
   end select
 end function div_var_int32
@@ -3194,8 +3764,6 @@ module function div_int32_var(x, y) result(res)
   integer(int32), intent(in) :: x
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: y_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = y%name
   res%length = y%length
@@ -3203,85 +3771,71 @@ module function div_int32_var(x, y) result(res)
   res%attributes = y%attributes
 
   select case (y%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int8), pointer :: yp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x/y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x / yp
+      nullify (yp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int16), pointer :: yp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x/y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x / yp
+      nullify (yp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int32), pointer :: yp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x/y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x / yp
+      nullify (yp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int64), pointer :: yp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x / yp
+      nullify (yp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: yp(:)
+      real(real32), pointer :: resp(:)
 
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x / yp
+      nullify (yp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x/y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x / yp
+      nullify (yp, resp)
     end block
   end select
 end function div_int32_var
@@ -3290,8 +3844,6 @@ module function div_var_int64(x, y) result(res)
   type(variable_type), target, intent(in) :: x
   integer(int64), intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: x_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = x%name
   res%length = x%length
@@ -3299,85 +3851,78 @@ module function div_var_int64(x, y) result(res)
   res%attributes = x%attributes
 
   select case (x%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int8), pointer :: xp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr/y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT64
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp / y
+      nullify (xp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int16), pointer :: xp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr/y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT64
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp / y
+      nullify (xp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int32), pointer :: xp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr/y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT64
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp / y
+      nullify (xp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int64), pointer :: xp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      res%data_type = NC_INT64
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp / y
+      nullify (xp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp
+      resp = resp / y
+      nullify (xp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr/y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp / y
+      nullify (xp, resp)
     end block
   end select
 end function div_var_int64
@@ -3386,8 +3931,6 @@ module function div_int64_var(x, y) result(res)
   integer(int64), intent(in) :: x
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: y_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = y%name
   res%length = y%length
@@ -3395,94 +3938,413 @@ module function div_int64_var(x, y) result(res)
   res%attributes = y%attributes
 
   select case (y%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int8), pointer :: yp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x/y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x / yp
+      nullify (yp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int16), pointer :: yp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x/y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x / yp
+      nullify (yp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int32), pointer :: yp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x/y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x / yp
+      nullify (yp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int64), pointer :: yp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x / yp
+      nullify (yp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
 
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x
+      resp = resp / yp
+      nullify (yp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x/y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x / yp
+      nullify (yp, resp)
     end block
   end select
 end function div_int64_var
 
+module function div_var_real32(x, y) result(res)
+  type(variable_type), target, intent(in) :: x
+  real(real32), intent(in) :: y
+  type(variable_type), target :: res
+
+  res%name = x%name
+  res%length = x%length
+  res%dimensions = x%dimensions
+  res%attributes = x%attributes
+
+  select case (x%data_type)
+  case (NC_BYTE)
+    block
+      integer(int8), pointer :: xp(:)
+      real(real32), pointer :: resp(:)
+
+      res%data_type = NC_FLOAT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp / y
+      nullify (xp, resp)
+    end block
+  case (NC_SHORT)
+    block
+      integer(int16), pointer :: xp(:)
+      real(real32), pointer :: resp(:)
+
+      res%data_type = NC_FLOAT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp / y
+      nullify (xp, resp)
+    end block
+  case (NC_INT)
+    block
+      integer(int32), pointer :: xp(:)
+      real(real32), pointer :: resp(:)
+
+      res%data_type = NC_FLOAT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp / y
+      nullify (xp, resp)
+    end block
+  case (NC_INT64)
+    block
+      integer(int64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp
+      resp = resp / y
+      nullify (xp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: xp(:)
+      real(real32), pointer :: resp(:)
+
+      res%data_type = NC_FLOAT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp / y
+      nullify (xp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp / y
+      nullify (xp, resp)
+    end block
+  end select
+end function div_var_real32
+
+module function div_real32_var(x, y) result(res)
+  real(real32), intent(in) :: x
+  type(variable_type), target, intent(in) :: y
+  type(variable_type), target :: res
+
+  res%name = y%name
+  res%length = y%length
+  res%dimensions = y%dimensions
+  res%attributes = y%attributes
+
+  select case (y%data_type)
+  case (NC_BYTE)
+    block
+      integer(int8), pointer :: yp(:)
+      real(real32), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x / yp
+      nullify (yp, resp)
+    end block
+  case (NC_SHORT)
+    block
+      integer(int16), pointer :: yp(:)
+      real(real32), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x / yp
+      nullify (yp, resp)
+    end block
+  case (NC_INT)
+    block
+      integer(int32), pointer :: yp(:)
+      real(real32), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x / yp
+      nullify (yp, resp)
+    end block
+  case (NC_INT64)
+    block
+      integer(int64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x
+      resp = resp / yp
+      nullify (yp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: yp(:)
+      real(real32), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x / yp
+      nullify (yp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x / yp
+      nullify (yp, resp)
+    end block
+  end select
+end function div_real32_var
+
+module function div_var_real64(x, y) result(res)
+  type(variable_type), target, intent(in) :: x
+  real(real64), intent(in) :: y
+  type(variable_type), target :: res
+
+  res%name = x%name
+  res%length = x%length
+  res%dimensions = x%dimensions
+  res%attributes = x%attributes
+
+  select case (x%data_type)
+  case (NC_BYTE)
+    block
+      integer(int8), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp / y
+      nullify (xp, resp)
+    end block
+  case (NC_SHORT)
+    block
+      integer(int16), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp / y
+      nullify (xp, resp)
+    end block
+  case (NC_INT)
+    block
+      integer(int32), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp / y
+      nullify (xp, resp)
+    end block
+  case (NC_INT64)
+    block
+      integer(int64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp / y
+      nullify (xp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp / y
+      nullify (xp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp / y
+      nullify (xp, resp)
+    end block
+  end select
+end function div_var_real64
+
+module function div_real64_var(x, y) result(res)
+  real(real64), intent(in) :: x
+  type(variable_type), target, intent(in) :: y
+  type(variable_type), target :: res
+
+  res%name = y%name
+  res%length = y%length
+  res%dimensions = y%dimensions
+  res%attributes = y%attributes
+
+  select case (y%data_type)
+  case (NC_BYTE)
+    block
+      integer(int8), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x / yp
+      nullify (yp, resp)
+    end block
+  case (NC_SHORT)
+    block
+      integer(int16), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x / yp
+      nullify (yp, resp)
+    end block
+  case (NC_INT)
+    block
+      integer(int32), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x / yp
+      nullify (yp, resp)
+    end block
+  case (NC_INT64)
+    block
+      integer(int64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x / yp
+      nullify (yp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x / yp
+      nullify (yp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x / yp
+      nullify (yp, resp)
+    end block
+  end select
+end function div_real64_var
+
 module function pow_vars(x, y) result(res)
   type(variable_type), target, intent(in) :: x, y
   type(variable_type), target :: res
-  type(c_ptr) :: x_cptr, y_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   if (any(x%dimensions /= y%dimensions)) &
     & error stop "[add_vars] Unequal dimensions."
@@ -3496,95 +4358,79 @@ module function pow_vars(x, y) result(res)
   res%attributes = x%attributes
 
   select case (x%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      integer(int8), pointer :: xp(:), yp(:), resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr**y_fptr
-      nullify (x_fptr, y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      call extract(y, yp)
+      resp = xp ** yp
+      nullify (xp, yp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      integer(int16), pointer :: xp(:), yp(:), resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr**y_fptr
-      nullify (x_fptr, y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      call extract(y, yp)
+      resp = xp ** yp
+      nullify (xp, yp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      integer(int32), pointer :: xp(:), yp(:), resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr**y_fptr
-      nullify (x_fptr, y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      call extract(y, yp)
+      resp = xp ** yp
+      nullify (xp, yp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: x_fptr(:), y_fptr(:), r_fptr(:)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      integer(int64), pointer :: xp(:), yp(:), resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      call extract(y, yp)
+      resp = xp ** yp
+      nullify (xp, yp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: xp(:), yp(:), resp(:)
 
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      call extract(y, yp)
+      resp = xp ** yp
+      nullify (xp, yp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: xp(:), yp(:), resp(:)
 
-      r_fptr = x_fptr**y_fptr
-      nullify (x_fptr, y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      call extract(y, yp)
+      resp = xp ** yp
+      nullify (xp, yp, resp)
     end block
   end select
 end function pow_vars
 
-module function pow_var_real32(x, y) result(res)
+module function pow_var_int8(x, y) result(res)
   type(variable_type), target, intent(in) :: x
-  real(real32), intent(in) :: y
+  integer(int8), intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: x_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = x%name
   res%length = x%length
@@ -3592,95 +4438,85 @@ module function pow_var_real32(x, y) result(res)
   res%attributes = x%attributes
 
   select case (x%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int8), pointer :: xp(:)
+      integer(int8), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr**y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_BYTE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp ** y
+      nullify (xp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int16), pointer :: xp(:)
+      integer(int16), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr**y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_SHORT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp ** y
+      nullify (xp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int32), pointer :: xp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr**y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp ** y
+      nullify (xp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int64), pointer :: xp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      res%data_type = NC_INT64
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp ** y
+      nullify (xp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: xp(:)
+      real(real32), pointer :: resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      res%data_type = NC_FLOAT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp ** y
+      nullify (xp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr**y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp ** y
+      nullify (xp, resp)
     end block
   end select
-end function pow_var_real32
+end function pow_var_int8
 
-module function pow_real32_var(x, y) result(res)
-  real(real32), intent(in) :: x
+module function pow_int8_var(x, y) result(res)
+  integer(int8), intent(in) :: x
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: y_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = y%name
   res%length = y%length
@@ -3688,95 +4524,79 @@ module function pow_real32_var(x, y) result(res)
   res%attributes = y%attributes
 
   select case (y%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int8), pointer :: yp(:)
+      integer(int8), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x**y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x ** yp
+      nullify (yp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int16), pointer :: yp(:)
+      integer(int16), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x**y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x ** yp
+      nullify (yp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int32), pointer :: yp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x**y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x ** yp
+      nullify (yp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int64), pointer :: yp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_FLOAT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x ** yp
+      nullify (yp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: yp(:)
+      real(real32), pointer :: resp(:)
 
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x ** yp
+      nullify (yp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x**y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x ** yp
+      nullify (yp, resp)
     end block
   end select
-end function pow_real32_var
+end function pow_int8_var
 
-module function pow_var_real64(x, y) result(res)
+module function pow_var_int16(x, y) result(res)
   type(variable_type), target, intent(in) :: x
-  real(real64), intent(in) :: y
+  integer(int16), intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: x_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = x%name
   res%length = x%length
@@ -3784,95 +4604,85 @@ module function pow_var_real64(x, y) result(res)
   res%attributes = x%attributes
 
   select case (x%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int8), pointer :: xp(:)
+      integer(int16), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr**y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_SHORT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp ** y
+      nullify (xp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int16), pointer :: xp(:)
+      integer(int16), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr**y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_SHORT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp ** y
+      nullify (xp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int32), pointer :: xp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr**y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp ** y
+      nullify (xp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int64), pointer :: xp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      res%data_type = NC_INT64
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp ** y
+      nullify (xp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: xp(:)
+      real(real32), pointer :: resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      res%data_type = NC_FLOAT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp ** y
+      nullify (xp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr**y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp ** y
+      nullify (xp, resp)
     end block
   end select
-end function pow_var_real64
+end function pow_var_int16
 
-module function pow_real64_var(x, y) result(res)
-  real(real64), intent(in) :: x
+module function pow_int16_var(x, y) result(res)
+  integer(int16), intent(in) :: x
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: y_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = y%name
   res%length = y%length
@@ -3880,95 +4690,79 @@ module function pow_real64_var(x, y) result(res)
   res%attributes = y%attributes
 
   select case (y%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int8), pointer :: yp(:)
+      integer(int16), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x**y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x ** yp
+      nullify (yp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int16), pointer :: yp(:)
+      integer(int16), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x**y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x ** yp
+      nullify (yp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int32), pointer :: yp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x**y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x ** yp
+      nullify (yp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int64), pointer :: yp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_DOUBLE)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x ** yp
+      nullify (yp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: yp(:)
+      real(real32), pointer :: resp(:)
 
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x ** yp
+      nullify (yp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x**y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x ** yp
+      nullify (yp, resp)
     end block
   end select
-end function pow_real64_var
+end function pow_int16_var
 
 module function pow_var_int32(x, y) result(res)
   type(variable_type), target, intent(in) :: x
   integer(int32), intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: x_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = x%name
   res%length = x%length
@@ -3976,85 +4770,77 @@ module function pow_var_int32(x, y) result(res)
   res%attributes = x%attributes
 
   select case (x%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int8), pointer :: xp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr**y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp ** y
+      nullify (xp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int16), pointer :: xp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr**y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp ** y
+      nullify (xp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int32), pointer :: xp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr**y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp ** y
+      nullify (xp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int64), pointer :: xp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      res%data_type = NC_INT64
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp ** y
+      nullify (xp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: xp(:)
+      real(real32), pointer :: resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      res%data_type = NC_FLOAT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp ** y
+      nullify (xp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr**y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp ** y
+      nullify (xp, resp)
     end block
   end select
 end function pow_var_int32
@@ -4063,8 +4849,6 @@ module function pow_int32_var(x, y) result(res)
   integer(int32), intent(in) :: x
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: y_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = y%name
   res%length = y%length
@@ -4072,85 +4856,71 @@ module function pow_int32_var(x, y) result(res)
   res%attributes = y%attributes
 
   select case (y%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int8), pointer :: yp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x**y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x ** yp
+      nullify (yp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int16), pointer :: yp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x**y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x ** yp
+      nullify (yp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int32), pointer :: yp(:)
+      integer(int32), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x**y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x ** yp
+      nullify (yp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int64), pointer :: yp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_INT)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x ** yp
+      nullify (yp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: yp(:)
+      real(real32), pointer :: resp(:)
 
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x ** yp
+      nullify (yp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x**y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x ** yp
+      nullify (yp, resp)
     end block
   end select
 end function pow_int32_var
@@ -4159,8 +4929,6 @@ module function pow_var_int64(x, y) result(res)
   type(variable_type), target, intent(in) :: x
   integer(int64), intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: x_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = x%name
   res%length = x%length
@@ -4168,85 +4936,78 @@ module function pow_var_int64(x, y) result(res)
   res%attributes = x%attributes
 
   select case (x%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int8), pointer :: xp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr**y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT64
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp ** y
+      nullify (xp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int16), pointer :: xp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr**y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT64
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp ** y
+      nullify (xp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: x_fptr(:), r_fptr(:)
+      integer(int32), pointer :: xp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr**y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_INT64
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp ** y
+      nullify (xp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: x_fptr(:), r_fptr(:)
+      integer(int64), pointer :: xp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      res%data_type = NC_INT64
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp ** y
+      nullify (xp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
 
-      x_cptr = c_loc(x%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp
+      resp = resp ** y
+      nullify (xp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(x_cptr, x_fptr, [x%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x_fptr**y
-      nullify (x_fptr, r_fptr)
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp ** y
+      nullify (xp, resp)
     end block
   end select
 end function pow_var_int64
@@ -4255,8 +5016,6 @@ module function pow_int64_var(x, y) result(res)
   integer(int64), intent(in) :: x
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
-  type(c_ptr) :: y_cptr, r_cptr
-  integer(int64) :: buffer_size
 
   res%name = y%name
   res%length = y%length
@@ -4264,88 +5023,409 @@ module function pow_int64_var(x, y) result(res)
   res%attributes = y%attributes
 
   select case (y%data_type)
-  case (NC_FLOAT)
+  case (NC_BYTE)
     block
-      real(real32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int8), pointer :: yp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_FLOAT, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x**y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x ** yp
+      nullify (yp, resp)
     end block
-  case (NC_DOUBLE)
+  case (NC_SHORT)
     block
-      real(real64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int16), pointer :: yp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_DOUBLE, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x**y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x ** yp
+      nullify (yp, resp)
     end block
   case (NC_INT)
     block
-      integer(int32), pointer :: y_fptr(:), r_fptr(:)
+      integer(int32), pointer :: yp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
-
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
-
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x**y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x ** yp
+      nullify (yp, resp)
     end block
   case (NC_INT64)
     block
-      integer(int64), pointer :: y_fptr(:), r_fptr(:)
+      integer(int64), pointer :: yp(:)
+      integer(int64), pointer :: resp(:)
 
-      res%data_type = max(NC_INT64, NC_INT64)
-      buffer_size = get_buffer_size(res%data_type, res%length)
-      if (allocation_required(res%buffer, buffer_size)) then
-        if (allocated(res%buffer)) deallocate (res%buffer)
-        allocate (res%buffer(buffer_size))
-      end if
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x ** yp
+      nullify (yp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
 
-      y_cptr = c_loc(y%buffer(1))
-      r_cptr = c_loc(res%buffer(1))
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x
+      resp = resp ** yp
+      nullify (yp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
 
-      call c_f_pointer(y_cptr, y_fptr, [y%length])
-      call c_f_pointer(r_cptr, r_fptr, [res%length])
-
-      r_fptr = x**y_fptr
-      nullify (y_fptr, r_fptr)
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x ** yp
+      nullify (yp, resp)
     end block
   end select
 end function pow_int64_var
+
+module function pow_var_real32(x, y) result(res)
+  type(variable_type), target, intent(in) :: x
+  real(real32), intent(in) :: y
+  type(variable_type), target :: res
+
+  res%name = x%name
+  res%length = x%length
+  res%dimensions = x%dimensions
+  res%attributes = x%attributes
+
+  select case (x%data_type)
+  case (NC_BYTE)
+    block
+      integer(int8), pointer :: xp(:)
+      real(real32), pointer :: resp(:)
+
+      res%data_type = NC_FLOAT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp ** y
+      nullify (xp, resp)
+    end block
+  case (NC_SHORT)
+    block
+      integer(int16), pointer :: xp(:)
+      real(real32), pointer :: resp(:)
+
+      res%data_type = NC_FLOAT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp ** y
+      nullify (xp, resp)
+    end block
+  case (NC_INT)
+    block
+      integer(int32), pointer :: xp(:)
+      real(real32), pointer :: resp(:)
+
+      res%data_type = NC_FLOAT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp ** y
+      nullify (xp, resp)
+    end block
+  case (NC_INT64)
+    block
+      integer(int64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp
+      resp = resp ** y
+      nullify (xp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: xp(:)
+      real(real32), pointer :: resp(:)
+
+      res%data_type = NC_FLOAT
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp ** y
+      nullify (xp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp ** y
+      nullify (xp, resp)
+    end block
+  end select
+end function pow_var_real32
+
+module function pow_real32_var(x, y) result(res)
+  real(real32), intent(in) :: x
+  type(variable_type), target, intent(in) :: y
+  type(variable_type), target :: res
+
+  res%name = y%name
+  res%length = y%length
+  res%dimensions = y%dimensions
+  res%attributes = y%attributes
+
+  select case (y%data_type)
+  case (NC_BYTE)
+    block
+      integer(int8), pointer :: yp(:)
+      real(real32), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x ** yp
+      nullify (yp, resp)
+    end block
+  case (NC_SHORT)
+    block
+      integer(int16), pointer :: yp(:)
+      real(real32), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x ** yp
+      nullify (yp, resp)
+    end block
+  case (NC_INT)
+    block
+      integer(int32), pointer :: yp(:)
+      real(real32), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x ** yp
+      nullify (yp, resp)
+    end block
+  case (NC_INT64)
+    block
+      integer(int64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x
+      resp = resp ** yp
+      nullify (yp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: yp(:)
+      real(real32), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x ** yp
+      nullify (yp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x ** yp
+      nullify (yp, resp)
+    end block
+  end select
+end function pow_real32_var
+
+module function pow_var_real64(x, y) result(res)
+  type(variable_type), target, intent(in) :: x
+  real(real64), intent(in) :: y
+  type(variable_type), target :: res
+
+  res%name = x%name
+  res%length = x%length
+  res%dimensions = x%dimensions
+  res%attributes = x%attributes
+
+  select case (x%data_type)
+  case (NC_BYTE)
+    block
+      integer(int8), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp ** y
+      nullify (xp, resp)
+    end block
+  case (NC_SHORT)
+    block
+      integer(int16), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp ** y
+      nullify (xp, resp)
+    end block
+  case (NC_INT)
+    block
+      integer(int32), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp ** y
+      nullify (xp, resp)
+    end block
+  case (NC_INT64)
+    block
+      integer(int64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp ** y
+      nullify (xp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp ** y
+      nullify (xp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: xp(:)
+      real(real64), pointer :: resp(:)
+
+      res%data_type = NC_DOUBLE
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(x, xp)
+      resp = xp ** y
+      nullify (xp, resp)
+    end block
+  end select
+end function pow_var_real64
+
+module function pow_real64_var(x, y) result(res)
+  real(real64), intent(in) :: x
+  type(variable_type), target, intent(in) :: y
+  type(variable_type), target :: res
+
+  res%name = y%name
+  res%length = y%length
+  res%dimensions = y%dimensions
+  res%attributes = y%attributes
+
+  select case (y%data_type)
+  case (NC_BYTE)
+    block
+      integer(int8), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x ** yp
+      nullify (yp, resp)
+    end block
+  case (NC_SHORT)
+    block
+      integer(int16), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x ** yp
+      nullify (yp, resp)
+    end block
+  case (NC_INT)
+    block
+      integer(int32), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x ** yp
+      nullify (yp, resp)
+    end block
+  case (NC_INT64)
+    block
+      integer(int64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x ** yp
+      nullify (yp, resp)
+    end block
+  case (NC_FLOAT)
+    block
+      real(real32), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x ** yp
+      nullify (yp, resp)
+    end block
+  case (NC_DOUBLE)
+    block
+      real(real64), pointer :: yp(:)
+      real(real64), pointer :: resp(:)
+
+      call allocate_buffer(res)
+      call extract(res, resp)
+      call extract(y, yp)
+      resp = x ** yp
+      nullify (yp, resp)
+    end block
+  end select
+end function pow_real64_var
 
 module function sum_vars(vars) result(s)
   type(variable_type), intent(in) :: vars(:)

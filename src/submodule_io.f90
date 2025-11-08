@@ -62,7 +62,6 @@ module subroutine write_formatted_attribute(att, unit, iotype, v_list, iostat, i
   integer, intent(in) :: v_list(:)
   integer, intent(out) :: iostat
   character(len=*), intent(inout) :: iomsg
-  integer :: kind_num
   type(c_ptr) :: ptr
 
   associate (v_list_ => v_list, iomsg_ => iomsg)
