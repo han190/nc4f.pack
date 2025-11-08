@@ -105,7 +105,7 @@ impure elemental module function define_dimension(nc, dim) result(new_dim)
   integer(c_int) :: stat, dimid
   integer(c_size_t) :: length
 
-  stat = nc_inq_dimid(nc%id, dim%name, dimid)
+  stat = nc_inq_dimid(nc%id, f2cstr(dim%name), dimid)
   dimension_exists: if (stat == NC_NOERR) then
     new_dim = dimension_type(dimid, dim%name, &
       & dim%length, dim%is_unlimited)
@@ -113,7 +113,9 @@ impure elemental module function define_dimension(nc, dim) result(new_dim)
   end if dimension_exists
 
   length = merge(NC_UNLIMITED, dim%length, dim%is_unlimited)
-  call handle_error(nc_def_dim(nc%id, f2cstr(dim%name), dim%length, dimid))
+  call handle_error(nc_def_dim( &
+    & nc%id, f2cstr(dim%name), dim%length, dimid), &
+    & "[define_dimension] Dimension: "//trim(dim%name)//".")
   new_dim = dimension_type(dimid, dim%name, dim%length, dim%is_unlimited)
 end function define_dimension
 

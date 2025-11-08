@@ -59,7 +59,10 @@ module subroutine to_netcdf_vars(filename, vars, atts)
 
   nc = open_dataset(filename, "w")
   call put_variable(nc, vars)
-  if (present(atts)) call put_attribute(nc, atts)
+  if (present(atts)) then
+    nc%attributes = atts
+    call put_attribute(nc)
+  end if
   call close_dataset(nc)
 end subroutine to_netcdf_vars
 
@@ -71,7 +74,10 @@ module subroutine to_netcdf_var(filename, var, atts)
 
   nc = open_dataset(filename, "w")
   call put_variable(nc, var)
-  if (present(atts)) call put_attribute(nc, atts)
+  if (present(atts)) then
+    nc%attributes = atts
+    call put_attribute(nc)
+  end if
   call close_dataset(nc)
 end subroutine to_netcdf_var
 

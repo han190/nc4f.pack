@@ -194,7 +194,6 @@ module impure elemental subroutine put_attribute_variable(nc, var)
   type(variable_type), target, intent(in) :: var
   integer :: i
 
-  if (.not. allocated(var%attributes) .or. size(var%attributes) == 0) return
   do i = 1, size(var%attributes)
     associate (att => var%attributes(i))
       call handle_error(nc_put_att(nc%id, var%id, f2cstr(att%name), &
@@ -204,14 +203,18 @@ module impure elemental subroutine put_attribute_variable(nc, var)
   end do
 end subroutine put_attribute_variable
 
-module impure elemental subroutine put_attribute_global(nc, att)
+module impure elemental subroutine put_attribute_global(nc)
   type(netcdf_type), intent(in) :: nc
-  type(attribute_type), target, intent(in) :: att
+  integer(int64) :: i
 
-  if (.not. allocated(nc%attributes) .or. size(nc%attributes) == 0) return
-  call handle_error(nc_put_att(nc%id, NC_GLOBAL, f2cstr(att%name), &
-    & att%data_type, att%length, c_loc(att%buffer(1))), &
-    & "[put_attribute_] Invalid attribute.")
+  if (.not. allocated(nc%attributes)) return
+  do i = 1, size(nc%attributes, kind=int64)
+    associate (att => nc%attributes(i))
+      call handle_error(nc_put_att(nc%id, NC_GLOBAL, f2cstr(att%name), &
+        & att%data_type, att%length, c_loc(att%buffer(1))), &
+        & "[put_attribute_] Invalid attribute.")
+    end associate
+  end do
 end subroutine put_attribute_global
 
 pure module subroutine allocate_buffer_attribute(att)

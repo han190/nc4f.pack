@@ -231,9 +231,8 @@ interface
     type(variable_type), target, intent(in) :: var
   end subroutine put_attribute_variable
 
-  module impure elemental subroutine put_attribute_global(nc, att)
+  module impure elemental subroutine put_attribute_global(nc)
     type(netcdf_type), intent(in) :: nc
-    type(attribute_type), target, intent(in) :: att
   end subroutine put_attribute_global
 
   pure module subroutine allocate_buffer_attribute(att)
