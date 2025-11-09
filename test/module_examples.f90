@@ -38,4 +38,37 @@ subroutine simple_rd(passed)
   call close_dataset(nc)
 end subroutine simple_rd
 
+subroutine sfc_pres_temp_wr(passed)
+  logical, intent(inout) :: passed
+  !> Example: sfc_pres_temp_wr
+  integer, parameter :: nlat = 47, nlon = 83
+  real :: pres(nlat, nlon), temp(nlat, nlon)
+  real :: lats(nlat), lons(nlon)
+  integer :: ilat, ilon
+  type(variable_type) :: vars(4)
+
+  do concurrent(ilon=1:nlon, ilat=1:nlat)
+    lats(ilat) = 90.0 - ilat + 1
+    lons(ilon) = ilon
+    pres(ilat, ilon) = 900.0 + 0.5*ilat - 0.5*ilon
+    temp(ilat, ilon) = 9.0 + 0.5*ilat - 0.5*ilon
+  end do
+
+  vars = [ &
+    data_array("latitude", lats, &
+      & ["latitude".dim.nlat], &
+      & ["units".att."degree_north"]), &
+    data_array("longitude", lons, &
+      & ["longitude".dim.nlon], &
+      & ["units".att."degree_east"]), &
+    data_array("temperature", temp, &
+      & ["latitude".dim.nlat, "longitude".dim.nlon], &
+      & ["units".att."celsius"]), &
+    data_array("pressure", pres, &
+      & ["latitude".dim.nlat, "longitude".dim.nlon], &
+      & ["units".att."hPa"])]
+  call to_netcdf("sfc_pres_temp_wr.nc", vars)
+  passed = .true.
+end subroutine sfc_pres_temp_wr
+
 end module module_examples

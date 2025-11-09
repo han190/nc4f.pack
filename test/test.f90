@@ -7,7 +7,8 @@ implicit none
 type(test_type), allocatable :: tests(:)
 tests = [&
   & test_type("simple_wr", simple_wr), &
-  & test_type("simple_rd", simple_rd)]
+  & test_type("simple_rd", simple_rd), &
+  & test_type("sfc_pres_temp_wr", sfc_pres_temp_wr)]
 call run_tests(tests)
 
 end program main

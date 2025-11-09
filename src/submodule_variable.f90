@@ -66,15 +66,17 @@ end function inquire_variable_
 module impure elemental subroutine put_variable(nc, var)
   type(netcdf_type), intent(in) :: nc
   type(variable_type), target, intent(in) :: var
+  type(variable_type) :: tmp
 
-  if (allocated(var%attributes)) call put_attribute_variable(nc, var)
-  call handle_error(nc_put_var(nc%id, &
-    & define_variable_(nc, var), c_loc(var%buffer(1))))
+  tmp = define_variable_(nc, var)
+  if (allocated(var%attributes)) call put_attribute_variable(nc, tmp)
+  call handle_error(nc_put_var(nc%id, tmp%id, c_loc(var%buffer(1))))
 end subroutine put_variable
 
-impure elemental function define_variable_(nc, var) result(varid)
+impure elemental function define_variable_(nc, var) result(new_var)
   type(netcdf_type), intent(in) :: nc
   type(variable_type), target, intent(in) :: var
+  type(variable_type) :: new_var
   integer(c_int) :: varid
   integer(c_int), allocatable :: new_dimids(:)
   type(dimension_type), allocatable :: new_dims(:)
@@ -91,6 +93,8 @@ impure elemental function define_variable_(nc, var) result(varid)
 
   call handle_error(nc_def_var(nc%id, f2cstr(var%name), &
     & var%data_type, size(new_dims), new_dimids, varid))
+  new_var%id = varid
+  if (allocated(var%attributes)) new_var%attributes = var%attributes
 end function define_variable_
 
 pure module function get_size(var, dim) result(n)
