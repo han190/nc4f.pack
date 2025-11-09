@@ -1,5 +1,5 @@
 submodule(module_netcdf) submodule_dataset
-implicit none
+implicit none (type, external)
 contains
 
 module function open_dataset(filename, mode, inquire_dimension, inquire_attribute) result(nc)

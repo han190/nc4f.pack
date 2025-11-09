@@ -1,5 +1,5 @@
 submodule(module_netcdf) submodule_attribute
-implicit none
+implicit none (type, external)
 contains
 
 module function new_attribute_arr_int32(name, values) result(att)

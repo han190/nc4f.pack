@@ -1,5 +1,5 @@
 submodule(module_netcdf) submodule_variable_constructor
-implicit none
+implicit none (type, external)
 contains
 
 module function new_variable_int8_1d(name, values, dims) result(var)

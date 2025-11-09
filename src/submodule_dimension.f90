@@ -1,5 +1,5 @@
 submodule(module_netcdf) submodule_dimension
-implicit none
+implicit none (type, external)
 contains
 
 module elemental function new_dimension_argument_int64(length, is_unlimited) result(arg)

@@ -1,5 +1,5 @@
 submodule(module_netcdf) submodule_utility
-implicit none
+implicit none (type, external)
 contains
 
 impure elemental module subroutine handle_error(status, error_message)

@@ -1,5 +1,5 @@
 submodule(module_netcdf) submodule_extract
-implicit none
+implicit none (type, external)
 contains
 
 module subroutine extract_att_int8_1d(att, ptr)

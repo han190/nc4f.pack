@@ -1,5 +1,5 @@
 submodule(module_netcdf) submodule_io
-implicit none
+implicit none (type, external)
 contains
 
 module subroutine write_formatted_variable(var, unit, iotype, v_list, iostat, iomsg)

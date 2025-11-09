@@ -1,5 +1,5 @@
 submodule(module_netcdf) submodule_variable
-implicit none
+implicit none (type, external)
 contains
 
 module impure elemental function get_variable(nc, name, exist) result(var)
@@ -55,7 +55,7 @@ impure elemental function inquire_variable_(ncid, name, exist) result(var)
   end if
 
   call handle_error(nc_inq_vartype(ncid, var%id, var%data_type))
-  var%attributes = get_attributes_(ncid, var%id)
+  if (allocated(var%attributes)) var%attributes = get_attributes_(ncid, var%id)
   var%dimensions = inquire_dimensions_(ncid, var%id)
   var%length = 1
   do i = 1, size(var%dimensions)
@@ -66,17 +66,15 @@ end function inquire_variable_
 module impure elemental subroutine put_variable(nc, var)
   type(netcdf_type), intent(in) :: nc
   type(variable_type), target, intent(in) :: var
-  type(variable_type) :: tmp
 
-  tmp = define_variable(nc, var)
-  call put_attribute_variable(nc, tmp)
-  call handle_error(nc_put_var(nc%id, tmp%id, c_loc(var%buffer(1))))
+  if (allocated(var%attributes)) call put_attribute_variable(nc, var)
+  call handle_error(nc_put_var(nc%id, &
+    & define_variable_(nc, var), c_loc(var%buffer(1))))
 end subroutine put_variable
 
-impure elemental function define_variable(nc, var) result(new_var)
+impure elemental function define_variable_(nc, var) result(varid)
   type(netcdf_type), intent(in) :: nc
   type(variable_type), target, intent(in) :: var
-  type(variable_type) :: new_var
   integer(c_int) :: varid
   integer(c_int), allocatable :: new_dimids(:)
   type(dimension_type), allocatable :: new_dims(:)
@@ -93,12 +91,7 @@ impure elemental function define_variable(nc, var) result(new_var)
 
   call handle_error(nc_def_var(nc%id, f2cstr(var%name), &
     & var%data_type, size(new_dims), new_dimids, varid))
-
-  !> Since we only need variable ID and attributes,
-  !> we only copy these two.
-  new_var%attributes = var%attributes
-  new_var%id = varid
-end function define_variable
+end function define_variable_
 
 pure module function get_size(var, dim) result(n)
   type(variable_type), intent(in) :: var

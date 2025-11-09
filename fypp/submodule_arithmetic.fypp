@@ -1,6 +1,6 @@
 #: include 'common.fypp'
 submodule(module_netcdf) submodule_arithmetic
-implicit none
+implicit none (type, external)
 contains${newline}$
 #: for O, N in zip(ops, op_names)
 module function ${N}$_vars(x, y) result(res)

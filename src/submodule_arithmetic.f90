@@ -1,5 +1,5 @@
 submodule(module_netcdf) submodule_arithmetic
-implicit none
+implicit none (type, external)
 contains
 
 module function add_vars(x, y) result(res)
