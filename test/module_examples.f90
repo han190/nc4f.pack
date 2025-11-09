@@ -71,4 +71,33 @@ subroutine sfc_pres_temp_wr(passed)
   passed = .true.
 end subroutine sfc_pres_temp_wr
 
+subroutine sfc_pres_temp_rd(passed)
+  logical, intent(inout) :: passed
+  !> Example sfc_pres_temp_rd
+  type(netcdf_type) :: nc
+  type(variable_type) :: var
+  integer, parameter :: nx = 47, nlon = 360
+  logical :: exist
+
+  nc = open_dataset("sfc_pres_temp_wr.nc", "r")
+  var = inquire_variable(nc, "pressure", exist)
+  associate (dims => var%dimensions)
+    passed = exist .and. &
+      & dims(1)%name == "latitude" .and. &
+      & dims(1)%length == 47 .and. &
+      & dims(2)%name == "longitude" .and. &
+      & dims(2)%length == 360
+  end associate
+  if (.not. passed) return
+
+  var = inquire_variable(nc, "temperature", exist)
+  associate (dims => var%dimensions)
+    passed = exist .and. &
+      & dims(1)%name == "latitude" .and. &
+      & dims(1)%length == 47 .and. &
+      & dims(2)%name == "longitude" .and. &
+      & dims(2)%length == 360
+  end associate
+end subroutine sfc_pres_temp_rd
+
 end module module_examples
