@@ -41,7 +41,7 @@ end subroutine simple_rd
 subroutine sfc_pres_temp_wr(passed)
   logical, intent(inout) :: passed
   !> Example: sfc_pres_temp_wr
-  integer, parameter :: nlat = 47, nlon = 83
+  integer, parameter :: nlat = 47, nlon = 360
   real :: pres(nlat, nlon), temp(nlat, nlon)
   real :: lats(nlat), lons(nlon)
   integer :: ilat, ilon
@@ -49,7 +49,7 @@ subroutine sfc_pres_temp_wr(passed)
 
   do concurrent(ilon=1:nlon, ilat=1:nlat)
     lats(ilat) = 90.0 - ilat + 1
-    lons(ilon) = ilon
+    lons(ilon) = merge(ilon - 360, ilon, ilon > 180)
     pres(ilat, ilon) = 900.0 + 0.5*ilat - 0.5*ilon
     temp(ilat, ilon) = 9.0 + 0.5*ilat - 0.5*ilon
   end do
