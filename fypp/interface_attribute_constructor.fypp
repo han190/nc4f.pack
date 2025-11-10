@@ -1,0 +1,33 @@
+#: include 'common.fypp'
+#! ----------------------
+#! Interface (data_array)
+#! ----------------------
+interface operator(.att.)
+#: for T, K in zip(types, kinds)
+  module procedure :: new_attribute_${K}$
+  module procedure :: new_attribute_${K}$_scalar
+#: endfor
+  module procedure :: new_attribute_character
+end interface operator(.att.)${newline}$
+#! ----------------
+#! Module interface
+#! ----------------
+interface
+#: for C, T, K, CK in zip(cases, types, kinds, ckinds)
+  module function new_attribute_${K}$(name, values) result(att)
+    character(len=*), intent(in) :: name
+    ${T}$(${K}$), intent(in) :: values(:)
+    type(attribute_type), target :: att
+  end function new_attribute_${K}$${newline}$
+  module function new_attribute_${K}$_scalar(name, value) result(att)
+    character(len=*), intent(in) :: name
+    ${T}$(${K}$), intent(in) :: value
+    type(attribute_type), target :: att
+  end function new_attribute_${K}$_scalar${newline}$
+#: endfor
+  module function new_attribute_character(name, value) result(att)
+    character(len=*), intent(in) :: name
+    character(len=*), intent(in) :: value
+    type(attribute_type), target :: att
+  end function new_attribute_character
+end interface

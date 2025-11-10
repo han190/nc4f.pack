@@ -7,6 +7,7 @@ COMPONENTS=(
   arithmetic
   extract
   variable_constructor
+  attribute_constructor
 )
 
 for name in "${COMPONENTS[@]}"; do

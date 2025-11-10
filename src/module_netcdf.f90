@@ -101,18 +101,6 @@ interface inquire_dimensions
   module procedure :: inquire_dimensions_global
 end interface inquire_dimensions
 
-interface operator(.att.)
-  module procedure :: new_attribute_int32
-  module procedure :: new_attribute_arr_int32
-  module procedure :: new_attribute_int64
-  module procedure :: new_attribute_arr_int64
-  module procedure :: new_attribute_real32
-  module procedure :: new_attribute_arr_real32
-  module procedure :: new_attribute_real64
-  module procedure :: new_attribute_arr_real64
-  module procedure :: new_attribute_character
-end interface operator(.att.)
-
 interface operator(.dim.)
   module procedure :: new_dimension_length_int32
   module procedure :: new_dimension_length_int64
@@ -156,60 +144,6 @@ integer(int8), parameter :: BYTE = 0_int8
 
 interface
   !> submodule_attribute.f90
-  module function new_attribute_arr_int32(name, values) result(att)
-    character(len=*), intent(in) :: name
-    integer(int32), intent(in) :: values(:)
-    type(attribute_type), target :: att
-  end function new_attribute_arr_int32
-
-  module function new_attribute_int32(name, value) result(att)
-    character(len=*), intent(in) :: name
-    integer(int32), intent(in) :: value
-    type(attribute_type) :: att
-  end function new_attribute_int32
-
-  module function new_attribute_arr_int64(name, values) result(att)
-    character(len=*), intent(in) :: name
-    integer(int64), intent(in) :: values(:)
-    type(attribute_type), target :: att
-  end function new_attribute_arr_int64
-
-  module function new_attribute_int64(name, value) result(att)
-    character(len=*), intent(in) :: name
-    integer(int64), intent(in) :: value
-    type(attribute_type) :: att
-  end function new_attribute_int64
-
-  module function new_attribute_arr_real32(name, values) result(att)
-    character(len=*), intent(in) :: name
-    real(real32), intent(in) :: values(:)
-    type(attribute_type), target :: att
-  end function new_attribute_arr_real32
-
-  module function new_attribute_real32(name, value) result(att)
-    character(len=*), intent(in) :: name
-    real(real32), intent(in) :: value
-    type(attribute_type) :: att
-  end function new_attribute_real32
-
-  module function new_attribute_arr_real64(name, values) result(att)
-    character(len=*), intent(in) :: name
-    real(real64), intent(in) :: values(:)
-    type(attribute_type), target :: att
-  end function new_attribute_arr_real64
-
-  module function new_attribute_real64(name, value) result(att)
-    character(len=*), intent(in) :: name
-    real(real64), intent(in) :: value
-    type(attribute_type) :: att
-  end function new_attribute_real64
-
-  module function new_attribute_character(name, value) result(att)
-    character(len=*), intent(in) :: name
-    character(len=*), intent(in) :: value
-    type(attribute_type), target :: att
-  end function new_attribute_character
-
   impure elemental module function get_attribute_name(nc, name) result(att)
     type(netcdf_type), intent(in) :: nc
     character(len=*), intent(in) :: name
@@ -414,5 +348,6 @@ end interface
 include "interface_arithmetic.inc"
 include "interface_extract.inc"
 include "interface_variable_constructor.inc"
+include "interface_attribute_constructor.inc"
 
 end module module_netcdf
