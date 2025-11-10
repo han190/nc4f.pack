@@ -155,8 +155,9 @@ interface
     type(attribute_type), allocatable :: atts(:)
   end function get_attributes_global
 
-  module function get_attributes_(ncid, varid) result(atts)
+  module function get_attributes_(ncid, varid, exist) result(atts)
     integer(c_int), intent(in) :: ncid, varid
+    logical, intent(inout), optional :: exist
     type(attribute_type), allocatable :: atts(:)
   end function get_attributes_
 

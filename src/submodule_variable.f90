@@ -44,18 +44,19 @@ impure elemental function inquire_variable_(ncid, name, exist) result(var)
   type(variable_type) :: var
   integer(c_int) :: stat
   integer :: i
+  logical :: atts_exist
 
   var%name = trim(adjustl(name))
   stat = nc_inq_varid(ncid, f2cstr(var%name), var%id)
   if (present(exist)) then
     exist = stat == NC_NOERR
     if (.not. exist) return
-  else
-    call handle_error(stat)
   end if
+  call handle_error(stat)
 
   call handle_error(nc_inq_vartype(ncid, var%id, var%data_type))
-  if (allocated(var%attributes)) var%attributes = get_attributes_(ncid, var%id)
+  var%attributes = get_attributes_(ncid, var%id, atts_exist)
+  if (.not. atts_exist .and. allocated(var%attributes)) deallocate(var%attributes)
   var%dimensions = inquire_dimensions_(ncid, var%id)
   var%length = 1
   do i = 1, size(var%dimensions)

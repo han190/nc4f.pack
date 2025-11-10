@@ -16,22 +16,25 @@ module function get_attributes_global(nc) result(atts)
   atts = get_attributes_(nc%id, NC_GLOBAL)
 end function get_attributes_global
 
-module function get_attributes_(ncid, varid) result(atts)
+module function get_attributes_(ncid, varid, exist) result(atts)
   integer(c_int), intent(in) :: ncid, varid
+  logical, intent(inout), optional :: exist
   type(attribute_type), allocatable :: atts(:)
   integer(c_int) :: natts, i
   character(kind=c_char, len=100) :: name
+  integer(c_int) :: stat
 
   if (varid == NC_GLOBAL) then
-    call handle_error(nc_inq_natts(ncid, natts))
+    stat = nc_inq_natts(ncid, natts)
   else
-    call handle_error(nc_inq_varnatts(ncid, varid, natts))
+    stat = nc_inq_varnatts(ncid, varid, natts)
   end if
 
-  if (natts == 0) then
-    if (allocated(atts)) deallocate (atts)
-    return
+  if (present(exist)) then
+    exist = stat == NC_NOERR
+    if (.not. exist) return
   end if
+  call handle_error(stat)
 
   if (.not. allocated(atts)) then
     allocate (atts(natts))
