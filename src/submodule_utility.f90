@@ -30,23 +30,23 @@ impure elemental module subroutine handle_error(status, error_message)
   nullify (fptr)
 end subroutine handle_error
 
-pure module function c2fstr(f2cstring) result(string)
-  character(kind=c_char, len=*), intent(in) :: f2cstring
-  character(len=:), allocatable :: string
+pure module function c2fstr(cstr) result(fstr)
+  character(kind=c_char, len=*), intent(in) :: cstr
+  character(len=:), allocatable :: fstr
   integer :: inull, str_len
 
-  str_len = len(f2cstring)
-  inull = scan(f2cstring, c_null_char)
+  str_len = len(cstr)
+  inull = scan(cstr, c_null_char)
   if (inull /= 0) str_len = inull - 1
   str_len = max(1, min(str_len, NC_MAX_NAME))
-  string = f2cstring(1:str_len)
+  fstr = cstr(1:str_len)
 end function c2fstr
 
-pure module function f2cstr(string) result(f2cstring)
-  character(len=*), intent(in) :: string
-  character(kind=c_char, len=:), allocatable :: f2cstring
+pure module function f2cstr(fstr) result(cstr)
+  character(len=*), intent(in) :: fstr
+  character(kind=c_char, len=:), allocatable :: cstr
 
-  f2cstring = trim(string)//c_null_char
+  cstr = trim(fstr)//c_null_char
 end function f2cstr
 
 pure logical module function allocation_required(buffer, buf_size)
