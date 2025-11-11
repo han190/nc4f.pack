@@ -2,7 +2,7 @@
 submodule(module_netcdf) submodule_attribute_constructor
 implicit none (type, external)
 contains${newline}$
-#: for C, T, K, CK in zip(cases, types, kinds, ckinds)
+#: for C, T, K, CK in zip(nc_types, types, kinds, ckinds)
 module function new_attribute_${K}$(name, values) result(att)
   character(len=*), intent(in) :: name
   ${T}$(${K}$), intent(in) :: values(:)

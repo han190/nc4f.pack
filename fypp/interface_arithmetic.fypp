@@ -5,38 +5,40 @@
 #: for O, N in zip(ops, op_names)
 interface operator(${O}$)
   module procedure :: ${N}$_vars
-  #: for C1, T1, K1 in zip(cases, types, kinds)
-  module procedure :: ${N}$_var_${K1}$
-  module procedure :: ${N}$_${K1}$_var
+  #: for K in kinds
+  module procedure :: ${N}$_var_${K}$
+  module procedure :: ${N}$_${K}$_var
   #: endfor
-end interface operator(${O}$)${newline}$
+end interface operator(${O}$)
+
 #: endfor
 #! ---------------
 #! Operators (sum)
 #! ---------------
 interface sum
   module procedure :: sum_vars
-end interface sum${newline}$
+end interface sum
+
 #! ----------------
 #! Module interface
 #! ----------------
 interface
-  #: for O, N in zip(ops, op_names)
+  #: for N in op_names
   module function ${N}$_vars(x, y) result(res)
     type(variable_type), target, intent(in) :: x, y
     type(variable_type), target :: res
   end function ${N}$_vars${newline}$
-  #: for C1, T1, K1 in zip(cases, types, kinds)
-  module function ${N}$_var_${K1}$(x, y) result(res)
+  #: for T, K in zip(types, kinds)
+  module function ${N}$_var_${K}$(x, y) result(res)
     type(variable_type), target, intent(in) :: x
-    ${T1}$(${K1}$), intent(in) :: y
+    ${T}$(${K}$), intent(in) :: y
     type(variable_type), target :: res
-  end function ${N}$_var_${K1}$${newline}$
-  module function ${N}$_${K1}$_var(x, y) result(res)
-    ${T1}$(${K1}$), intent(in) :: x
+  end function ${N}$_var_${K}$${newline}$
+  module function ${N}$_${K}$_var(x, y) result(res)
+    ${T}$(${K}$), intent(in) :: x
     type(variable_type), target, intent(in) :: y
     type(variable_type), target :: res
-  end function ${N}$_${K1}$_var${newline}$
+  end function ${N}$_${K}$_var${newline}$
   #: endfor
   #: endfor
   module function sum_vars(vars) result(s)

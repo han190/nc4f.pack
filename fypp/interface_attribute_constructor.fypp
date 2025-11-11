@@ -3,17 +3,18 @@
 #! Interface (data_array)
 #! ----------------------
 interface operator(.att.)
-#: for T, K in zip(types, kinds)
+  #: for K in kinds
   module procedure :: new_attribute_${K}$
   module procedure :: new_attribute_${K}$_scalar
-#: endfor
+  #: endfor
   module procedure :: new_attribute_character
-end interface operator(.att.)${newline}$
+end interface operator(.att.)
+
 #! ----------------
 #! Module interface
 #! ----------------
 interface
-#: for C, T, K, CK in zip(cases, types, kinds, ckinds)
+  #: for T, K in zip(types, kinds)
   module function new_attribute_${K}$(name, values) result(att)
     character(len=*), intent(in) :: name
     ${T}$(${K}$), intent(in) :: values(:)
@@ -24,7 +25,7 @@ interface
     ${T}$(${K}$), intent(in) :: value
     type(attribute_type), target :: att
   end function new_attribute_${K}$_scalar${newline}$
-#: endfor
+  #: endfor
   module function new_attribute_character(name, value) result(att)
     character(len=*), intent(in) :: name
     character(len=*), intent(in) :: value

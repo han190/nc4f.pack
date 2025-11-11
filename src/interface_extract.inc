@@ -73,32 +73,32 @@ interface
 
   module subroutine extract_var_int8_2d(var, ptr)
     type(variable_type), target, intent(in) :: var
-    integer(int8), pointer, intent(out) :: ptr(:,:)
+    integer(int8), pointer, intent(out) :: ptr(:, :)
   end subroutine extract_var_int8_2d
 
   module subroutine extract_var_int8_3d(var, ptr)
     type(variable_type), target, intent(in) :: var
-    integer(int8), pointer, intent(out) :: ptr(:,:,:)
+    integer(int8), pointer, intent(out) :: ptr(:, :, :)
   end subroutine extract_var_int8_3d
 
   module subroutine extract_var_int8_4d(var, ptr)
     type(variable_type), target, intent(in) :: var
-    integer(int8), pointer, intent(out) :: ptr(:,:,:,:)
+    integer(int8), pointer, intent(out) :: ptr(:, :, :, :)
   end subroutine extract_var_int8_4d
 
   module subroutine extract_var_int8_5d(var, ptr)
     type(variable_type), target, intent(in) :: var
-    integer(int8), pointer, intent(out) :: ptr(:,:,:,:,:)
+    integer(int8), pointer, intent(out) :: ptr(:, :, :, :, :)
   end subroutine extract_var_int8_5d
 
   module subroutine extract_var_int8_6d(var, ptr)
     type(variable_type), target, intent(in) :: var
-    integer(int8), pointer, intent(out) :: ptr(:,:,:,:,:,:)
+    integer(int8), pointer, intent(out) :: ptr(:, :, :, :, :, :)
   end subroutine extract_var_int8_6d
 
   module subroutine extract_var_int8_7d(var, ptr)
     type(variable_type), target, intent(in) :: var
-    integer(int8), pointer, intent(out) :: ptr(:,:,:,:,:,:,:)
+    integer(int8), pointer, intent(out) :: ptr(:, :, :, :, :, :, :)
   end subroutine extract_var_int8_7d
 
   module subroutine extract_att_int16_1d(att, ptr)
@@ -118,32 +118,32 @@ interface
 
   module subroutine extract_var_int16_2d(var, ptr)
     type(variable_type), target, intent(in) :: var
-    integer(int16), pointer, intent(out) :: ptr(:,:)
+    integer(int16), pointer, intent(out) :: ptr(:, :)
   end subroutine extract_var_int16_2d
 
   module subroutine extract_var_int16_3d(var, ptr)
     type(variable_type), target, intent(in) :: var
-    integer(int16), pointer, intent(out) :: ptr(:,:,:)
+    integer(int16), pointer, intent(out) :: ptr(:, :, :)
   end subroutine extract_var_int16_3d
 
   module subroutine extract_var_int16_4d(var, ptr)
     type(variable_type), target, intent(in) :: var
-    integer(int16), pointer, intent(out) :: ptr(:,:,:,:)
+    integer(int16), pointer, intent(out) :: ptr(:, :, :, :)
   end subroutine extract_var_int16_4d
 
   module subroutine extract_var_int16_5d(var, ptr)
     type(variable_type), target, intent(in) :: var
-    integer(int16), pointer, intent(out) :: ptr(:,:,:,:,:)
+    integer(int16), pointer, intent(out) :: ptr(:, :, :, :, :)
   end subroutine extract_var_int16_5d
 
   module subroutine extract_var_int16_6d(var, ptr)
     type(variable_type), target, intent(in) :: var
-    integer(int16), pointer, intent(out) :: ptr(:,:,:,:,:,:)
+    integer(int16), pointer, intent(out) :: ptr(:, :, :, :, :, :)
   end subroutine extract_var_int16_6d
 
   module subroutine extract_var_int16_7d(var, ptr)
     type(variable_type), target, intent(in) :: var
-    integer(int16), pointer, intent(out) :: ptr(:,:,:,:,:,:,:)
+    integer(int16), pointer, intent(out) :: ptr(:, :, :, :, :, :, :)
   end subroutine extract_var_int16_7d
 
   module subroutine extract_att_int32_1d(att, ptr)
@@ -163,32 +163,32 @@ interface
 
   module subroutine extract_var_int32_2d(var, ptr)
     type(variable_type), target, intent(in) :: var
-    integer(int32), pointer, intent(out) :: ptr(:,:)
+    integer(int32), pointer, intent(out) :: ptr(:, :)
   end subroutine extract_var_int32_2d
 
   module subroutine extract_var_int32_3d(var, ptr)
     type(variable_type), target, intent(in) :: var
-    integer(int32), pointer, intent(out) :: ptr(:,:,:)
+    integer(int32), pointer, intent(out) :: ptr(:, :, :)
   end subroutine extract_var_int32_3d
 
   module subroutine extract_var_int32_4d(var, ptr)
     type(variable_type), target, intent(in) :: var
-    integer(int32), pointer, intent(out) :: ptr(:,:,:,:)
+    integer(int32), pointer, intent(out) :: ptr(:, :, :, :)
   end subroutine extract_var_int32_4d
 
   module subroutine extract_var_int32_5d(var, ptr)
     type(variable_type), target, intent(in) :: var
-    integer(int32), pointer, intent(out) :: ptr(:,:,:,:,:)
+    integer(int32), pointer, intent(out) :: ptr(:, :, :, :, :)
   end subroutine extract_var_int32_5d
 
   module subroutine extract_var_int32_6d(var, ptr)
     type(variable_type), target, intent(in) :: var
-    integer(int32), pointer, intent(out) :: ptr(:,:,:,:,:,:)
+    integer(int32), pointer, intent(out) :: ptr(:, :, :, :, :, :)
   end subroutine extract_var_int32_6d
 
   module subroutine extract_var_int32_7d(var, ptr)
     type(variable_type), target, intent(in) :: var
-    integer(int32), pointer, intent(out) :: ptr(:,:,:,:,:,:,:)
+    integer(int32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :)
   end subroutine extract_var_int32_7d
 
   module subroutine extract_att_int64_1d(att, ptr)
@@ -208,32 +208,32 @@ interface
 
   module subroutine extract_var_int64_2d(var, ptr)
     type(variable_type), target, intent(in) :: var
-    integer(int64), pointer, intent(out) :: ptr(:,:)
+    integer(int64), pointer, intent(out) :: ptr(:, :)
   end subroutine extract_var_int64_2d
 
   module subroutine extract_var_int64_3d(var, ptr)
     type(variable_type), target, intent(in) :: var
-    integer(int64), pointer, intent(out) :: ptr(:,:,:)
+    integer(int64), pointer, intent(out) :: ptr(:, :, :)
   end subroutine extract_var_int64_3d
 
   module subroutine extract_var_int64_4d(var, ptr)
     type(variable_type), target, intent(in) :: var
-    integer(int64), pointer, intent(out) :: ptr(:,:,:,:)
+    integer(int64), pointer, intent(out) :: ptr(:, :, :, :)
   end subroutine extract_var_int64_4d
 
   module subroutine extract_var_int64_5d(var, ptr)
     type(variable_type), target, intent(in) :: var
-    integer(int64), pointer, intent(out) :: ptr(:,:,:,:,:)
+    integer(int64), pointer, intent(out) :: ptr(:, :, :, :, :)
   end subroutine extract_var_int64_5d
 
   module subroutine extract_var_int64_6d(var, ptr)
     type(variable_type), target, intent(in) :: var
-    integer(int64), pointer, intent(out) :: ptr(:,:,:,:,:,:)
+    integer(int64), pointer, intent(out) :: ptr(:, :, :, :, :, :)
   end subroutine extract_var_int64_6d
 
   module subroutine extract_var_int64_7d(var, ptr)
     type(variable_type), target, intent(in) :: var
-    integer(int64), pointer, intent(out) :: ptr(:,:,:,:,:,:,:)
+    integer(int64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :)
   end subroutine extract_var_int64_7d
 
   module subroutine extract_att_real32_1d(att, ptr)
@@ -253,32 +253,32 @@ interface
 
   module subroutine extract_var_real32_2d(var, ptr)
     type(variable_type), target, intent(in) :: var
-    real(real32), pointer, intent(out) :: ptr(:,:)
+    real(real32), pointer, intent(out) :: ptr(:, :)
   end subroutine extract_var_real32_2d
 
   module subroutine extract_var_real32_3d(var, ptr)
     type(variable_type), target, intent(in) :: var
-    real(real32), pointer, intent(out) :: ptr(:,:,:)
+    real(real32), pointer, intent(out) :: ptr(:, :, :)
   end subroutine extract_var_real32_3d
 
   module subroutine extract_var_real32_4d(var, ptr)
     type(variable_type), target, intent(in) :: var
-    real(real32), pointer, intent(out) :: ptr(:,:,:,:)
+    real(real32), pointer, intent(out) :: ptr(:, :, :, :)
   end subroutine extract_var_real32_4d
 
   module subroutine extract_var_real32_5d(var, ptr)
     type(variable_type), target, intent(in) :: var
-    real(real32), pointer, intent(out) :: ptr(:,:,:,:,:)
+    real(real32), pointer, intent(out) :: ptr(:, :, :, :, :)
   end subroutine extract_var_real32_5d
 
   module subroutine extract_var_real32_6d(var, ptr)
     type(variable_type), target, intent(in) :: var
-    real(real32), pointer, intent(out) :: ptr(:,:,:,:,:,:)
+    real(real32), pointer, intent(out) :: ptr(:, :, :, :, :, :)
   end subroutine extract_var_real32_6d
 
   module subroutine extract_var_real32_7d(var, ptr)
     type(variable_type), target, intent(in) :: var
-    real(real32), pointer, intent(out) :: ptr(:,:,:,:,:,:,:)
+    real(real32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :)
   end subroutine extract_var_real32_7d
 
   module subroutine extract_att_real64_1d(att, ptr)
@@ -298,32 +298,32 @@ interface
 
   module subroutine extract_var_real64_2d(var, ptr)
     type(variable_type), target, intent(in) :: var
-    real(real64), pointer, intent(out) :: ptr(:,:)
+    real(real64), pointer, intent(out) :: ptr(:, :)
   end subroutine extract_var_real64_2d
 
   module subroutine extract_var_real64_3d(var, ptr)
     type(variable_type), target, intent(in) :: var
-    real(real64), pointer, intent(out) :: ptr(:,:,:)
+    real(real64), pointer, intent(out) :: ptr(:, :, :)
   end subroutine extract_var_real64_3d
 
   module subroutine extract_var_real64_4d(var, ptr)
     type(variable_type), target, intent(in) :: var
-    real(real64), pointer, intent(out) :: ptr(:,:,:,:)
+    real(real64), pointer, intent(out) :: ptr(:, :, :, :)
   end subroutine extract_var_real64_4d
 
   module subroutine extract_var_real64_5d(var, ptr)
     type(variable_type), target, intent(in) :: var
-    real(real64), pointer, intent(out) :: ptr(:,:,:,:,:)
+    real(real64), pointer, intent(out) :: ptr(:, :, :, :, :)
   end subroutine extract_var_real64_5d
 
   module subroutine extract_var_real64_6d(var, ptr)
     type(variable_type), target, intent(in) :: var
-    real(real64), pointer, intent(out) :: ptr(:,:,:,:,:,:)
+    real(real64), pointer, intent(out) :: ptr(:, :, :, :, :, :)
   end subroutine extract_var_real64_6d
 
   module subroutine extract_var_real64_7d(var, ptr)
     type(variable_type), target, intent(in) :: var
-    real(real64), pointer, intent(out) :: ptr(:,:,:,:,:,:,:)
+    real(real64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :)
   end subroutine extract_var_real64_7d
 
 end interface
