@@ -34,6 +34,27 @@ var = get_variable(nc, "data")
 end program main
 ```
 
+### A slightly more advanced example
+This library provides simple functions and operators like `sum` and `+`.
+```Fortran
+program main
+use, non_intrinsic :: module_netcdf
+implicit none (type, external)
+
+real, parameter :: T0 = 300.0, R = 287.0, Cp = 1004.0
+integer, parameter :: p0 = 1000 * 100 ! Pa
+type(netcdf_type) :: nc
+type(variable_type) :: p, T
+
+nc = open_dataset("wrfout_d01_2000-01-01_00_00_00", "r") ! Simple APIs.
+p = sum(get_variable(nc, [character(len=2) :: "P", "PB"])) ! Get variable and preprocess.
+T = get_variable(nc, "T") + T0 ! Works with multiple types.
+T = T*(p/p0)**(R/Cp) ! Works with multiple operators.
+print *, T ! Supports UDDTIO
+
+end program main
+```
+
 ## Currently supported types
 | Data type       | Attribute | Variable  |
 |:----------------|:---------:|:---------:|
@@ -49,3 +70,8 @@ end program main
 | UNSIGNED INT    |           |           |
 | UNSIGNED INT64  |           |           |
 | STRING          |           |           |
+
+## TODOs
+- [ ] `group_type` and `data_set`.
+- [ ] Support `CHAR` type variable.
+- [ ] Support trig functions.
