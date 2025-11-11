@@ -35,7 +35,13 @@ end program main
 ```
 
 ### A slightly more advanced example
-This library provides simple functions and operators like `sum` and `+`.
+This library provides simple functions and operators like `sum` and `+`. For example, if one would like to compute temperature from a [WRF](https://github.com/wrf-model/WRF) output file. There are four steps:
+1. Load file with "read" mode.
+2. Extract pressure and perturbed pressure from the "wrfout" file, add them together to compute model pressure.
+3. Extract perturbed temperature (a constant $T_0=300$) and add base temperature to get potential temperature.
+4. Convert potential temperature to temperature through $T = \theta [(p/p_0)^{R/C_p}]$.
+
+With this library, you can do this very intuitively,
 ```Fortran
 program main
 use, non_intrinsic :: module_netcdf
