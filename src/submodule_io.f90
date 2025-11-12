@@ -2,7 +2,7 @@ submodule(module_netcdf) submodule_io
 implicit none (type, external)
 contains
 
-module subroutine write_formatted_var(var, unit, iotype, v_list, iostat, iomsg)
+module subroutine write_frmt_var(var, unit, iotype, v_list, iostat, iomsg)
   class(variable_type), intent(in) :: var
   integer, intent(in) :: unit
   character(len=*), intent(in) :: iotype
@@ -34,7 +34,7 @@ module subroutine write_formatted_var(var, unit, iotype, v_list, iostat, iomsg)
     case (NC_CHAR)
       title_str = 'character(len=*)::'//var%name
     case default
-      error stop "[write_formatted_var] Unsupported type."
+      error stop "[write_frmt_var] Unsupported type."
     end select
 
     ndim = size(var%dims)
@@ -45,7 +45,7 @@ module subroutine write_formatted_var(var, unit, iotype, v_list, iostat, iomsg)
       write (ndim_str, "(i0)") ndim
       fmt = "(1x, '(', DT, ')')"
     else if (ndim == 0) then
-      error stop "[write_formatted_var] Invalid dimension."
+      error stop "[write_frmt_var] Invalid dimension."
     end if
     write (dim_str, fmt) (var%dims(i), i=1, ndim)
     write (unit, "(a)") trim(title_str)//trim(dim_str)
@@ -53,9 +53,9 @@ module subroutine write_formatted_var(var, unit, iotype, v_list, iostat, iomsg)
       & write (unit, "(/, *(4x, DT, /))") var%atts
     iostat = 0
   end if
-end subroutine write_formatted_var
+end subroutine write_frmt_var
 
-module subroutine write_formatted_att(att, unit, iotype, v_list, iostat, iomsg)
+module subroutine write_frmt_att(att, unit, iotype, v_list, iostat, iomsg)
   class(attribute_type), target, intent(in) :: att
   integer, intent(in) :: unit
   character(len=*), intent(in) :: iotype
@@ -129,13 +129,13 @@ module subroutine write_formatted_att(att, unit, iotype, v_list, iostat, iomsg)
         nullify (fptr)
       end block
     case default
-      error stop "[write_formatted_att] Invalid attribute type."
+      error stop "[write_frmt_att] Invalid attribute type."
     end select
     iostat = 0
   end if
-end subroutine write_formatted_att
+end subroutine write_frmt_att
 
-module subroutine write_formatted_dim(dim, unit, iotype, v_list, iostat, iomsg)
+module subroutine write_frmt_dim(dim, unit, iotype, v_list, iostat, iomsg)
   class(dimension_type), intent(in) :: dim
   integer, intent(in) :: unit
   character(len=*), intent(in) :: iotype
@@ -157,6 +157,6 @@ module subroutine write_formatted_dim(dim, unit, iotype, v_list, iostat, iomsg)
     write (unit, fmt) dim%name, dim%len
     iostat = 0
   end if
-end subroutine write_formatted_dim
+end subroutine write_frmt_dim
 
 end submodule submodule_io

@@ -2,11 +2,11 @@ submodule(module_netcdf) submodule_dataset
 implicit none (type, external)
 contains
 
-module function open_dataset(filename, mode, inquire_dimension, inquire_attribute) result(nc)
+module function open_dataset(filename, mode, inq_dims, inq_atts) result(nc)
   character(len=*), intent(in) :: filename
   character(len=*), intent(in) :: mode
-  logical, intent(in), optional :: inquire_dimension
-  logical, intent(in), optional :: inquire_attribute
+  logical, intent(in), optional :: inq_dims
+  logical, intent(in), optional :: inq_atts
   type(netcdf_type) :: nc
 
   select case (mode)
@@ -16,10 +16,8 @@ module function open_dataset(filename, mode, inquire_dimension, inquire_attribut
       & "[open_dataset] File not found.")
     nc%mode = NC_NOWRITE
 
-    if (optval(.false., inquire_dimension)) &
-      & nc%dims = inq_dims_nc(nc)
-    if (optval(.false., inquire_attribute)) &
-      & nc%atts = get_atts_nc(nc)
+    if (optval(.false., inq_dims)) nc%dims = inq_dims_nc(nc)
+    if (optval(.false., inq_atts)) nc%atts = get_atts_nc(nc)
   case ("w", "write")
     nc%filename = trim(adjustl(filename))
     call handle_error(nc_create(f2cstr(nc%filename), NC_NETCDF4, nc%id), &

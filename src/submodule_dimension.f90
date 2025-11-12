@@ -98,7 +98,7 @@ module function inq_dims_(ncid, varid) result(dims)
     & "[inq_dims_] Too many unlimited dims."
 end function inq_dims_
 
-impure elemental module function define_dimension(nc, dim) result(new_dim)
+impure elemental module function def_dim(nc, dim) result(new_dim)
   type(netcdf_type), intent(in) :: nc
   type(dimension_type), intent(in) :: dim
   type(dimension_type) :: new_dim
@@ -115,22 +115,22 @@ impure elemental module function define_dimension(nc, dim) result(new_dim)
   len = merge(NC_UNLIMITED, dim%len, dim%is_unlim)
   call handle_error(nc_def_dim( &
     & nc%id, f2cstr(dim%name), dim%len, dimid), &
-    & "[define_dimension] Dimension: "//trim(dim%name)//".")
+    & "[def_dim] Dimension: "//trim(dim%name)//".")
   new_dim = dimension_type(dimid, dim%name, dim%len, dim%is_unlim)
-end function define_dimension
+end function def_dim
 
-elemental module logical function equal_dimension(x, y)
+elemental module logical function eq_dim(x, y)
   type(dimension_type), intent(in) :: x, y
 
-  equal_dimension = x%is_unlim .eqv. y%is_unlim .and. &
+  eq_dim = x%is_unlim .eqv. y%is_unlim .and. &
     & x%len == y%len .and. x%name == y%name
-end function equal_dimension
+end function eq_dim
 
-elemental module logical function unequal_dimension(x, y)
+elemental module logical function uneq_dim(x, y)
   type(dimension_type), intent(in) :: x, y
 
-  unequal_dimension = x%is_unlim .neqv. y%is_unlim .or. &
+  uneq_dim = x%is_unlim .neqv. y%is_unlim .or. &
     & x%len /= y%len .or. x%name /= y%name
-end function unequal_dimension
+end function uneq_dim
 
 end submodule submodule_dimension

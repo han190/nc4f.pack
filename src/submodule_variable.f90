@@ -85,7 +85,7 @@ impure elemental function def_var_(nc, var) result(new_var)
 
   n = size(var%dims)
   allocate (new_dims(n), new_dimids(n))
-  new_dims = define_dimension(nc, var%dims)
+  new_dims = def_dim(nc, var%dims)
   !> Reverse dimension since we use C APIs.
   do i = 1, n
     j = n - i + 1

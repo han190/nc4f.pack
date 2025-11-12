@@ -82,9 +82,9 @@ type :: dimension_argument_type
 end type dimension_argument_type
 
 interface write(formatted)
-  module procedure :: write_formatted_var
-  module procedure :: write_formatted_att
-  module procedure :: write_formatted_dim
+  module procedure :: write_frmt_var
+  module procedure :: write_frmt_att
+  module procedure :: write_frmt_dim
 end interface write(formatted)
 
 interface get_variable
@@ -125,11 +125,11 @@ interface operator(.and.)
 end interface operator(.and.)
 
 interface operator(==)
-  module procedure :: equal_dimension
+  module procedure :: eq_dim
 end interface operator(==)
 
 interface operator(/=)
-  module procedure :: unequal_dimension
+  module procedure :: uneq_dim
 end interface operator(/=)
 
 interface size
@@ -187,11 +187,11 @@ interface
   end subroutine allocate_buffer_att
 
   !> submodule_dataset.f90
-  module function open_dataset(filename, mode, inquire_dimension, inquire_attribute) result(nc)
+  module function open_dataset(filename, mode, inq_dims, inq_atts) result(nc)
     character(len=*), intent(in) :: filename
     character(len=*), intent(in) :: mode
-    logical, intent(in), optional :: inquire_dimension
-    logical, intent(in), optional :: inquire_attribute
+    logical, intent(in), optional :: inq_dims
+    logical, intent(in), optional :: inq_atts
     type(netcdf_type) :: nc
   end function open_dataset
 
@@ -253,47 +253,47 @@ interface
     type(dimension_type), allocatable :: dims(:)
   end function inq_dims_
 
-  impure elemental module function define_dimension(nc, dim) result(new_dim)
+  impure elemental module function def_dim(nc, dim) result(new_dim)
     type(netcdf_type), intent(in) :: nc
     type(dimension_type), intent(in) :: dim
     type(dimension_type) :: new_dim
-  end function define_dimension
+  end function def_dim
 
-  elemental module logical function equal_dimension(x, y)
+  elemental module logical function eq_dim(x, y)
     type(dimension_type), intent(in) :: x, y
-  end function equal_dimension
+  end function eq_dim
 
-  elemental module logical function unequal_dimension(x, y)
+  elemental module logical function uneq_dim(x, y)
     type(dimension_type), intent(in) :: x, y
-  end function unequal_dimension
+  end function uneq_dim
 
   !> submodule_io.f90
-  module subroutine write_formatted_var(var, unit, iotype, v_list, iostat, iomsg)
+  module subroutine write_frmt_var(var, unit, iotype, v_list, iostat, iomsg)
     class(variable_type), intent(in) :: var
     integer, intent(in) :: unit
     character(len=*), intent(in) :: iotype
     integer, intent(in) :: v_list(:)
     integer, intent(out) :: iostat
     character(len=*), intent(inout) :: iomsg
-  end subroutine write_formatted_var
+  end subroutine write_frmt_var
 
-  module subroutine write_formatted_att(att, unit, iotype, v_list, iostat, iomsg)
+  module subroutine write_frmt_att(att, unit, iotype, v_list, iostat, iomsg)
     class(attribute_type), target, intent(in) :: att
     integer, intent(in) :: unit
     character(len=*), intent(in) :: iotype
     integer, intent(in) :: v_list(:)
     integer, intent(out) :: iostat
     character(len=*), intent(inout) :: iomsg
-  end subroutine write_formatted_att
+  end subroutine write_frmt_att
 
-  module subroutine write_formatted_dim(dim, unit, iotype, v_list, iostat, iomsg)
+  module subroutine write_frmt_dim(dim, unit, iotype, v_list, iostat, iomsg)
     class(dimension_type), intent(in) :: dim
     integer, intent(in) :: unit
     character(len=*), intent(in) :: iotype
     integer, intent(in) :: v_list(:)
     integer, intent(out) :: iostat
     character(len=*), intent(inout) :: iomsg
-  end subroutine write_formatted_dim
+  end subroutine write_frmt_dim
 
   !> submodule_utility.f90
   impure elemental module subroutine handle_error(status, error_message)
@@ -311,9 +311,9 @@ interface
     character(kind=c_char, len=:), allocatable :: cstr
   end function f2cstr
 
-  pure logical module function allocation_required(buffer, buf_size)
+  pure logical module function allocation_required(buffer, bsize)
     integer(int8), allocatable, intent(in) :: buffer(:)
-    integer(int64), intent(in) :: buf_size
+    integer(int64), intent(in) :: bsize
   end function allocation_required
 
   module elemental function get_buffer_size(dtype, len) result(buffer_size)
