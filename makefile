@@ -60,23 +60,22 @@ SRC_FILES := \
 	$(SRC_DIR)/submodule_variable_constructor.f90	\
  	$(SRC_DIR)/submodule_variable.f90
 
-# F90_SOURCES := $(filter %.f90,$(SRC_FILES))
-OBJ_FILES := $(patsubst $(SRC_DIR)/%.f90,$(BUILD_DIR)/%.o,$(SRC_FILES))
-
 TEST_FILES := \
 	$(TEST_DIR)/module_examples.f90 \
-	$(TEST_DIR)/module_test.f90 \
-	$(TEST_DIR)/test.f90
+	$(TEST_DIR)/module_test.f90
+
+OBJ_FILES := $(patsubst $(SRC_DIR)/%.f90,$(BUILD_DIR)/%.o,$(SRC_FILES))
 TEST_OBJ_FILES := $(patsubst $(TEST_DIR)/%.f90,$(BUILD_DIR)/%.o,$(TEST_FILES))
 
-.PHONY: all library prepare preprocess build test clean 
+.PHONY: all prepare preprocess build library test clean 
 
+test: library $(TEST_OBJ_FILES)
 library: build
-	@ar rcs $(LIB) $(OBJ_FILES)
+	$(AR) rcs $(LIB) $(OBJ_FILES)
 build: preprocess $(OBJ_FILES)
 preprocess: prepare $(INC_FILES) $(F90_FILES)
 prepare:
-	@mkdir -p $(BUILD_DIR)
+	mkdir -p $(BUILD_DIR)
 
 $(SRC_DIR)/%.inc: $(FYPP_DIR)/%.fypp
 	fypp $< > $@

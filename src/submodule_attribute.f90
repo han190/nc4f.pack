@@ -69,11 +69,7 @@ impure elemental function get_att_(ncid, varid, name) result(att)
     return
   end if zero_size_attr
 
-  buffer_size = get_buffer_size(dtype, len)
-  if (allocation_required(att%buffer, buffer_size)) then
-    if (allocated(att%buffer)) deallocate (att%buffer)
-    allocate (att%buffer(buffer_size))
-  end if
+  call allocate_buffer_att(att)
   call handle_error(nc_get_att(ncid, varid, &
     & f2cstr(att%name), c_loc(att%buffer(1))), &
     & "[get_att_] Invalid attribute.")

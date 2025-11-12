@@ -1,12 +1,12 @@
-name = "WRF-Diagnostic-Tool"
+name = "netcdf.pack"
 version = "0.0.1"
 license = "MIT"
 maintainer = "htang23@ncsu.edu"
 author = "Han Tang"
 copyright = "Copyright 2019-2025 Han Tang"
-description = "WRF Post-processing / diagnostic tool kit."
-keywords = ["fortran", "modern-fortran", "WRF", "WRF post processing"]
-# homepage = "https://github.com/han190/PE-Fortran"
+description = "NetCDF Fortran Library"
+keywords = ["fortran", "modern-fortran", "NetCDF"]
+homepage = "https://github.com/han190/netcdf.pack"
 
 [build]
 external-modules = ["netcdf"]
