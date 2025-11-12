@@ -4,7 +4,7 @@ implicit none (type, external)
 contains${newline}$
 #: for N, T, K, C in zip(nc_types, types, kinds, ckinds)
 #: for R in range(1, MAX_RANK+1)
-module function new_variable_${K}$_${R}$d(name, values, dims, atts) result(var)
+module function new_var_${K}$_${R}$d(name, values, dims, atts) result(var)
   character(len=*), intent(in) :: name
   ${T}$(${K}$), target, intent(in) :: values(${COLONS(R)}$)
   type(dimension_type), intent(in) :: dims(:)
@@ -12,26 +12,26 @@ module function new_variable_${K}$_${R}$d(name, values, dims, atts) result(var)
   type(variable_type), target :: var
   ${T}$(${C}$), pointer :: var_ptr(${COLONS(R)}$)
 
-  call new_variable_(var, name, ${N}$, size(values, kind=int64), dims)
+  call new_var_(var, name, ${N}$, size(values, kind=int64), dims)
   call allocate_buffer(var)
   call extract(var, var_ptr)
   var_ptr = values
   nullify (var_ptr)
-  if (present(atts)) var%attributes = atts
-end function new_variable_${K}$_${R}$d${newline}$
+  if (present(atts)) var%atts = atts
+end function new_var_${K}$_${R}$d${newline}$
 #: endfor
 #: endfor
-pure subroutine new_variable_(var, name, data_type, length, dims)
+pure subroutine new_var_(var, name, dtype, len, dims)
   type(variable_type), intent(inout) :: var
   character(len=*), intent(in) :: name
-  integer(int32), intent(in) :: data_type
-  integer(int64), intent(in) :: length
+  integer(int32), intent(in) :: dtype
+  integer(int64), intent(in) :: len
   type(dimension_type), intent(in) :: dims(:)
 
   var%name = trim(adjustl(name))
-  var%data_type = data_type
-  var%length = length
-  var%dimensions = dims
-end subroutine new_variable_
+  var%dtype = dtype
+  var%len = len
+  var%dims = dims
+end subroutine new_var_
 
 end submodule submodule_variable_constructor

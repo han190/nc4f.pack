@@ -6,18 +6,18 @@ module function add_vars(x, y) result(res)
   type(variable_type), target, intent(in) :: x, y
   type(variable_type), target :: res
 
-  if (any(x%dimensions /= y%dimensions)) &
-    & error stop "[add_vars] Unequal dimensions."
-  if (x%data_type /= y%data_type) &
+  if (any(x%dims /= y%dims)) &
+    & error stop "[add_vars] Unequal dims."
+  if (x%dtype /= y%dtype) &
     & error stop "[add_vars] Unequal data type."
 
   res%name = x%name
-  res%data_type = x%data_type
-  res%length = x%length
-  res%dimensions = x%dimensions
-  res%attributes = x%attributes
+  res%dtype = x%dtype
+  res%len = x%len
+  res%dims = x%dims
+  res%atts = x%atts
 
-  select case (x%data_type)
+  select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:), yp(:), resp(:)
@@ -25,11 +25,11 @@ module function add_vars(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = xp + yp
       nullify (xp, yp, resp)
     end block
@@ -40,11 +40,11 @@ module function add_vars(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = xp + yp
       nullify (xp, yp, resp)
     end block
@@ -55,11 +55,11 @@ module function add_vars(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = xp + yp
       nullify (xp, yp, resp)
     end block
@@ -70,11 +70,11 @@ module function add_vars(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = xp + yp
       nullify (xp, yp, resp)
     end block
@@ -85,11 +85,11 @@ module function add_vars(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = xp + yp
       nullify (xp, yp, resp)
     end block
@@ -100,11 +100,11 @@ module function add_vars(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = xp + yp
       nullify (xp, yp, resp)
     end block
@@ -117,23 +117,23 @@ module function add_var_int8(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = x%name
-  res%length = x%length
-  res%dimensions = x%dimensions
-  res%attributes = x%attributes
+  res%len = x%len
+  res%dims = x%dims
+  res%atts = x%atts
 
-  select case (x%data_type)
+  select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int8), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_BYTE
+      res%dtype = NC_BYTE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp + y
       nullify (xp, resp)
     end block
@@ -143,12 +143,12 @@ module function add_var_int8(x, y) result(res)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_SHORT
+      res%dtype = NC_SHORT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp + y
       nullify (xp, resp)
     end block
@@ -158,12 +158,12 @@ module function add_var_int8(x, y) result(res)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT
+      res%dtype = NC_INT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp + y
       nullify (xp, resp)
     end block
@@ -173,12 +173,12 @@ module function add_var_int8(x, y) result(res)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT64
+      res%dtype = NC_INT64
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp + y
       nullify (xp, resp)
     end block
@@ -188,12 +188,12 @@ module function add_var_int8(x, y) result(res)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_FLOAT
+      res%dtype = NC_FLOAT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp + y
       nullify (xp, resp)
     end block
@@ -203,12 +203,12 @@ module function add_var_int8(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp + y
       nullify (xp, resp)
     end block
@@ -221,11 +221,11 @@ module function add_int8_var(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = y%name
-  res%length = y%length
-  res%dimensions = y%dimensions
-  res%attributes = y%attributes
+  res%len = y%len
+  res%dims = y%dims
+  res%atts = y%atts
 
-  select case (y%data_type)
+  select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
@@ -234,9 +234,9 @@ module function add_int8_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x + yp
       nullify (yp, resp)
     end block
@@ -248,9 +248,9 @@ module function add_int8_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x + yp
       nullify (yp, resp)
     end block
@@ -262,9 +262,9 @@ module function add_int8_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x + yp
       nullify (yp, resp)
     end block
@@ -276,9 +276,9 @@ module function add_int8_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x + yp
       nullify (yp, resp)
     end block
@@ -290,9 +290,9 @@ module function add_int8_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x + yp
       nullify (yp, resp)
     end block
@@ -304,9 +304,9 @@ module function add_int8_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x + yp
       nullify (yp, resp)
     end block
@@ -319,23 +319,23 @@ module function add_var_int16(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = x%name
-  res%length = x%length
-  res%dimensions = x%dimensions
-  res%attributes = x%attributes
+  res%len = x%len
+  res%dims = x%dims
+  res%atts = x%atts
 
-  select case (x%data_type)
+  select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_SHORT
+      res%dtype = NC_SHORT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp + y
       nullify (xp, resp)
     end block
@@ -345,12 +345,12 @@ module function add_var_int16(x, y) result(res)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_SHORT
+      res%dtype = NC_SHORT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp + y
       nullify (xp, resp)
     end block
@@ -360,12 +360,12 @@ module function add_var_int16(x, y) result(res)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT
+      res%dtype = NC_INT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp + y
       nullify (xp, resp)
     end block
@@ -375,12 +375,12 @@ module function add_var_int16(x, y) result(res)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT64
+      res%dtype = NC_INT64
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp + y
       nullify (xp, resp)
     end block
@@ -390,12 +390,12 @@ module function add_var_int16(x, y) result(res)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_FLOAT
+      res%dtype = NC_FLOAT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp + y
       nullify (xp, resp)
     end block
@@ -405,12 +405,12 @@ module function add_var_int16(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp + y
       nullify (xp, resp)
     end block
@@ -423,11 +423,11 @@ module function add_int16_var(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = y%name
-  res%length = y%length
-  res%dimensions = y%dimensions
-  res%attributes = y%attributes
+  res%len = y%len
+  res%dims = y%dims
+  res%atts = y%atts
 
-  select case (y%data_type)
+  select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
@@ -436,9 +436,9 @@ module function add_int16_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x + yp
       nullify (yp, resp)
     end block
@@ -450,9 +450,9 @@ module function add_int16_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x + yp
       nullify (yp, resp)
     end block
@@ -464,9 +464,9 @@ module function add_int16_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x + yp
       nullify (yp, resp)
     end block
@@ -478,9 +478,9 @@ module function add_int16_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x + yp
       nullify (yp, resp)
     end block
@@ -492,9 +492,9 @@ module function add_int16_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x + yp
       nullify (yp, resp)
     end block
@@ -506,9 +506,9 @@ module function add_int16_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x + yp
       nullify (yp, resp)
     end block
@@ -521,23 +521,23 @@ module function add_var_int32(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = x%name
-  res%length = x%length
-  res%dimensions = x%dimensions
-  res%attributes = x%attributes
+  res%len = x%len
+  res%dims = x%dims
+  res%atts = x%atts
 
-  select case (x%data_type)
+  select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT
+      res%dtype = NC_INT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp + y
       nullify (xp, resp)
     end block
@@ -547,12 +547,12 @@ module function add_var_int32(x, y) result(res)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT
+      res%dtype = NC_INT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp + y
       nullify (xp, resp)
     end block
@@ -562,12 +562,12 @@ module function add_var_int32(x, y) result(res)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT
+      res%dtype = NC_INT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp + y
       nullify (xp, resp)
     end block
@@ -577,12 +577,12 @@ module function add_var_int32(x, y) result(res)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT64
+      res%dtype = NC_INT64
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp + y
       nullify (xp, resp)
     end block
@@ -592,12 +592,12 @@ module function add_var_int32(x, y) result(res)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_FLOAT
+      res%dtype = NC_FLOAT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp + y
       nullify (xp, resp)
     end block
@@ -607,12 +607,12 @@ module function add_var_int32(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp + y
       nullify (xp, resp)
     end block
@@ -625,11 +625,11 @@ module function add_int32_var(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = y%name
-  res%length = y%length
-  res%dimensions = y%dimensions
-  res%attributes = y%attributes
+  res%len = y%len
+  res%dims = y%dims
+  res%atts = y%atts
 
-  select case (y%data_type)
+  select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
@@ -638,9 +638,9 @@ module function add_int32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x + yp
       nullify (yp, resp)
     end block
@@ -652,9 +652,9 @@ module function add_int32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x + yp
       nullify (yp, resp)
     end block
@@ -666,9 +666,9 @@ module function add_int32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x + yp
       nullify (yp, resp)
     end block
@@ -680,9 +680,9 @@ module function add_int32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x + yp
       nullify (yp, resp)
     end block
@@ -694,9 +694,9 @@ module function add_int32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x + yp
       nullify (yp, resp)
     end block
@@ -708,9 +708,9 @@ module function add_int32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x + yp
       nullify (yp, resp)
     end block
@@ -723,23 +723,23 @@ module function add_var_int64(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = x%name
-  res%length = x%length
-  res%dimensions = x%dimensions
-  res%attributes = x%attributes
+  res%len = x%len
+  res%dims = x%dims
+  res%atts = x%atts
 
-  select case (x%data_type)
+  select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT64
+      res%dtype = NC_INT64
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp + y
       nullify (xp, resp)
     end block
@@ -749,12 +749,12 @@ module function add_var_int64(x, y) result(res)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT64
+      res%dtype = NC_INT64
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp + y
       nullify (xp, resp)
     end block
@@ -764,12 +764,12 @@ module function add_var_int64(x, y) result(res)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT64
+      res%dtype = NC_INT64
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp + y
       nullify (xp, resp)
     end block
@@ -779,12 +779,12 @@ module function add_var_int64(x, y) result(res)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT64
+      res%dtype = NC_INT64
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp + y
       nullify (xp, resp)
     end block
@@ -794,12 +794,12 @@ module function add_var_int64(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp
       resp = resp + y
       nullify (xp, resp)
@@ -810,12 +810,12 @@ module function add_var_int64(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp + y
       nullify (xp, resp)
     end block
@@ -828,11 +828,11 @@ module function add_int64_var(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = y%name
-  res%length = y%length
-  res%dimensions = y%dimensions
-  res%attributes = y%attributes
+  res%len = y%len
+  res%dims = y%dims
+  res%atts = y%atts
 
-  select case (y%data_type)
+  select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
@@ -841,9 +841,9 @@ module function add_int64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x + yp
       nullify (yp, resp)
     end block
@@ -855,9 +855,9 @@ module function add_int64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x + yp
       nullify (yp, resp)
     end block
@@ -869,9 +869,9 @@ module function add_int64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x + yp
       nullify (yp, resp)
     end block
@@ -883,9 +883,9 @@ module function add_int64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x + yp
       nullify (yp, resp)
     end block
@@ -897,9 +897,9 @@ module function add_int64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x
       resp = resp + yp
       nullify (yp, resp)
@@ -912,9 +912,9 @@ module function add_int64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x + yp
       nullify (yp, resp)
     end block
@@ -927,23 +927,23 @@ module function add_var_real32(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = x%name
-  res%length = x%length
-  res%dimensions = x%dimensions
-  res%attributes = x%attributes
+  res%len = x%len
+  res%dims = x%dims
+  res%atts = x%atts
 
-  select case (x%data_type)
+  select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_FLOAT
+      res%dtype = NC_FLOAT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp + y
       nullify (xp, resp)
     end block
@@ -953,12 +953,12 @@ module function add_var_real32(x, y) result(res)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_FLOAT
+      res%dtype = NC_FLOAT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp + y
       nullify (xp, resp)
     end block
@@ -968,12 +968,12 @@ module function add_var_real32(x, y) result(res)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_FLOAT
+      res%dtype = NC_FLOAT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp + y
       nullify (xp, resp)
     end block
@@ -983,12 +983,12 @@ module function add_var_real32(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp
       resp = resp + y
       nullify (xp, resp)
@@ -999,12 +999,12 @@ module function add_var_real32(x, y) result(res)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_FLOAT
+      res%dtype = NC_FLOAT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp + y
       nullify (xp, resp)
     end block
@@ -1014,12 +1014,12 @@ module function add_var_real32(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp + y
       nullify (xp, resp)
     end block
@@ -1032,11 +1032,11 @@ module function add_real32_var(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = y%name
-  res%length = y%length
-  res%dimensions = y%dimensions
-  res%attributes = y%attributes
+  res%len = y%len
+  res%dims = y%dims
+  res%atts = y%atts
 
-  select case (y%data_type)
+  select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
@@ -1045,9 +1045,9 @@ module function add_real32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x + yp
       nullify (yp, resp)
     end block
@@ -1059,9 +1059,9 @@ module function add_real32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x + yp
       nullify (yp, resp)
     end block
@@ -1073,9 +1073,9 @@ module function add_real32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x + yp
       nullify (yp, resp)
     end block
@@ -1087,9 +1087,9 @@ module function add_real32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x
       resp = resp + yp
       nullify (yp, resp)
@@ -1102,9 +1102,9 @@ module function add_real32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x + yp
       nullify (yp, resp)
     end block
@@ -1116,9 +1116,9 @@ module function add_real32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x + yp
       nullify (yp, resp)
     end block
@@ -1131,23 +1131,23 @@ module function add_var_real64(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = x%name
-  res%length = x%length
-  res%dimensions = x%dimensions
-  res%attributes = x%attributes
+  res%len = x%len
+  res%dims = x%dims
+  res%atts = x%atts
 
-  select case (x%data_type)
+  select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp + y
       nullify (xp, resp)
     end block
@@ -1157,12 +1157,12 @@ module function add_var_real64(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp + y
       nullify (xp, resp)
     end block
@@ -1172,12 +1172,12 @@ module function add_var_real64(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp + y
       nullify (xp, resp)
     end block
@@ -1187,12 +1187,12 @@ module function add_var_real64(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp + y
       nullify (xp, resp)
     end block
@@ -1202,12 +1202,12 @@ module function add_var_real64(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp + y
       nullify (xp, resp)
     end block
@@ -1217,12 +1217,12 @@ module function add_var_real64(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp + y
       nullify (xp, resp)
     end block
@@ -1235,11 +1235,11 @@ module function add_real64_var(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = y%name
-  res%length = y%length
-  res%dimensions = y%dimensions
-  res%attributes = y%attributes
+  res%len = y%len
+  res%dims = y%dims
+  res%atts = y%atts
 
-  select case (y%data_type)
+  select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
@@ -1248,9 +1248,9 @@ module function add_real64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x + yp
       nullify (yp, resp)
     end block
@@ -1262,9 +1262,9 @@ module function add_real64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x + yp
       nullify (yp, resp)
     end block
@@ -1276,9 +1276,9 @@ module function add_real64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x + yp
       nullify (yp, resp)
     end block
@@ -1290,9 +1290,9 @@ module function add_real64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x + yp
       nullify (yp, resp)
     end block
@@ -1304,9 +1304,9 @@ module function add_real64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x + yp
       nullify (yp, resp)
     end block
@@ -1318,9 +1318,9 @@ module function add_real64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x + yp
       nullify (yp, resp)
     end block
@@ -1331,18 +1331,18 @@ module function sub_vars(x, y) result(res)
   type(variable_type), target, intent(in) :: x, y
   type(variable_type), target :: res
 
-  if (any(x%dimensions /= y%dimensions)) &
-    & error stop "[add_vars] Unequal dimensions."
-  if (x%data_type /= y%data_type) &
+  if (any(x%dims /= y%dims)) &
+    & error stop "[add_vars] Unequal dims."
+  if (x%dtype /= y%dtype) &
     & error stop "[add_vars] Unequal data type."
 
   res%name = x%name
-  res%data_type = x%data_type
-  res%length = x%length
-  res%dimensions = x%dimensions
-  res%attributes = x%attributes
+  res%dtype = x%dtype
+  res%len = x%len
+  res%dims = x%dims
+  res%atts = x%atts
 
-  select case (x%data_type)
+  select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:), yp(:), resp(:)
@@ -1350,11 +1350,11 @@ module function sub_vars(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = xp - yp
       nullify (xp, yp, resp)
     end block
@@ -1365,11 +1365,11 @@ module function sub_vars(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = xp - yp
       nullify (xp, yp, resp)
     end block
@@ -1380,11 +1380,11 @@ module function sub_vars(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = xp - yp
       nullify (xp, yp, resp)
     end block
@@ -1395,11 +1395,11 @@ module function sub_vars(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = xp - yp
       nullify (xp, yp, resp)
     end block
@@ -1410,11 +1410,11 @@ module function sub_vars(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = xp - yp
       nullify (xp, yp, resp)
     end block
@@ -1425,11 +1425,11 @@ module function sub_vars(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = xp - yp
       nullify (xp, yp, resp)
     end block
@@ -1442,23 +1442,23 @@ module function sub_var_int8(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = x%name
-  res%length = x%length
-  res%dimensions = x%dimensions
-  res%attributes = x%attributes
+  res%len = x%len
+  res%dims = x%dims
+  res%atts = x%atts
 
-  select case (x%data_type)
+  select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int8), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_BYTE
+      res%dtype = NC_BYTE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp - y
       nullify (xp, resp)
     end block
@@ -1468,12 +1468,12 @@ module function sub_var_int8(x, y) result(res)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_SHORT
+      res%dtype = NC_SHORT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp - y
       nullify (xp, resp)
     end block
@@ -1483,12 +1483,12 @@ module function sub_var_int8(x, y) result(res)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT
+      res%dtype = NC_INT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp - y
       nullify (xp, resp)
     end block
@@ -1498,12 +1498,12 @@ module function sub_var_int8(x, y) result(res)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT64
+      res%dtype = NC_INT64
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp - y
       nullify (xp, resp)
     end block
@@ -1513,12 +1513,12 @@ module function sub_var_int8(x, y) result(res)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_FLOAT
+      res%dtype = NC_FLOAT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp - y
       nullify (xp, resp)
     end block
@@ -1528,12 +1528,12 @@ module function sub_var_int8(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp - y
       nullify (xp, resp)
     end block
@@ -1546,11 +1546,11 @@ module function sub_int8_var(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = y%name
-  res%length = y%length
-  res%dimensions = y%dimensions
-  res%attributes = y%attributes
+  res%len = y%len
+  res%dims = y%dims
+  res%atts = y%atts
 
-  select case (y%data_type)
+  select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
@@ -1559,9 +1559,9 @@ module function sub_int8_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x - yp
       nullify (yp, resp)
     end block
@@ -1573,9 +1573,9 @@ module function sub_int8_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x - yp
       nullify (yp, resp)
     end block
@@ -1587,9 +1587,9 @@ module function sub_int8_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x - yp
       nullify (yp, resp)
     end block
@@ -1601,9 +1601,9 @@ module function sub_int8_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x - yp
       nullify (yp, resp)
     end block
@@ -1615,9 +1615,9 @@ module function sub_int8_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x - yp
       nullify (yp, resp)
     end block
@@ -1629,9 +1629,9 @@ module function sub_int8_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x - yp
       nullify (yp, resp)
     end block
@@ -1644,23 +1644,23 @@ module function sub_var_int16(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = x%name
-  res%length = x%length
-  res%dimensions = x%dimensions
-  res%attributes = x%attributes
+  res%len = x%len
+  res%dims = x%dims
+  res%atts = x%atts
 
-  select case (x%data_type)
+  select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_SHORT
+      res%dtype = NC_SHORT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp - y
       nullify (xp, resp)
     end block
@@ -1670,12 +1670,12 @@ module function sub_var_int16(x, y) result(res)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_SHORT
+      res%dtype = NC_SHORT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp - y
       nullify (xp, resp)
     end block
@@ -1685,12 +1685,12 @@ module function sub_var_int16(x, y) result(res)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT
+      res%dtype = NC_INT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp - y
       nullify (xp, resp)
     end block
@@ -1700,12 +1700,12 @@ module function sub_var_int16(x, y) result(res)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT64
+      res%dtype = NC_INT64
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp - y
       nullify (xp, resp)
     end block
@@ -1715,12 +1715,12 @@ module function sub_var_int16(x, y) result(res)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_FLOAT
+      res%dtype = NC_FLOAT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp - y
       nullify (xp, resp)
     end block
@@ -1730,12 +1730,12 @@ module function sub_var_int16(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp - y
       nullify (xp, resp)
     end block
@@ -1748,11 +1748,11 @@ module function sub_int16_var(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = y%name
-  res%length = y%length
-  res%dimensions = y%dimensions
-  res%attributes = y%attributes
+  res%len = y%len
+  res%dims = y%dims
+  res%atts = y%atts
 
-  select case (y%data_type)
+  select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
@@ -1761,9 +1761,9 @@ module function sub_int16_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x - yp
       nullify (yp, resp)
     end block
@@ -1775,9 +1775,9 @@ module function sub_int16_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x - yp
       nullify (yp, resp)
     end block
@@ -1789,9 +1789,9 @@ module function sub_int16_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x - yp
       nullify (yp, resp)
     end block
@@ -1803,9 +1803,9 @@ module function sub_int16_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x - yp
       nullify (yp, resp)
     end block
@@ -1817,9 +1817,9 @@ module function sub_int16_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x - yp
       nullify (yp, resp)
     end block
@@ -1831,9 +1831,9 @@ module function sub_int16_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x - yp
       nullify (yp, resp)
     end block
@@ -1846,23 +1846,23 @@ module function sub_var_int32(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = x%name
-  res%length = x%length
-  res%dimensions = x%dimensions
-  res%attributes = x%attributes
+  res%len = x%len
+  res%dims = x%dims
+  res%atts = x%atts
 
-  select case (x%data_type)
+  select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT
+      res%dtype = NC_INT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp - y
       nullify (xp, resp)
     end block
@@ -1872,12 +1872,12 @@ module function sub_var_int32(x, y) result(res)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT
+      res%dtype = NC_INT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp - y
       nullify (xp, resp)
     end block
@@ -1887,12 +1887,12 @@ module function sub_var_int32(x, y) result(res)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT
+      res%dtype = NC_INT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp - y
       nullify (xp, resp)
     end block
@@ -1902,12 +1902,12 @@ module function sub_var_int32(x, y) result(res)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT64
+      res%dtype = NC_INT64
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp - y
       nullify (xp, resp)
     end block
@@ -1917,12 +1917,12 @@ module function sub_var_int32(x, y) result(res)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_FLOAT
+      res%dtype = NC_FLOAT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp - y
       nullify (xp, resp)
     end block
@@ -1932,12 +1932,12 @@ module function sub_var_int32(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp - y
       nullify (xp, resp)
     end block
@@ -1950,11 +1950,11 @@ module function sub_int32_var(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = y%name
-  res%length = y%length
-  res%dimensions = y%dimensions
-  res%attributes = y%attributes
+  res%len = y%len
+  res%dims = y%dims
+  res%atts = y%atts
 
-  select case (y%data_type)
+  select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
@@ -1963,9 +1963,9 @@ module function sub_int32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x - yp
       nullify (yp, resp)
     end block
@@ -1977,9 +1977,9 @@ module function sub_int32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x - yp
       nullify (yp, resp)
     end block
@@ -1991,9 +1991,9 @@ module function sub_int32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x - yp
       nullify (yp, resp)
     end block
@@ -2005,9 +2005,9 @@ module function sub_int32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x - yp
       nullify (yp, resp)
     end block
@@ -2019,9 +2019,9 @@ module function sub_int32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x - yp
       nullify (yp, resp)
     end block
@@ -2033,9 +2033,9 @@ module function sub_int32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x - yp
       nullify (yp, resp)
     end block
@@ -2048,23 +2048,23 @@ module function sub_var_int64(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = x%name
-  res%length = x%length
-  res%dimensions = x%dimensions
-  res%attributes = x%attributes
+  res%len = x%len
+  res%dims = x%dims
+  res%atts = x%atts
 
-  select case (x%data_type)
+  select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT64
+      res%dtype = NC_INT64
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp - y
       nullify (xp, resp)
     end block
@@ -2074,12 +2074,12 @@ module function sub_var_int64(x, y) result(res)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT64
+      res%dtype = NC_INT64
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp - y
       nullify (xp, resp)
     end block
@@ -2089,12 +2089,12 @@ module function sub_var_int64(x, y) result(res)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT64
+      res%dtype = NC_INT64
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp - y
       nullify (xp, resp)
     end block
@@ -2104,12 +2104,12 @@ module function sub_var_int64(x, y) result(res)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT64
+      res%dtype = NC_INT64
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp - y
       nullify (xp, resp)
     end block
@@ -2119,12 +2119,12 @@ module function sub_var_int64(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp
       resp = resp - y
       nullify (xp, resp)
@@ -2135,12 +2135,12 @@ module function sub_var_int64(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp - y
       nullify (xp, resp)
     end block
@@ -2153,11 +2153,11 @@ module function sub_int64_var(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = y%name
-  res%length = y%length
-  res%dimensions = y%dimensions
-  res%attributes = y%attributes
+  res%len = y%len
+  res%dims = y%dims
+  res%atts = y%atts
 
-  select case (y%data_type)
+  select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
@@ -2166,9 +2166,9 @@ module function sub_int64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x - yp
       nullify (yp, resp)
     end block
@@ -2180,9 +2180,9 @@ module function sub_int64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x - yp
       nullify (yp, resp)
     end block
@@ -2194,9 +2194,9 @@ module function sub_int64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x - yp
       nullify (yp, resp)
     end block
@@ -2208,9 +2208,9 @@ module function sub_int64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x - yp
       nullify (yp, resp)
     end block
@@ -2222,9 +2222,9 @@ module function sub_int64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x
       resp = resp - yp
       nullify (yp, resp)
@@ -2237,9 +2237,9 @@ module function sub_int64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x - yp
       nullify (yp, resp)
     end block
@@ -2252,23 +2252,23 @@ module function sub_var_real32(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = x%name
-  res%length = x%length
-  res%dimensions = x%dimensions
-  res%attributes = x%attributes
+  res%len = x%len
+  res%dims = x%dims
+  res%atts = x%atts
 
-  select case (x%data_type)
+  select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_FLOAT
+      res%dtype = NC_FLOAT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp - y
       nullify (xp, resp)
     end block
@@ -2278,12 +2278,12 @@ module function sub_var_real32(x, y) result(res)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_FLOAT
+      res%dtype = NC_FLOAT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp - y
       nullify (xp, resp)
     end block
@@ -2293,12 +2293,12 @@ module function sub_var_real32(x, y) result(res)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_FLOAT
+      res%dtype = NC_FLOAT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp - y
       nullify (xp, resp)
     end block
@@ -2308,12 +2308,12 @@ module function sub_var_real32(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp
       resp = resp - y
       nullify (xp, resp)
@@ -2324,12 +2324,12 @@ module function sub_var_real32(x, y) result(res)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_FLOAT
+      res%dtype = NC_FLOAT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp - y
       nullify (xp, resp)
     end block
@@ -2339,12 +2339,12 @@ module function sub_var_real32(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp - y
       nullify (xp, resp)
     end block
@@ -2357,11 +2357,11 @@ module function sub_real32_var(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = y%name
-  res%length = y%length
-  res%dimensions = y%dimensions
-  res%attributes = y%attributes
+  res%len = y%len
+  res%dims = y%dims
+  res%atts = y%atts
 
-  select case (y%data_type)
+  select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
@@ -2370,9 +2370,9 @@ module function sub_real32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x - yp
       nullify (yp, resp)
     end block
@@ -2384,9 +2384,9 @@ module function sub_real32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x - yp
       nullify (yp, resp)
     end block
@@ -2398,9 +2398,9 @@ module function sub_real32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x - yp
       nullify (yp, resp)
     end block
@@ -2412,9 +2412,9 @@ module function sub_real32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x
       resp = resp - yp
       nullify (yp, resp)
@@ -2427,9 +2427,9 @@ module function sub_real32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x - yp
       nullify (yp, resp)
     end block
@@ -2441,9 +2441,9 @@ module function sub_real32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x - yp
       nullify (yp, resp)
     end block
@@ -2456,23 +2456,23 @@ module function sub_var_real64(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = x%name
-  res%length = x%length
-  res%dimensions = x%dimensions
-  res%attributes = x%attributes
+  res%len = x%len
+  res%dims = x%dims
+  res%atts = x%atts
 
-  select case (x%data_type)
+  select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp - y
       nullify (xp, resp)
     end block
@@ -2482,12 +2482,12 @@ module function sub_var_real64(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp - y
       nullify (xp, resp)
     end block
@@ -2497,12 +2497,12 @@ module function sub_var_real64(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp - y
       nullify (xp, resp)
     end block
@@ -2512,12 +2512,12 @@ module function sub_var_real64(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp - y
       nullify (xp, resp)
     end block
@@ -2527,12 +2527,12 @@ module function sub_var_real64(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp - y
       nullify (xp, resp)
     end block
@@ -2542,12 +2542,12 @@ module function sub_var_real64(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp - y
       nullify (xp, resp)
     end block
@@ -2560,11 +2560,11 @@ module function sub_real64_var(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = y%name
-  res%length = y%length
-  res%dimensions = y%dimensions
-  res%attributes = y%attributes
+  res%len = y%len
+  res%dims = y%dims
+  res%atts = y%atts
 
-  select case (y%data_type)
+  select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
@@ -2573,9 +2573,9 @@ module function sub_real64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x - yp
       nullify (yp, resp)
     end block
@@ -2587,9 +2587,9 @@ module function sub_real64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x - yp
       nullify (yp, resp)
     end block
@@ -2601,9 +2601,9 @@ module function sub_real64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x - yp
       nullify (yp, resp)
     end block
@@ -2615,9 +2615,9 @@ module function sub_real64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x - yp
       nullify (yp, resp)
     end block
@@ -2629,9 +2629,9 @@ module function sub_real64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x - yp
       nullify (yp, resp)
     end block
@@ -2643,9 +2643,9 @@ module function sub_real64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x - yp
       nullify (yp, resp)
     end block
@@ -2656,18 +2656,18 @@ module function mul_vars(x, y) result(res)
   type(variable_type), target, intent(in) :: x, y
   type(variable_type), target :: res
 
-  if (any(x%dimensions /= y%dimensions)) &
-    & error stop "[add_vars] Unequal dimensions."
-  if (x%data_type /= y%data_type) &
+  if (any(x%dims /= y%dims)) &
+    & error stop "[add_vars] Unequal dims."
+  if (x%dtype /= y%dtype) &
     & error stop "[add_vars] Unequal data type."
 
   res%name = x%name
-  res%data_type = x%data_type
-  res%length = x%length
-  res%dimensions = x%dimensions
-  res%attributes = x%attributes
+  res%dtype = x%dtype
+  res%len = x%len
+  res%dims = x%dims
+  res%atts = x%atts
 
-  select case (x%data_type)
+  select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:), yp(:), resp(:)
@@ -2675,11 +2675,11 @@ module function mul_vars(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = xp * yp
       nullify (xp, yp, resp)
     end block
@@ -2690,11 +2690,11 @@ module function mul_vars(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = xp * yp
       nullify (xp, yp, resp)
     end block
@@ -2705,11 +2705,11 @@ module function mul_vars(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = xp * yp
       nullify (xp, yp, resp)
     end block
@@ -2720,11 +2720,11 @@ module function mul_vars(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = xp * yp
       nullify (xp, yp, resp)
     end block
@@ -2735,11 +2735,11 @@ module function mul_vars(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = xp * yp
       nullify (xp, yp, resp)
     end block
@@ -2750,11 +2750,11 @@ module function mul_vars(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = xp * yp
       nullify (xp, yp, resp)
     end block
@@ -2767,23 +2767,23 @@ module function mul_var_int8(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = x%name
-  res%length = x%length
-  res%dimensions = x%dimensions
-  res%attributes = x%attributes
+  res%len = x%len
+  res%dims = x%dims
+  res%atts = x%atts
 
-  select case (x%data_type)
+  select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int8), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_BYTE
+      res%dtype = NC_BYTE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp * y
       nullify (xp, resp)
     end block
@@ -2793,12 +2793,12 @@ module function mul_var_int8(x, y) result(res)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_SHORT
+      res%dtype = NC_SHORT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp * y
       nullify (xp, resp)
     end block
@@ -2808,12 +2808,12 @@ module function mul_var_int8(x, y) result(res)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT
+      res%dtype = NC_INT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp * y
       nullify (xp, resp)
     end block
@@ -2823,12 +2823,12 @@ module function mul_var_int8(x, y) result(res)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT64
+      res%dtype = NC_INT64
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp * y
       nullify (xp, resp)
     end block
@@ -2838,12 +2838,12 @@ module function mul_var_int8(x, y) result(res)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_FLOAT
+      res%dtype = NC_FLOAT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp * y
       nullify (xp, resp)
     end block
@@ -2853,12 +2853,12 @@ module function mul_var_int8(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp * y
       nullify (xp, resp)
     end block
@@ -2871,11 +2871,11 @@ module function mul_int8_var(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = y%name
-  res%length = y%length
-  res%dimensions = y%dimensions
-  res%attributes = y%attributes
+  res%len = y%len
+  res%dims = y%dims
+  res%atts = y%atts
 
-  select case (y%data_type)
+  select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
@@ -2884,9 +2884,9 @@ module function mul_int8_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x * yp
       nullify (yp, resp)
     end block
@@ -2898,9 +2898,9 @@ module function mul_int8_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x * yp
       nullify (yp, resp)
     end block
@@ -2912,9 +2912,9 @@ module function mul_int8_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x * yp
       nullify (yp, resp)
     end block
@@ -2926,9 +2926,9 @@ module function mul_int8_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x * yp
       nullify (yp, resp)
     end block
@@ -2940,9 +2940,9 @@ module function mul_int8_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x * yp
       nullify (yp, resp)
     end block
@@ -2954,9 +2954,9 @@ module function mul_int8_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x * yp
       nullify (yp, resp)
     end block
@@ -2969,23 +2969,23 @@ module function mul_var_int16(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = x%name
-  res%length = x%length
-  res%dimensions = x%dimensions
-  res%attributes = x%attributes
+  res%len = x%len
+  res%dims = x%dims
+  res%atts = x%atts
 
-  select case (x%data_type)
+  select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_SHORT
+      res%dtype = NC_SHORT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp * y
       nullify (xp, resp)
     end block
@@ -2995,12 +2995,12 @@ module function mul_var_int16(x, y) result(res)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_SHORT
+      res%dtype = NC_SHORT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp * y
       nullify (xp, resp)
     end block
@@ -3010,12 +3010,12 @@ module function mul_var_int16(x, y) result(res)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT
+      res%dtype = NC_INT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp * y
       nullify (xp, resp)
     end block
@@ -3025,12 +3025,12 @@ module function mul_var_int16(x, y) result(res)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT64
+      res%dtype = NC_INT64
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp * y
       nullify (xp, resp)
     end block
@@ -3040,12 +3040,12 @@ module function mul_var_int16(x, y) result(res)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_FLOAT
+      res%dtype = NC_FLOAT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp * y
       nullify (xp, resp)
     end block
@@ -3055,12 +3055,12 @@ module function mul_var_int16(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp * y
       nullify (xp, resp)
     end block
@@ -3073,11 +3073,11 @@ module function mul_int16_var(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = y%name
-  res%length = y%length
-  res%dimensions = y%dimensions
-  res%attributes = y%attributes
+  res%len = y%len
+  res%dims = y%dims
+  res%atts = y%atts
 
-  select case (y%data_type)
+  select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
@@ -3086,9 +3086,9 @@ module function mul_int16_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x * yp
       nullify (yp, resp)
     end block
@@ -3100,9 +3100,9 @@ module function mul_int16_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x * yp
       nullify (yp, resp)
     end block
@@ -3114,9 +3114,9 @@ module function mul_int16_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x * yp
       nullify (yp, resp)
     end block
@@ -3128,9 +3128,9 @@ module function mul_int16_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x * yp
       nullify (yp, resp)
     end block
@@ -3142,9 +3142,9 @@ module function mul_int16_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x * yp
       nullify (yp, resp)
     end block
@@ -3156,9 +3156,9 @@ module function mul_int16_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x * yp
       nullify (yp, resp)
     end block
@@ -3171,23 +3171,23 @@ module function mul_var_int32(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = x%name
-  res%length = x%length
-  res%dimensions = x%dimensions
-  res%attributes = x%attributes
+  res%len = x%len
+  res%dims = x%dims
+  res%atts = x%atts
 
-  select case (x%data_type)
+  select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT
+      res%dtype = NC_INT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp * y
       nullify (xp, resp)
     end block
@@ -3197,12 +3197,12 @@ module function mul_var_int32(x, y) result(res)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT
+      res%dtype = NC_INT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp * y
       nullify (xp, resp)
     end block
@@ -3212,12 +3212,12 @@ module function mul_var_int32(x, y) result(res)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT
+      res%dtype = NC_INT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp * y
       nullify (xp, resp)
     end block
@@ -3227,12 +3227,12 @@ module function mul_var_int32(x, y) result(res)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT64
+      res%dtype = NC_INT64
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp * y
       nullify (xp, resp)
     end block
@@ -3242,12 +3242,12 @@ module function mul_var_int32(x, y) result(res)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_FLOAT
+      res%dtype = NC_FLOAT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp * y
       nullify (xp, resp)
     end block
@@ -3257,12 +3257,12 @@ module function mul_var_int32(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp * y
       nullify (xp, resp)
     end block
@@ -3275,11 +3275,11 @@ module function mul_int32_var(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = y%name
-  res%length = y%length
-  res%dimensions = y%dimensions
-  res%attributes = y%attributes
+  res%len = y%len
+  res%dims = y%dims
+  res%atts = y%atts
 
-  select case (y%data_type)
+  select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
@@ -3288,9 +3288,9 @@ module function mul_int32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x * yp
       nullify (yp, resp)
     end block
@@ -3302,9 +3302,9 @@ module function mul_int32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x * yp
       nullify (yp, resp)
     end block
@@ -3316,9 +3316,9 @@ module function mul_int32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x * yp
       nullify (yp, resp)
     end block
@@ -3330,9 +3330,9 @@ module function mul_int32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x * yp
       nullify (yp, resp)
     end block
@@ -3344,9 +3344,9 @@ module function mul_int32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x * yp
       nullify (yp, resp)
     end block
@@ -3358,9 +3358,9 @@ module function mul_int32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x * yp
       nullify (yp, resp)
     end block
@@ -3373,23 +3373,23 @@ module function mul_var_int64(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = x%name
-  res%length = x%length
-  res%dimensions = x%dimensions
-  res%attributes = x%attributes
+  res%len = x%len
+  res%dims = x%dims
+  res%atts = x%atts
 
-  select case (x%data_type)
+  select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT64
+      res%dtype = NC_INT64
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp * y
       nullify (xp, resp)
     end block
@@ -3399,12 +3399,12 @@ module function mul_var_int64(x, y) result(res)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT64
+      res%dtype = NC_INT64
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp * y
       nullify (xp, resp)
     end block
@@ -3414,12 +3414,12 @@ module function mul_var_int64(x, y) result(res)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT64
+      res%dtype = NC_INT64
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp * y
       nullify (xp, resp)
     end block
@@ -3429,12 +3429,12 @@ module function mul_var_int64(x, y) result(res)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT64
+      res%dtype = NC_INT64
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp * y
       nullify (xp, resp)
     end block
@@ -3444,12 +3444,12 @@ module function mul_var_int64(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp
       resp = resp * y
       nullify (xp, resp)
@@ -3460,12 +3460,12 @@ module function mul_var_int64(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp * y
       nullify (xp, resp)
     end block
@@ -3478,11 +3478,11 @@ module function mul_int64_var(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = y%name
-  res%length = y%length
-  res%dimensions = y%dimensions
-  res%attributes = y%attributes
+  res%len = y%len
+  res%dims = y%dims
+  res%atts = y%atts
 
-  select case (y%data_type)
+  select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
@@ -3491,9 +3491,9 @@ module function mul_int64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x * yp
       nullify (yp, resp)
     end block
@@ -3505,9 +3505,9 @@ module function mul_int64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x * yp
       nullify (yp, resp)
     end block
@@ -3519,9 +3519,9 @@ module function mul_int64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x * yp
       nullify (yp, resp)
     end block
@@ -3533,9 +3533,9 @@ module function mul_int64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x * yp
       nullify (yp, resp)
     end block
@@ -3547,9 +3547,9 @@ module function mul_int64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x
       resp = resp * yp
       nullify (yp, resp)
@@ -3562,9 +3562,9 @@ module function mul_int64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x * yp
       nullify (yp, resp)
     end block
@@ -3577,23 +3577,23 @@ module function mul_var_real32(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = x%name
-  res%length = x%length
-  res%dimensions = x%dimensions
-  res%attributes = x%attributes
+  res%len = x%len
+  res%dims = x%dims
+  res%atts = x%atts
 
-  select case (x%data_type)
+  select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_FLOAT
+      res%dtype = NC_FLOAT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp * y
       nullify (xp, resp)
     end block
@@ -3603,12 +3603,12 @@ module function mul_var_real32(x, y) result(res)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_FLOAT
+      res%dtype = NC_FLOAT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp * y
       nullify (xp, resp)
     end block
@@ -3618,12 +3618,12 @@ module function mul_var_real32(x, y) result(res)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_FLOAT
+      res%dtype = NC_FLOAT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp * y
       nullify (xp, resp)
     end block
@@ -3633,12 +3633,12 @@ module function mul_var_real32(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp
       resp = resp * y
       nullify (xp, resp)
@@ -3649,12 +3649,12 @@ module function mul_var_real32(x, y) result(res)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_FLOAT
+      res%dtype = NC_FLOAT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp * y
       nullify (xp, resp)
     end block
@@ -3664,12 +3664,12 @@ module function mul_var_real32(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp * y
       nullify (xp, resp)
     end block
@@ -3682,11 +3682,11 @@ module function mul_real32_var(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = y%name
-  res%length = y%length
-  res%dimensions = y%dimensions
-  res%attributes = y%attributes
+  res%len = y%len
+  res%dims = y%dims
+  res%atts = y%atts
 
-  select case (y%data_type)
+  select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
@@ -3695,9 +3695,9 @@ module function mul_real32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x * yp
       nullify (yp, resp)
     end block
@@ -3709,9 +3709,9 @@ module function mul_real32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x * yp
       nullify (yp, resp)
     end block
@@ -3723,9 +3723,9 @@ module function mul_real32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x * yp
       nullify (yp, resp)
     end block
@@ -3737,9 +3737,9 @@ module function mul_real32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x
       resp = resp * yp
       nullify (yp, resp)
@@ -3752,9 +3752,9 @@ module function mul_real32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x * yp
       nullify (yp, resp)
     end block
@@ -3766,9 +3766,9 @@ module function mul_real32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x * yp
       nullify (yp, resp)
     end block
@@ -3781,23 +3781,23 @@ module function mul_var_real64(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = x%name
-  res%length = x%length
-  res%dimensions = x%dimensions
-  res%attributes = x%attributes
+  res%len = x%len
+  res%dims = x%dims
+  res%atts = x%atts
 
-  select case (x%data_type)
+  select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp * y
       nullify (xp, resp)
     end block
@@ -3807,12 +3807,12 @@ module function mul_var_real64(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp * y
       nullify (xp, resp)
     end block
@@ -3822,12 +3822,12 @@ module function mul_var_real64(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp * y
       nullify (xp, resp)
     end block
@@ -3837,12 +3837,12 @@ module function mul_var_real64(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp * y
       nullify (xp, resp)
     end block
@@ -3852,12 +3852,12 @@ module function mul_var_real64(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp * y
       nullify (xp, resp)
     end block
@@ -3867,12 +3867,12 @@ module function mul_var_real64(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp * y
       nullify (xp, resp)
     end block
@@ -3885,11 +3885,11 @@ module function mul_real64_var(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = y%name
-  res%length = y%length
-  res%dimensions = y%dimensions
-  res%attributes = y%attributes
+  res%len = y%len
+  res%dims = y%dims
+  res%atts = y%atts
 
-  select case (y%data_type)
+  select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
@@ -3898,9 +3898,9 @@ module function mul_real64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x * yp
       nullify (yp, resp)
     end block
@@ -3912,9 +3912,9 @@ module function mul_real64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x * yp
       nullify (yp, resp)
     end block
@@ -3926,9 +3926,9 @@ module function mul_real64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x * yp
       nullify (yp, resp)
     end block
@@ -3940,9 +3940,9 @@ module function mul_real64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x * yp
       nullify (yp, resp)
     end block
@@ -3954,9 +3954,9 @@ module function mul_real64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x * yp
       nullify (yp, resp)
     end block
@@ -3968,9 +3968,9 @@ module function mul_real64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x * yp
       nullify (yp, resp)
     end block
@@ -3981,18 +3981,18 @@ module function div_vars(x, y) result(res)
   type(variable_type), target, intent(in) :: x, y
   type(variable_type), target :: res
 
-  if (any(x%dimensions /= y%dimensions)) &
-    & error stop "[add_vars] Unequal dimensions."
-  if (x%data_type /= y%data_type) &
+  if (any(x%dims /= y%dims)) &
+    & error stop "[add_vars] Unequal dims."
+  if (x%dtype /= y%dtype) &
     & error stop "[add_vars] Unequal data type."
 
   res%name = x%name
-  res%data_type = x%data_type
-  res%length = x%length
-  res%dimensions = x%dimensions
-  res%attributes = x%attributes
+  res%dtype = x%dtype
+  res%len = x%len
+  res%dims = x%dims
+  res%atts = x%atts
 
-  select case (x%data_type)
+  select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:), yp(:), resp(:)
@@ -4000,11 +4000,11 @@ module function div_vars(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = xp / yp
       nullify (xp, yp, resp)
     end block
@@ -4015,11 +4015,11 @@ module function div_vars(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = xp / yp
       nullify (xp, yp, resp)
     end block
@@ -4030,11 +4030,11 @@ module function div_vars(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = xp / yp
       nullify (xp, yp, resp)
     end block
@@ -4045,11 +4045,11 @@ module function div_vars(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = xp / yp
       nullify (xp, yp, resp)
     end block
@@ -4060,11 +4060,11 @@ module function div_vars(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = xp / yp
       nullify (xp, yp, resp)
     end block
@@ -4075,11 +4075,11 @@ module function div_vars(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = xp / yp
       nullify (xp, yp, resp)
     end block
@@ -4092,23 +4092,23 @@ module function div_var_int8(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = x%name
-  res%length = x%length
-  res%dimensions = x%dimensions
-  res%attributes = x%attributes
+  res%len = x%len
+  res%dims = x%dims
+  res%atts = x%atts
 
-  select case (x%data_type)
+  select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int8), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_BYTE
+      res%dtype = NC_BYTE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp / y
       nullify (xp, resp)
     end block
@@ -4118,12 +4118,12 @@ module function div_var_int8(x, y) result(res)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_SHORT
+      res%dtype = NC_SHORT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp / y
       nullify (xp, resp)
     end block
@@ -4133,12 +4133,12 @@ module function div_var_int8(x, y) result(res)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT
+      res%dtype = NC_INT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp / y
       nullify (xp, resp)
     end block
@@ -4148,12 +4148,12 @@ module function div_var_int8(x, y) result(res)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT64
+      res%dtype = NC_INT64
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp / y
       nullify (xp, resp)
     end block
@@ -4163,12 +4163,12 @@ module function div_var_int8(x, y) result(res)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_FLOAT
+      res%dtype = NC_FLOAT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp / y
       nullify (xp, resp)
     end block
@@ -4178,12 +4178,12 @@ module function div_var_int8(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp / y
       nullify (xp, resp)
     end block
@@ -4196,11 +4196,11 @@ module function div_int8_var(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = y%name
-  res%length = y%length
-  res%dimensions = y%dimensions
-  res%attributes = y%attributes
+  res%len = y%len
+  res%dims = y%dims
+  res%atts = y%atts
 
-  select case (y%data_type)
+  select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
@@ -4209,9 +4209,9 @@ module function div_int8_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x / yp
       nullify (yp, resp)
     end block
@@ -4223,9 +4223,9 @@ module function div_int8_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x / yp
       nullify (yp, resp)
     end block
@@ -4237,9 +4237,9 @@ module function div_int8_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x / yp
       nullify (yp, resp)
     end block
@@ -4251,9 +4251,9 @@ module function div_int8_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x / yp
       nullify (yp, resp)
     end block
@@ -4265,9 +4265,9 @@ module function div_int8_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x / yp
       nullify (yp, resp)
     end block
@@ -4279,9 +4279,9 @@ module function div_int8_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x / yp
       nullify (yp, resp)
     end block
@@ -4294,23 +4294,23 @@ module function div_var_int16(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = x%name
-  res%length = x%length
-  res%dimensions = x%dimensions
-  res%attributes = x%attributes
+  res%len = x%len
+  res%dims = x%dims
+  res%atts = x%atts
 
-  select case (x%data_type)
+  select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_SHORT
+      res%dtype = NC_SHORT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp / y
       nullify (xp, resp)
     end block
@@ -4320,12 +4320,12 @@ module function div_var_int16(x, y) result(res)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_SHORT
+      res%dtype = NC_SHORT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp / y
       nullify (xp, resp)
     end block
@@ -4335,12 +4335,12 @@ module function div_var_int16(x, y) result(res)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT
+      res%dtype = NC_INT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp / y
       nullify (xp, resp)
     end block
@@ -4350,12 +4350,12 @@ module function div_var_int16(x, y) result(res)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT64
+      res%dtype = NC_INT64
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp / y
       nullify (xp, resp)
     end block
@@ -4365,12 +4365,12 @@ module function div_var_int16(x, y) result(res)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_FLOAT
+      res%dtype = NC_FLOAT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp / y
       nullify (xp, resp)
     end block
@@ -4380,12 +4380,12 @@ module function div_var_int16(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp / y
       nullify (xp, resp)
     end block
@@ -4398,11 +4398,11 @@ module function div_int16_var(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = y%name
-  res%length = y%length
-  res%dimensions = y%dimensions
-  res%attributes = y%attributes
+  res%len = y%len
+  res%dims = y%dims
+  res%atts = y%atts
 
-  select case (y%data_type)
+  select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
@@ -4411,9 +4411,9 @@ module function div_int16_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x / yp
       nullify (yp, resp)
     end block
@@ -4425,9 +4425,9 @@ module function div_int16_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x / yp
       nullify (yp, resp)
     end block
@@ -4439,9 +4439,9 @@ module function div_int16_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x / yp
       nullify (yp, resp)
     end block
@@ -4453,9 +4453,9 @@ module function div_int16_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x / yp
       nullify (yp, resp)
     end block
@@ -4467,9 +4467,9 @@ module function div_int16_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x / yp
       nullify (yp, resp)
     end block
@@ -4481,9 +4481,9 @@ module function div_int16_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x / yp
       nullify (yp, resp)
     end block
@@ -4496,23 +4496,23 @@ module function div_var_int32(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = x%name
-  res%length = x%length
-  res%dimensions = x%dimensions
-  res%attributes = x%attributes
+  res%len = x%len
+  res%dims = x%dims
+  res%atts = x%atts
 
-  select case (x%data_type)
+  select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT
+      res%dtype = NC_INT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp / y
       nullify (xp, resp)
     end block
@@ -4522,12 +4522,12 @@ module function div_var_int32(x, y) result(res)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT
+      res%dtype = NC_INT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp / y
       nullify (xp, resp)
     end block
@@ -4537,12 +4537,12 @@ module function div_var_int32(x, y) result(res)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT
+      res%dtype = NC_INT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp / y
       nullify (xp, resp)
     end block
@@ -4552,12 +4552,12 @@ module function div_var_int32(x, y) result(res)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT64
+      res%dtype = NC_INT64
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp / y
       nullify (xp, resp)
     end block
@@ -4567,12 +4567,12 @@ module function div_var_int32(x, y) result(res)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_FLOAT
+      res%dtype = NC_FLOAT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp / y
       nullify (xp, resp)
     end block
@@ -4582,12 +4582,12 @@ module function div_var_int32(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp / y
       nullify (xp, resp)
     end block
@@ -4600,11 +4600,11 @@ module function div_int32_var(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = y%name
-  res%length = y%length
-  res%dimensions = y%dimensions
-  res%attributes = y%attributes
+  res%len = y%len
+  res%dims = y%dims
+  res%atts = y%atts
 
-  select case (y%data_type)
+  select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
@@ -4613,9 +4613,9 @@ module function div_int32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x / yp
       nullify (yp, resp)
     end block
@@ -4627,9 +4627,9 @@ module function div_int32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x / yp
       nullify (yp, resp)
     end block
@@ -4641,9 +4641,9 @@ module function div_int32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x / yp
       nullify (yp, resp)
     end block
@@ -4655,9 +4655,9 @@ module function div_int32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x / yp
       nullify (yp, resp)
     end block
@@ -4669,9 +4669,9 @@ module function div_int32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x / yp
       nullify (yp, resp)
     end block
@@ -4683,9 +4683,9 @@ module function div_int32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x / yp
       nullify (yp, resp)
     end block
@@ -4698,23 +4698,23 @@ module function div_var_int64(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = x%name
-  res%length = x%length
-  res%dimensions = x%dimensions
-  res%attributes = x%attributes
+  res%len = x%len
+  res%dims = x%dims
+  res%atts = x%atts
 
-  select case (x%data_type)
+  select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT64
+      res%dtype = NC_INT64
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp / y
       nullify (xp, resp)
     end block
@@ -4724,12 +4724,12 @@ module function div_var_int64(x, y) result(res)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT64
+      res%dtype = NC_INT64
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp / y
       nullify (xp, resp)
     end block
@@ -4739,12 +4739,12 @@ module function div_var_int64(x, y) result(res)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT64
+      res%dtype = NC_INT64
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp / y
       nullify (xp, resp)
     end block
@@ -4754,12 +4754,12 @@ module function div_var_int64(x, y) result(res)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT64
+      res%dtype = NC_INT64
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp / y
       nullify (xp, resp)
     end block
@@ -4769,12 +4769,12 @@ module function div_var_int64(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp
       resp = resp / y
       nullify (xp, resp)
@@ -4785,12 +4785,12 @@ module function div_var_int64(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp / y
       nullify (xp, resp)
     end block
@@ -4803,11 +4803,11 @@ module function div_int64_var(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = y%name
-  res%length = y%length
-  res%dimensions = y%dimensions
-  res%attributes = y%attributes
+  res%len = y%len
+  res%dims = y%dims
+  res%atts = y%atts
 
-  select case (y%data_type)
+  select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
@@ -4816,9 +4816,9 @@ module function div_int64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x / yp
       nullify (yp, resp)
     end block
@@ -4830,9 +4830,9 @@ module function div_int64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x / yp
       nullify (yp, resp)
     end block
@@ -4844,9 +4844,9 @@ module function div_int64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x / yp
       nullify (yp, resp)
     end block
@@ -4858,9 +4858,9 @@ module function div_int64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x / yp
       nullify (yp, resp)
     end block
@@ -4872,9 +4872,9 @@ module function div_int64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x
       resp = resp / yp
       nullify (yp, resp)
@@ -4887,9 +4887,9 @@ module function div_int64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x / yp
       nullify (yp, resp)
     end block
@@ -4902,23 +4902,23 @@ module function div_var_real32(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = x%name
-  res%length = x%length
-  res%dimensions = x%dimensions
-  res%attributes = x%attributes
+  res%len = x%len
+  res%dims = x%dims
+  res%atts = x%atts
 
-  select case (x%data_type)
+  select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_FLOAT
+      res%dtype = NC_FLOAT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp / y
       nullify (xp, resp)
     end block
@@ -4928,12 +4928,12 @@ module function div_var_real32(x, y) result(res)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_FLOAT
+      res%dtype = NC_FLOAT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp / y
       nullify (xp, resp)
     end block
@@ -4943,12 +4943,12 @@ module function div_var_real32(x, y) result(res)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_FLOAT
+      res%dtype = NC_FLOAT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp / y
       nullify (xp, resp)
     end block
@@ -4958,12 +4958,12 @@ module function div_var_real32(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp
       resp = resp / y
       nullify (xp, resp)
@@ -4974,12 +4974,12 @@ module function div_var_real32(x, y) result(res)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_FLOAT
+      res%dtype = NC_FLOAT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp / y
       nullify (xp, resp)
     end block
@@ -4989,12 +4989,12 @@ module function div_var_real32(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp / y
       nullify (xp, resp)
     end block
@@ -5007,11 +5007,11 @@ module function div_real32_var(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = y%name
-  res%length = y%length
-  res%dimensions = y%dimensions
-  res%attributes = y%attributes
+  res%len = y%len
+  res%dims = y%dims
+  res%atts = y%atts
 
-  select case (y%data_type)
+  select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
@@ -5020,9 +5020,9 @@ module function div_real32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x / yp
       nullify (yp, resp)
     end block
@@ -5034,9 +5034,9 @@ module function div_real32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x / yp
       nullify (yp, resp)
     end block
@@ -5048,9 +5048,9 @@ module function div_real32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x / yp
       nullify (yp, resp)
     end block
@@ -5062,9 +5062,9 @@ module function div_real32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x
       resp = resp / yp
       nullify (yp, resp)
@@ -5077,9 +5077,9 @@ module function div_real32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x / yp
       nullify (yp, resp)
     end block
@@ -5091,9 +5091,9 @@ module function div_real32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x / yp
       nullify (yp, resp)
     end block
@@ -5106,23 +5106,23 @@ module function div_var_real64(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = x%name
-  res%length = x%length
-  res%dimensions = x%dimensions
-  res%attributes = x%attributes
+  res%len = x%len
+  res%dims = x%dims
+  res%atts = x%atts
 
-  select case (x%data_type)
+  select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp / y
       nullify (xp, resp)
     end block
@@ -5132,12 +5132,12 @@ module function div_var_real64(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp / y
       nullify (xp, resp)
     end block
@@ -5147,12 +5147,12 @@ module function div_var_real64(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp / y
       nullify (xp, resp)
     end block
@@ -5162,12 +5162,12 @@ module function div_var_real64(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp / y
       nullify (xp, resp)
     end block
@@ -5177,12 +5177,12 @@ module function div_var_real64(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp / y
       nullify (xp, resp)
     end block
@@ -5192,12 +5192,12 @@ module function div_var_real64(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp / y
       nullify (xp, resp)
     end block
@@ -5210,11 +5210,11 @@ module function div_real64_var(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = y%name
-  res%length = y%length
-  res%dimensions = y%dimensions
-  res%attributes = y%attributes
+  res%len = y%len
+  res%dims = y%dims
+  res%atts = y%atts
 
-  select case (y%data_type)
+  select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
@@ -5223,9 +5223,9 @@ module function div_real64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x / yp
       nullify (yp, resp)
     end block
@@ -5237,9 +5237,9 @@ module function div_real64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x / yp
       nullify (yp, resp)
     end block
@@ -5251,9 +5251,9 @@ module function div_real64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x / yp
       nullify (yp, resp)
     end block
@@ -5265,9 +5265,9 @@ module function div_real64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x / yp
       nullify (yp, resp)
     end block
@@ -5279,9 +5279,9 @@ module function div_real64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x / yp
       nullify (yp, resp)
     end block
@@ -5293,9 +5293,9 @@ module function div_real64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x / yp
       nullify (yp, resp)
     end block
@@ -5306,18 +5306,18 @@ module function pow_vars(x, y) result(res)
   type(variable_type), target, intent(in) :: x, y
   type(variable_type), target :: res
 
-  if (any(x%dimensions /= y%dimensions)) &
-    & error stop "[add_vars] Unequal dimensions."
-  if (x%data_type /= y%data_type) &
+  if (any(x%dims /= y%dims)) &
+    & error stop "[add_vars] Unequal dims."
+  if (x%dtype /= y%dtype) &
     & error stop "[add_vars] Unequal data type."
 
   res%name = x%name
-  res%data_type = x%data_type
-  res%length = x%length
-  res%dimensions = x%dimensions
-  res%attributes = x%attributes
+  res%dtype = x%dtype
+  res%len = x%len
+  res%dims = x%dims
+  res%atts = x%atts
 
-  select case (x%data_type)
+  select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:), yp(:), resp(:)
@@ -5325,11 +5325,11 @@ module function pow_vars(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = xp ** yp
       nullify (xp, yp, resp)
     end block
@@ -5340,11 +5340,11 @@ module function pow_vars(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = xp ** yp
       nullify (xp, yp, resp)
     end block
@@ -5355,11 +5355,11 @@ module function pow_vars(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = xp ** yp
       nullify (xp, yp, resp)
     end block
@@ -5370,11 +5370,11 @@ module function pow_vars(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = xp ** yp
       nullify (xp, yp, resp)
     end block
@@ -5385,11 +5385,11 @@ module function pow_vars(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = xp ** yp
       nullify (xp, yp, resp)
     end block
@@ -5400,11 +5400,11 @@ module function pow_vars(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = xp ** yp
       nullify (xp, yp, resp)
     end block
@@ -5417,23 +5417,23 @@ module function pow_var_int8(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = x%name
-  res%length = x%length
-  res%dimensions = x%dimensions
-  res%attributes = x%attributes
+  res%len = x%len
+  res%dims = x%dims
+  res%atts = x%atts
 
-  select case (x%data_type)
+  select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int8), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_BYTE
+      res%dtype = NC_BYTE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp ** y
       nullify (xp, resp)
     end block
@@ -5443,12 +5443,12 @@ module function pow_var_int8(x, y) result(res)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_SHORT
+      res%dtype = NC_SHORT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp ** y
       nullify (xp, resp)
     end block
@@ -5458,12 +5458,12 @@ module function pow_var_int8(x, y) result(res)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT
+      res%dtype = NC_INT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp ** y
       nullify (xp, resp)
     end block
@@ -5473,12 +5473,12 @@ module function pow_var_int8(x, y) result(res)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT64
+      res%dtype = NC_INT64
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp ** y
       nullify (xp, resp)
     end block
@@ -5488,12 +5488,12 @@ module function pow_var_int8(x, y) result(res)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_FLOAT
+      res%dtype = NC_FLOAT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp ** y
       nullify (xp, resp)
     end block
@@ -5503,12 +5503,12 @@ module function pow_var_int8(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp ** y
       nullify (xp, resp)
     end block
@@ -5521,11 +5521,11 @@ module function pow_int8_var(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = y%name
-  res%length = y%length
-  res%dimensions = y%dimensions
-  res%attributes = y%attributes
+  res%len = y%len
+  res%dims = y%dims
+  res%atts = y%atts
 
-  select case (y%data_type)
+  select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
@@ -5534,9 +5534,9 @@ module function pow_int8_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x ** yp
       nullify (yp, resp)
     end block
@@ -5548,9 +5548,9 @@ module function pow_int8_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x ** yp
       nullify (yp, resp)
     end block
@@ -5562,9 +5562,9 @@ module function pow_int8_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x ** yp
       nullify (yp, resp)
     end block
@@ -5576,9 +5576,9 @@ module function pow_int8_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x ** yp
       nullify (yp, resp)
     end block
@@ -5590,9 +5590,9 @@ module function pow_int8_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x ** yp
       nullify (yp, resp)
     end block
@@ -5604,9 +5604,9 @@ module function pow_int8_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x ** yp
       nullify (yp, resp)
     end block
@@ -5619,23 +5619,23 @@ module function pow_var_int16(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = x%name
-  res%length = x%length
-  res%dimensions = x%dimensions
-  res%attributes = x%attributes
+  res%len = x%len
+  res%dims = x%dims
+  res%atts = x%atts
 
-  select case (x%data_type)
+  select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_SHORT
+      res%dtype = NC_SHORT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp ** y
       nullify (xp, resp)
     end block
@@ -5645,12 +5645,12 @@ module function pow_var_int16(x, y) result(res)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_SHORT
+      res%dtype = NC_SHORT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp ** y
       nullify (xp, resp)
     end block
@@ -5660,12 +5660,12 @@ module function pow_var_int16(x, y) result(res)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT
+      res%dtype = NC_INT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp ** y
       nullify (xp, resp)
     end block
@@ -5675,12 +5675,12 @@ module function pow_var_int16(x, y) result(res)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT64
+      res%dtype = NC_INT64
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp ** y
       nullify (xp, resp)
     end block
@@ -5690,12 +5690,12 @@ module function pow_var_int16(x, y) result(res)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_FLOAT
+      res%dtype = NC_FLOAT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp ** y
       nullify (xp, resp)
     end block
@@ -5705,12 +5705,12 @@ module function pow_var_int16(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp ** y
       nullify (xp, resp)
     end block
@@ -5723,11 +5723,11 @@ module function pow_int16_var(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = y%name
-  res%length = y%length
-  res%dimensions = y%dimensions
-  res%attributes = y%attributes
+  res%len = y%len
+  res%dims = y%dims
+  res%atts = y%atts
 
-  select case (y%data_type)
+  select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
@@ -5736,9 +5736,9 @@ module function pow_int16_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x ** yp
       nullify (yp, resp)
     end block
@@ -5750,9 +5750,9 @@ module function pow_int16_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x ** yp
       nullify (yp, resp)
     end block
@@ -5764,9 +5764,9 @@ module function pow_int16_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x ** yp
       nullify (yp, resp)
     end block
@@ -5778,9 +5778,9 @@ module function pow_int16_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x ** yp
       nullify (yp, resp)
     end block
@@ -5792,9 +5792,9 @@ module function pow_int16_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x ** yp
       nullify (yp, resp)
     end block
@@ -5806,9 +5806,9 @@ module function pow_int16_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x ** yp
       nullify (yp, resp)
     end block
@@ -5821,23 +5821,23 @@ module function pow_var_int32(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = x%name
-  res%length = x%length
-  res%dimensions = x%dimensions
-  res%attributes = x%attributes
+  res%len = x%len
+  res%dims = x%dims
+  res%atts = x%atts
 
-  select case (x%data_type)
+  select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT
+      res%dtype = NC_INT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp ** y
       nullify (xp, resp)
     end block
@@ -5847,12 +5847,12 @@ module function pow_var_int32(x, y) result(res)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT
+      res%dtype = NC_INT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp ** y
       nullify (xp, resp)
     end block
@@ -5862,12 +5862,12 @@ module function pow_var_int32(x, y) result(res)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT
+      res%dtype = NC_INT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp ** y
       nullify (xp, resp)
     end block
@@ -5877,12 +5877,12 @@ module function pow_var_int32(x, y) result(res)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT64
+      res%dtype = NC_INT64
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp ** y
       nullify (xp, resp)
     end block
@@ -5892,12 +5892,12 @@ module function pow_var_int32(x, y) result(res)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_FLOAT
+      res%dtype = NC_FLOAT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp ** y
       nullify (xp, resp)
     end block
@@ -5907,12 +5907,12 @@ module function pow_var_int32(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp ** y
       nullify (xp, resp)
     end block
@@ -5925,11 +5925,11 @@ module function pow_int32_var(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = y%name
-  res%length = y%length
-  res%dimensions = y%dimensions
-  res%attributes = y%attributes
+  res%len = y%len
+  res%dims = y%dims
+  res%atts = y%atts
 
-  select case (y%data_type)
+  select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
@@ -5938,9 +5938,9 @@ module function pow_int32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x ** yp
       nullify (yp, resp)
     end block
@@ -5952,9 +5952,9 @@ module function pow_int32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x ** yp
       nullify (yp, resp)
     end block
@@ -5966,9 +5966,9 @@ module function pow_int32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x ** yp
       nullify (yp, resp)
     end block
@@ -5980,9 +5980,9 @@ module function pow_int32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x ** yp
       nullify (yp, resp)
     end block
@@ -5994,9 +5994,9 @@ module function pow_int32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x ** yp
       nullify (yp, resp)
     end block
@@ -6008,9 +6008,9 @@ module function pow_int32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x ** yp
       nullify (yp, resp)
     end block
@@ -6023,23 +6023,23 @@ module function pow_var_int64(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = x%name
-  res%length = x%length
-  res%dimensions = x%dimensions
-  res%attributes = x%attributes
+  res%len = x%len
+  res%dims = x%dims
+  res%atts = x%atts
 
-  select case (x%data_type)
+  select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT64
+      res%dtype = NC_INT64
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp ** y
       nullify (xp, resp)
     end block
@@ -6049,12 +6049,12 @@ module function pow_var_int64(x, y) result(res)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT64
+      res%dtype = NC_INT64
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp ** y
       nullify (xp, resp)
     end block
@@ -6064,12 +6064,12 @@ module function pow_var_int64(x, y) result(res)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT64
+      res%dtype = NC_INT64
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp ** y
       nullify (xp, resp)
     end block
@@ -6079,12 +6079,12 @@ module function pow_var_int64(x, y) result(res)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_INT64
+      res%dtype = NC_INT64
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp ** y
       nullify (xp, resp)
     end block
@@ -6094,12 +6094,12 @@ module function pow_var_int64(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp
       resp = resp ** y
       nullify (xp, resp)
@@ -6110,12 +6110,12 @@ module function pow_var_int64(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp ** y
       nullify (xp, resp)
     end block
@@ -6128,11 +6128,11 @@ module function pow_int64_var(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = y%name
-  res%length = y%length
-  res%dimensions = y%dimensions
-  res%attributes = y%attributes
+  res%len = y%len
+  res%dims = y%dims
+  res%atts = y%atts
 
-  select case (y%data_type)
+  select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
@@ -6141,9 +6141,9 @@ module function pow_int64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x ** yp
       nullify (yp, resp)
     end block
@@ -6155,9 +6155,9 @@ module function pow_int64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x ** yp
       nullify (yp, resp)
     end block
@@ -6169,9 +6169,9 @@ module function pow_int64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x ** yp
       nullify (yp, resp)
     end block
@@ -6183,9 +6183,9 @@ module function pow_int64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x ** yp
       nullify (yp, resp)
     end block
@@ -6197,9 +6197,9 @@ module function pow_int64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x
       resp = resp ** yp
       nullify (yp, resp)
@@ -6212,9 +6212,9 @@ module function pow_int64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x ** yp
       nullify (yp, resp)
     end block
@@ -6227,23 +6227,23 @@ module function pow_var_real32(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = x%name
-  res%length = x%length
-  res%dimensions = x%dimensions
-  res%attributes = x%attributes
+  res%len = x%len
+  res%dims = x%dims
+  res%atts = x%atts
 
-  select case (x%data_type)
+  select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_FLOAT
+      res%dtype = NC_FLOAT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp ** y
       nullify (xp, resp)
     end block
@@ -6253,12 +6253,12 @@ module function pow_var_real32(x, y) result(res)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_FLOAT
+      res%dtype = NC_FLOAT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp ** y
       nullify (xp, resp)
     end block
@@ -6268,12 +6268,12 @@ module function pow_var_real32(x, y) result(res)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_FLOAT
+      res%dtype = NC_FLOAT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp ** y
       nullify (xp, resp)
     end block
@@ -6283,12 +6283,12 @@ module function pow_var_real32(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp
       resp = resp ** y
       nullify (xp, resp)
@@ -6299,12 +6299,12 @@ module function pow_var_real32(x, y) result(res)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_FLOAT
+      res%dtype = NC_FLOAT
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp ** y
       nullify (xp, resp)
     end block
@@ -6314,12 +6314,12 @@ module function pow_var_real32(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp ** y
       nullify (xp, resp)
     end block
@@ -6332,11 +6332,11 @@ module function pow_real32_var(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = y%name
-  res%length = y%length
-  res%dimensions = y%dimensions
-  res%attributes = y%attributes
+  res%len = y%len
+  res%dims = y%dims
+  res%atts = y%atts
 
-  select case (y%data_type)
+  select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
@@ -6345,9 +6345,9 @@ module function pow_real32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x ** yp
       nullify (yp, resp)
     end block
@@ -6359,9 +6359,9 @@ module function pow_real32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x ** yp
       nullify (yp, resp)
     end block
@@ -6373,9 +6373,9 @@ module function pow_real32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x ** yp
       nullify (yp, resp)
     end block
@@ -6387,9 +6387,9 @@ module function pow_real32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x
       resp = resp ** yp
       nullify (yp, resp)
@@ -6402,9 +6402,9 @@ module function pow_real32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x ** yp
       nullify (yp, resp)
     end block
@@ -6416,9 +6416,9 @@ module function pow_real32_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x ** yp
       nullify (yp, resp)
     end block
@@ -6431,23 +6431,23 @@ module function pow_var_real64(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = x%name
-  res%length = x%length
-  res%dimensions = x%dimensions
-  res%attributes = x%attributes
+  res%len = x%len
+  res%dims = x%dims
+  res%atts = x%atts
 
-  select case (x%data_type)
+  select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp ** y
       nullify (xp, resp)
     end block
@@ -6457,12 +6457,12 @@ module function pow_var_real64(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp ** y
       nullify (xp, resp)
     end block
@@ -6472,12 +6472,12 @@ module function pow_var_real64(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp ** y
       nullify (xp, resp)
     end block
@@ -6487,12 +6487,12 @@ module function pow_var_real64(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp ** y
       nullify (xp, resp)
     end block
@@ -6502,12 +6502,12 @@ module function pow_var_real64(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp ** y
       nullify (xp, resp)
     end block
@@ -6517,12 +6517,12 @@ module function pow_var_real64(x, y) result(res)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
 
-      res%data_type = NC_DOUBLE
+      res%dtype = NC_DOUBLE
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       resp = xp ** y
       nullify (xp, resp)
     end block
@@ -6535,11 +6535,11 @@ module function pow_real64_var(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = y%name
-  res%length = y%length
-  res%dimensions = y%dimensions
-  res%attributes = y%attributes
+  res%len = y%len
+  res%dims = y%dims
+  res%atts = y%atts
 
-  select case (y%data_type)
+  select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
@@ -6548,9 +6548,9 @@ module function pow_real64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x ** yp
       nullify (yp, resp)
     end block
@@ -6562,9 +6562,9 @@ module function pow_real64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x ** yp
       nullify (yp, resp)
     end block
@@ -6576,9 +6576,9 @@ module function pow_real64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x ** yp
       nullify (yp, resp)
     end block
@@ -6590,9 +6590,9 @@ module function pow_real64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x ** yp
       nullify (yp, resp)
     end block
@@ -6604,9 +6604,9 @@ module function pow_real64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x ** yp
       nullify (yp, resp)
     end block
@@ -6618,9 +6618,9 @@ module function pow_real64_var(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = x ** yp
       nullify (yp, resp)
     end block

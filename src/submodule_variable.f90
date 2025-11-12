@@ -2,42 +2,42 @@ submodule(module_netcdf) submodule_variable
 implicit none (type, external)
 contains
 
-module impure elemental function get_variable(nc, name, exist) result(var)
+module impure elemental function get_var(nc, name, exist) result(var)
   type(netcdf_type), intent(in) :: nc
   character(len=*), intent(in) :: name
   logical, intent(out), optional :: exist
   type(variable_type) :: var
 
-  var = get_variable_(nc%id, name, exist)
-end function get_variable
+  var = get_var_(nc%id, name, exist)
+end function get_var
 
-impure elemental function get_variable_(ncid, name, exist) result(var)
+impure elemental function get_var_(ncid, name, exist) result(var)
   integer(c_int), intent(in) :: ncid
   character(len=*), intent(in) :: name
   logical, intent(out) :: exist
   type(variable_type), target :: var
 
-  var = inquire_variable_(ncid, name, exist)
-  zero_size_var: if (var%length == 0) then
+  var = inq_var_(ncid, name, exist)
+  zero_size_var: if (var%len == 0) then
     if (allocated(var%buffer)) deallocate (var%buffer)
     return
   end if zero_size_var
 
   call allocate_buffer(var)
   call handle_error(nc_get_var(ncid, var%id, c_loc(var%buffer(1))), &
-    & "[get_variable_] Invalid variable.")
-end function get_variable_
+    & "[get_var_] Invalid variable.")
+end function get_var_
 
-module impure elemental function inquire_variable(nc, name, exist) result(var)
+module impure elemental function inq_var(nc, name, exist) result(var)
   type(netcdf_type), intent(in) :: nc
   character(len=*), intent(in) :: name
   logical, intent(out), optional :: exist
   type(variable_type) :: var
 
-  var = inquire_variable_(nc%id, name, exist)
-end function inquire_variable
+  var = inq_var_(nc%id, name, exist)
+end function inq_var
 
-impure elemental function inquire_variable_(ncid, name, exist) result(var)
+impure elemental function inq_var_(ncid, name, exist) result(var)
   integer(c_int), intent(in) :: ncid
   character(len=*), intent(in) :: name
   logical, intent(out), optional :: exist
@@ -54,27 +54,27 @@ impure elemental function inquire_variable_(ncid, name, exist) result(var)
   end if
   call handle_error(stat)
 
-  call handle_error(nc_inq_vartype(ncid, var%id, var%data_type))
-  var%attributes = get_attributes_(ncid, var%id, atts_exist)
-  if (.not. atts_exist .and. allocated(var%attributes)) deallocate(var%attributes)
-  var%dimensions = inquire_dimensions_(ncid, var%id)
-  var%length = 1
-  do i = 1, size(var%dimensions)
-    var%length = var%length*var%dimensions(i)%length
+  call handle_error(nc_inq_vartype(ncid, var%id, var%dtype))
+  var%atts = get_atts_(ncid, var%id, atts_exist)
+  if (.not. atts_exist .and. allocated(var%atts)) deallocate(var%atts)
+  var%dims = inq_dims_(ncid, var%id)
+  var%len = 1
+  do i = 1, size(var%dims)
+    var%len = var%len*var%dims(i)%len
   end do
-end function inquire_variable_
+end function inq_var_
 
-module impure elemental subroutine put_variable(nc, var)
+module impure elemental subroutine put_var(nc, var)
   type(netcdf_type), intent(in) :: nc
   type(variable_type), target, intent(in) :: var
   type(variable_type) :: tmp
 
-  tmp = define_variable_(nc, var)
-  if (allocated(var%attributes)) call put_attribute_variable(nc, tmp)
+  tmp = def_var_(nc, var)
+  if (allocated(var%atts)) call put_att_var(nc, tmp)
   call handle_error(nc_put_var(nc%id, tmp%id, c_loc(var%buffer(1))))
-end subroutine put_variable
+end subroutine put_var
 
-impure elemental function define_variable_(nc, var) result(new_var)
+impure elemental function def_var_(nc, var) result(new_var)
   type(netcdf_type), intent(in) :: nc
   type(variable_type), target, intent(in) :: var
   type(variable_type) :: new_var
@@ -83,9 +83,9 @@ impure elemental function define_variable_(nc, var) result(new_var)
   type(dimension_type), allocatable :: new_dims(:)
   integer :: n, i, j
 
-  n = size(var%dimensions)
+  n = size(var%dims)
   allocate (new_dims(n), new_dimids(n))
-  new_dims = define_dimension(nc, var%dimensions)
+  new_dims = define_dimension(nc, var%dims)
   !> Reverse dimension since we use C APIs.
   do i = 1, n
     j = n - i + 1
@@ -93,10 +93,10 @@ impure elemental function define_variable_(nc, var) result(new_var)
   end do
 
   call handle_error(nc_def_var(nc%id, f2cstr(var%name), &
-    & var%data_type, size(new_dims), new_dimids, varid))
+    & var%dtype, size(new_dims), new_dimids, varid))
   new_var%id = varid
-  if (allocated(var%attributes)) new_var%attributes = var%attributes
-end function define_variable_
+  if (allocated(var%atts)) new_var%atts = var%atts
+end function def_var_
 
 pure module function get_size(var, dim) result(n)
   type(variable_type), intent(in) :: var
@@ -104,8 +104,8 @@ pure module function get_size(var, dim) result(n)
   integer(int64) :: n
   integer :: dim_, i
 
-  if (.not. allocated(var%dimensions)) &
-    & error stop "[get_size] Invalid dimensions."
+  if (.not. allocated(var%dims)) &
+    & error stop "[get_size] Invalid dims."
 
   if (present(dim)) then
     dim_ = dim
@@ -116,12 +116,12 @@ pure module function get_size(var, dim) result(n)
   n = 1
   select case (dim_)
   case (0)
-    do i = 1, size(var%dimensions)
-      n = n*var%dimensions(i)%length
+    do i = 1, size(var%dims)
+      n = n*var%dims(i)%len
     end do
   case (1:)
-    i = size(var%dimensions) - dim_ + 1
-    n = var%dimensions(i)%length
+    i = size(var%dims) - dim_ + 1
+    n = var%dims(i)%len
   case default
     error stop "[get_size] Invalid dim."
   end select
@@ -132,9 +132,9 @@ pure module function get_shape(var) result(n)
   integer(int64), allocatable :: n(:)
   integer :: ndims, i
 
-  if (.not. allocated(var%dimensions)) &
-    & error stop "[get_size] Invalid dimensions."
-  ndims = size(var%dimensions)
+  if (.not. allocated(var%dims)) &
+    & error stop "[get_size] Invalid dims."
+  ndims = size(var%dims)
   if (.not. allocated(n)) then
     allocate (n(ndims))
   else if (size(n) /= ndims) then
@@ -143,20 +143,20 @@ pure module function get_shape(var) result(n)
   end if
 
   do i = 1, ndims
-    n(i) = var%dimensions(i)%length
+    n(i) = var%dims(i)%len
   end do
 end function get_shape
 
-pure module subroutine allocate_buffer_variable(var)
+pure module subroutine allocate_buffer_var(var)
   type(variable_type), intent(inout) :: var
   integer(int64) :: buffer_size
 
-  !> Assuming var%data_type and var%length is properly initialized.
-  buffer_size = get_buffer_size(var%data_type, var%length)
+  !> Assuming var%dtype and var%len is properly initialized.
+  buffer_size = get_buffer_size(var%dtype, var%len)
   if (allocation_required(var%buffer, buffer_size)) then
     if (allocated(var%buffer)) deallocate (var%buffer)
     allocate (var%buffer(buffer_size))
   end if
-end subroutine allocate_buffer_variable
+end subroutine allocate_buffer_var
 
 end submodule submodule_variable

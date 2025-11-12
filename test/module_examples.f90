@@ -31,10 +31,10 @@ subroutine simple_rd(passed)
   nc = open_dataset("simple_wr.nc", "r")
   var = inquire_variable(nc, "data", exist)
   passed = &
-    var%dimensions(1)%name == "x" .and. &
-    var%dimensions(1)%length == nx .and. &
-    var%dimensions(2)%name == "y" .and. &
-    var%dimensions(2)%length == ny
+    var%dims(1)%name == "x" .and. &
+    var%dims(1)%len == nx .and. &
+    var%dims(2)%name == "y" .and. &
+    var%dims(2)%len == ny
   call close_dataset(nc)
 end subroutine simple_rd
 
@@ -81,22 +81,22 @@ subroutine sfc_pres_temp_rd(passed)
 
   nc = open_dataset("sfc_pres_temp_wr.nc", "r")
   var = inquire_variable(nc, "pressure", exist)
-  associate (dims => var%dimensions)
+  associate (dims => var%dims)
     passed = exist .and. &
       & dims(1)%name == "latitude" .and. &
-      & dims(1)%length == 47 .and. &
+      & dims(1)%len == 47 .and. &
       & dims(2)%name == "longitude" .and. &
-      & dims(2)%length == 360
+      & dims(2)%len == 360
   end associate
   if (.not. passed) return
 
   var = inquire_variable(nc, "temperature", exist)
-  associate (dims => var%dimensions)
+  associate (dims => var%dims)
     passed = exist .and. &
       & dims(1)%name == "latitude" .and. &
-      & dims(1)%length == 47 .and. &
+      & dims(1)%len == 47 .and. &
       & dims(2)%name == "longitude" .and. &
-      & dims(2)%length == 360
+      & dims(2)%len == 360
   end associate
 end subroutine sfc_pres_temp_rd
 

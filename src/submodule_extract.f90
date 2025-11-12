@@ -8,7 +8,7 @@ module subroutine extract_att_int8_1d(att, ptr)
   type(c_ptr) :: cptr
 
   cptr = c_loc(att%buffer(1))
-  call c_f_pointer(cptr, ptr, [att%length])
+  call c_f_pointer(cptr, ptr, [att%len])
 end subroutine extract_att_int8_1d
 
 module subroutine extract_att_int8_scalar(att, ptr)
@@ -16,7 +16,7 @@ module subroutine extract_att_int8_scalar(att, ptr)
   integer(int8), pointer, intent(out) :: ptr
   type(c_ptr) :: cptr
 
-  if (att%length /= 1) error stop &
+  if (att%len /= 1) error stop &
     & "[extract_att_int8_scalar] Not a scalar."
   cptr = c_loc(att%buffer(1))
   call c_f_pointer(cptr, ptr)
@@ -105,7 +105,7 @@ module subroutine extract_att_int16_1d(att, ptr)
   type(c_ptr) :: cptr
 
   cptr = c_loc(att%buffer(1))
-  call c_f_pointer(cptr, ptr, [att%length])
+  call c_f_pointer(cptr, ptr, [att%len])
 end subroutine extract_att_int16_1d
 
 module subroutine extract_att_int16_scalar(att, ptr)
@@ -113,7 +113,7 @@ module subroutine extract_att_int16_scalar(att, ptr)
   integer(int16), pointer, intent(out) :: ptr
   type(c_ptr) :: cptr
 
-  if (att%length /= 1) error stop &
+  if (att%len /= 1) error stop &
     & "[extract_att_int16_scalar] Not a scalar."
   cptr = c_loc(att%buffer(1))
   call c_f_pointer(cptr, ptr)
@@ -202,7 +202,7 @@ module subroutine extract_att_int32_1d(att, ptr)
   type(c_ptr) :: cptr
 
   cptr = c_loc(att%buffer(1))
-  call c_f_pointer(cptr, ptr, [att%length])
+  call c_f_pointer(cptr, ptr, [att%len])
 end subroutine extract_att_int32_1d
 
 module subroutine extract_att_int32_scalar(att, ptr)
@@ -210,7 +210,7 @@ module subroutine extract_att_int32_scalar(att, ptr)
   integer(int32), pointer, intent(out) :: ptr
   type(c_ptr) :: cptr
 
-  if (att%length /= 1) error stop &
+  if (att%len /= 1) error stop &
     & "[extract_att_int32_scalar] Not a scalar."
   cptr = c_loc(att%buffer(1))
   call c_f_pointer(cptr, ptr)
@@ -299,7 +299,7 @@ module subroutine extract_att_int64_1d(att, ptr)
   type(c_ptr) :: cptr
 
   cptr = c_loc(att%buffer(1))
-  call c_f_pointer(cptr, ptr, [att%length])
+  call c_f_pointer(cptr, ptr, [att%len])
 end subroutine extract_att_int64_1d
 
 module subroutine extract_att_int64_scalar(att, ptr)
@@ -307,7 +307,7 @@ module subroutine extract_att_int64_scalar(att, ptr)
   integer(int64), pointer, intent(out) :: ptr
   type(c_ptr) :: cptr
 
-  if (att%length /= 1) error stop &
+  if (att%len /= 1) error stop &
     & "[extract_att_int64_scalar] Not a scalar."
   cptr = c_loc(att%buffer(1))
   call c_f_pointer(cptr, ptr)
@@ -396,7 +396,7 @@ module subroutine extract_att_real32_1d(att, ptr)
   type(c_ptr) :: cptr
 
   cptr = c_loc(att%buffer(1))
-  call c_f_pointer(cptr, ptr, [att%length])
+  call c_f_pointer(cptr, ptr, [att%len])
 end subroutine extract_att_real32_1d
 
 module subroutine extract_att_real32_scalar(att, ptr)
@@ -404,7 +404,7 @@ module subroutine extract_att_real32_scalar(att, ptr)
   real(real32), pointer, intent(out) :: ptr
   type(c_ptr) :: cptr
 
-  if (att%length /= 1) error stop &
+  if (att%len /= 1) error stop &
     & "[extract_att_real32_scalar] Not a scalar."
   cptr = c_loc(att%buffer(1))
   call c_f_pointer(cptr, ptr)
@@ -493,7 +493,7 @@ module subroutine extract_att_real64_1d(att, ptr)
   type(c_ptr) :: cptr
 
   cptr = c_loc(att%buffer(1))
-  call c_f_pointer(cptr, ptr, [att%length])
+  call c_f_pointer(cptr, ptr, [att%len])
 end subroutine extract_att_real64_1d
 
 module subroutine extract_att_real64_scalar(att, ptr)
@@ -501,7 +501,7 @@ module subroutine extract_att_real64_scalar(att, ptr)
   real(real64), pointer, intent(out) :: ptr
   type(c_ptr) :: cptr
 
-  if (att%length /= 1) error stop &
+  if (att%len /= 1) error stop &
     & "[extract_att_real64_scalar] Not a scalar."
   cptr = c_loc(att%buffer(1))
   call c_f_pointer(cptr, ptr)

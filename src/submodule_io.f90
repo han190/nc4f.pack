@@ -2,7 +2,7 @@ submodule(module_netcdf) submodule_io
 implicit none (type, external)
 contains
 
-module subroutine write_formatted_variable(var, unit, iotype, v_list, iostat, iomsg)
+module subroutine write_formatted_var(var, unit, iotype, v_list, iostat, iomsg)
   class(variable_type), intent(in) :: var
   integer, intent(in) :: unit
   character(len=*), intent(in) :: iotype
@@ -18,7 +18,7 @@ module subroutine write_formatted_variable(var, unit, iotype, v_list, iostat, io
   iostat = 999
   if (iotype == 'LISTDIRECTED' .or. iotype == 'DT') then
     fmt = "(2a)"
-    select case (var%data_type)
+    select case (var%dtype)
     case (NC_FLOAT)
       title_str = 'real(real32)::'//var%name
     case (NC_DOUBLE)
@@ -34,10 +34,10 @@ module subroutine write_formatted_variable(var, unit, iotype, v_list, iostat, io
     case (NC_CHAR)
       title_str = 'character(len=*)::'//var%name
     case default
-      error stop "[write_formatted_variable] Unsupported type."
+      error stop "[write_formatted_var] Unsupported type."
     end select
 
-    ndim = size(var%dimensions)
+    ndim = size(var%dims)
     if (ndim > 1) then
       write (ndim_str, "(i0)") ndim - 1
       fmt = "(1x, '(', "//trim(ndim_str)//"(DT, ',', 1x), DT, ')')"
@@ -45,17 +45,17 @@ module subroutine write_formatted_variable(var, unit, iotype, v_list, iostat, io
       write (ndim_str, "(i0)") ndim
       fmt = "(1x, '(', DT, ')')"
     else if (ndim == 0) then
-      error stop "[write_formatted_variable] Invalid dimension."
+      error stop "[write_formatted_var] Invalid dimension."
     end if
-    write (dim_str, fmt) (var%dimensions(i), i=1, ndim)
+    write (dim_str, fmt) (var%dims(i), i=1, ndim)
     write (unit, "(a)") trim(title_str)//trim(dim_str)
-    if (allocated(var%attributes)) &
-      & write (unit, "(/, *(4x, DT, /))") var%attributes
+    if (allocated(var%atts)) &
+      & write (unit, "(/, *(4x, DT, /))") var%atts
     iostat = 0
   end if
-end subroutine write_formatted_variable
+end subroutine write_formatted_var
 
-module subroutine write_formatted_attribute(att, unit, iotype, v_list, iostat, iomsg)
+module subroutine write_formatted_att(att, unit, iotype, v_list, iostat, iomsg)
   class(attribute_type), target, intent(in) :: att
   integer, intent(in) :: unit
   character(len=*), intent(in) :: iotype
@@ -71,11 +71,11 @@ module subroutine write_formatted_attribute(att, unit, iotype, v_list, iostat, i
   ptr = c_loc(att%buffer(1))
 
   if (iotype == 'LISTDIRECTED' .or. iotype == 'DT') then
-    select case (att%data_type)
+    select case (att%dtype)
     case (NC_FLOAT)
       block
         real(real32), pointer :: fptr(:) => null()
-        call c_f_pointer(ptr, fptr, [att%length])
+        call c_f_pointer(ptr, fptr, [att%len])
         write (unit, "(2(a), 1x, '=', *(1x, g0.6))") &
           & 'real(real32)::', att%name, fptr
         nullify (fptr)
@@ -83,7 +83,7 @@ module subroutine write_formatted_attribute(att, unit, iotype, v_list, iostat, i
     case (NC_DOUBLE)
       block
         real(real64), pointer :: fptr(:) => null()
-        call c_f_pointer(ptr, fptr, [att%length])
+        call c_f_pointer(ptr, fptr, [att%len])
         write (unit, "(2(a), 1x, '=', *(1x, g0.6))") &
           & 'real(real64)::', att%name, fptr
         nullify (fptr)
@@ -91,7 +91,7 @@ module subroutine write_formatted_attribute(att, unit, iotype, v_list, iostat, i
     case (NC_BYTE)
       block
         integer(int8), pointer :: fptr(:) => null()
-        call c_f_pointer(ptr, fptr, [att%length])
+        call c_f_pointer(ptr, fptr, [att%len])
         write (unit, "(2(a), 1x, '=', *(1x, i0))") &
           & 'integer(int8)::', att%name, fptr
         nullify (fptr)
@@ -99,7 +99,7 @@ module subroutine write_formatted_attribute(att, unit, iotype, v_list, iostat, i
     case (NC_SHORT)
       block
         integer(int16), pointer :: fptr(:) => null()
-        call c_f_pointer(ptr, fptr, [att%length])
+        call c_f_pointer(ptr, fptr, [att%len])
         write (unit, "(2(a), 1x, '=', *(1x, i0))") &
           & 'integer(int16)::', att%name, fptr
         nullify (fptr)
@@ -107,7 +107,7 @@ module subroutine write_formatted_attribute(att, unit, iotype, v_list, iostat, i
     case (NC_INT)
       block
         integer(int32), pointer :: fptr(:) => null()
-        call c_f_pointer(ptr, fptr, [att%length])
+        call c_f_pointer(ptr, fptr, [att%len])
         write (unit, "(2(a), 1x, '=', *(1x, i0))") &
           & 'integer(int32)::', att%name, fptr
         nullify (fptr)
@@ -115,7 +115,7 @@ module subroutine write_formatted_attribute(att, unit, iotype, v_list, iostat, i
     case (NC_INT64)
       block
         integer(int64), pointer :: fptr(:) => null()
-        call c_f_pointer(ptr, fptr, [att%length])
+        call c_f_pointer(ptr, fptr, [att%len])
         write (unit, "(2(a), 1x, '=', *(1x, i0))") &
           & 'integer(int64)::', att%name, fptr
         nullify (fptr)
@@ -123,19 +123,19 @@ module subroutine write_formatted_attribute(att, unit, iotype, v_list, iostat, i
     case (NC_CHAR)
       block
         character(kind=c_char), pointer :: fptr(:) => null()
-        call c_f_pointer(ptr, fptr, [att%length])
+        call c_f_pointer(ptr, fptr, [att%len])
         write (unit, "(4(g0), 1x, '=', 1x, *(a))") &
-          & 'character(len=', att%length, ')::', att%name, fptr
+          & 'character(len=', att%len, ')::', att%name, fptr
         nullify (fptr)
       end block
     case default
-      error stop "[write_formatted_attribute] Invalid attribute type."
+      error stop "[write_formatted_att] Invalid attribute type."
     end select
     iostat = 0
   end if
-end subroutine write_formatted_attribute
+end subroutine write_formatted_att
 
-module subroutine write_formatted_dimension(dim, unit, iotype, v_list, iostat, iomsg)
+module subroutine write_formatted_dim(dim, unit, iotype, v_list, iostat, iomsg)
   class(dimension_type), intent(in) :: dim
   integer, intent(in) :: unit
   character(len=*), intent(in) :: iotype
@@ -149,14 +149,14 @@ module subroutine write_formatted_dimension(dim, unit, iotype, v_list, iostat, i
 
   iostat = 999
   if (iotype == 'LISTDIRECTED' .or. iotype == 'DT') then
-    if (dim%is_unlimited) then
+    if (dim%is_unlim) then
       fmt = "(a, '(unlimited):', i0)"
     else
       fmt = "(a, ':', i0)"
     end if
-    write (unit, fmt) dim%name, dim%length
+    write (unit, fmt) dim%name, dim%len
     iostat = 0
   end if
-end subroutine write_formatted_dimension
+end subroutine write_formatted_dim
 
 end submodule submodule_io

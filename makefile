@@ -1,7 +1,8 @@
 SRC_DIR := src
 FYPP_DIR := fypp
 BUILD_DIR := build
-TARGET := test
+TEST_DIR := test
+LIB := $(BUILD_DIR)/ncpack.a
 PROFILE ?= release
 FC := gfortran
 NCFLAGS := $(shell pkg-config --cflags --libs netcdf-fortran)
@@ -62,10 +63,16 @@ SRC_FILES := \
 # F90_SOURCES := $(filter %.f90,$(SRC_FILES))
 OBJ_FILES := $(patsubst $(SRC_DIR)/%.f90,$(BUILD_DIR)/%.o,$(SRC_FILES))
 
-.PHONY: all library prepare preprocess build clean
+TEST_FILES := \
+	$(TEST_DIR)/module_examples.f90 \
+	$(TEST_DIR)/module_test.f90 \
+	$(TEST_DIR)/test.f90
+TEST_OBJ_FILES := $(patsubst $(TEST_DIR)/%.f90,$(BUILD_DIR)/%.o,$(TEST_FILES))
+
+.PHONY: all library prepare preprocess build test clean 
 
 library: build
-	@ar rcs $(BUILD_DIR)/ncpack.a $(OBJ_FILES)
+	@ar rcs $(LIB) $(OBJ_FILES)
 build: preprocess $(OBJ_FILES)
 preprocess: prepare $(INC_FILES) $(F90_FILES)
 prepare:
@@ -80,6 +87,9 @@ $(SRC_DIR)/%.f90: $(FYPP_DIR)/%.fypp
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 
+$(BUILD_DIR)/%.o: $(TEST_DIR)/%.f90 $(LIB)
+	$(FC) -c $(FFLAGS) $< -o $@ -L$(LIB)
+
 clean:
 	$(RM) $(INC_FILES) $(F90_FILES)
-	$(RM) $(BUILD_DIR)/*
+	$(RM) -r $(BUILD_DIR)/

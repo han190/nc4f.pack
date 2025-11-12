@@ -4,10 +4,10 @@
 #! ----------------------
 interface operator(.att.)
   #: for K in kinds
-  module procedure :: new_attribute_${K}$
-  module procedure :: new_attribute_${K}$_scalar
+  module procedure :: new_att_${K}$
+  module procedure :: new_att_${K}$_scalar
   #: endfor
-  module procedure :: new_attribute_character
+  module procedure :: new_att_character
 end interface operator(.att.)
 
 #! ----------------
@@ -15,20 +15,20 @@ end interface operator(.att.)
 #! ----------------
 interface
   #: for T, K in zip(types, kinds)
-  module function new_attribute_${K}$(name, values) result(att)
+  module function new_att_${K}$(name, values) result(att)
     character(len=*), intent(in) :: name
     ${T}$(${K}$), intent(in) :: values(:)
     type(attribute_type), target :: att
-  end function new_attribute_${K}$${newline}$
-  module function new_attribute_${K}$_scalar(name, value) result(att)
+  end function new_att_${K}$${newline}$
+  module function new_att_${K}$_scalar(name, value) result(att)
     character(len=*), intent(in) :: name
     ${T}$(${K}$), intent(in) :: value
     type(attribute_type), target :: att
-  end function new_attribute_${K}$_scalar${newline}$
+  end function new_att_${K}$_scalar${newline}$
   #: endfor
-  module function new_attribute_character(name, value) result(att)
+  module function new_att_character(name, value) result(att)
     character(len=*), intent(in) :: name
     character(len=*), intent(in) :: value
     type(attribute_type), target :: att
-  end function new_attribute_character
+  end function new_att_character
 end interface

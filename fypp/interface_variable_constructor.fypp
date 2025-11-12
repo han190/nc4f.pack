@@ -5,7 +5,7 @@
 interface data_array
   #: for K in kinds
   #: for R in range(1, MAX_RANK+1)
-  module procedure :: new_variable_${K}$_${R}$d
+  module procedure :: new_var_${K}$_${R}$d
   #: endfor
   #: endfor
 end interface
@@ -16,13 +16,13 @@ end interface
 interface
   #: for T, K in zip(types, kinds)
   #: for R in range(1, MAX_RANK+1)
-  module function new_variable_${K}$_${R}$d(name, values, dims, atts) result(var)
+  module function new_var_${K}$_${R}$d(name, values, dims, atts) result(var)
     character(len=*), intent(in) :: name
     ${T}$(${K}$), target, intent(in) :: values(${COLONS(R)}$)
     type(dimension_type), intent(in) :: dims(:)
     type(attribute_type), intent(in), optional :: atts(:)
     type(variable_type), target :: var
-  end function new_variable_${K}$_${R}$d${newline}$
+  end function new_var_${K}$_${R}$d${newline}$
   #:endfor
   #:endfor
 end interface

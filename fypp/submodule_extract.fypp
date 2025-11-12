@@ -11,14 +11,14 @@ module subroutine extract_att_${K}$_${R}$d(att, ptr)
   type(c_ptr) :: cptr
 
   cptr = c_loc(att%buffer(1))
-  call c_f_pointer(cptr, ptr, [att%length])
+  call c_f_pointer(cptr, ptr, [att%len])
 end subroutine extract_att_${K}$_${R}$d${newline}$
 module subroutine extract_att_${K}$_scalar(att, ptr)
   type(attribute_type), target, intent(in) :: att
   ${T}$(${K}$), pointer, intent(out) :: ptr
   type(c_ptr) :: cptr
 
-  if (att%length /= 1) error stop &
+  if (att%len /= 1) error stop &
     & "[extract_att_${K}$_scalar] Not a scalar."
   cptr = c_loc(att%buffer(1))
   call c_f_pointer(cptr, ptr)

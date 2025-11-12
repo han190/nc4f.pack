@@ -7,18 +7,18 @@ module function ${N}$_vars(x, y) result(res)
   type(variable_type), target, intent(in) :: x, y
   type(variable_type), target :: res
 
-  if (any(x%dimensions /= y%dimensions)) &
-    & error stop "[add_vars] Unequal dimensions."
-  if (x%data_type /= y%data_type) &
+  if (any(x%dims /= y%dims)) &
+    & error stop "[add_vars] Unequal dims."
+  if (x%dtype /= y%dtype) &
     & error stop "[add_vars] Unequal data type."
 
   res%name = x%name
-  res%data_type = x%data_type
-  res%length = x%length
-  res%dimensions = x%dimensions
-  res%attributes = x%attributes
+  res%dtype = x%dtype
+  res%len = x%len
+  res%dims = x%dims
+  res%atts = x%atts
 
-  select case (x%data_type)
+  select case (x%dtype)
   #: for C, T, K in zip(nc_types, types, kinds)
   case (${C}$)
     block
@@ -27,11 +27,11 @@ module function ${N}$_vars(x, y) result(res)
 
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       resp = xp ${O}$ yp
       nullify (xp, yp, resp)
     end block
@@ -45,11 +45,11 @@ module function ${N}$_var_${K1}$(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = x%name
-  res%length = x%length
-  res%dimensions = x%dimensions
-  res%attributes = x%attributes
+  res%len = x%len
+  res%dims = x%dims
+  res%atts = x%atts
 
-  select case (x%data_type)
+  select case (x%dtype)
   #: for I, C, T, K in zip(indices, nc_types, types, kinds)
   case (${C}$)
     block
@@ -60,12 +60,12 @@ module function ${N}$_var_${K1}$(x, y) result(res)
       type(c_ptr) :: cptr
 
       #: set TYPE_SEL = COMPARE_TYPES3(I1, I)
-      res%data_type = ${TYPE_SEL}$
+      res%dtype = ${TYPE_SEL}$
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%length])
+      call c_f_pointer(cptr, xp, [x%len])
       #: set RESULT = COMPARE_TYPES4(I1, I)
       #: if RESULT == '1'
       resp = xp ${O}$ y
@@ -84,11 +84,11 @@ module function ${N}$_${K1}$_var(x, y) result(res)
   type(variable_type), target :: res
 
   res%name = y%name
-  res%length = y%length
-  res%dimensions = y%dimensions
-  res%attributes = y%attributes
+  res%len = y%len
+  res%dims = y%dims
+  res%atts = y%atts
 
-  select case (y%data_type)
+  select case (y%dtype)
   #: for I, C, T, K in zip(indices, nc_types, types, kinds)
   case (${C}$)
     block
@@ -101,9 +101,9 @@ module function ${N}$_${K1}$_var(x, y) result(res)
       #: set TYPE_SEL = COMPARE_TYPES3(I1, I)
       call allocate_buffer(res)
       cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%length])
+      call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%length])
+      call c_f_pointer(cptr, yp, [y%len])
       #: set RESULT = COMPARE_TYPES4(I1, I)
       #: if RESULT == '1'
       resp = x ${O}$ yp

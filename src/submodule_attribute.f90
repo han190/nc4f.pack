@@ -2,21 +2,21 @@ submodule(module_netcdf) submodule_attribute
 implicit none (type, external)
 contains
 
-impure elemental module function get_attribute_name(nc, name) result(att)
+impure elemental module function get_att_nc(nc, name) result(att)
   type(netcdf_type), intent(in) :: nc
   character(len=*), intent(in) :: name
   type(attribute_type) :: att
 
-  att = get_attribute_(nc%id, NC_GLOBAL, f2cstr(trim(adjustl(name))))
-end function get_attribute_name
+  att = get_att_(nc%id, NC_GLOBAL, f2cstr(trim(adjustl(name))))
+end function get_att_nc
 
-module function get_attributes_global(nc) result(atts)
+module function get_atts_nc(nc) result(atts)
   type(netcdf_type), intent(in) :: nc
   type(attribute_type), allocatable :: atts(:)
-  atts = get_attributes_(nc%id, NC_GLOBAL)
-end function get_attributes_global
+  atts = get_atts_(nc%id, NC_GLOBAL)
+end function get_atts_nc
 
-module function get_attributes_(ncid, varid, exist) result(atts)
+module function get_atts_(ncid, varid, exist) result(atts)
   integer(c_int), intent(in) :: ncid, varid
   logical, intent(inout), optional :: exist
   type(attribute_type), allocatable :: atts(:)
@@ -45,78 +45,78 @@ module function get_attributes_(ncid, varid, exist) result(atts)
 
   do i = 0, natts - 1
     call handle_error(nc_inq_attname(ncid, varid, i, name))
-    atts(i + 1) = get_attribute_(ncid, varid, c2fstr(name))
+    atts(i + 1) = get_att_(ncid, varid, c2fstr(name))
   end do
-end function get_attributes_
+end function get_atts_
 
-impure elemental function get_attribute_(ncid, varid, name) result(att)
+impure elemental function get_att_(ncid, varid, name) result(att)
   integer(c_int), intent(in) :: ncid, varid
   character(len=*), intent(in) :: name
   type(attribute_type), target :: att
-  integer(c_int) :: data_type
-  integer(c_size_t) :: length
+  integer(c_int) :: dtype
+  integer(c_size_t) :: len
   integer(int64) :: buffer_size
 
   att%name = trim(adjustl(name))
   call handle_error(nc_inq_att(ncid, varid, &
-    & f2cstr(att%name), xtypep=data_type, lenp=length), &
-    & "[get_attribute_] Invalid attribute: "//att%name//".")
-  att%length = length
-  att%data_type = data_type
+    & f2cstr(att%name), xtypep=dtype, lenp=len), &
+    & "[get_att_] Invalid attribute: "//att%name//".")
+  att%len = len
+  att%dtype = dtype
 
-  zero_size_attr: if (att%length == 0) then
+  zero_size_attr: if (att%len == 0) then
     if (allocated(att%buffer)) deallocate (att%buffer)
     return
   end if zero_size_attr
 
-  buffer_size = get_buffer_size(data_type, length)
+  buffer_size = get_buffer_size(dtype, len)
   if (allocation_required(att%buffer, buffer_size)) then
     if (allocated(att%buffer)) deallocate (att%buffer)
     allocate (att%buffer(buffer_size))
   end if
   call handle_error(nc_get_att(ncid, varid, &
     & f2cstr(att%name), c_loc(att%buffer(1))), &
-    & "[get_attribute_] Invalid attribute.")
-end function get_attribute_
+    & "[get_att_] Invalid attribute.")
+end function get_att_
 
-module impure elemental subroutine put_attribute_variable(nc, var)
+module impure elemental subroutine put_att_var(nc, var)
   type(netcdf_type), intent(in) :: nc
   type(variable_type), target, intent(in) :: var
   integer :: i
 
-  do i = 1, size(var%attributes)
-    associate (att => var%attributes(i))
+  do i = 1, size(var%atts)
+    associate (att => var%atts(i))
       call handle_error(nc_put_att(nc%id, var%id, f2cstr(att%name), &
-        & att%data_type, att%length, c_loc(att%buffer(1))), &
-        & "[put_attribute_] Invalid attribute.")
+        & att%dtype, att%len, c_loc(att%buffer(1))), &
+        & "[put_att_] Invalid attribute.")
     end associate
   end do
-end subroutine put_attribute_variable
+end subroutine put_att_var
 
-module impure elemental subroutine put_attribute_global(nc)
+module impure elemental subroutine put_att_nc(nc)
   type(netcdf_type), target, intent(in) :: nc
   integer(int64) :: i
 
-  if (.not. allocated(nc%attributes)) return
-  do i = 1, size(nc%attributes, kind=int64)
-    associate (att => nc%attributes(i))
+  if (.not. allocated(nc%atts)) return
+  do i = 1, size(nc%atts, kind=int64)
+    associate (att => nc%atts(i))
       call handle_error(nc_put_att(nc%id, NC_GLOBAL, f2cstr(att%name), &
-        & att%data_type, att%length, c_loc(att%buffer(1))), &
-        & "[put_attribute_] Invalid attribute.")
+        & att%dtype, att%len, c_loc(att%buffer(1))), &
+        & "[put_att_] Invalid attribute.")
     end associate
   end do
-end subroutine put_attribute_global
+end subroutine put_att_nc
 
-pure module subroutine allocate_buffer_attribute(att)
+pure module subroutine allocate_buffer_att(att)
   type(attribute_type), intent(inout) :: att
   integer(int64) :: buffer_size
 
-  !> Assuming att%data_type and att%length is properly initialized.
-  buffer_size = get_buffer_size(att%data_type, att%length)
+  !> Assuming att%dtype and att%len is properly initialized.
+  buffer_size = get_buffer_size(att%dtype, att%len)
   if (allocation_required(att%buffer, buffer_size)) then
     if (allocated(att%buffer)) deallocate (att%buffer)
     allocate (att%buffer(buffer_size))
   end if
-end subroutine allocate_buffer_attribute
+end subroutine allocate_buffer_att
 
 end submodule submodule_attribute

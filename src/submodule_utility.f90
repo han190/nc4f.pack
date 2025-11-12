@@ -61,14 +61,14 @@ pure logical module function allocation_required(buffer, buf_size)
   end if
 end function allocation_required
 
-module elemental function get_buffer_size(data_type, length) result(buffer_size)
-  integer(int32), intent(in) :: data_type
-  integer(int64), intent(in) :: length
+module elemental function get_buffer_size(dtype, len) result(buffer_size)
+  integer(int32), intent(in) :: dtype
+  integer(int64), intent(in) :: len
   integer(int64) :: buffer_size
   character(len=NC_MAX_NAME) :: data_name
   integer(int64) :: st_size
 
-  select case (data_type)
+  select case (dtype)
   case (NC_BYTE, NC_CHAR)
     st_size = storage_size(0_int8, kind=int64)
   case (NC_SHORT)
@@ -82,11 +82,11 @@ module elemental function get_buffer_size(data_type, length) result(buffer_size)
   case (NC_DOUBLE)
     st_size = storage_size(0.0_real64, kind=int64)
   case default
-    write (data_name, "(i0)") data_type
+    write (data_name, "(i0)") dtype
     error stop "[get_buffer_size] Unsupported type."// &
       & " Data type: "//trim(data_name)//"."
   end select
-  buffer_size = length*st_size/8
+  buffer_size = len*st_size/8
 end function get_buffer_size
 
 end submodule submodule_utility
