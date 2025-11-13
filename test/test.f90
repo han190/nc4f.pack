@@ -2,7 +2,7 @@ program main
 
 use, non_intrinsic :: module_test
 use, non_intrinsic :: module_examples
-implicit none
+implicit none (type, external)
 
 type(test_type), allocatable :: tests(:)
 tests = [&

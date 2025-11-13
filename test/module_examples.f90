@@ -2,6 +2,12 @@ module module_examples
 use, non_intrinsic :: module_netcdf
 implicit none (type, external)
 
+public :: simple_wr
+public :: simple_rd
+public :: sfc_pres_temp_wr
+public :: sfc_pres_temp_rd
+private
+
 contains
 
 subroutine simple_wr(passed)

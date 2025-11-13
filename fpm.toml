@@ -1,4 +1,4 @@
-name = "netcdf.pack"
+name = "netcdf_pack"
 version = "0.0.1"
 license = "MIT"
 maintainer = "htang23@ncsu.edu"
@@ -23,3 +23,7 @@ source-dir = "src"
 name = "test"
 source-dir = "test"
 main = "test.f90"
+
+[extra.fortitude.check]
+ignore = ['C002', 'C071', 'C072', 'C121']
+line-length = 120

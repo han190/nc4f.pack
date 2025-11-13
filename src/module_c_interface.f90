@@ -40,9 +40,9 @@ interface
 
   function nc_open(path, mode, ncidp) bind(c, name="nc_open")
     import :: c_char, c_int
-    character(kind=c_char), dimension(*) :: path
+    character(kind=c_char), intent(in) :: path(*)
     integer(c_int), value :: mode
-    integer(c_int) :: ncidp
+    integer(c_int), intent(out) :: ncidp
     integer(c_int) :: nc_open
   end function nc_open
 
