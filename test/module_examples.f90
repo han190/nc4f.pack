@@ -48,11 +48,12 @@ subroutine sfc_pres_temp_wr(passed)
   logical, intent(inout) :: passed
   !> Example: sfc_pres_temp_wr
   integer, parameter :: nlat = 47, nlon = 360
-  real :: pres(nlat, nlon), temp(nlat, nlon)
+  real, allocatable :: pres(:, :), temp(:, :)
   real :: lats(nlat), lons(nlon)
   integer :: ilat, ilon
   type(variable_type) :: vars(4)
 
+  allocate (pres(nlon, nlat), temp(nlon, nlat))
   do concurrent(ilon=1:nlon, ilat=1:nlat)
     lats(ilat) = 90.0 - ilat + 1
     lons(ilon) = merge(ilon - 360, ilon, ilon > 180)
@@ -82,7 +83,6 @@ subroutine sfc_pres_temp_rd(passed)
   !> Example sfc_pres_temp_rd
   type(netcdf_type) :: nc
   type(variable_type) :: var
-  integer, parameter :: nx = 47, nlon = 360
   logical :: exist
 
   nc = open_dataset("sfc_pres_temp_wr.nc", "r")

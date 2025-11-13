@@ -55,7 +55,6 @@ impure elemental function get_att_(ncid, varid, name) result(att)
   type(attribute_type), target :: att
   integer(c_int) :: dtype
   integer(c_size_t) :: len
-  integer(int64) :: buffer_size
 
   att%name = trim(adjustl(name))
   call handle_error(nc_inq_att(ncid, varid, &
