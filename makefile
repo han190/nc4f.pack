@@ -9,14 +9,17 @@ FC := gfortran
 NCFLAGS := $(shell pkg-config --cflags --libs netcdf)
 
 ifeq ($(PROFILE),release)
-  FFLAGS ?= -O3 -funroll-loops \
+  FFLAGS ?= -O3 -funroll-loops -Wimplicit-interface \
+		-fPIC -fmax-errors=1 -fcoarray=single -fPIC \
 		-J$(BUILD_DIR) -I$(SRC_DIR) $(NCFLAGS)
 else ifeq ($(PROFILE),debug)
-  FFLAGS ?= -O0 -g -fbacktrace -Wall -Wextra \
+  FFLAGS ?= -Wall -Wextra -fPIC -fmax-errors=1 -g \
+		-fcheck=bounds -fcheck=array-temps -fbacktrace -fcoarray=single \
 		-J$(BUILD_DIR) -I$(SRC_DIR) $(NCFLAGS)
 else
   $(warning Unknown PROFILE '$(PROFILE)'; using release settings)
-  FFLAGS ?= -O3 -funroll-loops \
+  FFLAGS ?= -O3 -funroll-loops -Wimplicit-interface \
+		-fPIC -fmax-errors=1 -fcoarray=single -fPIC \
 		-J$(BUILD_DIR) -I$(SRC_DIR) $(NCFLAGS)
 endif
 

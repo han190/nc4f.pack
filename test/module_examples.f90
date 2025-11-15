@@ -57,23 +57,23 @@ subroutine sfc_pres_temp_wr(passed)
   do concurrent(ilon=1:nlon, ilat=1:nlat)
     lats(ilat) = 90.0 - ilat + 1
     lons(ilon) = merge(ilon - 360, ilon, ilon > 180)
-    pres(ilat, ilon) = 900.0 + 0.5*ilat - 0.5*ilon
-    temp(ilat, ilon) = 9.0 + 0.5*ilat - 0.5*ilon
+    pres(ilon, ilat) = 900.0 + 0.5*ilat - 0.5*ilon
+    temp(ilon, ilat) = 9.0 + 0.5*ilat - 0.5*ilon
   end do
 
-  vars = [ &
-    data_array("latitude", lats, &
-      & ["latitude".dim.nlat], &
-      & ["units".att."degree_north"]), &
-    data_array("longitude", lons, &
-      & ["longitude".dim.nlon], &
-      & ["units".att."degree_east"]), &
-    data_array("temperature", temp, &
-      & ["latitude".dim.nlat, "longitude".dim.nlon], &
-      & ["units".att."celsius"]), &
-    data_array("pressure", pres, &
-      & ["latitude".dim.nlat, "longitude".dim.nlon], &
-      & ["units".att."hPa"])]
+  associate ( &
+    & lat_dim => "latitude".dim.nlat, &
+    & lon_dim => "longitude".dim.nlon)
+    vars = [ &
+      data_array("latitude", lats, [lat_dim], &
+        & ["units".att."degree_north"]), &
+      data_array("longitude", lons, [lon_dim], &
+        & ["units".att."degree_east"]), &
+      data_array("temperature", temp, [lon_dim, lat_dim], &
+        & ["units".att."celsius"]), &
+      data_array("pressure", pres, [lon_dim, lat_dim], &
+        & ["units".att."hPa"])]
+  end associate
   call to_netcdf("sfc_pres_temp_wr.nc", vars)
   passed = .true.
 end subroutine sfc_pres_temp_wr
@@ -89,20 +89,20 @@ subroutine sfc_pres_temp_rd(passed)
   var = inquire_variable(nc, "pressure", exist)
   associate (dims => var%dims)
     passed = exist .and. &
-      & dims(1)%name == "latitude" .and. &
-      & dims(1)%len == 47 .and. &
-      & dims(2)%name == "longitude" .and. &
-      & dims(2)%len == 360
+      & dims(2)%name == "latitude" .and. &
+      & dims(2)%len == 47 .and. &
+      & dims(1)%name == "longitude" .and. &
+      & dims(1)%len == 360
   end associate
   if (.not. passed) return
 
   var = inquire_variable(nc, "temperature", exist)
   associate (dims => var%dims)
     passed = exist .and. &
-      & dims(1)%name == "latitude" .and. &
-      & dims(1)%len == 47 .and. &
-      & dims(2)%name == "longitude" .and. &
-      & dims(2)%len == 360
+      & dims(2)%name == "latitude" .and. &
+      & dims(2)%len == 47 .and. &
+      & dims(1)%name == "longitude" .and. &
+      & dims(1)%len == 360
   end associate
 end subroutine sfc_pres_temp_rd
 

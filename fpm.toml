@@ -1,4 +1,4 @@
-name = "netcdf_pack"
+name = "netcdf4_pack"
 version = "0.0.1"
 license = "MIT"
 maintainer = "htang23@ncsu.edu"
