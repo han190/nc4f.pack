@@ -1,53 +1,28 @@
 #: mute
 
+#: set MAX_RANK = 7
 #: set ops = ['+', '-', '*', '/', '**']
 #: set op_names = ['add', 'sub', 'mul', 'div', 'pow']
-
-#: set indices = [0, 1, 2, 3, 4, 5]
 #: set kinds = ['int8', 'int16', 'int32', 'int64', 'real32', 'real64']
 #: set types = ['integer', 'integer', 'integer', 'integer', 'real', 'real']
 #: set nc_types = ['NC_BYTE', 'NC_SHORT', 'NC_INT', 'NC_INT64', 'NC_FLOAT', 'NC_DOUBLE']
 #: set ckinds = ['c_int8_t', 'c_int16_t', 'c_int32_t', 'c_int64_t', 'c_float', 'c_double']
 #: set newline = "\n"
-#: set MAX_RANK = 7
-#: set integer_types = nc_types[:4]
-#: set real_types = nc_types[4:]
 
 #! Generate colons for array.
 #: def COLONS(R)
 :#{for _ in range(R - 1)}#, :#{endfor}#
 #: enddef
 
-#: def COMPARE_TYPES1(i, j)
+#: def MERGE_TYPE(c1, c2, lst)
+#: set i = nc_types.index(c1)
+#: set j = nc_types.index(c2)
 #: if (i == 3 and j == 4) or (i == 4 and j == 3)
-real
+#: set idx = 5
 #: else
-${types[max(i, j)]}$
+#: set idx = max(i, j)
 #: endif
-#: enddef
-
-#: def COMPARE_TYPES2(i, j)
-#: if (i == 3 and j == 4) or (i == 4 and j == 3)
-real64
-#: else
-${kinds[max(i, j)]}$
-#: endif
-#: enddef
-
-#: def COMPARE_TYPES3(i, j)
-#: if (i == 3 and j == 4) or (i == 4 and j == 3)
-NC_DOUBLE
-#: else
-${nc_types[max(i, j)]}$
-#: endif
-#: enddef
-
-#: def COMPARE_TYPES4(i, j)
-#: if (i == 3 and j == 4) or (i == 4 and j == 3)
-2
-#: else
-1
-#: endif
+${lst[idx]}$
 #: enddef
 
 #: endmute
