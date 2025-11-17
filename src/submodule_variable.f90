@@ -159,4 +159,41 @@ pure module subroutine allocate_buffer_var(var)
   end if
 end subroutine allocate_buffer_var
 
+module elemental logical function eq_var(x, y)
+  type(variable_type), intent(in) :: x, y
+  logical :: is_alloc(2)
+
+  eq_var = (x%name == y%name) .and. &
+    & (x%dtype == y%dtype) .and. (x%len == y%len)
+  if (.not. eq_var) return
+
+  is_alloc(1) = allocated(x%dims)
+  is_alloc(2) = allocated(y%dims)
+
+  if (all(is_alloc)) then
+    eq_var = eq_var .and. all(x%dims == y%dims)
+    continue
+  else
+    eq_var = .false.
+    return
+  end if
+
+  is_alloc(1) = allocated(x%atts)
+  is_alloc(2) = allocated(y%atts)
+
+  if (all(is_alloc)) then
+    eq_var = eq_var .and. all(x%atts == y%atts)
+  else if (.not. is_alloc(1) .and. is_alloc(2)) then
+    eq_var = .false.
+  else if (is_alloc(1) .and. .not. is_alloc(2)) then
+    eq_var = .false.
+  end if
+end function eq_var
+
+module elemental logical function neq_var(x, y)
+  type(variable_type), intent(in) :: x, y
+
+  neq_var = .not. eq_var(x, y)
+end function neq_var
+
 end submodule submodule_variable

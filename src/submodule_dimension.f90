@@ -119,18 +119,18 @@ impure elemental module function def_dim(nc, dim) result(new_dim)
   new_dim = dimension_type(dimid, dim%name, dim%len, dim%is_unlim)
 end function def_dim
 
-elemental module logical function eq_dim(x, y)
+module elemental logical function eq_dim(x, y)
   type(dimension_type), intent(in) :: x, y
 
-  eq_dim = x%is_unlim .eqv. y%is_unlim .and. &
-    & x%len == y%len .and. x%name == y%name
+  eq_dim = (x%is_unlim .eqv. y%is_unlim) .and. &
+    & (x%len == y%len) .and. (x%name == y%name)
 end function eq_dim
 
-elemental module logical function uneq_dim(x, y)
+module elemental logical function neq_dim(x, y)
   type(dimension_type), intent(in) :: x, y
 
-  uneq_dim = x%is_unlim .neqv. y%is_unlim .or. &
-    & x%len /= y%len .or. x%name /= y%name
-end function uneq_dim
+  neq_dim = (x%is_unlim .neqv. y%is_unlim) .or. &
+    & (x%len /= y%len) .or. (x%name /= y%name)
+end function neq_dim
 
 end submodule submodule_dimension

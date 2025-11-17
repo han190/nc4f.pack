@@ -43,8 +43,14 @@ public :: allocate_buffer
 public :: to_netcdf
 private
 
+!> Constants
+integer, parameter :: MAX_CHAR_LEN = 1024
+integer(int8), parameter :: BYTE = 0_int8
+integer(int32), parameter :: INVALID_INT32 = -2147483647_int32
+integer(int64), parameter :: INVALID_INT64 = -9223372036854775807_int64
+
 type :: netcdf_type
-  integer(c_int), private :: id = -1
+  integer(c_int), private :: id = INVALID_INT32
   character(len=:), allocatable :: filename
   integer(c_int) :: mode
   type(attribute_type), allocatable :: atts(:)
@@ -52,32 +58,32 @@ type :: netcdf_type
 end type netcdf_type
 
 type :: variable_type
-  integer(c_int), private :: id = -1
+  integer(c_int), private :: id = INVALID_INT32
   character(len=:), allocatable :: name
-  integer(int32) :: dtype = -1
-  integer(int64) :: len = -1
+  integer(int32) :: dtype = INVALID_INT32
+  integer(int64) :: len = INVALID_INT64
   type(dimension_type), allocatable :: dims(:)
   type(attribute_type), allocatable :: atts(:)
   integer(int8), allocatable :: buffer(:)
 end type variable_type
 
 type :: attribute_type
-  integer(c_int), private :: id = -1
+  integer(c_int), private :: id = INVALID_INT32
   character(len=:), allocatable :: name
-  integer(int32) :: dtype = -1
-  integer(int64) :: len = -1
+  integer(int32) :: dtype = INVALID_INT32
+  integer(int64) :: len = INVALID_INT64
   integer(int8), allocatable :: buffer(:)
 end type attribute_type
 
 type :: dimension_type
-  integer(c_int), private :: id = -1
+  integer(c_int), private :: id = INVALID_INT32
   character(len=:), allocatable :: name
-  integer(int64) :: len = -1
+  integer(int64) :: len = INVALID_INT64
   logical :: is_unlim = .false.
 end type dimension_type
 
 type :: dimension_argument_type
-  integer(int64) :: len = -1
+  integer(int64) :: len = INVALID_INT64
   logical :: is_unlim = .false.
 end type dimension_argument_type
 
@@ -126,10 +132,14 @@ end interface operator(.and.)
 
 interface operator(==)
   module procedure :: eq_dim
+  module procedure :: eq_att
+  module procedure :: eq_var
 end interface operator(==)
 
 interface operator(/=)
-  module procedure :: uneq_dim
+  module procedure :: neq_dim
+  module procedure :: neq_att
+  module procedure :: neq_var
 end interface operator(/=)
 
 interface size
@@ -149,10 +159,6 @@ interface to_netcdf
   module procedure :: to_netcdf_var
   module procedure :: to_netcdf_vars
 end interface to_netcdf
-
-!> Constants
-integer, parameter :: MAX_CHAR_LEN = 1024
-integer(int8), parameter :: BYTE = 0_int8
 
 interface
   !> submodule_attribute.f90
@@ -185,6 +191,14 @@ interface
   pure module subroutine allocate_buffer_att(att)
     type(attribute_type), intent(inout) :: att
   end subroutine allocate_buffer_att
+
+  module elemental logical function eq_att(x, y)
+    type(attribute_type), intent(in) :: x, y
+  end function eq_att
+
+  module elemental logical function neq_att(x, y)
+    type(attribute_type), intent(in) :: x, y
+  end function neq_att
 
   !> submodule_dataset.f90
   module function open_dataset(filename, mode, inq_dims, inq_atts) result(nc)
@@ -259,13 +273,13 @@ interface
     type(dimension_type) :: new_dim
   end function def_dim
 
-  elemental module logical function eq_dim(x, y)
+  module elemental logical function eq_dim(x, y)
     type(dimension_type), intent(in) :: x, y
   end function eq_dim
 
-  elemental module logical function uneq_dim(x, y)
+  module elemental logical function neq_dim(x, y)
     type(dimension_type), intent(in) :: x, y
-  end function uneq_dim
+  end function neq_dim
 
   !> submodule_io.f90
   module subroutine write_frmt_var(var, unit, iotype, v_list, iostat, iomsg)
@@ -356,6 +370,14 @@ interface
   pure module subroutine allocate_buffer_var(var)
     type(variable_type), intent(inout) :: var
   end subroutine allocate_buffer_var
+
+  module elemental logical function eq_var(x, y)
+    type(variable_type), intent(in) :: x, y
+  end function eq_var
+
+  module elemental logical function neq_var(x, y)
+    type(variable_type), intent(in) :: x, y
+  end function neq_var
 end interface
 
 include "interface_arithmetic.inc"

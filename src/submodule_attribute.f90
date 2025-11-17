@@ -114,4 +114,22 @@ pure module subroutine allocate_buffer_att(att)
   end if
 end subroutine allocate_buffer_att
 
+module elemental logical function eq_att(x, y)
+  type(attribute_type), intent(in) :: x, y
+
+  eq_att = x%name == y%name .and. &
+    & x%dtype == y%dtype .and. &
+    & x%len == y%len .and. &
+    & all(x%buffer == y%buffer)
+end function eq_att
+
+module elemental logical function neq_att(x, y)
+  type(attribute_type), intent(in) :: x, y
+
+  neq_att = x%name /= y%name .or. &
+    & x%dtype /= y%dtype .or. &
+    & x%len /= y%len .or. &
+    & any(x%buffer /= y%buffer)
+end function neq_att
+
 end submodule submodule_attribute
