@@ -40,6 +40,8 @@ public :: size
 public :: shape
 public :: sum
 public :: allocate_buffer
+public :: allocate_variable
+public :: allocate_attribute
 public :: to_netcdf
 private
 
