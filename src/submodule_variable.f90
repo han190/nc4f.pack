@@ -147,7 +147,36 @@ pure module function get_shape(var) result(n)
   end do
 end function get_shape
 
-pure module subroutine allocate_buffer_var(var)
+module pure subroutine allocate_var_mold(var, mold)
+  type(variable_type), intent(inout) :: var
+  type(variable_type), intent(in) :: mold
+
+  if (allocated(mold%atts)) then
+    call allocate_var_meta(var, mold%name, &
+      & mold%dtype, mold%len, mold%dims, mold%atts)
+  else
+    call allocate_var_meta(var, mold%name, &
+      & mold%dtype, mold%len, mold%dims)
+  end if
+end subroutine allocate_var_mold
+
+module pure subroutine allocate_var_meta(var, name, dtype, len, dims, atts)
+  type(variable_type), intent(inout) :: var
+  character(len=*), intent(in) :: name
+  integer(int32), intent(in) :: dtype
+  integer(int64), intent(in) :: len
+  type(dimension_type), intent(in) :: dims(:)
+  type(attribute_type), intent(in), optional :: atts(:)
+
+  var%name = name
+  var%dtype = dtype
+  var%len = len
+  var%dims = dims
+  if (present(atts)) var%atts = atts
+  call allocate_buffer_var(var)
+end subroutine allocate_var_meta
+
+module pure subroutine allocate_buffer_var(var)
   type(variable_type), intent(inout) :: var
   integer(int64) :: buffer_size
 

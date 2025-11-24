@@ -150,6 +150,16 @@ interface shape
   module procedure :: get_shape
 end interface shape
 
+interface allocate_variable
+  module procedure :: allocate_var_meta
+  module procedure :: allocate_var_mold
+end interface allocate_variable
+
+interface allocate_attribute
+  module procedure :: allocate_att_meta
+  module procedure :: allocate_att_mold
+end interface allocate_attribute
+
 interface allocate_buffer
   module procedure :: allocate_buffer_att
   module procedure :: allocate_buffer_var
@@ -187,6 +197,18 @@ interface
   module impure elemental subroutine put_att_nc(nc)
     type(netcdf_type), target, intent(in) :: nc
   end subroutine put_att_nc
+
+  module pure subroutine allocate_att_mold(att, mold)
+    type(attribute_type), intent(inout) :: att
+    type(attribute_type), intent(in) :: mold
+  end subroutine allocate_att_mold
+
+  module pure subroutine allocate_att_meta(att, name, dtype, len)
+    type(attribute_type), intent(inout) :: att
+    character(len=*), intent(in) :: name
+    integer(int32), intent(in) :: dtype
+    integer(int64), intent(in) :: len
+  end subroutine allocate_att_meta
 
   pure module subroutine allocate_buffer_att(att)
     type(attribute_type), intent(inout) :: att
@@ -367,7 +389,21 @@ interface
     integer(int64), allocatable :: n(:)
   end function get_shape
 
-  pure module subroutine allocate_buffer_var(var)
+  module pure subroutine allocate_var_mold(var, mold)
+    type(variable_type), intent(inout) :: var
+    type(variable_type), intent(in) :: mold
+  end subroutine allocate_var_mold
+
+  module pure subroutine allocate_var_meta(var, name, dtype, len, dims, atts)
+    type(variable_type), intent(inout) :: var
+    character(len=*), intent(in) :: name
+    integer(int32), intent(in) :: dtype
+    integer(int64), intent(in) :: len
+    type(dimension_type), intent(in) :: dims(:)
+    type(attribute_type), intent(in), optional :: atts(:)
+  end subroutine allocate_var_meta
+
+  module pure subroutine allocate_buffer_var(var)
     type(variable_type), intent(inout) :: var
   end subroutine allocate_buffer_var
 

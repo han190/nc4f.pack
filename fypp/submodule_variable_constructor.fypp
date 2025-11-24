@@ -12,26 +12,19 @@ module function new_var_${K}$_${R}$d(name, values, dims, atts) result(var)
   type(variable_type), target :: var
   ${T}$(${C}$), pointer :: var_ptr(${COLONS(R)}$)
 
-  call new_var_(var, name, ${N}$, size(values, kind=int64), dims)
-  call allocate_buffer(var)
+
+  if (present(atts)) then
+    call allocate_variable(var, name, ${N}$, &
+      & size(values, kind=int64), dims, atts)
+  else
+    call allocate_variable(var, name, ${N}$, &
+      & size(values, kind=int64), dims)
+  end if
+
   call extract(var, var_ptr)
   var_ptr = values
   nullify (var_ptr)
-  if (present(atts)) var%atts = atts
 end function new_var_${K}$_${R}$d${newline}$
 #: endfor
 #: endfor
-pure subroutine new_var_(var, name, dtype, len, dims)
-  type(variable_type), intent(inout) :: var
-  character(len=*), intent(in) :: name
-  integer(int32), intent(in) :: dtype
-  integer(int64), intent(in) :: len
-  type(dimension_type), intent(in) :: dims(:)
-
-  var%name = trim(adjustl(name))
-  var%dtype = dtype
-  var%len = len
-  var%dims = dims
-end subroutine new_var_
-
 end submodule submodule_variable_constructor

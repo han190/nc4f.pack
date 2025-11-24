@@ -11,13 +11,7 @@ module function add_vars(x, y) result(res)
   if (x%dtype /= y%dtype) &
     & error stop "[add_vars] Unequal data type."
 
-  res%name = x%name
-  res%dtype = x%dtype
-  res%len = x%len
-  res%dims = x%dims
-  res%atts = x%atts
-
-  call allocate_buffer(res)
+  call allocate_variable(res, mold=x)
   select case (x%dtype)
   case (NC_BYTE)
     block
@@ -111,20 +105,23 @@ module function add_var_int8(x, y) result(res)
   integer(int8), intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = x%name
-  res%len = x%len
-  res%dims = x%dims
-  res%atts = x%atts
-
-  call allocate_buffer(res)
   select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int8), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_BYTE
+      dtype = NC_BYTE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -138,8 +135,17 @@ module function add_var_int8(x, y) result(res)
       integer(int16), pointer :: xp(:)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_SHORT
+      dtype = NC_SHORT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -153,8 +159,17 @@ module function add_var_int8(x, y) result(res)
       integer(int32), pointer :: xp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -168,8 +183,17 @@ module function add_var_int8(x, y) result(res)
       integer(int64), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -183,8 +207,17 @@ module function add_var_int8(x, y) result(res)
       real(real32), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -198,8 +231,17 @@ module function add_var_int8(x, y) result(res)
       real(real64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -216,20 +258,23 @@ module function add_int8_var(x, y) result(res)
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = y%name
-  res%len = y%len
-  res%dims = y%dims
-  res%atts = y%atts
-
-  call allocate_buffer(res)
   select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
       integer(int8), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_BYTE
+      dtype = NC_BYTE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -243,8 +288,17 @@ module function add_int8_var(x, y) result(res)
       integer(int16), pointer :: yp(:)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_SHORT
+      dtype = NC_SHORT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -258,8 +312,17 @@ module function add_int8_var(x, y) result(res)
       integer(int32), pointer :: yp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -273,8 +336,17 @@ module function add_int8_var(x, y) result(res)
       integer(int64), pointer :: yp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -288,8 +360,17 @@ module function add_int8_var(x, y) result(res)
       real(real32), pointer :: yp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -303,8 +384,17 @@ module function add_int8_var(x, y) result(res)
       real(real64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -321,20 +411,23 @@ module function add_var_int16(x, y) result(res)
   integer(int16), intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = x%name
-  res%len = x%len
-  res%dims = x%dims
-  res%atts = x%atts
-
-  call allocate_buffer(res)
   select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_SHORT
+      dtype = NC_SHORT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -348,8 +441,17 @@ module function add_var_int16(x, y) result(res)
       integer(int16), pointer :: xp(:)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_SHORT
+      dtype = NC_SHORT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -363,8 +465,17 @@ module function add_var_int16(x, y) result(res)
       integer(int32), pointer :: xp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -378,8 +489,17 @@ module function add_var_int16(x, y) result(res)
       integer(int64), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -393,8 +513,17 @@ module function add_var_int16(x, y) result(res)
       real(real32), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -408,8 +537,17 @@ module function add_var_int16(x, y) result(res)
       real(real64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -426,20 +564,23 @@ module function add_int16_var(x, y) result(res)
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = y%name
-  res%len = y%len
-  res%dims = y%dims
-  res%atts = y%atts
-
-  call allocate_buffer(res)
   select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_SHORT
+      dtype = NC_SHORT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -453,8 +594,17 @@ module function add_int16_var(x, y) result(res)
       integer(int16), pointer :: yp(:)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_SHORT
+      dtype = NC_SHORT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -468,8 +618,17 @@ module function add_int16_var(x, y) result(res)
       integer(int32), pointer :: yp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -483,8 +642,17 @@ module function add_int16_var(x, y) result(res)
       integer(int64), pointer :: yp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -498,8 +666,17 @@ module function add_int16_var(x, y) result(res)
       real(real32), pointer :: yp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -513,8 +690,17 @@ module function add_int16_var(x, y) result(res)
       real(real64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -531,20 +717,23 @@ module function add_var_int32(x, y) result(res)
   integer(int32), intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = x%name
-  res%len = x%len
-  res%dims = x%dims
-  res%atts = x%atts
-
-  call allocate_buffer(res)
   select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -558,8 +747,17 @@ module function add_var_int32(x, y) result(res)
       integer(int16), pointer :: xp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -573,8 +771,17 @@ module function add_var_int32(x, y) result(res)
       integer(int32), pointer :: xp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -588,8 +795,17 @@ module function add_var_int32(x, y) result(res)
       integer(int64), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -603,8 +819,17 @@ module function add_var_int32(x, y) result(res)
       real(real32), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -618,8 +843,17 @@ module function add_var_int32(x, y) result(res)
       real(real64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -636,20 +870,23 @@ module function add_int32_var(x, y) result(res)
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = y%name
-  res%len = y%len
-  res%dims = y%dims
-  res%atts = y%atts
-
-  call allocate_buffer(res)
   select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -663,8 +900,17 @@ module function add_int32_var(x, y) result(res)
       integer(int16), pointer :: yp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -678,8 +924,17 @@ module function add_int32_var(x, y) result(res)
       integer(int32), pointer :: yp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -693,8 +948,17 @@ module function add_int32_var(x, y) result(res)
       integer(int64), pointer :: yp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -708,8 +972,17 @@ module function add_int32_var(x, y) result(res)
       real(real32), pointer :: yp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -723,8 +996,17 @@ module function add_int32_var(x, y) result(res)
       real(real64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -741,20 +1023,23 @@ module function add_var_int64(x, y) result(res)
   integer(int64), intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = x%name
-  res%len = x%len
-  res%dims = x%dims
-  res%atts = x%atts
-
-  call allocate_buffer(res)
   select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -768,8 +1053,17 @@ module function add_var_int64(x, y) result(res)
       integer(int16), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -783,8 +1077,17 @@ module function add_var_int64(x, y) result(res)
       integer(int32), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -798,8 +1101,17 @@ module function add_var_int64(x, y) result(res)
       integer(int64), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -813,8 +1125,17 @@ module function add_var_int64(x, y) result(res)
       real(real32), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -828,8 +1149,17 @@ module function add_var_int64(x, y) result(res)
       real(real64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -846,20 +1176,23 @@ module function add_int64_var(x, y) result(res)
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = y%name
-  res%len = y%len
-  res%dims = y%dims
-  res%atts = y%atts
-
-  call allocate_buffer(res)
   select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -873,8 +1206,17 @@ module function add_int64_var(x, y) result(res)
       integer(int16), pointer :: yp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -888,8 +1230,17 @@ module function add_int64_var(x, y) result(res)
       integer(int32), pointer :: yp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -903,8 +1254,17 @@ module function add_int64_var(x, y) result(res)
       integer(int64), pointer :: yp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -918,8 +1278,17 @@ module function add_int64_var(x, y) result(res)
       real(real32), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -933,8 +1302,17 @@ module function add_int64_var(x, y) result(res)
       real(real64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -951,20 +1329,23 @@ module function add_var_real32(x, y) result(res)
   real(real32), intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = x%name
-  res%len = x%len
-  res%dims = x%dims
-  res%atts = x%atts
-
-  call allocate_buffer(res)
   select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -978,8 +1359,17 @@ module function add_var_real32(x, y) result(res)
       integer(int16), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -993,8 +1383,17 @@ module function add_var_real32(x, y) result(res)
       integer(int32), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -1008,8 +1407,17 @@ module function add_var_real32(x, y) result(res)
       integer(int64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -1023,8 +1431,17 @@ module function add_var_real32(x, y) result(res)
       real(real32), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -1038,8 +1455,17 @@ module function add_var_real32(x, y) result(res)
       real(real64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -1056,20 +1482,23 @@ module function add_real32_var(x, y) result(res)
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = y%name
-  res%len = y%len
-  res%dims = y%dims
-  res%atts = y%atts
-
-  call allocate_buffer(res)
   select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -1083,8 +1512,17 @@ module function add_real32_var(x, y) result(res)
       integer(int16), pointer :: yp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -1098,8 +1536,17 @@ module function add_real32_var(x, y) result(res)
       integer(int32), pointer :: yp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -1113,8 +1560,17 @@ module function add_real32_var(x, y) result(res)
       integer(int64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -1128,8 +1584,17 @@ module function add_real32_var(x, y) result(res)
       real(real32), pointer :: yp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -1143,8 +1608,17 @@ module function add_real32_var(x, y) result(res)
       real(real64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -1161,20 +1635,23 @@ module function add_var_real64(x, y) result(res)
   real(real64), intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = x%name
-  res%len = x%len
-  res%dims = x%dims
-  res%atts = x%atts
-
-  call allocate_buffer(res)
   select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -1188,8 +1665,17 @@ module function add_var_real64(x, y) result(res)
       integer(int16), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -1203,8 +1689,17 @@ module function add_var_real64(x, y) result(res)
       integer(int32), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -1218,8 +1713,17 @@ module function add_var_real64(x, y) result(res)
       integer(int64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -1233,8 +1737,17 @@ module function add_var_real64(x, y) result(res)
       real(real32), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -1248,8 +1761,17 @@ module function add_var_real64(x, y) result(res)
       real(real64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -1266,20 +1788,23 @@ module function add_real64_var(x, y) result(res)
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = y%name
-  res%len = y%len
-  res%dims = y%dims
-  res%atts = y%atts
-
-  call allocate_buffer(res)
   select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -1293,8 +1818,17 @@ module function add_real64_var(x, y) result(res)
       integer(int16), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -1308,8 +1842,17 @@ module function add_real64_var(x, y) result(res)
       integer(int32), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -1323,8 +1866,17 @@ module function add_real64_var(x, y) result(res)
       integer(int64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -1338,8 +1890,17 @@ module function add_real64_var(x, y) result(res)
       real(real32), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -1353,8 +1914,17 @@ module function add_real64_var(x, y) result(res)
       real(real64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -1375,13 +1945,7 @@ module function sub_vars(x, y) result(res)
   if (x%dtype /= y%dtype) &
     & error stop "[add_vars] Unequal data type."
 
-  res%name = x%name
-  res%dtype = x%dtype
-  res%len = x%len
-  res%dims = x%dims
-  res%atts = x%atts
-
-  call allocate_buffer(res)
+  call allocate_variable(res, mold=x)
   select case (x%dtype)
   case (NC_BYTE)
     block
@@ -1475,20 +2039,23 @@ module function sub_var_int8(x, y) result(res)
   integer(int8), intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = x%name
-  res%len = x%len
-  res%dims = x%dims
-  res%atts = x%atts
-
-  call allocate_buffer(res)
   select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int8), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_BYTE
+      dtype = NC_BYTE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -1502,8 +2069,17 @@ module function sub_var_int8(x, y) result(res)
       integer(int16), pointer :: xp(:)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_SHORT
+      dtype = NC_SHORT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -1517,8 +2093,17 @@ module function sub_var_int8(x, y) result(res)
       integer(int32), pointer :: xp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -1532,8 +2117,17 @@ module function sub_var_int8(x, y) result(res)
       integer(int64), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -1547,8 +2141,17 @@ module function sub_var_int8(x, y) result(res)
       real(real32), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -1562,8 +2165,17 @@ module function sub_var_int8(x, y) result(res)
       real(real64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -1580,20 +2192,23 @@ module function sub_int8_var(x, y) result(res)
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = y%name
-  res%len = y%len
-  res%dims = y%dims
-  res%atts = y%atts
-
-  call allocate_buffer(res)
   select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
       integer(int8), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_BYTE
+      dtype = NC_BYTE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -1607,8 +2222,17 @@ module function sub_int8_var(x, y) result(res)
       integer(int16), pointer :: yp(:)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_SHORT
+      dtype = NC_SHORT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -1622,8 +2246,17 @@ module function sub_int8_var(x, y) result(res)
       integer(int32), pointer :: yp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -1637,8 +2270,17 @@ module function sub_int8_var(x, y) result(res)
       integer(int64), pointer :: yp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -1652,8 +2294,17 @@ module function sub_int8_var(x, y) result(res)
       real(real32), pointer :: yp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -1667,8 +2318,17 @@ module function sub_int8_var(x, y) result(res)
       real(real64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -1685,20 +2345,23 @@ module function sub_var_int16(x, y) result(res)
   integer(int16), intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = x%name
-  res%len = x%len
-  res%dims = x%dims
-  res%atts = x%atts
-
-  call allocate_buffer(res)
   select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_SHORT
+      dtype = NC_SHORT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -1712,8 +2375,17 @@ module function sub_var_int16(x, y) result(res)
       integer(int16), pointer :: xp(:)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_SHORT
+      dtype = NC_SHORT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -1727,8 +2399,17 @@ module function sub_var_int16(x, y) result(res)
       integer(int32), pointer :: xp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -1742,8 +2423,17 @@ module function sub_var_int16(x, y) result(res)
       integer(int64), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -1757,8 +2447,17 @@ module function sub_var_int16(x, y) result(res)
       real(real32), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -1772,8 +2471,17 @@ module function sub_var_int16(x, y) result(res)
       real(real64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -1790,20 +2498,23 @@ module function sub_int16_var(x, y) result(res)
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = y%name
-  res%len = y%len
-  res%dims = y%dims
-  res%atts = y%atts
-
-  call allocate_buffer(res)
   select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_SHORT
+      dtype = NC_SHORT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -1817,8 +2528,17 @@ module function sub_int16_var(x, y) result(res)
       integer(int16), pointer :: yp(:)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_SHORT
+      dtype = NC_SHORT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -1832,8 +2552,17 @@ module function sub_int16_var(x, y) result(res)
       integer(int32), pointer :: yp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -1847,8 +2576,17 @@ module function sub_int16_var(x, y) result(res)
       integer(int64), pointer :: yp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -1862,8 +2600,17 @@ module function sub_int16_var(x, y) result(res)
       real(real32), pointer :: yp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -1877,8 +2624,17 @@ module function sub_int16_var(x, y) result(res)
       real(real64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -1895,20 +2651,23 @@ module function sub_var_int32(x, y) result(res)
   integer(int32), intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = x%name
-  res%len = x%len
-  res%dims = x%dims
-  res%atts = x%atts
-
-  call allocate_buffer(res)
   select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -1922,8 +2681,17 @@ module function sub_var_int32(x, y) result(res)
       integer(int16), pointer :: xp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -1937,8 +2705,17 @@ module function sub_var_int32(x, y) result(res)
       integer(int32), pointer :: xp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -1952,8 +2729,17 @@ module function sub_var_int32(x, y) result(res)
       integer(int64), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -1967,8 +2753,17 @@ module function sub_var_int32(x, y) result(res)
       real(real32), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -1982,8 +2777,17 @@ module function sub_var_int32(x, y) result(res)
       real(real64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -2000,20 +2804,23 @@ module function sub_int32_var(x, y) result(res)
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = y%name
-  res%len = y%len
-  res%dims = y%dims
-  res%atts = y%atts
-
-  call allocate_buffer(res)
   select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -2027,8 +2834,17 @@ module function sub_int32_var(x, y) result(res)
       integer(int16), pointer :: yp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -2042,8 +2858,17 @@ module function sub_int32_var(x, y) result(res)
       integer(int32), pointer :: yp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -2057,8 +2882,17 @@ module function sub_int32_var(x, y) result(res)
       integer(int64), pointer :: yp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -2072,8 +2906,17 @@ module function sub_int32_var(x, y) result(res)
       real(real32), pointer :: yp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -2087,8 +2930,17 @@ module function sub_int32_var(x, y) result(res)
       real(real64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -2105,20 +2957,23 @@ module function sub_var_int64(x, y) result(res)
   integer(int64), intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = x%name
-  res%len = x%len
-  res%dims = x%dims
-  res%atts = x%atts
-
-  call allocate_buffer(res)
   select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -2132,8 +2987,17 @@ module function sub_var_int64(x, y) result(res)
       integer(int16), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -2147,8 +3011,17 @@ module function sub_var_int64(x, y) result(res)
       integer(int32), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -2162,8 +3035,17 @@ module function sub_var_int64(x, y) result(res)
       integer(int64), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -2177,8 +3059,17 @@ module function sub_var_int64(x, y) result(res)
       real(real32), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -2192,8 +3083,17 @@ module function sub_var_int64(x, y) result(res)
       real(real64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -2210,20 +3110,23 @@ module function sub_int64_var(x, y) result(res)
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = y%name
-  res%len = y%len
-  res%dims = y%dims
-  res%atts = y%atts
-
-  call allocate_buffer(res)
   select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -2237,8 +3140,17 @@ module function sub_int64_var(x, y) result(res)
       integer(int16), pointer :: yp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -2252,8 +3164,17 @@ module function sub_int64_var(x, y) result(res)
       integer(int32), pointer :: yp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -2267,8 +3188,17 @@ module function sub_int64_var(x, y) result(res)
       integer(int64), pointer :: yp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -2282,8 +3212,17 @@ module function sub_int64_var(x, y) result(res)
       real(real32), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -2297,8 +3236,17 @@ module function sub_int64_var(x, y) result(res)
       real(real64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -2315,20 +3263,23 @@ module function sub_var_real32(x, y) result(res)
   real(real32), intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = x%name
-  res%len = x%len
-  res%dims = x%dims
-  res%atts = x%atts
-
-  call allocate_buffer(res)
   select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -2342,8 +3293,17 @@ module function sub_var_real32(x, y) result(res)
       integer(int16), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -2357,8 +3317,17 @@ module function sub_var_real32(x, y) result(res)
       integer(int32), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -2372,8 +3341,17 @@ module function sub_var_real32(x, y) result(res)
       integer(int64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -2387,8 +3365,17 @@ module function sub_var_real32(x, y) result(res)
       real(real32), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -2402,8 +3389,17 @@ module function sub_var_real32(x, y) result(res)
       real(real64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -2420,20 +3416,23 @@ module function sub_real32_var(x, y) result(res)
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = y%name
-  res%len = y%len
-  res%dims = y%dims
-  res%atts = y%atts
-
-  call allocate_buffer(res)
   select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -2447,8 +3446,17 @@ module function sub_real32_var(x, y) result(res)
       integer(int16), pointer :: yp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -2462,8 +3470,17 @@ module function sub_real32_var(x, y) result(res)
       integer(int32), pointer :: yp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -2477,8 +3494,17 @@ module function sub_real32_var(x, y) result(res)
       integer(int64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -2492,8 +3518,17 @@ module function sub_real32_var(x, y) result(res)
       real(real32), pointer :: yp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -2507,8 +3542,17 @@ module function sub_real32_var(x, y) result(res)
       real(real64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -2525,20 +3569,23 @@ module function sub_var_real64(x, y) result(res)
   real(real64), intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = x%name
-  res%len = x%len
-  res%dims = x%dims
-  res%atts = x%atts
-
-  call allocate_buffer(res)
   select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -2552,8 +3599,17 @@ module function sub_var_real64(x, y) result(res)
       integer(int16), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -2567,8 +3623,17 @@ module function sub_var_real64(x, y) result(res)
       integer(int32), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -2582,8 +3647,17 @@ module function sub_var_real64(x, y) result(res)
       integer(int64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -2597,8 +3671,17 @@ module function sub_var_real64(x, y) result(res)
       real(real32), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -2612,8 +3695,17 @@ module function sub_var_real64(x, y) result(res)
       real(real64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -2630,20 +3722,23 @@ module function sub_real64_var(x, y) result(res)
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = y%name
-  res%len = y%len
-  res%dims = y%dims
-  res%atts = y%atts
-
-  call allocate_buffer(res)
   select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -2657,8 +3752,17 @@ module function sub_real64_var(x, y) result(res)
       integer(int16), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -2672,8 +3776,17 @@ module function sub_real64_var(x, y) result(res)
       integer(int32), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -2687,8 +3800,17 @@ module function sub_real64_var(x, y) result(res)
       integer(int64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -2702,8 +3824,17 @@ module function sub_real64_var(x, y) result(res)
       real(real32), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -2717,8 +3848,17 @@ module function sub_real64_var(x, y) result(res)
       real(real64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -2739,13 +3879,7 @@ module function mul_vars(x, y) result(res)
   if (x%dtype /= y%dtype) &
     & error stop "[add_vars] Unequal data type."
 
-  res%name = x%name
-  res%dtype = x%dtype
-  res%len = x%len
-  res%dims = x%dims
-  res%atts = x%atts
-
-  call allocate_buffer(res)
+  call allocate_variable(res, mold=x)
   select case (x%dtype)
   case (NC_BYTE)
     block
@@ -2839,20 +3973,23 @@ module function mul_var_int8(x, y) result(res)
   integer(int8), intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = x%name
-  res%len = x%len
-  res%dims = x%dims
-  res%atts = x%atts
-
-  call allocate_buffer(res)
   select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int8), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_BYTE
+      dtype = NC_BYTE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -2866,8 +4003,17 @@ module function mul_var_int8(x, y) result(res)
       integer(int16), pointer :: xp(:)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_SHORT
+      dtype = NC_SHORT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -2881,8 +4027,17 @@ module function mul_var_int8(x, y) result(res)
       integer(int32), pointer :: xp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -2896,8 +4051,17 @@ module function mul_var_int8(x, y) result(res)
       integer(int64), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -2911,8 +4075,17 @@ module function mul_var_int8(x, y) result(res)
       real(real32), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -2926,8 +4099,17 @@ module function mul_var_int8(x, y) result(res)
       real(real64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -2944,20 +4126,23 @@ module function mul_int8_var(x, y) result(res)
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = y%name
-  res%len = y%len
-  res%dims = y%dims
-  res%atts = y%atts
-
-  call allocate_buffer(res)
   select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
       integer(int8), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_BYTE
+      dtype = NC_BYTE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -2971,8 +4156,17 @@ module function mul_int8_var(x, y) result(res)
       integer(int16), pointer :: yp(:)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_SHORT
+      dtype = NC_SHORT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -2986,8 +4180,17 @@ module function mul_int8_var(x, y) result(res)
       integer(int32), pointer :: yp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -3001,8 +4204,17 @@ module function mul_int8_var(x, y) result(res)
       integer(int64), pointer :: yp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -3016,8 +4228,17 @@ module function mul_int8_var(x, y) result(res)
       real(real32), pointer :: yp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -3031,8 +4252,17 @@ module function mul_int8_var(x, y) result(res)
       real(real64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -3049,20 +4279,23 @@ module function mul_var_int16(x, y) result(res)
   integer(int16), intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = x%name
-  res%len = x%len
-  res%dims = x%dims
-  res%atts = x%atts
-
-  call allocate_buffer(res)
   select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_SHORT
+      dtype = NC_SHORT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -3076,8 +4309,17 @@ module function mul_var_int16(x, y) result(res)
       integer(int16), pointer :: xp(:)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_SHORT
+      dtype = NC_SHORT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -3091,8 +4333,17 @@ module function mul_var_int16(x, y) result(res)
       integer(int32), pointer :: xp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -3106,8 +4357,17 @@ module function mul_var_int16(x, y) result(res)
       integer(int64), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -3121,8 +4381,17 @@ module function mul_var_int16(x, y) result(res)
       real(real32), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -3136,8 +4405,17 @@ module function mul_var_int16(x, y) result(res)
       real(real64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -3154,20 +4432,23 @@ module function mul_int16_var(x, y) result(res)
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = y%name
-  res%len = y%len
-  res%dims = y%dims
-  res%atts = y%atts
-
-  call allocate_buffer(res)
   select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_SHORT
+      dtype = NC_SHORT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -3181,8 +4462,17 @@ module function mul_int16_var(x, y) result(res)
       integer(int16), pointer :: yp(:)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_SHORT
+      dtype = NC_SHORT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -3196,8 +4486,17 @@ module function mul_int16_var(x, y) result(res)
       integer(int32), pointer :: yp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -3211,8 +4510,17 @@ module function mul_int16_var(x, y) result(res)
       integer(int64), pointer :: yp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -3226,8 +4534,17 @@ module function mul_int16_var(x, y) result(res)
       real(real32), pointer :: yp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -3241,8 +4558,17 @@ module function mul_int16_var(x, y) result(res)
       real(real64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -3259,20 +4585,23 @@ module function mul_var_int32(x, y) result(res)
   integer(int32), intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = x%name
-  res%len = x%len
-  res%dims = x%dims
-  res%atts = x%atts
-
-  call allocate_buffer(res)
   select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -3286,8 +4615,17 @@ module function mul_var_int32(x, y) result(res)
       integer(int16), pointer :: xp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -3301,8 +4639,17 @@ module function mul_var_int32(x, y) result(res)
       integer(int32), pointer :: xp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -3316,8 +4663,17 @@ module function mul_var_int32(x, y) result(res)
       integer(int64), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -3331,8 +4687,17 @@ module function mul_var_int32(x, y) result(res)
       real(real32), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -3346,8 +4711,17 @@ module function mul_var_int32(x, y) result(res)
       real(real64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -3364,20 +4738,23 @@ module function mul_int32_var(x, y) result(res)
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = y%name
-  res%len = y%len
-  res%dims = y%dims
-  res%atts = y%atts
-
-  call allocate_buffer(res)
   select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -3391,8 +4768,17 @@ module function mul_int32_var(x, y) result(res)
       integer(int16), pointer :: yp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -3406,8 +4792,17 @@ module function mul_int32_var(x, y) result(res)
       integer(int32), pointer :: yp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -3421,8 +4816,17 @@ module function mul_int32_var(x, y) result(res)
       integer(int64), pointer :: yp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -3436,8 +4840,17 @@ module function mul_int32_var(x, y) result(res)
       real(real32), pointer :: yp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -3451,8 +4864,17 @@ module function mul_int32_var(x, y) result(res)
       real(real64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -3469,20 +4891,23 @@ module function mul_var_int64(x, y) result(res)
   integer(int64), intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = x%name
-  res%len = x%len
-  res%dims = x%dims
-  res%atts = x%atts
-
-  call allocate_buffer(res)
   select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -3496,8 +4921,17 @@ module function mul_var_int64(x, y) result(res)
       integer(int16), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -3511,8 +4945,17 @@ module function mul_var_int64(x, y) result(res)
       integer(int32), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -3526,8 +4969,17 @@ module function mul_var_int64(x, y) result(res)
       integer(int64), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -3541,8 +4993,17 @@ module function mul_var_int64(x, y) result(res)
       real(real32), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -3556,8 +5017,17 @@ module function mul_var_int64(x, y) result(res)
       real(real64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -3574,20 +5044,23 @@ module function mul_int64_var(x, y) result(res)
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = y%name
-  res%len = y%len
-  res%dims = y%dims
-  res%atts = y%atts
-
-  call allocate_buffer(res)
   select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -3601,8 +5074,17 @@ module function mul_int64_var(x, y) result(res)
       integer(int16), pointer :: yp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -3616,8 +5098,17 @@ module function mul_int64_var(x, y) result(res)
       integer(int32), pointer :: yp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -3631,8 +5122,17 @@ module function mul_int64_var(x, y) result(res)
       integer(int64), pointer :: yp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -3646,8 +5146,17 @@ module function mul_int64_var(x, y) result(res)
       real(real32), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -3661,8 +5170,17 @@ module function mul_int64_var(x, y) result(res)
       real(real64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -3679,20 +5197,23 @@ module function mul_var_real32(x, y) result(res)
   real(real32), intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = x%name
-  res%len = x%len
-  res%dims = x%dims
-  res%atts = x%atts
-
-  call allocate_buffer(res)
   select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -3706,8 +5227,17 @@ module function mul_var_real32(x, y) result(res)
       integer(int16), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -3721,8 +5251,17 @@ module function mul_var_real32(x, y) result(res)
       integer(int32), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -3736,8 +5275,17 @@ module function mul_var_real32(x, y) result(res)
       integer(int64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -3751,8 +5299,17 @@ module function mul_var_real32(x, y) result(res)
       real(real32), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -3766,8 +5323,17 @@ module function mul_var_real32(x, y) result(res)
       real(real64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -3784,20 +5350,23 @@ module function mul_real32_var(x, y) result(res)
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = y%name
-  res%len = y%len
-  res%dims = y%dims
-  res%atts = y%atts
-
-  call allocate_buffer(res)
   select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -3811,8 +5380,17 @@ module function mul_real32_var(x, y) result(res)
       integer(int16), pointer :: yp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -3826,8 +5404,17 @@ module function mul_real32_var(x, y) result(res)
       integer(int32), pointer :: yp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -3841,8 +5428,17 @@ module function mul_real32_var(x, y) result(res)
       integer(int64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -3856,8 +5452,17 @@ module function mul_real32_var(x, y) result(res)
       real(real32), pointer :: yp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -3871,8 +5476,17 @@ module function mul_real32_var(x, y) result(res)
       real(real64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -3889,20 +5503,23 @@ module function mul_var_real64(x, y) result(res)
   real(real64), intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = x%name
-  res%len = x%len
-  res%dims = x%dims
-  res%atts = x%atts
-
-  call allocate_buffer(res)
   select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -3916,8 +5533,17 @@ module function mul_var_real64(x, y) result(res)
       integer(int16), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -3931,8 +5557,17 @@ module function mul_var_real64(x, y) result(res)
       integer(int32), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -3946,8 +5581,17 @@ module function mul_var_real64(x, y) result(res)
       integer(int64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -3961,8 +5605,17 @@ module function mul_var_real64(x, y) result(res)
       real(real32), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -3976,8 +5629,17 @@ module function mul_var_real64(x, y) result(res)
       real(real64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -3994,20 +5656,23 @@ module function mul_real64_var(x, y) result(res)
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = y%name
-  res%len = y%len
-  res%dims = y%dims
-  res%atts = y%atts
-
-  call allocate_buffer(res)
   select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -4021,8 +5686,17 @@ module function mul_real64_var(x, y) result(res)
       integer(int16), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -4036,8 +5710,17 @@ module function mul_real64_var(x, y) result(res)
       integer(int32), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -4051,8 +5734,17 @@ module function mul_real64_var(x, y) result(res)
       integer(int64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -4066,8 +5758,17 @@ module function mul_real64_var(x, y) result(res)
       real(real32), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -4081,8 +5782,17 @@ module function mul_real64_var(x, y) result(res)
       real(real64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -4103,13 +5813,7 @@ module function div_vars(x, y) result(res)
   if (x%dtype /= y%dtype) &
     & error stop "[add_vars] Unequal data type."
 
-  res%name = x%name
-  res%dtype = x%dtype
-  res%len = x%len
-  res%dims = x%dims
-  res%atts = x%atts
-
-  call allocate_buffer(res)
+  call allocate_variable(res, mold=x)
   select case (x%dtype)
   case (NC_BYTE)
     block
@@ -4203,20 +5907,23 @@ module function div_var_int8(x, y) result(res)
   integer(int8), intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = x%name
-  res%len = x%len
-  res%dims = x%dims
-  res%atts = x%atts
-
-  call allocate_buffer(res)
   select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int8), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_BYTE
+      dtype = NC_BYTE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -4230,8 +5937,17 @@ module function div_var_int8(x, y) result(res)
       integer(int16), pointer :: xp(:)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_SHORT
+      dtype = NC_SHORT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -4245,8 +5961,17 @@ module function div_var_int8(x, y) result(res)
       integer(int32), pointer :: xp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -4260,8 +5985,17 @@ module function div_var_int8(x, y) result(res)
       integer(int64), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -4275,8 +6009,17 @@ module function div_var_int8(x, y) result(res)
       real(real32), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -4290,8 +6033,17 @@ module function div_var_int8(x, y) result(res)
       real(real64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -4308,20 +6060,23 @@ module function div_int8_var(x, y) result(res)
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = y%name
-  res%len = y%len
-  res%dims = y%dims
-  res%atts = y%atts
-
-  call allocate_buffer(res)
   select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
       integer(int8), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_BYTE
+      dtype = NC_BYTE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -4335,8 +6090,17 @@ module function div_int8_var(x, y) result(res)
       integer(int16), pointer :: yp(:)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_SHORT
+      dtype = NC_SHORT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -4350,8 +6114,17 @@ module function div_int8_var(x, y) result(res)
       integer(int32), pointer :: yp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -4365,8 +6138,17 @@ module function div_int8_var(x, y) result(res)
       integer(int64), pointer :: yp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -4380,8 +6162,17 @@ module function div_int8_var(x, y) result(res)
       real(real32), pointer :: yp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -4395,8 +6186,17 @@ module function div_int8_var(x, y) result(res)
       real(real64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -4413,20 +6213,23 @@ module function div_var_int16(x, y) result(res)
   integer(int16), intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = x%name
-  res%len = x%len
-  res%dims = x%dims
-  res%atts = x%atts
-
-  call allocate_buffer(res)
   select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_SHORT
+      dtype = NC_SHORT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -4440,8 +6243,17 @@ module function div_var_int16(x, y) result(res)
       integer(int16), pointer :: xp(:)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_SHORT
+      dtype = NC_SHORT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -4455,8 +6267,17 @@ module function div_var_int16(x, y) result(res)
       integer(int32), pointer :: xp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -4470,8 +6291,17 @@ module function div_var_int16(x, y) result(res)
       integer(int64), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -4485,8 +6315,17 @@ module function div_var_int16(x, y) result(res)
       real(real32), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -4500,8 +6339,17 @@ module function div_var_int16(x, y) result(res)
       real(real64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -4518,20 +6366,23 @@ module function div_int16_var(x, y) result(res)
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = y%name
-  res%len = y%len
-  res%dims = y%dims
-  res%atts = y%atts
-
-  call allocate_buffer(res)
   select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_SHORT
+      dtype = NC_SHORT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -4545,8 +6396,17 @@ module function div_int16_var(x, y) result(res)
       integer(int16), pointer :: yp(:)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_SHORT
+      dtype = NC_SHORT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -4560,8 +6420,17 @@ module function div_int16_var(x, y) result(res)
       integer(int32), pointer :: yp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -4575,8 +6444,17 @@ module function div_int16_var(x, y) result(res)
       integer(int64), pointer :: yp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -4590,8 +6468,17 @@ module function div_int16_var(x, y) result(res)
       real(real32), pointer :: yp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -4605,8 +6492,17 @@ module function div_int16_var(x, y) result(res)
       real(real64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -4623,20 +6519,23 @@ module function div_var_int32(x, y) result(res)
   integer(int32), intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = x%name
-  res%len = x%len
-  res%dims = x%dims
-  res%atts = x%atts
-
-  call allocate_buffer(res)
   select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -4650,8 +6549,17 @@ module function div_var_int32(x, y) result(res)
       integer(int16), pointer :: xp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -4665,8 +6573,17 @@ module function div_var_int32(x, y) result(res)
       integer(int32), pointer :: xp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -4680,8 +6597,17 @@ module function div_var_int32(x, y) result(res)
       integer(int64), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -4695,8 +6621,17 @@ module function div_var_int32(x, y) result(res)
       real(real32), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -4710,8 +6645,17 @@ module function div_var_int32(x, y) result(res)
       real(real64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -4728,20 +6672,23 @@ module function div_int32_var(x, y) result(res)
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = y%name
-  res%len = y%len
-  res%dims = y%dims
-  res%atts = y%atts
-
-  call allocate_buffer(res)
   select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -4755,8 +6702,17 @@ module function div_int32_var(x, y) result(res)
       integer(int16), pointer :: yp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -4770,8 +6726,17 @@ module function div_int32_var(x, y) result(res)
       integer(int32), pointer :: yp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -4785,8 +6750,17 @@ module function div_int32_var(x, y) result(res)
       integer(int64), pointer :: yp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -4800,8 +6774,17 @@ module function div_int32_var(x, y) result(res)
       real(real32), pointer :: yp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -4815,8 +6798,17 @@ module function div_int32_var(x, y) result(res)
       real(real64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -4833,20 +6825,23 @@ module function div_var_int64(x, y) result(res)
   integer(int64), intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = x%name
-  res%len = x%len
-  res%dims = x%dims
-  res%atts = x%atts
-
-  call allocate_buffer(res)
   select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -4860,8 +6855,17 @@ module function div_var_int64(x, y) result(res)
       integer(int16), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -4875,8 +6879,17 @@ module function div_var_int64(x, y) result(res)
       integer(int32), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -4890,8 +6903,17 @@ module function div_var_int64(x, y) result(res)
       integer(int64), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -4905,8 +6927,17 @@ module function div_var_int64(x, y) result(res)
       real(real32), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -4920,8 +6951,17 @@ module function div_var_int64(x, y) result(res)
       real(real64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -4938,20 +6978,23 @@ module function div_int64_var(x, y) result(res)
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = y%name
-  res%len = y%len
-  res%dims = y%dims
-  res%atts = y%atts
-
-  call allocate_buffer(res)
   select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -4965,8 +7008,17 @@ module function div_int64_var(x, y) result(res)
       integer(int16), pointer :: yp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -4980,8 +7032,17 @@ module function div_int64_var(x, y) result(res)
       integer(int32), pointer :: yp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -4995,8 +7056,17 @@ module function div_int64_var(x, y) result(res)
       integer(int64), pointer :: yp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -5010,8 +7080,17 @@ module function div_int64_var(x, y) result(res)
       real(real32), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -5025,8 +7104,17 @@ module function div_int64_var(x, y) result(res)
       real(real64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -5043,20 +7131,23 @@ module function div_var_real32(x, y) result(res)
   real(real32), intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = x%name
-  res%len = x%len
-  res%dims = x%dims
-  res%atts = x%atts
-
-  call allocate_buffer(res)
   select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -5070,8 +7161,17 @@ module function div_var_real32(x, y) result(res)
       integer(int16), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -5085,8 +7185,17 @@ module function div_var_real32(x, y) result(res)
       integer(int32), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -5100,8 +7209,17 @@ module function div_var_real32(x, y) result(res)
       integer(int64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -5115,8 +7233,17 @@ module function div_var_real32(x, y) result(res)
       real(real32), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -5130,8 +7257,17 @@ module function div_var_real32(x, y) result(res)
       real(real64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -5148,20 +7284,23 @@ module function div_real32_var(x, y) result(res)
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = y%name
-  res%len = y%len
-  res%dims = y%dims
-  res%atts = y%atts
-
-  call allocate_buffer(res)
   select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -5175,8 +7314,17 @@ module function div_real32_var(x, y) result(res)
       integer(int16), pointer :: yp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -5190,8 +7338,17 @@ module function div_real32_var(x, y) result(res)
       integer(int32), pointer :: yp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -5205,8 +7362,17 @@ module function div_real32_var(x, y) result(res)
       integer(int64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -5220,8 +7386,17 @@ module function div_real32_var(x, y) result(res)
       real(real32), pointer :: yp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -5235,8 +7410,17 @@ module function div_real32_var(x, y) result(res)
       real(real64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -5253,20 +7437,23 @@ module function div_var_real64(x, y) result(res)
   real(real64), intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = x%name
-  res%len = x%len
-  res%dims = x%dims
-  res%atts = x%atts
-
-  call allocate_buffer(res)
   select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -5280,8 +7467,17 @@ module function div_var_real64(x, y) result(res)
       integer(int16), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -5295,8 +7491,17 @@ module function div_var_real64(x, y) result(res)
       integer(int32), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -5310,8 +7515,17 @@ module function div_var_real64(x, y) result(res)
       integer(int64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -5325,8 +7539,17 @@ module function div_var_real64(x, y) result(res)
       real(real32), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -5340,8 +7563,17 @@ module function div_var_real64(x, y) result(res)
       real(real64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -5358,20 +7590,23 @@ module function div_real64_var(x, y) result(res)
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = y%name
-  res%len = y%len
-  res%dims = y%dims
-  res%atts = y%atts
-
-  call allocate_buffer(res)
   select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -5385,8 +7620,17 @@ module function div_real64_var(x, y) result(res)
       integer(int16), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -5400,8 +7644,17 @@ module function div_real64_var(x, y) result(res)
       integer(int32), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -5415,8 +7668,17 @@ module function div_real64_var(x, y) result(res)
       integer(int64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -5430,8 +7692,17 @@ module function div_real64_var(x, y) result(res)
       real(real32), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -5445,8 +7716,17 @@ module function div_real64_var(x, y) result(res)
       real(real64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -5467,13 +7747,7 @@ module function pow_vars(x, y) result(res)
   if (x%dtype /= y%dtype) &
     & error stop "[add_vars] Unequal data type."
 
-  res%name = x%name
-  res%dtype = x%dtype
-  res%len = x%len
-  res%dims = x%dims
-  res%atts = x%atts
-
-  call allocate_buffer(res)
+  call allocate_variable(res, mold=x)
   select case (x%dtype)
   case (NC_BYTE)
     block
@@ -5567,20 +7841,23 @@ module function pow_var_int8(x, y) result(res)
   integer(int8), intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = x%name
-  res%len = x%len
-  res%dims = x%dims
-  res%atts = x%atts
-
-  call allocate_buffer(res)
   select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int8), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_BYTE
+      dtype = NC_BYTE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -5594,8 +7871,17 @@ module function pow_var_int8(x, y) result(res)
       integer(int16), pointer :: xp(:)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_SHORT
+      dtype = NC_SHORT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -5609,8 +7895,17 @@ module function pow_var_int8(x, y) result(res)
       integer(int32), pointer :: xp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -5624,8 +7919,17 @@ module function pow_var_int8(x, y) result(res)
       integer(int64), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -5639,8 +7943,17 @@ module function pow_var_int8(x, y) result(res)
       real(real32), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -5654,8 +7967,17 @@ module function pow_var_int8(x, y) result(res)
       real(real64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -5672,20 +7994,23 @@ module function pow_int8_var(x, y) result(res)
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = y%name
-  res%len = y%len
-  res%dims = y%dims
-  res%atts = y%atts
-
-  call allocate_buffer(res)
   select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
       integer(int8), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_BYTE
+      dtype = NC_BYTE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -5699,8 +8024,17 @@ module function pow_int8_var(x, y) result(res)
       integer(int16), pointer :: yp(:)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_SHORT
+      dtype = NC_SHORT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -5714,8 +8048,17 @@ module function pow_int8_var(x, y) result(res)
       integer(int32), pointer :: yp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -5729,8 +8072,17 @@ module function pow_int8_var(x, y) result(res)
       integer(int64), pointer :: yp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -5744,8 +8096,17 @@ module function pow_int8_var(x, y) result(res)
       real(real32), pointer :: yp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -5759,8 +8120,17 @@ module function pow_int8_var(x, y) result(res)
       real(real64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -5777,20 +8147,23 @@ module function pow_var_int16(x, y) result(res)
   integer(int16), intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = x%name
-  res%len = x%len
-  res%dims = x%dims
-  res%atts = x%atts
-
-  call allocate_buffer(res)
   select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_SHORT
+      dtype = NC_SHORT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -5804,8 +8177,17 @@ module function pow_var_int16(x, y) result(res)
       integer(int16), pointer :: xp(:)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_SHORT
+      dtype = NC_SHORT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -5819,8 +8201,17 @@ module function pow_var_int16(x, y) result(res)
       integer(int32), pointer :: xp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -5834,8 +8225,17 @@ module function pow_var_int16(x, y) result(res)
       integer(int64), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -5849,8 +8249,17 @@ module function pow_var_int16(x, y) result(res)
       real(real32), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -5864,8 +8273,17 @@ module function pow_var_int16(x, y) result(res)
       real(real64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -5882,20 +8300,23 @@ module function pow_int16_var(x, y) result(res)
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = y%name
-  res%len = y%len
-  res%dims = y%dims
-  res%atts = y%atts
-
-  call allocate_buffer(res)
   select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_SHORT
+      dtype = NC_SHORT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -5909,8 +8330,17 @@ module function pow_int16_var(x, y) result(res)
       integer(int16), pointer :: yp(:)
       integer(int16), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_SHORT
+      dtype = NC_SHORT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -5924,8 +8354,17 @@ module function pow_int16_var(x, y) result(res)
       integer(int32), pointer :: yp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -5939,8 +8378,17 @@ module function pow_int16_var(x, y) result(res)
       integer(int64), pointer :: yp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -5954,8 +8402,17 @@ module function pow_int16_var(x, y) result(res)
       real(real32), pointer :: yp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -5969,8 +8426,17 @@ module function pow_int16_var(x, y) result(res)
       real(real64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -5987,20 +8453,23 @@ module function pow_var_int32(x, y) result(res)
   integer(int32), intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = x%name
-  res%len = x%len
-  res%dims = x%dims
-  res%atts = x%atts
-
-  call allocate_buffer(res)
   select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -6014,8 +8483,17 @@ module function pow_var_int32(x, y) result(res)
       integer(int16), pointer :: xp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -6029,8 +8507,17 @@ module function pow_var_int32(x, y) result(res)
       integer(int32), pointer :: xp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -6044,8 +8531,17 @@ module function pow_var_int32(x, y) result(res)
       integer(int64), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -6059,8 +8555,17 @@ module function pow_var_int32(x, y) result(res)
       real(real32), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -6074,8 +8579,17 @@ module function pow_var_int32(x, y) result(res)
       real(real64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -6092,20 +8606,23 @@ module function pow_int32_var(x, y) result(res)
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = y%name
-  res%len = y%len
-  res%dims = y%dims
-  res%atts = y%atts
-
-  call allocate_buffer(res)
   select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -6119,8 +8636,17 @@ module function pow_int32_var(x, y) result(res)
       integer(int16), pointer :: yp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -6134,8 +8660,17 @@ module function pow_int32_var(x, y) result(res)
       integer(int32), pointer :: yp(:)
       integer(int32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT
+      dtype = NC_INT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -6149,8 +8684,17 @@ module function pow_int32_var(x, y) result(res)
       integer(int64), pointer :: yp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -6164,8 +8708,17 @@ module function pow_int32_var(x, y) result(res)
       real(real32), pointer :: yp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -6179,8 +8732,17 @@ module function pow_int32_var(x, y) result(res)
       real(real64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -6197,20 +8759,23 @@ module function pow_var_int64(x, y) result(res)
   integer(int64), intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = x%name
-  res%len = x%len
-  res%dims = x%dims
-  res%atts = x%atts
-
-  call allocate_buffer(res)
   select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -6224,8 +8789,17 @@ module function pow_var_int64(x, y) result(res)
       integer(int16), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -6239,8 +8813,17 @@ module function pow_var_int64(x, y) result(res)
       integer(int32), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -6254,8 +8837,17 @@ module function pow_var_int64(x, y) result(res)
       integer(int64), pointer :: xp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -6269,8 +8861,17 @@ module function pow_var_int64(x, y) result(res)
       real(real32), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -6284,8 +8885,17 @@ module function pow_var_int64(x, y) result(res)
       real(real64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -6302,20 +8912,23 @@ module function pow_int64_var(x, y) result(res)
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = y%name
-  res%len = y%len
-  res%dims = y%dims
-  res%atts = y%atts
-
-  call allocate_buffer(res)
   select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -6329,8 +8942,17 @@ module function pow_int64_var(x, y) result(res)
       integer(int16), pointer :: yp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -6344,8 +8966,17 @@ module function pow_int64_var(x, y) result(res)
       integer(int32), pointer :: yp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -6359,8 +8990,17 @@ module function pow_int64_var(x, y) result(res)
       integer(int64), pointer :: yp(:)
       integer(int64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_INT64
+      dtype = NC_INT64
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -6374,8 +9014,17 @@ module function pow_int64_var(x, y) result(res)
       real(real32), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -6389,8 +9038,17 @@ module function pow_int64_var(x, y) result(res)
       real(real64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -6407,20 +9065,23 @@ module function pow_var_real32(x, y) result(res)
   real(real32), intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = x%name
-  res%len = x%len
-  res%dims = x%dims
-  res%atts = x%atts
-
-  call allocate_buffer(res)
   select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -6434,8 +9095,17 @@ module function pow_var_real32(x, y) result(res)
       integer(int16), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -6449,8 +9119,17 @@ module function pow_var_real32(x, y) result(res)
       integer(int32), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -6464,8 +9143,17 @@ module function pow_var_real32(x, y) result(res)
       integer(int64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -6479,8 +9167,17 @@ module function pow_var_real32(x, y) result(res)
       real(real32), pointer :: xp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -6494,8 +9191,17 @@ module function pow_var_real32(x, y) result(res)
       real(real64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -6512,20 +9218,23 @@ module function pow_real32_var(x, y) result(res)
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = y%name
-  res%len = y%len
-  res%dims = y%dims
-  res%atts = y%atts
-
-  call allocate_buffer(res)
   select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -6539,8 +9248,17 @@ module function pow_real32_var(x, y) result(res)
       integer(int16), pointer :: yp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -6554,8 +9272,17 @@ module function pow_real32_var(x, y) result(res)
       integer(int32), pointer :: yp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -6569,8 +9296,17 @@ module function pow_real32_var(x, y) result(res)
       integer(int64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -6584,8 +9320,17 @@ module function pow_real32_var(x, y) result(res)
       real(real32), pointer :: yp(:)
       real(real32), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_FLOAT
+      dtype = NC_FLOAT
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -6599,8 +9344,17 @@ module function pow_real32_var(x, y) result(res)
       real(real64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -6617,20 +9371,23 @@ module function pow_var_real64(x, y) result(res)
   real(real64), intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = x%name
-  res%len = x%len
-  res%dims = x%dims
-  res%atts = x%atts
-
-  call allocate_buffer(res)
   select case (x%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -6644,8 +9401,17 @@ module function pow_var_real64(x, y) result(res)
       integer(int16), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -6659,8 +9425,17 @@ module function pow_var_real64(x, y) result(res)
       integer(int32), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -6674,8 +9449,17 @@ module function pow_var_real64(x, y) result(res)
       integer(int64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -6689,8 +9473,17 @@ module function pow_var_real64(x, y) result(res)
       real(real32), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -6704,8 +9497,17 @@ module function pow_var_real64(x, y) result(res)
       real(real64), pointer :: xp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -6722,20 +9524,23 @@ module function pow_real64_var(x, y) result(res)
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = y%name
-  res%len = y%len
-  res%dims = y%dims
-  res%atts = y%atts
-
-  call allocate_buffer(res)
   select case (y%dtype)
   case (NC_BYTE)
     block
       integer(int8), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -6749,8 +9554,17 @@ module function pow_real64_var(x, y) result(res)
       integer(int16), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -6764,8 +9578,17 @@ module function pow_real64_var(x, y) result(res)
       integer(int32), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -6779,8 +9602,17 @@ module function pow_real64_var(x, y) result(res)
       integer(int64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -6794,8 +9626,17 @@ module function pow_real64_var(x, y) result(res)
       real(real32), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))
@@ -6809,8 +9650,17 @@ module function pow_real64_var(x, y) result(res)
       real(real64), pointer :: yp(:)
       real(real64), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = NC_DOUBLE
+      dtype = NC_DOUBLE
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))

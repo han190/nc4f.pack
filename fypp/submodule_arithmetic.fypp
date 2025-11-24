@@ -12,13 +12,7 @@ module function ${N}$_vars(x, y) result(res)
   if (x%dtype /= y%dtype) &
     & error stop "[add_vars] Unequal data type."
 
-  res%name = x%name
-  res%dtype = x%dtype
-  res%len = x%len
-  res%dims = x%dims
-  res%atts = x%atts
-
-  call allocate_buffer(res)
+  call allocate_variable(res, mold=x)
   select case (x%dtype)
   #: for C, T, K in zip(nc_types, types, kinds)
   case (${C}$)
@@ -44,12 +38,6 @@ module function ${N}$_var_${K1}$(x, y) result(res)
   ${T1}$(${K1}$), intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = x%name
-  res%len = x%len
-  res%dims = x%dims
-  res%atts = x%atts
-
-  call allocate_buffer(res)
   select case (x%dtype)
   #: for C2, T2, K2 in zip(nc_types, types, kinds)
   case (${C2}$)
@@ -57,8 +45,17 @@ module function ${N}$_var_${K1}$(x, y) result(res)
       ${T2}$(${K2}$), pointer :: xp(:)
       ${MERGE_TYPE(C1,C2,types)}$(${MERGE_TYPE(C1,C2,kinds)}$), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = ${MERGE_TYPE(C1,C2,nc_types)}$
+      dtype = ${MERGE_TYPE(C1,C2,nc_types)}$
+      if (allocated(x%atts)) then
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims, x%atts)
+      else
+        call allocate_variable(res, x%name, &
+          & dtype, x%len, x%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(x%buffer(1))
@@ -75,12 +72,6 @@ module function ${N}$_${K1}$_var(x, y) result(res)
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
 
-  res%name = y%name
-  res%len = y%len
-  res%dims = y%dims
-  res%atts = y%atts
-
-  call allocate_buffer(res)
   select case (y%dtype)
   #: for C2, T2, K2 in zip(nc_types, types, kinds)
   case (${C2}$)
@@ -88,8 +79,17 @@ module function ${N}$_${K1}$_var(x, y) result(res)
       ${T2}$(${K2}$), pointer :: yp(:)
       ${MERGE_TYPE(C1,C2,types)}$(${MERGE_TYPE(C1,C2,kinds)}$), pointer :: resp(:)
       type(c_ptr) :: cptr
+      integer(int32) :: dtype
 
-      res%dtype = ${MERGE_TYPE(C1,C2,nc_types)}$
+      dtype = ${MERGE_TYPE(C1,C2,nc_types)}$
+      if (allocated(y%atts)) then
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims, y%atts)
+      else
+        call allocate_variable(res, y%name, &
+          & dtype, y%len, y%dims)
+      end if
+
       cptr = c_loc(res%buffer(1))
       call c_f_pointer(cptr, resp, [res%len])
       cptr = c_loc(y%buffer(1))

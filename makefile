@@ -4,7 +4,7 @@ BUILD_DIR := build
 TEST_DIR := test
 LIB := $(BUILD_DIR)/ncpack.a
 TEST_TARGET := $(BUILD_DIR)/test
-PROFILE ?= release
+PROFILE ?= debug
 FC := gfortran
 NCFLAGS := $(shell pkg-config --cflags --libs netcdf)
 

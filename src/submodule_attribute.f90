@@ -102,7 +102,26 @@ module impure elemental subroutine put_att_nc(nc)
   end do
 end subroutine put_att_nc
 
-pure module subroutine allocate_buffer_att(att)
+module pure subroutine allocate_att_mold(att, mold)
+  type(attribute_type), intent(inout) :: att
+  type(attribute_type), intent(in) :: mold
+
+  call allocate_att_meta(att, mold%name, mold%dtype, mold%len)
+end subroutine allocate_att_mold
+
+module pure subroutine allocate_att_meta(att, name, dtype, len)
+  type(attribute_type), intent(inout) :: att
+  character(len=*), intent(in) :: name
+  integer(int32), intent(in) :: dtype
+  integer(int64), intent(in) :: len
+
+  att%name = name
+  att%dtype = dtype
+  att%len = len
+  call allocate_buffer_att(att)
+end subroutine allocate_att_meta
+
+module pure subroutine allocate_buffer_att(att)
   type(attribute_type), intent(inout) :: att
   integer(int64) :: buffer_size
 
