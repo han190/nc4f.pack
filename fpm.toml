@@ -1,7 +1,7 @@
-name = "netcdf4_pack"
+name = "netcdf4pack"
 version = "0.0.1"
 license = "MIT"
-maintainer = "htang23@ncsu.edu"
+maintainer = "limpid.mazarine@gmail.com"
 author = "Han Tang"
 copyright = "Copyright 2019-2025 Han Tang"
 description = "NetCDF Fortran Library"
@@ -15,6 +15,9 @@ link = ["netcdf"]
 [dependencies]
 netcdf = "*"
 # openmp = "*"
+
+[install]
+library = true
 
 [library]
 source-dir = "src"
