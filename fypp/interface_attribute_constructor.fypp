@@ -1,7 +1,4 @@
 #: include 'common.fypp'
-#! ----------------------
-#! Interface (data_array)
-#! ----------------------
 interface operator(.att.)
   #: for K in kinds
   module procedure :: new_att_${K}$
@@ -10,25 +7,23 @@ interface operator(.att.)
   module procedure :: new_att_character
 end interface operator(.att.)
 
-#! ----------------
-#! Module interface
-#! ----------------
 interface
   #: for T, K in zip(types, kinds)
   module function new_att_${K}$(name, values) result(att)
     character(len=*), intent(in) :: name
     ${T}$(${K}$), intent(in) :: values(:)
-    type(attribute_type), target :: att
-  end function new_att_${K}$${newline}$
+    type(attribute_type) :: att
+  end function new_att_${K}$
+
   module function new_att_${K}$_scalar(name, value) result(att)
     character(len=*), intent(in) :: name
     ${T}$(${K}$), intent(in) :: value
-    type(attribute_type), target :: att
-  end function new_att_${K}$_scalar${newline}$
+    type(attribute_type) :: att
+  end function new_att_${K}$_scalar
+
   #: endfor
   module function new_att_character(name, value) result(att)
-    character(len=*), intent(in) :: name
-    character(len=*), intent(in) :: value
+    character(len=*), intent(in) :: name, value
     type(attribute_type), target :: att
   end function new_att_character
 end interface

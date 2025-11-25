@@ -1,23 +1,24 @@
 #: include "common.fypp"
 submodule(module_netcdf) submodule_attribute_constructor
 implicit none (type, external)
-contains${newline}$
+contains
+
 #: for C, T, K, CK in zip(nc_types, types, kinds, ckinds)
 module function new_att_${K}$(name, values) result(att)
   character(len=*), intent(in) :: name
   ${T}$(${K}$), intent(in) :: values(:)
-  type(attribute_type), target :: att
+  type(attribute_type) :: att
   ${T}$(${K}$), pointer :: ptr(:)
 
   call allocate_attribute(att, name, ${C}$, size(values, kind=int64))
   call extract(att, ptr)
   ptr = values
-  nullify (ptr)
-end function new_att_${K}$${newline}$
+end function new_att_${K}$
+
 module function new_att_${K}$_scalar(name, value) result(att)
   character(len=*), intent(in) :: name
   ${T}$(${K}$), intent(in) :: value
-  type(attribute_type), target :: att
+  type(attribute_type) :: att
   ${T}$(${K}$) :: tmp(1)
 
   tmp(1) = value
@@ -25,8 +26,7 @@ module function new_att_${K}$_scalar(name, value) result(att)
 end function new_att_${K}$_scalar${newline}$
 #: endfor
 module function new_att_character(name, value) result(att)
-  character(len=*), intent(in) :: name
-  character(len=*), intent(in) :: value
+  character(len=*), intent(in) :: name, value
   type(attribute_type), target :: att
   character(kind=c_char), pointer :: fptr(:)
   type(c_ptr) :: cptr
@@ -38,7 +38,6 @@ module function new_att_character(name, value) result(att)
   do i = 1, att%len
     fptr(i) = value(i:i)
   end do
-  nullify (fptr)
 end function new_att_character
 
 end submodule submodule_attribute_constructor

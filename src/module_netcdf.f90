@@ -5,6 +5,7 @@ use, intrinsic :: iso_c_binding
 use, non_intrinsic :: module_c_interface
 implicit none (type, external)
 
+!> Types
 public :: netcdf_type
 public :: variable_type
 public :: attribute_type

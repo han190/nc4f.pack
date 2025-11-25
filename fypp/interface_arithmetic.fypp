@@ -1,7 +1,4 @@
 #: include "common.fypp"
-#! --------------------------
-#! Operators (+, -, *, /, **)
-#! --------------------------
 #: for O, N in zip(ops, op_names)
 interface operator(${O}$)
   module procedure :: ${N}$_vars
@@ -12,16 +9,10 @@ interface operator(${O}$)
 end interface operator(${O}$)
 
 #: endfor
-#! ---------------
-#! Operators (sum)
-#! ---------------
 interface sum
   module procedure :: sum_vars
 end interface sum
 
-#! ----------------
-#! Module interface
-#! ----------------
 interface
   #: for N in op_names
   module function ${N}$_vars(x, y) result(res)
