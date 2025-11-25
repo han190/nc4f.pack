@@ -23,6 +23,7 @@ subroutine simple_wr(passed)
   end do
   var = data_array("data", values, ["x".dim.nx, "y".dim.ny])
   call to_netcdf("simple_wr.nc", var)
+  print "(dt)", var
   passed = .true.
 end subroutine simple_wr
 
@@ -36,6 +37,7 @@ subroutine simple_rd(passed)
 
   nc = open_dataset("simple_wr.nc", "r")
   var = inquire_variable(nc, "data", exist)
+  print "(dt)", var
   passed = &
     var%dims(1)%name == "x" .and. &
     var%dims(1)%len == nx .and. &
@@ -74,6 +76,7 @@ subroutine sfc_pres_temp_wr(passed)
       data_array("pressure", pres, [lon_dim, lat_dim], &
         & ["units".att."hPa"])]
   end associate
+  print "(dt)", vars
   call to_netcdf("sfc_pres_temp_wr.nc", vars)
   passed = .true.
 end subroutine sfc_pres_temp_wr
@@ -94,6 +97,7 @@ subroutine sfc_pres_temp_rd(passed)
       & dims(1)%name == "longitude" .and. &
       & dims(1)%len == 360
   end associate
+  print "(dt)", var
   if (.not. passed) return
 
   var = inquire_variable(nc, "temperature", exist)
@@ -104,6 +108,7 @@ subroutine sfc_pres_temp_rd(passed)
       & dims(1)%name == "longitude" .and. &
       & dims(1)%len == 360
   end associate
+  print "(dt)", var
 end subroutine sfc_pres_temp_rd
 
 end module module_examples
