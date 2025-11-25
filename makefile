@@ -46,7 +46,7 @@ prepare: create_build_dir
 
 $(TEST_TARGET): $(TEST_OBJS)
 	@echo "[test] create executable: $(TEST_TARGET)"
-	@$(FC) -o $(TEST_TARGET) $(TEST_OBJS) $(FFLAGS) $(LIB)
+	@$(FC) -o $(TEST_TARGET) $(TEST_OBJS) $(LIB) $(FFLAGS)
 
 $(BUILD_DIR)/%.o: $(TEST_DIR)/%.f90
 	@echo "[compile] $<"
