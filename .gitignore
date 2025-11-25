@@ -2,3 +2,4 @@ build/
 *.nc
 *.log
 *.txt
+.DS_store
