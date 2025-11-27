@@ -43,14 +43,8 @@ module function ${N}$_var_${K1}$(x, y) result(res)
 
   if (x%dtype /= ${C1}$) error stop &
     & "[${N}$_var_${K1}$] typeof(x) /= typeof(y)."
-  if (allocated(x%atts)) then
-    call allocate_variable(res, x%name, &
-      & x%dtype, x%len, x%dims, x%atts)
-  else
-    call allocate_variable(res, x%name, &
-      & x%dtype, x%len, x%dims)
-  end if
 
+  call allocate_variable(res, mold=x)
   cptr = c_loc(res%buffer(1))
   call c_f_pointer(cptr, resp, [res%len])
   cptr = c_loc(x%buffer(1))
@@ -67,14 +61,8 @@ module function ${N}$_${K1}$_var(x, y) result(res)
 
   if (y%dtype /= ${C1}$) error stop &
     & "[${N}$_var_${K1}$] typeof(x) /= typeof(y)."
-  if (allocated(y%atts)) then
-    call allocate_variable(res, y%name, &
-      & y%dtype, y%len, y%dims, y%atts)
-  else
-    call allocate_variable(res, y%name, &
-      & y%dtype, y%len, y%dims)
-  end if
   
+  call allocate_variable(res, mold=y)
   cptr = c_loc(res%buffer(1))
   call c_f_pointer(cptr, resp, [res%len])
   cptr = c_loc(y%buffer(1))
