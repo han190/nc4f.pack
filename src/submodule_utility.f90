@@ -2,7 +2,7 @@ submodule(module_netcdf) submodule_utility
 implicit none (type, external)
 contains
 
-impure elemental module subroutine handle_error(status, error_message)
+module impure elemental subroutine handle_error(status, error_message)
   integer(c_int), intent(in) :: status
   character(*), intent(in), optional :: error_message
   character(:), pointer :: fptr => null()
@@ -30,7 +30,7 @@ impure elemental module subroutine handle_error(status, error_message)
   nullify (fptr)
 end subroutine handle_error
 
-pure module function c2fstr(cstr) result(fstr)
+module pure function c2fstr(cstr) result(fstr)
   character(kind=c_char, len=*), intent(in) :: cstr
   character(len=:), allocatable :: fstr
   integer :: inull, str_len
@@ -42,7 +42,7 @@ pure module function c2fstr(cstr) result(fstr)
   fstr = cstr(1:str_len)
 end function c2fstr
 
-pure module function f2cstr(fstr) result(cstr)
+module pure function f2cstr(fstr) result(cstr)
   character(len=*), intent(in) :: fstr
   character(kind=c_char, len=:), allocatable :: cstr
 

@@ -98,7 +98,7 @@ module function inq_dims_(ncid, varid) result(dims)
     & "[inq_dims_] Too many unlimited dims."
 end function inq_dims_
 
-impure elemental module function def_dim(nc, dim) result(new_dim)
+module impure elemental function def_dim(nc, dim) result(new_dim)
   type(netcdf_type), intent(in) :: nc
   type(dimension_type), intent(in) :: dim
   type(dimension_type) :: new_dim

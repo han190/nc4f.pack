@@ -98,7 +98,7 @@ impure elemental function def_var_(nc, var) result(new_var)
   if (allocated(var%atts)) new_var%atts = var%atts
 end function def_var_
 
-pure module function get_size(var, dim) result(n)
+module pure function get_size(var, dim) result(n)
   type(variable_type), intent(in) :: var
   integer, intent(in), optional :: dim
   integer(int64) :: n
@@ -127,7 +127,7 @@ pure module function get_size(var, dim) result(n)
   end select
 end function get_size
 
-pure module function get_shape(var) result(n)
+module pure function get_shape(var) result(n)
   type(variable_type), intent(in) :: var
   integer(int64), allocatable :: n(:)
   integer :: ndims, i

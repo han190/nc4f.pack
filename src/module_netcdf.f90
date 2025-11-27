@@ -175,7 +175,7 @@ end interface to_netcdf
 
 interface
   !> submodule_attribute.f90
-  impure elemental module function get_att_nc(nc, name) result(att)
+  module impure elemental function get_att_nc(nc, name) result(att)
     type(netcdf_type), intent(in) :: nc
     character(len=*), intent(in) :: name
     type(attribute_type) :: att
@@ -213,7 +213,7 @@ interface
     integer(int64), intent(in) :: len
   end subroutine allocate_att_meta
 
-  pure module subroutine allocate_buffer_att(att)
+  module pure subroutine allocate_buffer_att(att)
     type(attribute_type), intent(inout) :: att
   end subroutine allocate_buffer_att
 
@@ -292,7 +292,7 @@ interface
     type(dimension_type), allocatable :: dims(:)
   end function inq_dims_
 
-  impure elemental module function def_dim(nc, dim) result(new_dim)
+  module impure elemental function def_dim(nc, dim) result(new_dim)
     type(netcdf_type), intent(in) :: nc
     type(dimension_type), intent(in) :: dim
     type(dimension_type) :: new_dim
@@ -335,7 +335,7 @@ interface
   end subroutine write_frmt_dim
 
   !> submodule_utility.f90
-  impure elemental module subroutine handle_error(status, error_message)
+  module impure elemental subroutine handle_error(status, error_message)
     integer(c_int), intent(in) :: status
     character(*), intent(in), optional :: error_message
   end subroutine handle_error
@@ -350,7 +350,7 @@ interface
     character(kind=c_char, len=:), allocatable :: cstr
   end function f2cstr
 
-  pure logical module function allocation_required(buffer, bsize)
+  module pure logical function allocation_required(buffer, bsize)
     integer(int8), allocatable, intent(in) :: buffer(:)
     integer(int64), intent(in) :: bsize
   end function allocation_required
@@ -381,13 +381,13 @@ interface
     type(variable_type), target, intent(in) :: var
   end subroutine put_var
 
-  pure module function get_size(var, dim) result(n)
+  module pure function get_size(var, dim) result(n)
     type(variable_type), intent(in) :: var
     integer, intent(in), optional :: dim
     integer(int64) :: n
   end function get_size
 
-  pure module function get_shape(var) result(n)
+  module pure function get_shape(var) result(n)
     type(variable_type), intent(in) :: var
     integer(int64), allocatable :: n(:)
   end function get_shape

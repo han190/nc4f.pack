@@ -56,23 +56,51 @@ calculations from the data you read. Thus, this library provides simple function
 3. Extract perturbed temperature (a constant $\theta_0=300$) and add base
    temperature to get potential temperature ($\theta = \theta_0 + \tilde{\theta}$).
 4. Convert potential temperature to temperature through $T = \theta [(p/p_0)^{R/C_p}]$.
+5. Save the output to a new netcdf file.
 
-With this library, you can do this very intuitively,
+If you would like to "extract", you could do
 ```advanced.f90
 program main
 
 use, non_intrinsic :: module_netcdf
 implicit none (type, external)
 
-real, parameter :: T0 = 300.0, R = 287.0, CP = 1004.0, P0 = 1000.0 * 100
+real, parameter :: THETA0 = 300.0, R = 287.0, CP = 1004.0, P0 = 1000.0 * 100
+type(netcdf_type) :: nc
+type(variable_type) :: vars(3), output
+real, dimension(:, :, :, :), pointer :: P, PB, THETA, T
+
+nc = open_dataset("wrfout_d01_2000-01-01_00_00_00", "r")
+vars = get_variable(nc, [character(len=2) :: "P", "PB", "T"])
+
+call extract(vars(1), P)
+call extract(vars(2), PB)
+call extract(vars(3), THETA)
+call allocate_variable(output, mold=P)
+call extract(output, T)
+
+T = (THETA + THETA0)*(P/P0)**(R/CP)
+call to_netcdf("output.nc", output)
+
+end program main
+```
+With this library, you can also do this very intuitively,
+```advanced.f90
+program main
+
+use, non_intrinsic :: module_netcdf
+implicit none (type, external)
+
+real, parameter :: THETA0 = 300.0, R = 287.0, CP = 1004.0, P0 = 1000.0 * 100
 type(netcdf_type) :: nc
 type(variable_type) :: P, THETA, T
 
 nc = open_dataset("wrfout_d01_2000-01-01_00_00_00", "r")
 P = sum(get_variable(nc, [character(len=2) :: "P", "PB"]))
-THETA = get_variable(nc, "T") + T0
-T = THETA*(P/P0)**(R/CP)
-print *, T
+THETA = get_variable(nc, "T")
+
+T = (THETA + THETA0)*(P/P0)**(R/CP)
+call to_netcdf("output.nc", T)
 
 end program main
 ```

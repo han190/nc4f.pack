@@ -2,7 +2,7 @@ submodule(module_netcdf) submodule_attribute
 implicit none (type, external)
 contains
 
-impure elemental module function get_att_nc(nc, name) result(att)
+module impure elemental function get_att_nc(nc, name) result(att)
   type(netcdf_type), intent(in) :: nc
   character(len=*), intent(in) :: name
   type(attribute_type) :: att
@@ -21,7 +21,7 @@ module function get_atts_(ncid, varid, exist) result(atts)
   logical, intent(inout), optional :: exist
   type(attribute_type), allocatable :: atts(:)
   integer(c_int) :: natts, i
-  character(kind=c_char, len=100) :: name
+  character(kind=c_char, len=MAX_CHAR_LEN) :: name
   integer(c_int) :: stat
 
   if (varid == NC_GLOBAL) then

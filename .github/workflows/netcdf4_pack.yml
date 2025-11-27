@@ -14,9 +14,6 @@ jobs:
 
     
     steps:
-      - name: Use Checkout
-        uses: actions/checkout@v1
-    
       - name: Install dependencies
         if: contains( matrix.os, 'ubuntu' )
         run: sudo apt install gfortran-${{ matrix.gcc_version }} libnetcdf-dev pkg-config
