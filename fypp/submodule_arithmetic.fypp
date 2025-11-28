@@ -61,7 +61,7 @@ module function ${N}$_${K1}$_var(x, y) result(res)
 
   if (y%dtype /= ${C1}$) error stop &
     & "[${N}$_var_${K1}$] typeof(x) /= typeof(y)."
-  
+
   call allocate_variable(res, mold=y)
   cptr = c_loc(res%buffer(1))
   call c_f_pointer(cptr, resp, [res%len])

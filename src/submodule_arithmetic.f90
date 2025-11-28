@@ -127,7 +127,7 @@ module function add_int8_var(x, y) result(res)
 
   if (y%dtype /= NC_BYTE) error stop &
     & "[add_var_int8] typeof(x) /= typeof(y)."
-  
+
   call allocate_variable(res, mold=y)
   cptr = c_loc(res%buffer(1))
   call c_f_pointer(cptr, resp, [res%len])
@@ -163,7 +163,7 @@ module function add_int16_var(x, y) result(res)
 
   if (y%dtype /= NC_SHORT) error stop &
     & "[add_var_int16] typeof(x) /= typeof(y)."
-  
+
   call allocate_variable(res, mold=y)
   cptr = c_loc(res%buffer(1))
   call c_f_pointer(cptr, resp, [res%len])
@@ -199,7 +199,7 @@ module function add_int32_var(x, y) result(res)
 
   if (y%dtype /= NC_INT) error stop &
     & "[add_var_int32] typeof(x) /= typeof(y)."
-  
+
   call allocate_variable(res, mold=y)
   cptr = c_loc(res%buffer(1))
   call c_f_pointer(cptr, resp, [res%len])
@@ -235,7 +235,7 @@ module function add_int64_var(x, y) result(res)
 
   if (y%dtype /= NC_INT64) error stop &
     & "[add_var_int64] typeof(x) /= typeof(y)."
-  
+
   call allocate_variable(res, mold=y)
   cptr = c_loc(res%buffer(1))
   call c_f_pointer(cptr, resp, [res%len])
@@ -271,7 +271,7 @@ module function add_real32_var(x, y) result(res)
 
   if (y%dtype /= NC_FLOAT) error stop &
     & "[add_var_real32] typeof(x) /= typeof(y)."
-  
+
   call allocate_variable(res, mold=y)
   cptr = c_loc(res%buffer(1))
   call c_f_pointer(cptr, resp, [res%len])
@@ -307,7 +307,7 @@ module function add_real64_var(x, y) result(res)
 
   if (y%dtype /= NC_DOUBLE) error stop &
     & "[add_var_real64] typeof(x) /= typeof(y)."
-  
+
   call allocate_variable(res, mold=y)
   cptr = c_loc(res%buffer(1))
   call c_f_pointer(cptr, resp, [res%len])
@@ -441,7 +441,7 @@ module function sub_int8_var(x, y) result(res)
 
   if (y%dtype /= NC_BYTE) error stop &
     & "[sub_var_int8] typeof(x) /= typeof(y)."
-  
+
   call allocate_variable(res, mold=y)
   cptr = c_loc(res%buffer(1))
   call c_f_pointer(cptr, resp, [res%len])
@@ -477,7 +477,7 @@ module function sub_int16_var(x, y) result(res)
 
   if (y%dtype /= NC_SHORT) error stop &
     & "[sub_var_int16] typeof(x) /= typeof(y)."
-  
+
   call allocate_variable(res, mold=y)
   cptr = c_loc(res%buffer(1))
   call c_f_pointer(cptr, resp, [res%len])
@@ -513,7 +513,7 @@ module function sub_int32_var(x, y) result(res)
 
   if (y%dtype /= NC_INT) error stop &
     & "[sub_var_int32] typeof(x) /= typeof(y)."
-  
+
   call allocate_variable(res, mold=y)
   cptr = c_loc(res%buffer(1))
   call c_f_pointer(cptr, resp, [res%len])
@@ -549,7 +549,7 @@ module function sub_int64_var(x, y) result(res)
 
   if (y%dtype /= NC_INT64) error stop &
     & "[sub_var_int64] typeof(x) /= typeof(y)."
-  
+
   call allocate_variable(res, mold=y)
   cptr = c_loc(res%buffer(1))
   call c_f_pointer(cptr, resp, [res%len])
@@ -585,7 +585,7 @@ module function sub_real32_var(x, y) result(res)
 
   if (y%dtype /= NC_FLOAT) error stop &
     & "[sub_var_real32] typeof(x) /= typeof(y)."
-  
+
   call allocate_variable(res, mold=y)
   cptr = c_loc(res%buffer(1))
   call c_f_pointer(cptr, resp, [res%len])
@@ -621,7 +621,7 @@ module function sub_real64_var(x, y) result(res)
 
   if (y%dtype /= NC_DOUBLE) error stop &
     & "[sub_var_real64] typeof(x) /= typeof(y)."
-  
+
   call allocate_variable(res, mold=y)
   cptr = c_loc(res%buffer(1))
   call c_f_pointer(cptr, resp, [res%len])
@@ -755,7 +755,7 @@ module function mul_int8_var(x, y) result(res)
 
   if (y%dtype /= NC_BYTE) error stop &
     & "[mul_var_int8] typeof(x) /= typeof(y)."
-  
+
   call allocate_variable(res, mold=y)
   cptr = c_loc(res%buffer(1))
   call c_f_pointer(cptr, resp, [res%len])
@@ -791,7 +791,7 @@ module function mul_int16_var(x, y) result(res)
 
   if (y%dtype /= NC_SHORT) error stop &
     & "[mul_var_int16] typeof(x) /= typeof(y)."
-  
+
   call allocate_variable(res, mold=y)
   cptr = c_loc(res%buffer(1))
   call c_f_pointer(cptr, resp, [res%len])
@@ -827,7 +827,7 @@ module function mul_int32_var(x, y) result(res)
 
   if (y%dtype /= NC_INT) error stop &
     & "[mul_var_int32] typeof(x) /= typeof(y)."
-  
+
   call allocate_variable(res, mold=y)
   cptr = c_loc(res%buffer(1))
   call c_f_pointer(cptr, resp, [res%len])
@@ -863,7 +863,7 @@ module function mul_int64_var(x, y) result(res)
 
   if (y%dtype /= NC_INT64) error stop &
     & "[mul_var_int64] typeof(x) /= typeof(y)."
-  
+
   call allocate_variable(res, mold=y)
   cptr = c_loc(res%buffer(1))
   call c_f_pointer(cptr, resp, [res%len])
@@ -899,7 +899,7 @@ module function mul_real32_var(x, y) result(res)
 
   if (y%dtype /= NC_FLOAT) error stop &
     & "[mul_var_real32] typeof(x) /= typeof(y)."
-  
+
   call allocate_variable(res, mold=y)
   cptr = c_loc(res%buffer(1))
   call c_f_pointer(cptr, resp, [res%len])
@@ -935,7 +935,7 @@ module function mul_real64_var(x, y) result(res)
 
   if (y%dtype /= NC_DOUBLE) error stop &
     & "[mul_var_real64] typeof(x) /= typeof(y)."
-  
+
   call allocate_variable(res, mold=y)
   cptr = c_loc(res%buffer(1))
   call c_f_pointer(cptr, resp, [res%len])
@@ -1069,7 +1069,7 @@ module function div_int8_var(x, y) result(res)
 
   if (y%dtype /= NC_BYTE) error stop &
     & "[div_var_int8] typeof(x) /= typeof(y)."
-  
+
   call allocate_variable(res, mold=y)
   cptr = c_loc(res%buffer(1))
   call c_f_pointer(cptr, resp, [res%len])
@@ -1105,7 +1105,7 @@ module function div_int16_var(x, y) result(res)
 
   if (y%dtype /= NC_SHORT) error stop &
     & "[div_var_int16] typeof(x) /= typeof(y)."
-  
+
   call allocate_variable(res, mold=y)
   cptr = c_loc(res%buffer(1))
   call c_f_pointer(cptr, resp, [res%len])
@@ -1141,7 +1141,7 @@ module function div_int32_var(x, y) result(res)
 
   if (y%dtype /= NC_INT) error stop &
     & "[div_var_int32] typeof(x) /= typeof(y)."
-  
+
   call allocate_variable(res, mold=y)
   cptr = c_loc(res%buffer(1))
   call c_f_pointer(cptr, resp, [res%len])
@@ -1177,7 +1177,7 @@ module function div_int64_var(x, y) result(res)
 
   if (y%dtype /= NC_INT64) error stop &
     & "[div_var_int64] typeof(x) /= typeof(y)."
-  
+
   call allocate_variable(res, mold=y)
   cptr = c_loc(res%buffer(1))
   call c_f_pointer(cptr, resp, [res%len])
@@ -1213,7 +1213,7 @@ module function div_real32_var(x, y) result(res)
 
   if (y%dtype /= NC_FLOAT) error stop &
     & "[div_var_real32] typeof(x) /= typeof(y)."
-  
+
   call allocate_variable(res, mold=y)
   cptr = c_loc(res%buffer(1))
   call c_f_pointer(cptr, resp, [res%len])
@@ -1249,7 +1249,7 @@ module function div_real64_var(x, y) result(res)
 
   if (y%dtype /= NC_DOUBLE) error stop &
     & "[div_var_real64] typeof(x) /= typeof(y)."
-  
+
   call allocate_variable(res, mold=y)
   cptr = c_loc(res%buffer(1))
   call c_f_pointer(cptr, resp, [res%len])
@@ -1383,7 +1383,7 @@ module function pow_int8_var(x, y) result(res)
 
   if (y%dtype /= NC_BYTE) error stop &
     & "[pow_var_int8] typeof(x) /= typeof(y)."
-  
+
   call allocate_variable(res, mold=y)
   cptr = c_loc(res%buffer(1))
   call c_f_pointer(cptr, resp, [res%len])
@@ -1419,7 +1419,7 @@ module function pow_int16_var(x, y) result(res)
 
   if (y%dtype /= NC_SHORT) error stop &
     & "[pow_var_int16] typeof(x) /= typeof(y)."
-  
+
   call allocate_variable(res, mold=y)
   cptr = c_loc(res%buffer(1))
   call c_f_pointer(cptr, resp, [res%len])
@@ -1455,7 +1455,7 @@ module function pow_int32_var(x, y) result(res)
 
   if (y%dtype /= NC_INT) error stop &
     & "[pow_var_int32] typeof(x) /= typeof(y)."
-  
+
   call allocate_variable(res, mold=y)
   cptr = c_loc(res%buffer(1))
   call c_f_pointer(cptr, resp, [res%len])
@@ -1491,7 +1491,7 @@ module function pow_int64_var(x, y) result(res)
 
   if (y%dtype /= NC_INT64) error stop &
     & "[pow_var_int64] typeof(x) /= typeof(y)."
-  
+
   call allocate_variable(res, mold=y)
   cptr = c_loc(res%buffer(1))
   call c_f_pointer(cptr, resp, [res%len])
@@ -1527,7 +1527,7 @@ module function pow_real32_var(x, y) result(res)
 
   if (y%dtype /= NC_FLOAT) error stop &
     & "[pow_var_real32] typeof(x) /= typeof(y)."
-  
+
   call allocate_variable(res, mold=y)
   cptr = c_loc(res%buffer(1))
   call c_f_pointer(cptr, resp, [res%len])
@@ -1563,7 +1563,7 @@ module function pow_real64_var(x, y) result(res)
 
   if (y%dtype /= NC_DOUBLE) error stop &
     & "[pow_var_real64] typeof(x) /= typeof(y)."
-  
+
   call allocate_variable(res, mold=y)
   cptr = c_loc(res%buffer(1))
   call c_f_pointer(cptr, resp, [res%len])
@@ -1593,3 +1593,4 @@ module function sum_vars(vars) result(s)
 end function sum_vars
 
 end submodule submodule_arithmetic
+
