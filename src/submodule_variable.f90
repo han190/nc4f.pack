@@ -199,23 +199,25 @@ module elemental logical function eq_var(x, y)
   is_alloc(2) = allocated(y%dims)
 
   if (all(is_alloc)) then
-    eq_var = eq_var .and. all(x%dims == y%dims)
-    continue
+    eq_var = all(x%dims == y%dims)
   else
     eq_var = .false.
-    return
   end if
+  if (.not. eq_var) return
 
   is_alloc(1) = allocated(x%atts)
   is_alloc(2) = allocated(y%atts)
 
   if (all(is_alloc)) then
-    eq_var = eq_var .and. all(x%atts == y%atts)
-  else if (.not. is_alloc(1) .and. is_alloc(2)) then
-    eq_var = .false.
-  else if (is_alloc(1) .and. .not. is_alloc(2)) then
+    eq_var = all(x%atts == y%atts)
+  else if (.not. any(is_alloc)) then
+    eq_var = .true.
+  else
     eq_var = .false.
   end if
+  if (.not. eq_var) return
+
+  eq_var = all(x%buffer == y%buffer)
 end function eq_var
 
 module elemental logical function neq_var(x, y)
