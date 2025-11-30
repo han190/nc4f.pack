@@ -5,7 +5,7 @@ contains
 module impure elemental function get_var(nc, name, exist) result(var)
   type(netcdf_type), intent(in) :: nc
   character(len=*), intent(in) :: name
-  logical, intent(out), optional :: exist
+  logical, optional, intent(out) :: exist
   type(variable_type) :: var
 
   var = get_var_(nc%id, name, exist)
@@ -31,20 +31,27 @@ end function get_var_
 module impure elemental function inq_var(nc, name, exist) result(var)
   type(netcdf_type), intent(in) :: nc
   character(len=*), intent(in) :: name
-  logical, intent(out), optional :: exist
+  logical, optional, intent(out) :: exist
   type(variable_type) :: var
+  logical :: atts_exist
+  integer :: i
 
   var = inq_var_(nc%id, name, exist)
+  var%atts = get_atts_var(nc, var, atts_exist)
+  if (.not. atts_exist .and. allocated(var%atts)) deallocate (var%atts)
+  var%dims = inq_dims_var(nc, var)
+  var%len = 1
+  do i = 1, size(var%dims)
+    var%len = var%len*var%dims(i)%len
+  end do
 end function inq_var
 
 impure elemental function inq_var_(ncid, name, exist) result(var)
   integer(c_int), intent(in) :: ncid
   character(len=*), intent(in) :: name
-  logical, intent(out), optional :: exist
+  logical, optional, intent(out) :: exist
   type(variable_type) :: var
   integer(c_int) :: stat
-  integer :: i
-  logical :: atts_exist
 
   var%name = trim(adjustl(name))
   stat = nc_inq_varid(ncid, f2cstr(var%name), var%id)
@@ -53,15 +60,7 @@ impure elemental function inq_var_(ncid, name, exist) result(var)
     if (.not. exist) return
   end if
   call handle_error(stat)
-
   call handle_error(nc_inq_vartype(ncid, var%id, var%dtype))
-  var%atts = get_atts_(ncid, var%id, atts_exist)
-  if (.not. atts_exist .and. allocated(var%atts)) deallocate(var%atts)
-  var%dims = inq_dims_(ncid, var%id)
-  var%len = 1
-  do i = 1, size(var%dims)
-    var%len = var%len*var%dims(i)%len
-  end do
 end function inq_var_
 
 module impure elemental subroutine put_var(nc, var)
@@ -100,7 +99,7 @@ end function def_var_
 
 module pure function get_size(var, dim) result(n)
   type(variable_type), intent(in) :: var
-  integer, intent(in), optional :: dim
+  integer, optional, intent(in) :: dim
   integer(int64) :: n
   integer :: dim_, i
 
@@ -166,7 +165,7 @@ module pure subroutine allocate_var_meta(var, name, dtype, len, dims, atts)
   integer(int32), intent(in) :: dtype
   integer(int64), intent(in) :: len
   type(dimension_type), intent(in) :: dims(:)
-  type(attribute_type), intent(in), optional :: atts(:)
+  type(attribute_type), optional, intent(in) :: atts(:)
 
   var%name = name
   var%dtype = dtype

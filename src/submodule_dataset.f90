@@ -8,24 +8,30 @@ module function open_dataset(filename, mode, inq_dims, inq_atts) result(nc)
   logical, intent(in), optional :: inq_dims
   logical, intent(in), optional :: inq_atts
   type(netcdf_type) :: nc
+  logical :: atts_exist
 
   select case (mode)
   case ("r", "read")
+
     nc%filename = trim(adjustl(filename))
     call handle_error(nc_open(f2cstr(nc%filename), NC_NOWRITE, nc%id), &
       & "[open_dataset] File not found.")
     nc%mode = NC_NOWRITE
-
     if (optval(.false., inq_dims)) nc%dims = inq_dims_nc(nc)
-    if (optval(.false., inq_atts)) nc%atts = get_atts_nc(nc)
+    if (optval(.false., inq_atts)) then
+      nc%atts = get_atts_nc(nc, atts_exist)
+      if (.not. atts_exist .and. allocated(nc%atts)) deallocate (nc%atts)
+    end if
+
   case ("w", "write")
+
     nc%filename = trim(adjustl(filename))
     call handle_error(nc_create(f2cstr(nc%filename), NC_NETCDF4, nc%id), &
       & "[open_dataset] Could not create file.")
     nc%mode = NC_NETCDF4
-
     if (allocated(nc%atts)) deallocate (nc%atts)
     if (allocated(nc%dims)) deallocate (nc%dims)
+
   case default
     error stop "[open_dataset] Invalid mode."
   end select

@@ -57,9 +57,17 @@ module function inq_dims_nc(nc) result(dims)
   dims = inq_dims_(nc%id)
 end function inq_dims_nc
 
+module function inq_dims_var(nc, var) result(dims)
+  type(netcdf_type), intent(in) :: nc
+  type(variable_type), intent(in) :: var
+  type(dimension_type), allocatable :: dims(:)
+
+  dims = inq_dims_(nc%id, var%id)
+end function inq_dims_var
+
 module function inq_dims_(ncid, varid) result(dims)
   integer(c_int), intent(in) :: ncid
-  integer(c_int), intent(in), optional :: varid
+  integer(c_int), optional, intent(in) :: varid
   type(dimension_type), allocatable :: dims(:)
   integer(c_int) :: dimids(NC_MAX_DIMS)
   character(len=NC_MAX_NAME, kind=c_char) :: dim_name

@@ -10,15 +10,35 @@ module impure elemental function get_att_nc(nc, name) result(att)
   att = get_att_(nc%id, NC_GLOBAL, f2cstr(trim(adjustl(name))))
 end function get_att_nc
 
-module function get_atts_nc(nc) result(atts)
+module function get_atts_nc(nc, exist) result(atts)
   type(netcdf_type), intent(in) :: nc
+  logical, optional, intent(out) :: exist
   type(attribute_type), allocatable :: atts(:)
-  atts = get_atts_(nc%id, NC_GLOBAL)
+
+  atts = get_atts_(nc%id, NC_GLOBAL, exist)
 end function get_atts_nc
 
-module function get_atts_(ncid, varid, exist) result(atts)
+module function get_att_var(nc, var, name) result(att)
+  type(netcdf_type), intent(in) :: nc
+  type(variable_type), intent(in) :: var
+  character(len=*), intent(in) :: name
+  type(attribute_type) :: att
+
+  att = get_att_(nc%id, var%id, name)
+end function get_att_var
+
+module function get_atts_var(nc, var, exist) result(atts)
+  type(netcdf_type), intent(in) :: nc
+  type(variable_type), intent(in) :: var
+  logical, optional, intent(out) :: exist
+  type(attribute_type), allocatable :: atts(:)
+
+  atts = get_atts_(nc%id, var%id, exist)
+end function get_atts_var
+
+function get_atts_(ncid, varid, exist) result(atts)
   integer(c_int), intent(in) :: ncid, varid
-  logical, intent(inout), optional :: exist
+  logical, optional, intent(out) :: exist
   type(attribute_type), allocatable :: atts(:)
   integer(c_int) :: natts, i
   character(kind=c_char, len=MAX_CHAR_LEN) :: name

@@ -110,7 +110,9 @@ end interface inquire_variable
 
 interface get_attribute
   module procedure :: get_atts_nc
-  module procedure :: get_att_nc
+  module procedure :: get_att_nc !> Impure elemental
+  module procedure :: get_atts_var
+  module procedure :: get_att_var !> Impure elemental
 end interface get_attribute
 
 interface put_attribute
@@ -120,6 +122,7 @@ end interface put_attribute
 
 interface inquire_dimensions
   module procedure :: inq_dims_nc
+  module procedure :: inq_dims_var
 end interface inquire_dimensions
 
 interface operator(.dim.)
@@ -181,16 +184,25 @@ interface
     type(attribute_type) :: att
   end function get_att_nc
 
-  module function get_atts_nc(nc) result(atts)
+  module function get_atts_nc(nc, exist) result(atts)
     type(netcdf_type), intent(in) :: nc
+    logical, optional, intent(out) :: exist
     type(attribute_type), allocatable :: atts(:)
   end function get_atts_nc
 
-  module function get_atts_(ncid, varid, exist) result(atts)
-    integer(c_int), intent(in) :: ncid, varid
-    logical, intent(inout), optional :: exist
+  module function get_att_var(nc, var, name) result(att)
+    type(netcdf_type), intent(in) :: nc
+    type(variable_type), intent(in) :: var
+    character(len=*), intent(in) :: name
+    type(attribute_type) :: att
+  end function get_att_var
+
+  module function get_atts_var(nc, var, exist) result(atts)
+    type(netcdf_type), intent(in) :: nc
+    type(variable_type), intent(in) :: var
+    logical, optional, intent(out) :: exist
     type(attribute_type), allocatable :: atts(:)
-  end function get_atts_
+  end function get_atts_var
 
   module impure elemental subroutine put_att_var(nc, var)
     type(netcdf_type), intent(in) :: nc
@@ -286,11 +298,11 @@ interface
     type(dimension_type), allocatable :: dims(:)
   end function inq_dims_nc
 
-  module function inq_dims_(ncid, varid) result(dims)
-    integer(c_int), intent(in) :: ncid
-    integer(c_int), intent(in), optional :: varid
+  module function inq_dims_var(nc, var) result(dims)
+    type(netcdf_type), intent(in) :: nc
+    type(variable_type), intent(in) :: var
     type(dimension_type), allocatable :: dims(:)
-  end function inq_dims_
+  end function inq_dims_var
 
   module impure elemental function def_dim(nc, dim) result(new_dim)
     type(netcdf_type), intent(in) :: nc
