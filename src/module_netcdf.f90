@@ -96,28 +96,29 @@ interface write(formatted)
   module procedure :: write_frmt_dim
 end interface write(formatted)
 
+!> Public APIs (IE: Impure Elemental)
 interface get_variable
-  module procedure :: get_var
+  module procedure :: get_var !> IE
 end interface get_variable
 
 interface put_variable
-  module procedure :: put_var
+  module procedure :: put_var !> IE
 end interface put_variable
 
 interface inquire_variable
-  module procedure :: inq_var
+  module procedure :: inq_var !> IE
 end interface inquire_variable
 
 interface get_attribute
   module procedure :: get_atts_nc
-  module procedure :: get_att_nc !> Impure elemental
+  module procedure :: get_att_nc !> IE
   module procedure :: get_atts_var
-  module procedure :: get_att_var !> Impure elemental
+  module procedure :: get_att_var !> IE
 end interface get_attribute
 
 interface put_attribute
-  module procedure :: put_att_nc
-  module procedure :: put_att_var
+  module procedure :: put_att_nc !> IE
+  module procedure :: put_att_var !> IE
 end interface put_attribute
 
 interface inquire_dimensions
