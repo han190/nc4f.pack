@@ -49,7 +49,7 @@ module pure function f2cstr(fstr) result(cstr)
   cstr = trim(fstr)//c_null_char
 end function f2cstr
 
-pure logical module function allocation_required(buffer, bsize)
+module pure logical function allocation_required(buffer, bsize)
   integer(int8), allocatable, intent(in) :: buffer(:)
   integer(int64), intent(in) :: bsize
 

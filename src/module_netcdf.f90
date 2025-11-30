@@ -352,12 +352,12 @@ interface
     character(*), intent(in), optional :: error_message
   end subroutine handle_error
 
-  pure module function c2fstr(cstr) result(fstr)
+  module pure function c2fstr(cstr) result(fstr)
     character(kind=c_char, len=*), intent(in) :: cstr
     character(len=:), allocatable :: fstr
   end function c2fstr
 
-  pure module function f2cstr(fstr) result(cstr)
+  module pure function f2cstr(fstr) result(cstr)
     character(len=*), intent(in) :: fstr
     character(kind=c_char, len=:), allocatable :: cstr
   end function f2cstr
