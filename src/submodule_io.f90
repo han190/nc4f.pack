@@ -56,13 +56,12 @@ module subroutine write_frmt_var(var, unit, iotype, v_list, iostat, iomsg)
 end subroutine write_frmt_var
 
 module subroutine write_frmt_att(att, unit, iotype, v_list, iostat, iomsg)
-  class(attribute_type), target, intent(in) :: att
+  class(attribute_type), intent(in) :: att
   integer, intent(in) :: unit
   character(len=*), intent(in) :: iotype
   integer, intent(in) :: v_list(:)
   integer, intent(out) :: iostat
   character(len=*), intent(inout) :: iomsg
-  type(c_ptr) :: ptr
   character(len=28), parameter :: &
     & fmt_real = "(2(a), 1x, '=', *(1x, g0.6))", &
     & fmt_int = "(2(a), 1x, '=', *(1x, i0))"
@@ -71,52 +70,51 @@ module subroutine write_frmt_att(att, unit, iotype, v_list, iostat, iomsg)
   end associate
 
   iostat = 999
-  ptr = c_loc(att%buffer(1))
 
   if (iotype == 'LISTDIRECTED' .or. iotype == 'DT') then
     select case (att%dtype)
     case (NC_FLOAT)
       block
-        real(real32), pointer :: fptr(:)
-        call c_f_pointer(ptr, fptr, [att%len])
-        write (unit, fmt_real) 'real(real32)::', att%name, fptr
+        real(real32), pointer :: ptr(:)
+        call extract(att, ptr)
+        write (unit, fmt_real) 'real(real32)::', att%name, ptr
       end block
     case (NC_DOUBLE)
       block
-        real(real64), pointer :: fptr(:)
-        call c_f_pointer(ptr, fptr, [att%len])
-        write (unit, fmt_real) 'real(real64)::', att%name, fptr
+        real(real64), pointer :: ptr(:)
+        call extract(att, ptr)
+        write (unit, fmt_real) 'real(real64)::', att%name, ptr
       end block
     case (NC_BYTE)
       block
-        integer(int8), pointer :: fptr(:)
-        call c_f_pointer(ptr, fptr, [att%len])
-        write (unit, fmt_int) 'integer(int8)::', att%name, fptr
+        integer(int8), pointer :: ptr(:)
+        call extract(att, ptr)
+        write (unit, fmt_int) 'integer(int8)::', att%name, ptr
       end block
     case (NC_SHORT)
       block
-        integer(int16), pointer :: fptr(:)
-        call c_f_pointer(ptr, fptr, [att%len])
-        write (unit, fmt_int) 'integer(int16)::', att%name, fptr
+        integer(int16), pointer :: ptr(:)
+        call extract(att, ptr)
+        write (unit, fmt_int) 'integer(int16)::', att%name, ptr
       end block
     case (NC_INT)
       block
-        integer(int32), pointer :: fptr(:)
-        call c_f_pointer(ptr, fptr, [att%len])
-        write (unit, fmt_int) 'integer(int32)::', att%name, fptr
+        integer(int32), pointer :: ptr(:)
+        call extract(att, ptr)
+        write (unit, fmt_int) 'integer(int32)::', att%name, ptr
       end block
     case (NC_INT64)
       block
-        integer(int64), pointer :: fptr(:)
-        call c_f_pointer(ptr, fptr, [att%len])
-        write (unit, fmt_int) 'integer(int64)::', att%name, fptr
+        integer(int64), pointer :: ptr(:)
+        call extract(att, ptr)
+        write (unit, fmt_int) 'integer(int64)::', att%name, ptr
       end block
     case (NC_CHAR)
       block
-        character(kind=c_char), pointer :: fptr(:)
-        call c_f_pointer(ptr, fptr, [att%len])
+        character, pointer :: ptr(:)
+        call extract(att, ptr)
         write (unit, "(4(g0), 1x, '=', 1x, *(a))") &
-          & 'character(len=', att%len, ')::', att%name, fptr
+          & 'character(len=', att%len, ')::', att%name, ptr
       end block
     case default
       error stop "[write_frmt_att] Invalid attribute type."

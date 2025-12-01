@@ -1,16 +1,18 @@
 interface extract
-  module procedure :: extract_att_int8_1d
+  module procedure :: extract_att_int8_vector
   module procedure :: extract_att_int8_scalar
-  module procedure :: extract_att_int16_1d
+  module procedure :: extract_att_int16_vector
   module procedure :: extract_att_int16_scalar
-  module procedure :: extract_att_int32_1d
+  module procedure :: extract_att_int32_vector
   module procedure :: extract_att_int32_scalar
-  module procedure :: extract_att_int64_1d
+  module procedure :: extract_att_int64_vector
   module procedure :: extract_att_int64_scalar
-  module procedure :: extract_att_real32_1d
+  module procedure :: extract_att_real32_vector
   module procedure :: extract_att_real32_scalar
-  module procedure :: extract_att_real64_1d
+  module procedure :: extract_att_real64_vector
   module procedure :: extract_att_real64_scalar
+  module procedure :: extract_att_char_scalar
+  module procedure :: extract_att_char_vector
   module procedure :: extract_var_int8_1d
   module procedure :: extract_var_int8_2d
   module procedure :: extract_var_int8_3d
@@ -56,15 +58,75 @@ interface extract
 end interface extract
 
 interface
-  module subroutine extract_att_int8_1d(att, ptr)
+  module subroutine extract_att_int8_vector(att, ptr)
     type(attribute_type), target, intent(in) :: att
     integer(int8), pointer, intent(out) :: ptr(:)
-  end subroutine extract_att_int8_1d
+  end subroutine extract_att_int8_vector
 
   module subroutine extract_att_int8_scalar(att, ptr)
     type(attribute_type), target, intent(in) :: att
     integer(int8), pointer, intent(out) :: ptr
   end subroutine extract_att_int8_scalar
+
+  module subroutine extract_att_int16_vector(att, ptr)
+    type(attribute_type), target, intent(in) :: att
+    integer(int16), pointer, intent(out) :: ptr(:)
+  end subroutine extract_att_int16_vector
+
+  module subroutine extract_att_int16_scalar(att, ptr)
+    type(attribute_type), target, intent(in) :: att
+    integer(int16), pointer, intent(out) :: ptr
+  end subroutine extract_att_int16_scalar
+
+  module subroutine extract_att_int32_vector(att, ptr)
+    type(attribute_type), target, intent(in) :: att
+    integer(int32), pointer, intent(out) :: ptr(:)
+  end subroutine extract_att_int32_vector
+
+  module subroutine extract_att_int32_scalar(att, ptr)
+    type(attribute_type), target, intent(in) :: att
+    integer(int32), pointer, intent(out) :: ptr
+  end subroutine extract_att_int32_scalar
+
+  module subroutine extract_att_int64_vector(att, ptr)
+    type(attribute_type), target, intent(in) :: att
+    integer(int64), pointer, intent(out) :: ptr(:)
+  end subroutine extract_att_int64_vector
+
+  module subroutine extract_att_int64_scalar(att, ptr)
+    type(attribute_type), target, intent(in) :: att
+    integer(int64), pointer, intent(out) :: ptr
+  end subroutine extract_att_int64_scalar
+
+  module subroutine extract_att_real32_vector(att, ptr)
+    type(attribute_type), target, intent(in) :: att
+    real(real32), pointer, intent(out) :: ptr(:)
+  end subroutine extract_att_real32_vector
+
+  module subroutine extract_att_real32_scalar(att, ptr)
+    type(attribute_type), target, intent(in) :: att
+    real(real32), pointer, intent(out) :: ptr
+  end subroutine extract_att_real32_scalar
+
+  module subroutine extract_att_real64_vector(att, ptr)
+    type(attribute_type), target, intent(in) :: att
+    real(real64), pointer, intent(out) :: ptr(:)
+  end subroutine extract_att_real64_vector
+
+  module subroutine extract_att_real64_scalar(att, ptr)
+    type(attribute_type), target, intent(in) :: att
+    real(real64), pointer, intent(out) :: ptr
+  end subroutine extract_att_real64_scalar
+
+  module subroutine extract_att_char_vector(var, ptr)
+    type(attribute_type), target, intent(in) :: var
+    character, pointer, intent(out) :: ptr(:)
+  end subroutine extract_att_char_vector
+
+  module subroutine extract_att_char_scalar(var, ptr)
+    type(attribute_type), target, intent(in) :: var
+    character(len=:), pointer, intent(out) :: ptr
+  end subroutine extract_att_char_scalar
 
   module subroutine extract_var_int8_1d(var, ptr)
     type(variable_type), target, intent(in) :: var
@@ -101,16 +163,6 @@ interface
     integer(int8), pointer, intent(out) :: ptr(:, :, :, :, :, :, :)
   end subroutine extract_var_int8_7d
 
-  module subroutine extract_att_int16_1d(att, ptr)
-    type(attribute_type), target, intent(in) :: att
-    integer(int16), pointer, intent(out) :: ptr(:)
-  end subroutine extract_att_int16_1d
-
-  module subroutine extract_att_int16_scalar(att, ptr)
-    type(attribute_type), target, intent(in) :: att
-    integer(int16), pointer, intent(out) :: ptr
-  end subroutine extract_att_int16_scalar
-
   module subroutine extract_var_int16_1d(var, ptr)
     type(variable_type), target, intent(in) :: var
     integer(int16), pointer, intent(out) :: ptr(:)
@@ -145,16 +197,6 @@ interface
     type(variable_type), target, intent(in) :: var
     integer(int16), pointer, intent(out) :: ptr(:, :, :, :, :, :, :)
   end subroutine extract_var_int16_7d
-
-  module subroutine extract_att_int32_1d(att, ptr)
-    type(attribute_type), target, intent(in) :: att
-    integer(int32), pointer, intent(out) :: ptr(:)
-  end subroutine extract_att_int32_1d
-
-  module subroutine extract_att_int32_scalar(att, ptr)
-    type(attribute_type), target, intent(in) :: att
-    integer(int32), pointer, intent(out) :: ptr
-  end subroutine extract_att_int32_scalar
 
   module subroutine extract_var_int32_1d(var, ptr)
     type(variable_type), target, intent(in) :: var
@@ -191,16 +233,6 @@ interface
     integer(int32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :)
   end subroutine extract_var_int32_7d
 
-  module subroutine extract_att_int64_1d(att, ptr)
-    type(attribute_type), target, intent(in) :: att
-    integer(int64), pointer, intent(out) :: ptr(:)
-  end subroutine extract_att_int64_1d
-
-  module subroutine extract_att_int64_scalar(att, ptr)
-    type(attribute_type), target, intent(in) :: att
-    integer(int64), pointer, intent(out) :: ptr
-  end subroutine extract_att_int64_scalar
-
   module subroutine extract_var_int64_1d(var, ptr)
     type(variable_type), target, intent(in) :: var
     integer(int64), pointer, intent(out) :: ptr(:)
@@ -236,16 +268,6 @@ interface
     integer(int64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :)
   end subroutine extract_var_int64_7d
 
-  module subroutine extract_att_real32_1d(att, ptr)
-    type(attribute_type), target, intent(in) :: att
-    real(real32), pointer, intent(out) :: ptr(:)
-  end subroutine extract_att_real32_1d
-
-  module subroutine extract_att_real32_scalar(att, ptr)
-    type(attribute_type), target, intent(in) :: att
-    real(real32), pointer, intent(out) :: ptr
-  end subroutine extract_att_real32_scalar
-
   module subroutine extract_var_real32_1d(var, ptr)
     type(variable_type), target, intent(in) :: var
     real(real32), pointer, intent(out) :: ptr(:)
@@ -280,16 +302,6 @@ interface
     type(variable_type), target, intent(in) :: var
     real(real32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :)
   end subroutine extract_var_real32_7d
-
-  module subroutine extract_att_real64_1d(att, ptr)
-    type(attribute_type), target, intent(in) :: att
-    real(real64), pointer, intent(out) :: ptr(:)
-  end subroutine extract_att_real64_1d
-
-  module subroutine extract_att_real64_scalar(att, ptr)
-    type(attribute_type), target, intent(in) :: att
-    real(real64), pointer, intent(out) :: ptr
-  end subroutine extract_att_real64_scalar
 
   module subroutine extract_var_real64_1d(var, ptr)
     type(variable_type), target, intent(in) :: var

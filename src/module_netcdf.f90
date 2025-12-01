@@ -330,7 +330,7 @@ interface
   end subroutine write_frmt_var
 
   module subroutine write_frmt_att(att, unit, iotype, v_list, iostat, iomsg)
-    class(attribute_type), target, intent(in) :: att
+    class(attribute_type), intent(in) :: att
     integer, intent(in) :: unit
     character(len=*), intent(in) :: iotype
     integer, intent(in) :: v_list(:)

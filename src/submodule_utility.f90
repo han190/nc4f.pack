@@ -5,14 +5,12 @@ contains
 module impure elemental subroutine handle_error(status, error_message)
   integer(c_int), intent(in) :: status
   character(*), intent(in), optional :: error_message
-  character(:), pointer :: fptr => null()
+  character(len=MAX_CHAR_LEN + 1), pointer :: fptr
   type(c_ptr) :: cptr
   integer :: inull, iptr
   character(len=MAX_CHAR_LEN) :: message
 
   if (status /= NC_NOERR) then
-    allocate (character(len=NC_MAX_NAME + 1) :: fptr)
-
     cptr = nc_strerror(status)
     call c_f_pointer(cptr, fptr)
 

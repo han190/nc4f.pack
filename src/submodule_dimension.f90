@@ -65,7 +65,7 @@ module function inq_dims_var(nc, var) result(dims)
   dims = inq_dims_(nc%id, var%id)
 end function inq_dims_var
 
-module function inq_dims_(ncid, varid) result(dims)
+function inq_dims_(ncid, varid) result(dims)
   integer(c_int), intent(in) :: ncid
   integer(c_int), optional, intent(in) :: varid
   type(dimension_type), allocatable :: dims(:)
