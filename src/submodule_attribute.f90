@@ -63,6 +63,7 @@ function get_atts_(ncid, varid, exist) result(atts)
     allocate (atts(natts))
   end if
 
+  !> For NetCDF C Library, attribute ID starts from 0.
   do i = 0, natts - 1
     call handle_error(nc_inq_attname(ncid, varid, i, name))
     atts(i + 1) = get_att_(ncid, varid, c2fstr(name))
