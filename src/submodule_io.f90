@@ -9,46 +9,29 @@ module subroutine write_frmt_var(var, unit, iotype, v_list, iostat, iomsg)
   integer, intent(in) :: v_list(:)
   integer, intent(out) :: iostat
   character(len=*), intent(inout) :: iomsg
-  integer :: i, ndim
-  character(len=MAX_CHAR_LEN) :: title_str, dim_str, ndim_str, fmt
+  integer :: i, n
+  character(len=MAX_CHAR_LEN) :: title, dims, ndims, fmt, type_kind
 
   associate (v_list_ => v_list, iomsg_ => iomsg)
   end associate
 
   iostat = 999
   if (iotype == 'LISTDIRECTED' .or. iotype == 'DT') then
-    fmt = "(2a)"
-    select case (var%dtype)
-    case (NC_FLOAT)
-      title_str = 'real(real32)::'//var%name
-    case (NC_DOUBLE)
-      title_str = 'real(real64)::'//var%name
-    case (NC_BYTE)
-      title_str = 'integer(int8)::'//var%name
-    case (NC_SHORT)
-      title_str = 'integer(int16)::'//var%name
-    case (NC_INT)
-      title_str = 'integer(int32)::'//var%name
-    case (NC_INT64)
-      title_str = 'integer(int64)::'//var%name
-    case (NC_CHAR)
-      title_str = 'character(len=*)::'//var%name
-    case default
-      error stop "[write_frmt_var] Unsupported type."
-    end select
+    call type_kind_str(var%dtype, type_kind)
+    write (title, "(a, '::', a)") trim(type_kind), var%name
 
-    ndim = size(var%dims)
-    if (ndim > 1) then
-      write (ndim_str, "(i0)") ndim - 1
-      fmt = "(1x, '(', "//trim(ndim_str)//"(DT, ',', 1x), DT, ')')"
-    else if (ndim == 1) then
-      write (ndim_str, "(i0)") ndim
+    n = size(var%dims)
+    if (n > 1) then
+      write (ndims, "(i0)") n - 1
+      fmt = "(1x, '(', "//trim(ndims)//"(DT, ',', 1x), DT, ')')"
+    else if (n == 1) then
+      write (ndims, "(i0)") n
       fmt = "(1x, '(', DT, ')')"
-    else if (ndim == 0) then
+    else if (n == 0) then
       error stop "[write_frmt_var] Invalid dimension."
     end if
-    write (dim_str, fmt) (var%dims(i), i=1, ndim)
-    write (unit, "(a)") trim(title_str)//trim(dim_str)
+    write (dims, fmt) (var%dims(i), i=1, n)
+    write (unit, "(a)") trim(title)//trim(dims)
     if (allocated(var%atts) .and. size(var%atts) > 0) &
       & write (unit, "(/, *(4x, DT))") var%atts
     iostat = 0
@@ -62,59 +45,65 @@ module subroutine write_frmt_att(att, unit, iotype, v_list, iostat, iomsg)
   integer, intent(in) :: v_list(:)
   integer, intent(out) :: iostat
   character(len=*), intent(inout) :: iomsg
-  character(len=28), parameter :: &
-    & fmt_real = "(2(a), 1x, '=', *(1x, g0.6))", &
-    & fmt_int = "(2(a), 1x, '=', *(1x, i0))"
+  character(len=MAX_CHAR_LEN) :: type_kind, fmt
 
   associate (v_list_ => v_list, iomsg_ => iomsg)
   end associate
 
   iostat = 999
-
   if (iotype == 'LISTDIRECTED' .or. iotype == 'DT') then
+    call type_kind_str(att%dtype, type_kind)
+    select case (att%dtype)
+    case (NC_FLOAT, NC_DOUBLE)
+      fmt = "(a, '::', a, 1x, '=', *(1x, g0.6))"
+    case (NC_BYTE, NC_SHORT, NC_INT, NC_INT64)
+      fmt = "(a, '::', a, 1x, '=', *(1x, i0))"
+    case (NC_CHAR)
+      fmt = "(4(g0), 1x, '=', 1x, *(a))"
+    end select
+
     select case (att%dtype)
     case (NC_FLOAT)
       block
         real(real32), pointer :: ptr(:)
         call extract(att, ptr)
-        write (unit, fmt_real) 'real(real32)::', att%name, ptr
+        write (unit, fmt) trim(type_kind), att%name, ptr
       end block
     case (NC_DOUBLE)
       block
         real(real64), pointer :: ptr(:)
         call extract(att, ptr)
-        write (unit, fmt_real) 'real(real64)::', att%name, ptr
+        write (unit, fmt) trim(type_kind), att%name, ptr
       end block
     case (NC_BYTE)
       block
         integer(int8), pointer :: ptr(:)
         call extract(att, ptr)
-        write (unit, fmt_int) 'integer(int8)::', att%name, ptr
+        write (unit, fmt) trim(type_kind), att%name, ptr
       end block
     case (NC_SHORT)
       block
         integer(int16), pointer :: ptr(:)
         call extract(att, ptr)
-        write (unit, fmt_int) 'integer(int16)::', att%name, ptr
+        write (unit, fmt) trim(type_kind), att%name, ptr
       end block
     case (NC_INT)
       block
         integer(int32), pointer :: ptr(:)
         call extract(att, ptr)
-        write (unit, fmt_int) 'integer(int32)::', att%name, ptr
+        write (unit, fmt) trim(type_kind), att%name, ptr
       end block
     case (NC_INT64)
       block
         integer(int64), pointer :: ptr(:)
         call extract(att, ptr)
-        write (unit, fmt_int) 'integer(int64)::', att%name, ptr
+        write (unit, fmt) trim(type_kind), att%name, ptr
       end block
     case (NC_CHAR)
       block
         character, pointer :: ptr(:)
         call extract(att, ptr)
-        write (unit, "(4(g0), 1x, '=', 1x, *(a))") &
-          & 'character(len=', att%len, ')::', att%name, ptr
+        write (unit, fmt) 'character(len=', att%len, ')::', att%name, ptr
       end block
     case default
       error stop "[write_frmt_att] Invalid attribute type."
@@ -146,5 +135,29 @@ module subroutine write_frmt_dim(dim, unit, iotype, v_list, iostat, iomsg)
     iostat = 0
   end if
 end subroutine write_frmt_dim
+
+pure subroutine type_kind_str(nc_type, str)
+  integer, intent(in) :: nc_type
+  character(len=*), intent(out) :: str
+
+  select case (nc_type)
+  case (NC_FLOAT)
+    str = 'real(real32)'
+  case (NC_DOUBLE)
+    str = 'real(real64)'
+  case (NC_BYTE)
+    str = 'integer(int8)'
+  case (NC_SHORT)
+    str = 'integer(int16)'
+  case (NC_INT)
+    str = 'integer(int32)'
+  case (NC_INT64)
+    str = 'integer(int64)'
+  case (NC_CHAR)
+    str = 'character(len=*)'
+  case default
+    error stop "[type_kind_str] Invalid NC type."
+  end select
+end subroutine type_kind_str
 
 end submodule submodule_io
