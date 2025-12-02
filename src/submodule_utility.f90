@@ -2,13 +2,14 @@ submodule(module_netcdf) submodule_utility
 implicit none (type, external)
 contains
 
+!> NetCDF error handler.
 module impure elemental subroutine handle_error(status, error_message)
   integer(c_int), intent(in) :: status
   character(*), intent(in), optional :: error_message
   character(len=MAX_CHAR_LEN + 1), pointer :: fptr
   type(c_ptr) :: cptr
   integer :: inull, iptr
-  character(len=MAX_CHAR_LEN) :: message
+  character(len=MAX_CHAR_LEN) :: err_msg
 
   if (status /= NC_NOERR) then
     cptr = nc_strerror(status)
@@ -19,15 +20,16 @@ module impure elemental subroutine handle_error(status, error_message)
     if (inull /= 0) iptr = inull - 1
     iptr = max(1, min(iptr, NC_MAX_NAME))
     if (present(error_message)) then
-      message = fptr(1:iptr)//" ("//error_message//")"
-      error stop trim(adjustl(message))
+      write (err_msg, "(a, '(', a, ')')") fptr(1:iptr), error_message
+      error stop trim(adjustl(err_msg))
     else
-      error stop trim(adjustl(fptr(1:iptr)))
+      error stop fptr(1:iptr)
     end if
   end if
   nullify (fptr)
 end subroutine handle_error
 
+!> Convert C string to Fortran string.
 module pure function c2fstr(cstr) result(fstr)
   character(kind=c_char, len=*), intent(in) :: cstr
   character(len=:), allocatable :: fstr
@@ -40,6 +42,7 @@ module pure function c2fstr(cstr) result(fstr)
   fstr = cstr(1:str_len)
 end function c2fstr
 
+!> Convert Fortran string to C string.
 module pure function f2cstr(fstr) result(cstr)
   character(len=*), intent(in) :: fstr
   character(kind=c_char, len=:), allocatable :: cstr
@@ -47,6 +50,8 @@ module pure function f2cstr(fstr) result(cstr)
   cstr = trim(fstr)//c_null_char
 end function f2cstr
 
+!> Check if a buffer re-allocation is required
+!> by comparing buffer size with a target size (`bsize`).
 module pure logical function allocation_required(buffer, bsize)
   integer(int8), allocatable, intent(in) :: buffer(:)
   integer(int64), intent(in) :: bsize
@@ -59,6 +64,7 @@ module pure logical function allocation_required(buffer, bsize)
   end if
 end function allocation_required
 
+!> Compute buffer size based on data type and length.
 module elemental function get_buffer_size(dtype, len) result(buffer_size)
   integer(int32), intent(in) :: dtype
   integer(int64), intent(in) :: len
