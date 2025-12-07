@@ -90,7 +90,7 @@ interface
   !> Create a new netCDF file.
   function nc_create(path, cmode, ncidp) bind(c, name="nc_create")
     import :: c_char, c_int
-    !>         The file name of the new netCDF dataset.
+    !> The file name of the new netCDF dataset.
     character(kind=c_char), intent(in) :: path(*)
     !> The creation mode flag. The following flags are available: NC_CLOBBER
     !> (overwrite existing file), NC_NOCLOBBER (do not overwrite existing
@@ -449,7 +449,7 @@ interface
     integer(c_int), value :: ncid
     !> Variable ID.
     integer(c_int), value :: varid
-    !>         Pointer where typeid will be stored. Ignored if NULL.
+    !> Pointer where typeid will be stored. Ignored if NULL.
     integer(c_int), intent(out) :: typep
     !> Options:
     !> - NC_NOERR No error.
@@ -558,7 +558,7 @@ interface
     !> NetCDF or group ID, from a previous call to nc_open(), nc_create(),
     !> nc_def_grp(), or associated inquiry functions such as nc_inq_ncid().
     integer(c_int), value :: ncid
-    !>         Variable ID.
+    !> Variable ID.
     integer(c_int), value :: varid
     !> Pointer from where the data will be copied.
     type(c_ptr), value :: op
