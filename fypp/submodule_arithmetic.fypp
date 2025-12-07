@@ -15,7 +15,7 @@ module function ${N}$_vars(x, y) result(res)
 
   call allocate_variable(res, mold=x)
   select case (x%dtype)
-  #: for C, T, K in zip(nc_types, types, kinds)
+    #: for C, T, K in zip(nc_types, types, kinds)
   case (${C}$)
     block
       ${T}$(${K}$), pointer :: xp(:), yp(:), resp(:)
@@ -30,7 +30,7 @@ module function ${N}$_vars(x, y) result(res)
       resp = xp ${O}$ yp
       nullify (xp, yp, resp)
     end block
-  #: endfor
+    #: endfor
   end select
 end function ${N}$_vars${newline}$
 #: for C1, T1, K1 in zip(nc_types, types, kinds)

@@ -1,5 +1,5 @@
 module module_test
-implicit none(type, external)
+implicit none (type, external)
 
 public :: test_type
 public :: run_tests

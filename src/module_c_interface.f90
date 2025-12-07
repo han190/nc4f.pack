@@ -90,7 +90,7 @@ interface
   !> Create a new netCDF file.
   function nc_create(path, cmode, ncidp) bind(c, name="nc_create")
     import :: c_char, c_int
-    !> 	The file name of the new netCDF dataset.
+    !>         The file name of the new netCDF dataset.
     character(kind=c_char), intent(in) :: path(*)
     !> The creation mode flag. The following flags are available: NC_CLOBBER
     !> (overwrite existing file), NC_NOCLOBBER (do not overwrite existing
@@ -289,7 +289,7 @@ interface
     integer(c_int), value :: ncid
     !> Variable ID, or NC_GLOBAL for a global attribute.
     integer(c_int), value :: varid
-    !> 	Attribute NetCDF Names.
+    !>         Attribute NetCDF Names.
     character(kind=c_char), intent(in) :: name(*)
     !> The type of attribute to write. Data will be converted to this type.
     integer(c_int), value :: xtype
@@ -375,7 +375,7 @@ interface
     character(kind=c_char), intent(out) :: name(*)
     !> Options:
     !> - NC_NOERR No error.
-    !> - NC_EBADID Not a valid ID. 
+    !> - NC_EBADID Not a valid ID.
     !> - NC_EBADDIM Invalid dimension ID or name.
     integer(c_int) :: nc_inq_dimname
   end function nc_inq_dimname
@@ -384,13 +384,13 @@ interface
   function nc_inq_unlimdim(ncid, unlimdimidp) bind(c, name="nc_inq_unlimdim")
     import :: c_int
     !> NetCDF or group ID, from a previous call to nc_open(), nc_create(),
-    !> nc_def_grp(), or associated inquiry functions such as nc_inq_ncid(). 
+    !> nc_def_grp(), or associated inquiry functions such as nc_inq_ncid().
     integer(c_int), value :: ncid
     !> Pointer where unlimited dimension ID will be stored. If there is no
     !> unlimited dimension, -1 will be stored here. Ignored if NULL.
     integer(c_int), intent(out) :: unlimdimidp
     !> Options:
-    !> - NC_NOERR No error. 
+    !> - NC_NOERR No error.
     !> - NC_EBADID Not a valid ID.
     integer(c_int) :: nc_inq_unlimdim
   end function nc_inq_unlimdim
@@ -399,27 +399,27 @@ interface
   function nc_def_dim(ncid, name, len, idp) bind(c, name="nc_def_dim")
     import :: c_int, c_char, c_size_t
     !> NetCDF or group ID, from a previous call to nc_open(), nc_create(),
-    !> nc_def_grp(), or associated inquiry functions such as nc_inq_ncid(). 
+    !> nc_def_grp(), or associated inquiry functions such as nc_inq_ncid().
     integer(c_int), value :: ncid
-    !> Name of the dimension to be created. 
+    !> Name of the dimension to be created.
     character(kind=c_char), intent(in) :: name
     !> Length of the dimension to be created. Use NC_UNLIMITED for unlimited
-    !> dimensions. 
+    !> dimensions.
     integer(c_size_t), value :: len
     !> Pointer where dimension ID will be stored.
     integer(c_int), intent(inout) :: idp
     !> Options:
-    !> - NC_NOERR No error. 
-    !> - NC_EBADID Not a valid ID. 
-    !> - NC_EMAXNAME Name is too long. 
-    !> - NC_EBADNAME Name breaks netCDF name rules. 
-    !> - NC_EINVAL Invalid input. 
-    !> - NC_ENOTINDEFINE Not in define mode. 
-    !> - NC_EDIMSIZE Invalid dimension size. 
-    !> - NC_EUNLIMIT NC_UNLIMITED size already in use 
-    !> - NC_EMAXDIMS NC_MAX_DIMS exceeded [not enforced after 4.5.0] 
-    !> - NC_ENAMEINUSE String match to name in use 
-    !> - NC_ENOMEM Memory allocation (malloc) failure 
+    !> - NC_NOERR No error.
+    !> - NC_EBADID Not a valid ID.
+    !> - NC_EMAXNAME Name is too long.
+    !> - NC_EBADNAME Name breaks netCDF name rules.
+    !> - NC_EINVAL Invalid input.
+    !> - NC_ENOTINDEFINE Not in define mode.
+    !> - NC_EDIMSIZE Invalid dimension size.
+    !> - NC_EUNLIMIT NC_UNLIMITED size already in use
+    !> - NC_EMAXDIMS NC_MAX_DIMS exceeded [not enforced after 4.5.0]
+    !> - NC_ENAMEINUSE String match to name in use
+    !> - NC_ENOMEM Memory allocation (malloc) failure
     !> - NC_EPERM Write to read only
     integer(c_int) :: nc_def_dim
   end function nc_def_dim
@@ -435,13 +435,13 @@ interface
     !> Pointer to location for returned variable ID. Ignored if NULL.
     integer(c_int), intent(out) :: varidp
     !> Options:
-    !> - NC_NOERR No error. 
-    !> - NC_EBADID Bad ncid. 
+    !> - NC_NOERR No error.
+    !> - NC_EBADID Bad ncid.
     !> - NC_ENOTVAR Invalid variable ID.
     integer(c_int) :: nc_inq_varid
   end function nc_inq_varid
 
-  !> Learn the type of a variable. 
+  !> Learn the type of a variable.
   function nc_inq_vartype(ncid, varid, typep) bind(c, name="nc_inq_vartype")
     import :: c_int
     !> NetCDF or group ID, from a previous call to nc_open(), nc_create(),
@@ -449,12 +449,12 @@ interface
     integer(c_int), value :: ncid
     !> Variable ID.
     integer(c_int), value :: varid
-    !> 	Pointer where typeid will be stored. Ignored if NULL.
+    !>         Pointer where typeid will be stored. Ignored if NULL.
     integer(c_int), intent(out) :: typep
     !> Options:
-    !> - NC_NOERR No error. 
-    !> - NC_EBADID Bad ncid. 
-    !> - NC_ENOTVAR Invalid variable ID. 
+    !> - NC_NOERR No error.
+    !> - NC_EBADID Bad ncid.
+    !> - NC_ENOTVAR Invalid variable ID.
     integer(c_int) :: nc_inq_vartype
   end function nc_inq_vartype
 
@@ -469,9 +469,9 @@ interface
     !> Pointer where array of dimension IDs will be stored. Ignored if NULL.
     integer(c_int), intent(out) :: dimidsp(*)
     !> Options:
-    !> - NC_NOERR No error. 
-    !> - NC_EBADID Bad ncid. 
-    !> - NC_ENOTVAR Invalid variable ID. 
+    !> - NC_NOERR No error.
+    !> - NC_EBADID Bad ncid.
+    !> - NC_ENOTVAR Invalid variable ID.
     integer(c_int) :: nc_inq_vardimid
   end function nc_inq_vardimid
 
@@ -486,9 +486,9 @@ interface
     !> Pointer where number of dimensions will be stored. Ignored if NULL.
     integer(c_int), intent(out) :: ndimsp
     !> Options:
-    !> - NC_NOERR No error. 
-    !> - NC_EBADID Bad ncid. 
-    !> - NC_ENOTVAR Invalid variable ID. 
+    !> - NC_NOERR No error.
+    !> - NC_EBADID Bad ncid.
+    !> - NC_ENOTVAR Invalid variable ID.
     integer(c_int) :: nc_inq_varndims
   end function nc_inq_varndims
 
@@ -504,11 +504,11 @@ interface
     !> user before this function is called.
     type(c_ptr), value :: ip
     !> Options:
-    !> - NC_NOERR No error. 
-    !> - NC_ENOTVAR Variable not found. 
-    !> - NC_ERANGE One or more of the values are out of range. 
-    !> - NC_EINDEFINE Operation not allowed in define mode. 
-    !> - NC_EBADID Bad ncid. 
+    !> - NC_NOERR No error.
+    !> - NC_ENOTVAR Variable not found.
+    !> - NC_ERANGE One or more of the values are out of range.
+    !> - NC_EINDEFINE Operation not allowed in define mode.
+    !> - NC_EBADID Bad ncid.
     integer(c_int) :: nc_get_var
   end function nc_get_var
 
@@ -517,37 +517,37 @@ interface
     & bind(c, name="nc_def_var")
     import :: c_int, c_char
     !> NetCDF or group ID, from a previous call to nc_open(), nc_create(),
-    !> nc_def_grp(), or associated inquiry functions such as nc_inq_ncid(). 
+    !> nc_def_grp(), or associated inquiry functions such as nc_inq_ncid().
     integer(c_int), value :: ncid
-    !> Variable NetCDF Names. 
+    !> Variable NetCDF Names.
     character(kind=c_char), intent(in) :: name(*)
     !> (Data type)
     !> [https://docs.unidata.ucar.edu/nug/current/md_types.html#data_type]
-    !> of the variable. 
+    !> of the variable.
     integer(c_int), value :: xtype
     !> Number of dimensions for the variable. For example, 2 specifies a
     !> matrix, 1 specifies a vector, and 0 means the variable is a scalar with
     !> no dimensions. Must not be negative or greater than the predefined
     !> constant NC_MAX_VAR_DIMS. In netCDF-4/HDF5 files, may not exceed the
-    !> HDF5 maximum number of dimensions (32). 
+    !> HDF5 maximum number of dimensions (32).
     integer(c_int), value :: ndims
     !> Vector of ndims dimension IDs corresponding to the variable dimensions.
     !> For classic model netCDF files, if the ID of the unlimited dimension is
     !> included, it must be first. This argument is ignored if ndims is 0. For
     !> expanded model netCDF4/HDF5 files, there may be any number of unlimited
-    !> dimensions, and they may be used in any element of the dimids array. 
+    !> dimensions, and they may be used in any element of the dimids array.
     integer(c_int), intent(in) :: dimidsp(*)
     !> Pointer to location for the returned variable ID.
     integer(c_int), intent(out) :: varidp
     !> Options:
-    !> - NC_NOERR No error. 
-    !> - NC_EBADID Bad ncid. 
-    !> - NC_ENOTINDEFINE Not in define mode. 
-    !> - NC_ESTRICTNC3 Attempting netcdf-4 operation on strict nc3 netcdf-4 file. 
-    !> - NC_EMAXVARS NC_MAX_VARS exceeded [Not enforced after 4.5.0] 
-    !> - NC_EBADTYPE Bad type. 
-    !> - NC_EINVAL Invalid input. 
-    !> - NC_ENAMEINUSE Name already in use. 
+    !> - NC_NOERR No error.
+    !> - NC_EBADID Bad ncid.
+    !> - NC_ENOTINDEFINE Not in define mode.
+    !> - NC_ESTRICTNC3 Attempting netcdf-4 operation on strict nc3 netcdf-4 file.
+    !> - NC_EMAXVARS NC_MAX_VARS exceeded [Not enforced after 4.5.0]
+    !> - NC_EBADTYPE Bad type.
+    !> - NC_EINVAL Invalid input.
+    !> - NC_ENAMEINUSE Name already in use.
     !> - NC_EPERM Attempt to create object in read-only file.
     integer(c_int) :: nc_def_var
   end function nc_def_var
@@ -558,18 +558,18 @@ interface
     !> NetCDF or group ID, from a previous call to nc_open(), nc_create(),
     !> nc_def_grp(), or associated inquiry functions such as nc_inq_ncid().
     integer(c_int), value :: ncid
-    !> 	Variable ID.
+    !>         Variable ID.
     integer(c_int), value :: varid
     !> Pointer from where the data will be copied.
     type(c_ptr), value :: op
     !> Options:
-    !> - NC_NOERR No error. 
-    !> - NC_ENOTVAR Variable not found. 
-    !> - NC_EINVALCOORDS Index exceeds dimension bound. 
-    !> - NC_EEDGE Start+count exceeds dimension bound. 
-    !> - NC_ERANGE One or more of the values are out of range. 
-    !> - NC_EINDEFINE Operation not allowed in define mode. 
-    !> - NC_EBADID Bad ncid. 
+    !> - NC_NOERR No error.
+    !> - NC_ENOTVAR Variable not found.
+    !> - NC_EINVALCOORDS Index exceeds dimension bound.
+    !> - NC_EEDGE Start+count exceeds dimension bound.
+    !> - NC_ERANGE One or more of the values are out of range.
+    !> - NC_EINDEFINE Operation not allowed in define mode.
+    !> - NC_EBADID Bad ncid.
     integer(c_int) :: nc_put_var
   end function nc_put_var
 end interface

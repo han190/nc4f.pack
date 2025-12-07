@@ -25,22 +25,22 @@ module subroutine extract_att_${K}$_scalar(att, ptr)
 end subroutine extract_att_${K}$_scalar
 
 #: endfor
-module subroutine extract_att_char_vector(var, ptr)
-  type(attribute_type), target, intent(in) :: var
+module subroutine extract_att_char_vector(att, ptr)
+  type(attribute_type), target, intent(in) :: att
   character, pointer, intent(out) :: ptr(:)
   type(c_ptr) :: cptr
 
-  cptr = c_loc(var%buffer(1))
-  call c_f_pointer(cptr, ptr, [var%len])
+  cptr = c_loc(att%buffer(1))
+  call c_f_pointer(cptr, ptr, [att%len])
 end subroutine extract_att_char_vector
 
-module subroutine extract_att_char_scalar(var, ptr)
-  type(attribute_type), target, intent(in) :: var
+module subroutine extract_att_char_scalar(att, ptr)
+  type(attribute_type), target, intent(in) :: att
   character(len=:), pointer, intent(out) :: ptr
   character, pointer :: ptrs(:)
   integer :: i
 
-  call extract_att_char_vector(var, ptrs)
+  call extract_att_char_vector(att, ptrs)
   do i = 1, size(ptrs)
     ptr(i:i) = ptrs(i)
   end do

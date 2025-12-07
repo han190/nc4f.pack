@@ -118,13 +118,13 @@ interface
     real(real64), pointer, intent(out) :: ptr
   end subroutine extract_att_real64_scalar
 
-  module subroutine extract_att_char_vector(var, ptr)
-    type(attribute_type), target, intent(in) :: var
+  module subroutine extract_att_char_vector(att, ptr)
+    type(attribute_type), target, intent(in) :: att
     character, pointer, intent(out) :: ptr(:)
   end subroutine extract_att_char_vector
 
-  module subroutine extract_att_char_scalar(var, ptr)
-    type(attribute_type), target, intent(in) :: var
+  module subroutine extract_att_char_scalar(att, ptr)
+    type(attribute_type), target, intent(in) :: att
     character(len=:), pointer, intent(out) :: ptr
   end subroutine extract_att_char_scalar
 

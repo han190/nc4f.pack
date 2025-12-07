@@ -1,20 +1,20 @@
 #: include "common.fypp"
 interface extract
-#: for K in kinds
+  #: for K in kinds
   module procedure :: extract_att_${K}$_vector
   module procedure :: extract_att_${K}$_scalar
-#: endfor
+  #: endfor
   module procedure :: extract_att_char_scalar
   module procedure :: extract_att_char_vector
-#: for K in kinds
-#: for R in range(1, MAX_RANK+1)
+  #: for K in kinds
+  #: for R in range(1, MAX_RANK+1)
   module procedure :: extract_var_${K}$_${R}$d
-#: endfor
-#: endfor
+  #: endfor
+  #: endfor
 end interface extract
 
 interface
-#: for T, K in zip(types, kinds)
+  #: for T, K in zip(types, kinds)
   module subroutine extract_att_${K}$_vector(att, ptr)
     type(attribute_type), target, intent(in) :: att
     ${T}$(${K}$), pointer, intent(out) :: ptr(:)
@@ -23,23 +23,23 @@ interface
     type(attribute_type), target, intent(in) :: att
     ${T}$(${K}$), pointer, intent(out) :: ptr
   end subroutine extract_att_${K}$_scalar${newline}$
-#: endfor
-  module subroutine extract_att_char_vector(var, ptr)
-    type(attribute_type), target, intent(in) :: var
+  #: endfor
+  module subroutine extract_att_char_vector(att, ptr)
+    type(attribute_type), target, intent(in) :: att
     character, pointer, intent(out) :: ptr(:)
   end subroutine extract_att_char_vector
 
-  module subroutine extract_att_char_scalar(var, ptr)
-    type(attribute_type), target, intent(in) :: var
+  module subroutine extract_att_char_scalar(att, ptr)
+    type(attribute_type), target, intent(in) :: att
     character(len=:), pointer, intent(out) :: ptr
   end subroutine extract_att_char_scalar
 
-#: for T, K in zip(types, kinds)
-#: for R in range(1, MAX_RANK+1)
+  #: for T, K in zip(types, kinds)
+  #: for R in range(1, MAX_RANK+1)
   module subroutine extract_var_${K}$_${R}$d(var, ptr)
     type(variable_type), target, intent(in) :: var
     ${T}$(${K}$), pointer, intent(out) :: ptr(${COLONS(R)}$)
   end subroutine extract_var_${K}$_${R}$d${newline}$
-#: endfor
-#: endfor
+  #: endfor
+  #: endfor
 end interface
