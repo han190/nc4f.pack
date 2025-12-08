@@ -28,11 +28,11 @@ module function ${N}$_vars(x, y) result(res)
       cptr = c_loc(y%buffer(1))
       call c_f_pointer(cptr, yp, [y%len])
       resp = xp ${O}$ yp
-      nullify (xp, yp, resp)
     end block
     #: endfor
   end select
-end function ${N}$_vars${newline}$
+end function ${N}$_vars
+
 #: for C1, T1, K1 in zip(nc_types, types, kinds)
 module function ${N}$_var_${K1}$(x, y) result(res)
   type(variable_type), target, intent(in) :: x
@@ -68,7 +68,7 @@ module function ${N}$_${K1}$_var(x, y) result(res)
   cptr = c_loc(y%buffer(1))
   call c_f_pointer(cptr, yp, [y%len])
   resp = x ${O}$ yp
-end function ${N}$_${K1}$_var${newline}$
+end function ${N}$_${K1}$_var${NEWLINE()}$
 #: endfor
 #: endfor
 module function sum_vars(vars) result(s)
@@ -91,4 +91,4 @@ module function sum_vars(vars) result(s)
   end select
 end function sum_vars
 
-end submodule submodule_arithmetic${newline}$
+end submodule submodule_arithmetic

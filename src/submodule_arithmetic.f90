@@ -25,7 +25,6 @@ module function add_vars(x, y) result(res)
       cptr = c_loc(y%buffer(1))
       call c_f_pointer(cptr, yp, [y%len])
       resp = xp + yp
-      nullify (xp, yp, resp)
     end block
   case (NC_SHORT)
     block
@@ -39,7 +38,6 @@ module function add_vars(x, y) result(res)
       cptr = c_loc(y%buffer(1))
       call c_f_pointer(cptr, yp, [y%len])
       resp = xp + yp
-      nullify (xp, yp, resp)
     end block
   case (NC_INT)
     block
@@ -53,7 +51,6 @@ module function add_vars(x, y) result(res)
       cptr = c_loc(y%buffer(1))
       call c_f_pointer(cptr, yp, [y%len])
       resp = xp + yp
-      nullify (xp, yp, resp)
     end block
   case (NC_INT64)
     block
@@ -67,7 +64,6 @@ module function add_vars(x, y) result(res)
       cptr = c_loc(y%buffer(1))
       call c_f_pointer(cptr, yp, [y%len])
       resp = xp + yp
-      nullify (xp, yp, resp)
     end block
   case (NC_FLOAT)
     block
@@ -81,7 +77,6 @@ module function add_vars(x, y) result(res)
       cptr = c_loc(y%buffer(1))
       call c_f_pointer(cptr, yp, [y%len])
       resp = xp + yp
-      nullify (xp, yp, resp)
     end block
   case (NC_DOUBLE)
     block
@@ -95,7 +90,6 @@ module function add_vars(x, y) result(res)
       cptr = c_loc(y%buffer(1))
       call c_f_pointer(cptr, yp, [y%len])
       resp = xp + yp
-      nullify (xp, yp, resp)
     end block
   end select
 end function add_vars
@@ -339,7 +333,6 @@ module function sub_vars(x, y) result(res)
       cptr = c_loc(y%buffer(1))
       call c_f_pointer(cptr, yp, [y%len])
       resp = xp - yp
-      nullify (xp, yp, resp)
     end block
   case (NC_SHORT)
     block
@@ -353,7 +346,6 @@ module function sub_vars(x, y) result(res)
       cptr = c_loc(y%buffer(1))
       call c_f_pointer(cptr, yp, [y%len])
       resp = xp - yp
-      nullify (xp, yp, resp)
     end block
   case (NC_INT)
     block
@@ -367,7 +359,6 @@ module function sub_vars(x, y) result(res)
       cptr = c_loc(y%buffer(1))
       call c_f_pointer(cptr, yp, [y%len])
       resp = xp - yp
-      nullify (xp, yp, resp)
     end block
   case (NC_INT64)
     block
@@ -381,7 +372,6 @@ module function sub_vars(x, y) result(res)
       cptr = c_loc(y%buffer(1))
       call c_f_pointer(cptr, yp, [y%len])
       resp = xp - yp
-      nullify (xp, yp, resp)
     end block
   case (NC_FLOAT)
     block
@@ -395,7 +385,6 @@ module function sub_vars(x, y) result(res)
       cptr = c_loc(y%buffer(1))
       call c_f_pointer(cptr, yp, [y%len])
       resp = xp - yp
-      nullify (xp, yp, resp)
     end block
   case (NC_DOUBLE)
     block
@@ -409,7 +398,6 @@ module function sub_vars(x, y) result(res)
       cptr = c_loc(y%buffer(1))
       call c_f_pointer(cptr, yp, [y%len])
       resp = xp - yp
-      nullify (xp, yp, resp)
     end block
   end select
 end function sub_vars
@@ -653,7 +641,6 @@ module function mul_vars(x, y) result(res)
       cptr = c_loc(y%buffer(1))
       call c_f_pointer(cptr, yp, [y%len])
       resp = xp*yp
-      nullify (xp, yp, resp)
     end block
   case (NC_SHORT)
     block
@@ -667,7 +654,6 @@ module function mul_vars(x, y) result(res)
       cptr = c_loc(y%buffer(1))
       call c_f_pointer(cptr, yp, [y%len])
       resp = xp*yp
-      nullify (xp, yp, resp)
     end block
   case (NC_INT)
     block
@@ -681,7 +667,6 @@ module function mul_vars(x, y) result(res)
       cptr = c_loc(y%buffer(1))
       call c_f_pointer(cptr, yp, [y%len])
       resp = xp*yp
-      nullify (xp, yp, resp)
     end block
   case (NC_INT64)
     block
@@ -695,7 +680,6 @@ module function mul_vars(x, y) result(res)
       cptr = c_loc(y%buffer(1))
       call c_f_pointer(cptr, yp, [y%len])
       resp = xp*yp
-      nullify (xp, yp, resp)
     end block
   case (NC_FLOAT)
     block
@@ -709,7 +693,6 @@ module function mul_vars(x, y) result(res)
       cptr = c_loc(y%buffer(1))
       call c_f_pointer(cptr, yp, [y%len])
       resp = xp*yp
-      nullify (xp, yp, resp)
     end block
   case (NC_DOUBLE)
     block
@@ -723,7 +706,6 @@ module function mul_vars(x, y) result(res)
       cptr = c_loc(y%buffer(1))
       call c_f_pointer(cptr, yp, [y%len])
       resp = xp*yp
-      nullify (xp, yp, resp)
     end block
   end select
 end function mul_vars
@@ -967,7 +949,6 @@ module function div_vars(x, y) result(res)
       cptr = c_loc(y%buffer(1))
       call c_f_pointer(cptr, yp, [y%len])
       resp = xp/yp
-      nullify (xp, yp, resp)
     end block
   case (NC_SHORT)
     block
@@ -981,7 +962,6 @@ module function div_vars(x, y) result(res)
       cptr = c_loc(y%buffer(1))
       call c_f_pointer(cptr, yp, [y%len])
       resp = xp/yp
-      nullify (xp, yp, resp)
     end block
   case (NC_INT)
     block
@@ -995,7 +975,6 @@ module function div_vars(x, y) result(res)
       cptr = c_loc(y%buffer(1))
       call c_f_pointer(cptr, yp, [y%len])
       resp = xp/yp
-      nullify (xp, yp, resp)
     end block
   case (NC_INT64)
     block
@@ -1009,7 +988,6 @@ module function div_vars(x, y) result(res)
       cptr = c_loc(y%buffer(1))
       call c_f_pointer(cptr, yp, [y%len])
       resp = xp/yp
-      nullify (xp, yp, resp)
     end block
   case (NC_FLOAT)
     block
@@ -1023,7 +1001,6 @@ module function div_vars(x, y) result(res)
       cptr = c_loc(y%buffer(1))
       call c_f_pointer(cptr, yp, [y%len])
       resp = xp/yp
-      nullify (xp, yp, resp)
     end block
   case (NC_DOUBLE)
     block
@@ -1037,7 +1014,6 @@ module function div_vars(x, y) result(res)
       cptr = c_loc(y%buffer(1))
       call c_f_pointer(cptr, yp, [y%len])
       resp = xp/yp
-      nullify (xp, yp, resp)
     end block
   end select
 end function div_vars
@@ -1281,7 +1257,6 @@ module function pow_vars(x, y) result(res)
       cptr = c_loc(y%buffer(1))
       call c_f_pointer(cptr, yp, [y%len])
       resp = xp**yp
-      nullify (xp, yp, resp)
     end block
   case (NC_SHORT)
     block
@@ -1295,7 +1270,6 @@ module function pow_vars(x, y) result(res)
       cptr = c_loc(y%buffer(1))
       call c_f_pointer(cptr, yp, [y%len])
       resp = xp**yp
-      nullify (xp, yp, resp)
     end block
   case (NC_INT)
     block
@@ -1309,7 +1283,6 @@ module function pow_vars(x, y) result(res)
       cptr = c_loc(y%buffer(1))
       call c_f_pointer(cptr, yp, [y%len])
       resp = xp**yp
-      nullify (xp, yp, resp)
     end block
   case (NC_INT64)
     block
@@ -1323,7 +1296,6 @@ module function pow_vars(x, y) result(res)
       cptr = c_loc(y%buffer(1))
       call c_f_pointer(cptr, yp, [y%len])
       resp = xp**yp
-      nullify (xp, yp, resp)
     end block
   case (NC_FLOAT)
     block
@@ -1337,7 +1309,6 @@ module function pow_vars(x, y) result(res)
       cptr = c_loc(y%buffer(1))
       call c_f_pointer(cptr, yp, [y%len])
       resp = xp**yp
-      nullify (xp, yp, resp)
     end block
   case (NC_DOUBLE)
     block
@@ -1351,7 +1322,6 @@ module function pow_vars(x, y) result(res)
       cptr = c_loc(y%buffer(1))
       call c_f_pointer(cptr, yp, [y%len])
       resp = xp**yp
-      nullify (xp, yp, resp)
     end block
   end select
 end function pow_vars
@@ -1593,4 +1563,3 @@ module function sum_vars(vars) result(s)
 end function sum_vars
 
 end submodule submodule_arithmetic
-

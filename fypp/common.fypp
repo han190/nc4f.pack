@@ -7,7 +7,12 @@
 #: set types = ['integer', 'integer', 'integer', 'integer', 'real', 'real']
 #: set nc_types = ['NC_BYTE', 'NC_SHORT', 'NC_INT', 'NC_INT64', 'NC_FLOAT', 'NC_DOUBLE']
 #: set ckinds = ['c_int8_t', 'c_int16_t', 'c_int32_t', 'c_int64_t', 'c_float', 'c_double']
-#: set newline = "\n"
+
+#: def NEWLINE(cond=None)
+#: if cond is None or cond
+$: "\n"
+#: endif
+#: enddef
 
 #! Generate colons for array.
 #: def COLONS(R)

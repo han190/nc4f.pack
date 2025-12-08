@@ -23,7 +23,7 @@ module function new_att_${K}$_scalar(name, value) result(att)
 
   tmp(1) = value
   att = new_att_${K}$(name, tmp)
-end function new_att_${K}$_scalar${newline}$
+end function new_att_${K}$_scalar${NEWLINE()}$
 #: endfor
 module function new_att_character(name, value) result(att)
   character(len=*), intent(in) :: name, value

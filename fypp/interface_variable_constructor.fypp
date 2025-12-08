@@ -16,7 +16,7 @@ interface
     type(dimension_type), intent(in) :: dims(:)
     type(attribute_type), intent(in), optional :: atts(:)
     type(variable_type) :: var
-  end function new_var_${K}$_${R}$d${newline}$
+  end function new_var_${K}$_${R}$d${NEWLINE(not (K == 'real64' and R == MAX_RANK))}$
   #:endfor
 #:endfor
 end interface

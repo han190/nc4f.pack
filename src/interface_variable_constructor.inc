@@ -379,5 +379,4 @@ interface
     type(attribute_type), intent(in), optional :: atts(:)
     type(variable_type) :: var
   end function new_var_real64_7d
-
 end interface

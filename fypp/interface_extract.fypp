@@ -18,12 +18,14 @@ interface
   module subroutine extract_att_${K}$_vector(att, ptr)
     type(attribute_type), target, intent(in) :: att
     ${T}$(${K}$), pointer, intent(out) :: ptr(:)
-  end subroutine extract_att_${K}$_vector${newline}$
+  end subroutine extract_att_${K}$_vector
+
   module subroutine extract_att_${K}$_scalar(att, ptr)
     type(attribute_type), target, intent(in) :: att
     ${T}$(${K}$), pointer, intent(out) :: ptr
-  end subroutine extract_att_${K}$_scalar${newline}$
+  end subroutine extract_att_${K}$_scalar${NEWLINE(not (K == 'real64'))}$
   #: endfor
+
   module subroutine extract_att_char_vector(att, ptr)
     type(attribute_type), target, intent(in) :: att
     character, pointer, intent(out) :: ptr(:)
@@ -39,7 +41,7 @@ interface
   module subroutine extract_var_${K}$_${R}$d(var, ptr)
     type(variable_type), target, intent(in) :: var
     ${T}$(${K}$), pointer, intent(out) :: ptr(${COLONS(R)}$)
-  end subroutine extract_var_${K}$_${R}$d${newline}$
+  end subroutine extract_var_${K}$_${R}$d${NEWLINE(not (K == 'real64' and R == MAX_RANK))}$
   #: endfor
   #: endfor
 end interface

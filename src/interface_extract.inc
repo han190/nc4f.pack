@@ -337,5 +337,4 @@ interface
     type(variable_type), target, intent(in) :: var
     real(real64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :)
   end subroutine extract_var_real64_7d
-
 end interface
