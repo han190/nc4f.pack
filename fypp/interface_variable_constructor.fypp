@@ -18,5 +18,5 @@ interface
     type(variable_type) :: var
   end function new_var_${K}$_${R}$d${NEWLINE(not (K == 'real64' and R == MAX_RANK))}$
   #:endfor
-#:endfor
+  #:endfor
 end interface

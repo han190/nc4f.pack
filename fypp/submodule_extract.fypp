@@ -65,7 +65,7 @@ module subroutine extract_var_${K}$_${R}$d(var, ptr)
   call c_f_pointer(cptr, ptr, [var%len])
   #: else
   call c_f_pointer(cptr, ptr, shape(var))
-  #: endif 
+  #: endif
 end subroutine extract_var_${K}$_${R}$d${NEWLINE(not (K == 'real64' and R == MAX_RANK))}$
 #: endfor
 #: endfor

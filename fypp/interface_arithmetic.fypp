@@ -6,9 +6,9 @@ interface operator(${O}$)
   module procedure :: ${N}$_var_${K}$
   module procedure :: ${N}$_${K}$_var
   #: endfor
-end interface operator(${O}$)
-
+end interface operator(${O}$) ${NEWLINE(not (N == 'pow'))}$
 #: endfor
+
 interface sum
   module procedure :: sum_vars
 end interface sum
@@ -31,10 +31,10 @@ interface
     ${T}$(${K}$), intent(in) :: x
     type(variable_type), target, intent(in) :: y
     type(variable_type), target :: res
-  end function ${N}$_${K}$_var
+  end function ${N}$_${K}$_var${NEWLINE(not (N == 'pow' and K == 'real64'))}$
+  #: endfor
+  #: endfor
 
-  #: endfor
-  #: endfor
   module function sum_vars(vars) result(s)
     type(variable_type), intent(in) :: vars(:)
     type(variable_type) :: s

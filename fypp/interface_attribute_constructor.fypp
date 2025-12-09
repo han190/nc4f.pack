@@ -19,9 +19,9 @@ interface
     character(len=*), intent(in) :: name
     ${T}$(${K}$), intent(in) :: value
     type(attribute_type) :: att
-  end function new_att_${K}$_scalar
-
+  end function new_att_${K}$_scalar${NEWLINE(not (K == 'real64'))}$
   #: endfor
+
   module function new_att_character(name, value) result(att)
     character(len=*), intent(in) :: name, value
     type(attribute_type), target :: att
