@@ -3,48 +3,45 @@ submodule(module_netcdf) submodule_extract
 implicit none (type, external)
 contains
 
-#: for T, K in zip(types, kinds)
-module subroutine extract_att_${K}$_vector(att, ptr)
+#: for T, K in zip(types + ['char'], kinds + ['char'])
+#: for R in ('vector', 'scalar')
+module subroutine extract_att_${K}$_${R}$(att, ptr)
   type(attribute_type), target, intent(in) :: att
-  ${T}$(${K}$), pointer, intent(out) :: ptr(:)
-  type(c_ptr) :: cptr
-
-  cptr = c_loc(att%buffer(1))
-  call c_f_pointer(cptr, ptr, [att%len])
-end subroutine extract_att_${K}$_vector
-
-module subroutine extract_att_${K}$_scalar(att, ptr)
-  type(attribute_type), target, intent(in) :: att
-  ${T}$(${K}$), pointer, intent(out) :: ptr
-  type(c_ptr) :: cptr
-
-  if (att%len /= 1) error stop &
-    & "[extract_att_${K}$_scalar] Not a scalar."
-  cptr = c_loc(att%buffer(1))
-  call c_f_pointer(cptr, ptr)
-end subroutine extract_att_${K}$_scalar${NEWLINE(not (K == 'real64'))}$
-#: endfor
-
-module subroutine extract_att_char_vector(att, ptr)
-  type(attribute_type), target, intent(in) :: att
-  character, pointer, intent(out) :: ptr(:)
-  type(c_ptr) :: cptr
-
-  cptr = c_loc(att%buffer(1))
-  call c_f_pointer(cptr, ptr, [att%len])
-end subroutine extract_att_char_vector
-
-module subroutine extract_att_char_scalar(att, ptr)
-  type(attribute_type), target, intent(in) :: att
+  #: if K == 'char' and R == 'scalar'
   character(len=:), pointer, intent(out) :: ptr
+  #: elif K == 'char' and R == 'vector'
+  character, pointer, intent(out) :: ptr(:)
+  #: elif R == 'vector'
+  ${T}$(${K}$), pointer, intent(out) :: ptr(:)
+  #: elif R == 'scalar'
+  ${T}$(${K}$), pointer, intent(out) :: ptr
+  #: endif
+  #: if (K == 'char' and R == 'scalar')
   character, pointer :: ptrs(:)
   integer :: i
+  #: else
+  type(c_ptr) :: cptr
+  #: endif
 
+  #: if R == 'scalar' and T != 'char'
+  if (att%len /= 1) error stop &
+    & "[extract_att_${K}$_scalar] Not a scalar."
+  #: endif
+  #: if K == 'char' and R == 'scalar'
   call extract_att_char_vector(att, ptrs)
   do i = 1, size(ptrs)
     ptr(i:i) = ptrs(i)
   end do
-end subroutine extract_att_char_scalar
+  #: elif R == 'vector'
+  cptr = c_loc(att%buffer(1))
+  call c_f_pointer(cptr, ptr, [att%len])
+  #: elif R == 'scalar'
+  cptr = c_loc(att%buffer(1))
+  call c_f_pointer(cptr, ptr)
+  #: endif
+end subroutine extract_att_${K}$_${R}$${NEWLINE(not (K == 'char' and R == 'scalar'))}$
+#: endfor
+#: endfor
 
 #: for T, K in zip(types, kinds)
 #: for R in range(1, MAX_RANK+1)
