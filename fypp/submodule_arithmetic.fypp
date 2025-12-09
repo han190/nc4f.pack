@@ -19,14 +19,10 @@ module function ${N}$_vars(x, y) result(res)
   case (${C}$)
     block
       ${T}$(${K}$), pointer :: xp(:), yp(:), resp(:)
-      type(c_ptr) :: cptr
 
-      cptr = c_loc(res%buffer(1))
-      call c_f_pointer(cptr, resp, [res%len])
-      cptr = c_loc(x%buffer(1))
-      call c_f_pointer(cptr, xp, [x%len])
-      cptr = c_loc(y%buffer(1))
-      call c_f_pointer(cptr, yp, [y%len])
+      call extract(x, xp, flatten=.true.)
+      call extract(y, yp, flatten=.true.)
+      call extract(res, resp, flatten=.true.)
       resp = xp ${O}$ yp
     end block
     #: endfor
@@ -39,16 +35,13 @@ module function ${N}$_var_${K1}$(x, y) result(res)
   ${T1}$(${K1}$), intent(in) :: y
   type(variable_type), target :: res
   ${T1}$(${K1}$), pointer :: xp(:), resp(:)
-  type(c_ptr) :: cptr
 
   if (x%dtype /= ${C1}$) error stop &
     & "[${N}$_var_${K1}$] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=x)
-  cptr = c_loc(res%buffer(1))
-  call c_f_pointer(cptr, resp, [res%len])
-  cptr = c_loc(x%buffer(1))
-  call c_f_pointer(cptr, xp, [x%len])
+  call extract(x, xp, flatten=.true.)
+  call extract(res, resp, flatten=.true.)
   resp = xp ${O}$ y
 end function ${N}$_var_${K1}$
 
@@ -57,20 +50,18 @@ module function ${N}$_${K1}$_var(x, y) result(res)
   type(variable_type), target, intent(in) :: y
   type(variable_type), target :: res
   ${T1}$(${K1}$), pointer :: yp(:), resp(:)
-  type(c_ptr) :: cptr
 
   if (y%dtype /= ${C1}$) error stop &
     & "[${N}$_var_${K1}$] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=y)
-  cptr = c_loc(res%buffer(1))
-  call c_f_pointer(cptr, resp, [res%len])
-  cptr = c_loc(y%buffer(1))
-  call c_f_pointer(cptr, yp, [y%len])
+  call extract(y, yp, flatten=.true.)
+  call extract(res, resp, flatten=.true.)
   resp = x ${O}$ yp
-end function ${N}$_${K1}$_var${NEWLINE()}$
+end function ${N}$_${K1}$_var${NEWLINE(not (N == 'pow' and K1 == 'read64'))}$
 #: endfor
 #: endfor
+
 module function sum_vars(vars) result(s)
   type(variable_type), intent(in) :: vars(:)
   type(variable_type) :: s

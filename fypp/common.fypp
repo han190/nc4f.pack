@@ -8,6 +8,7 @@
 #: set nc_types = ['NC_BYTE', 'NC_SHORT', 'NC_INT', 'NC_INT64', 'NC_FLOAT', 'NC_DOUBLE']
 #: set ckinds = ['c_int8_t', 'c_int16_t', 'c_int32_t', 'c_int64_t', 'c_float', 'c_double']
 
+#! Conditionally create a new line.
 #: def NEWLINE(cond=None)
 #: if cond is None or cond
 $: "\n"
@@ -17,17 +18,6 @@ $: "\n"
 #! Generate colons for array.
 #: def COLONS(R)
 :#{for _ in range(R - 1)}#, :#{endfor}#
-#: enddef
-
-#: def MERGE_TYPE(c1, c2, lst)
-#: set i = nc_types.index(c1)
-#: set j = nc_types.index(c2)
-#: if (i == 3 and j == 4) or (i == 4 and j == 3)
-#: set idx = 5
-#: else
-#: set idx = max(i, j)
-#: endif
-${lst[idx]}$
 #: enddef
 
 #: endmute
