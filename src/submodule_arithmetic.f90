@@ -17,54 +17,54 @@ module function add_vars(x, y) result(res)
     block
       integer(int8), pointer :: xp(:), yp(:), resp(:)
 
-      call extract(x, xp, flatten=.true.)
-      call extract(y, yp, flatten=.true.)
-      call extract(res, resp, flatten=.true.)
+      call extract(x, xp)
+      call extract(y, yp)
+      call extract(res, resp)
       resp = xp + yp
     end block
   case (NC_SHORT)
     block
       integer(int16), pointer :: xp(:), yp(:), resp(:)
 
-      call extract(x, xp, flatten=.true.)
-      call extract(y, yp, flatten=.true.)
-      call extract(res, resp, flatten=.true.)
+      call extract(x, xp)
+      call extract(y, yp)
+      call extract(res, resp)
       resp = xp + yp
     end block
   case (NC_INT)
     block
       integer(int32), pointer :: xp(:), yp(:), resp(:)
 
-      call extract(x, xp, flatten=.true.)
-      call extract(y, yp, flatten=.true.)
-      call extract(res, resp, flatten=.true.)
+      call extract(x, xp)
+      call extract(y, yp)
+      call extract(res, resp)
       resp = xp + yp
     end block
   case (NC_INT64)
     block
       integer(int64), pointer :: xp(:), yp(:), resp(:)
 
-      call extract(x, xp, flatten=.true.)
-      call extract(y, yp, flatten=.true.)
-      call extract(res, resp, flatten=.true.)
+      call extract(x, xp)
+      call extract(y, yp)
+      call extract(res, resp)
       resp = xp + yp
     end block
   case (NC_FLOAT)
     block
       real(real32), pointer :: xp(:), yp(:), resp(:)
 
-      call extract(x, xp, flatten=.true.)
-      call extract(y, yp, flatten=.true.)
-      call extract(res, resp, flatten=.true.)
+      call extract(x, xp)
+      call extract(y, yp)
+      call extract(res, resp)
       resp = xp + yp
     end block
   case (NC_DOUBLE)
     block
       real(real64), pointer :: xp(:), yp(:), resp(:)
 
-      call extract(x, xp, flatten=.true.)
-      call extract(y, yp, flatten=.true.)
-      call extract(res, resp, flatten=.true.)
+      call extract(x, xp)
+      call extract(y, yp)
+      call extract(res, resp)
       resp = xp + yp
     end block
   end select
@@ -80,8 +80,8 @@ module function add_var_int8(x, y) result(res)
     & "[add_var_int8] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=x)
-  call extract(x, xp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(x, xp)
+  call extract(res, resp)
   resp = xp + y
 end function add_var_int8
 
@@ -95,8 +95,8 @@ module function add_int8_var(x, y) result(res)
     & "[add_var_int8] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=y)
-  call extract(y, yp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(y, yp)
+  call extract(res, resp)
   resp = x + yp
 end function add_int8_var
 
@@ -110,8 +110,8 @@ module function add_var_int16(x, y) result(res)
     & "[add_var_int16] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=x)
-  call extract(x, xp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(x, xp)
+  call extract(res, resp)
   resp = xp + y
 end function add_var_int16
 
@@ -125,8 +125,8 @@ module function add_int16_var(x, y) result(res)
     & "[add_var_int16] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=y)
-  call extract(y, yp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(y, yp)
+  call extract(res, resp)
   resp = x + yp
 end function add_int16_var
 
@@ -140,8 +140,8 @@ module function add_var_int32(x, y) result(res)
     & "[add_var_int32] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=x)
-  call extract(x, xp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(x, xp)
+  call extract(res, resp)
   resp = xp + y
 end function add_var_int32
 
@@ -155,8 +155,8 @@ module function add_int32_var(x, y) result(res)
     & "[add_var_int32] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=y)
-  call extract(y, yp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(y, yp)
+  call extract(res, resp)
   resp = x + yp
 end function add_int32_var
 
@@ -170,8 +170,8 @@ module function add_var_int64(x, y) result(res)
     & "[add_var_int64] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=x)
-  call extract(x, xp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(x, xp)
+  call extract(res, resp)
   resp = xp + y
 end function add_var_int64
 
@@ -185,8 +185,8 @@ module function add_int64_var(x, y) result(res)
     & "[add_var_int64] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=y)
-  call extract(y, yp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(y, yp)
+  call extract(res, resp)
   resp = x + yp
 end function add_int64_var
 
@@ -200,8 +200,8 @@ module function add_var_real32(x, y) result(res)
     & "[add_var_real32] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=x)
-  call extract(x, xp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(x, xp)
+  call extract(res, resp)
   resp = xp + y
 end function add_var_real32
 
@@ -215,8 +215,8 @@ module function add_real32_var(x, y) result(res)
     & "[add_var_real32] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=y)
-  call extract(y, yp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(y, yp)
+  call extract(res, resp)
   resp = x + yp
 end function add_real32_var
 
@@ -230,8 +230,8 @@ module function add_var_real64(x, y) result(res)
     & "[add_var_real64] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=x)
-  call extract(x, xp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(x, xp)
+  call extract(res, resp)
   resp = xp + y
 end function add_var_real64
 
@@ -245,8 +245,8 @@ module function add_real64_var(x, y) result(res)
     & "[add_var_real64] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=y)
-  call extract(y, yp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(y, yp)
+  call extract(res, resp)
   resp = x + yp
 end function add_real64_var
 
@@ -265,54 +265,54 @@ module function sub_vars(x, y) result(res)
     block
       integer(int8), pointer :: xp(:), yp(:), resp(:)
 
-      call extract(x, xp, flatten=.true.)
-      call extract(y, yp, flatten=.true.)
-      call extract(res, resp, flatten=.true.)
+      call extract(x, xp)
+      call extract(y, yp)
+      call extract(res, resp)
       resp = xp - yp
     end block
   case (NC_SHORT)
     block
       integer(int16), pointer :: xp(:), yp(:), resp(:)
 
-      call extract(x, xp, flatten=.true.)
-      call extract(y, yp, flatten=.true.)
-      call extract(res, resp, flatten=.true.)
+      call extract(x, xp)
+      call extract(y, yp)
+      call extract(res, resp)
       resp = xp - yp
     end block
   case (NC_INT)
     block
       integer(int32), pointer :: xp(:), yp(:), resp(:)
 
-      call extract(x, xp, flatten=.true.)
-      call extract(y, yp, flatten=.true.)
-      call extract(res, resp, flatten=.true.)
+      call extract(x, xp)
+      call extract(y, yp)
+      call extract(res, resp)
       resp = xp - yp
     end block
   case (NC_INT64)
     block
       integer(int64), pointer :: xp(:), yp(:), resp(:)
 
-      call extract(x, xp, flatten=.true.)
-      call extract(y, yp, flatten=.true.)
-      call extract(res, resp, flatten=.true.)
+      call extract(x, xp)
+      call extract(y, yp)
+      call extract(res, resp)
       resp = xp - yp
     end block
   case (NC_FLOAT)
     block
       real(real32), pointer :: xp(:), yp(:), resp(:)
 
-      call extract(x, xp, flatten=.true.)
-      call extract(y, yp, flatten=.true.)
-      call extract(res, resp, flatten=.true.)
+      call extract(x, xp)
+      call extract(y, yp)
+      call extract(res, resp)
       resp = xp - yp
     end block
   case (NC_DOUBLE)
     block
       real(real64), pointer :: xp(:), yp(:), resp(:)
 
-      call extract(x, xp, flatten=.true.)
-      call extract(y, yp, flatten=.true.)
-      call extract(res, resp, flatten=.true.)
+      call extract(x, xp)
+      call extract(y, yp)
+      call extract(res, resp)
       resp = xp - yp
     end block
   end select
@@ -328,8 +328,8 @@ module function sub_var_int8(x, y) result(res)
     & "[sub_var_int8] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=x)
-  call extract(x, xp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(x, xp)
+  call extract(res, resp)
   resp = xp - y
 end function sub_var_int8
 
@@ -343,8 +343,8 @@ module function sub_int8_var(x, y) result(res)
     & "[sub_var_int8] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=y)
-  call extract(y, yp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(y, yp)
+  call extract(res, resp)
   resp = x - yp
 end function sub_int8_var
 
@@ -358,8 +358,8 @@ module function sub_var_int16(x, y) result(res)
     & "[sub_var_int16] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=x)
-  call extract(x, xp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(x, xp)
+  call extract(res, resp)
   resp = xp - y
 end function sub_var_int16
 
@@ -373,8 +373,8 @@ module function sub_int16_var(x, y) result(res)
     & "[sub_var_int16] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=y)
-  call extract(y, yp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(y, yp)
+  call extract(res, resp)
   resp = x - yp
 end function sub_int16_var
 
@@ -388,8 +388,8 @@ module function sub_var_int32(x, y) result(res)
     & "[sub_var_int32] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=x)
-  call extract(x, xp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(x, xp)
+  call extract(res, resp)
   resp = xp - y
 end function sub_var_int32
 
@@ -403,8 +403,8 @@ module function sub_int32_var(x, y) result(res)
     & "[sub_var_int32] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=y)
-  call extract(y, yp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(y, yp)
+  call extract(res, resp)
   resp = x - yp
 end function sub_int32_var
 
@@ -418,8 +418,8 @@ module function sub_var_int64(x, y) result(res)
     & "[sub_var_int64] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=x)
-  call extract(x, xp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(x, xp)
+  call extract(res, resp)
   resp = xp - y
 end function sub_var_int64
 
@@ -433,8 +433,8 @@ module function sub_int64_var(x, y) result(res)
     & "[sub_var_int64] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=y)
-  call extract(y, yp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(y, yp)
+  call extract(res, resp)
   resp = x - yp
 end function sub_int64_var
 
@@ -448,8 +448,8 @@ module function sub_var_real32(x, y) result(res)
     & "[sub_var_real32] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=x)
-  call extract(x, xp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(x, xp)
+  call extract(res, resp)
   resp = xp - y
 end function sub_var_real32
 
@@ -463,8 +463,8 @@ module function sub_real32_var(x, y) result(res)
     & "[sub_var_real32] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=y)
-  call extract(y, yp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(y, yp)
+  call extract(res, resp)
   resp = x - yp
 end function sub_real32_var
 
@@ -478,8 +478,8 @@ module function sub_var_real64(x, y) result(res)
     & "[sub_var_real64] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=x)
-  call extract(x, xp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(x, xp)
+  call extract(res, resp)
   resp = xp - y
 end function sub_var_real64
 
@@ -493,8 +493,8 @@ module function sub_real64_var(x, y) result(res)
     & "[sub_var_real64] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=y)
-  call extract(y, yp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(y, yp)
+  call extract(res, resp)
   resp = x - yp
 end function sub_real64_var
 
@@ -513,54 +513,54 @@ module function mul_vars(x, y) result(res)
     block
       integer(int8), pointer :: xp(:), yp(:), resp(:)
 
-      call extract(x, xp, flatten=.true.)
-      call extract(y, yp, flatten=.true.)
-      call extract(res, resp, flatten=.true.)
+      call extract(x, xp)
+      call extract(y, yp)
+      call extract(res, resp)
       resp = xp * yp
     end block
   case (NC_SHORT)
     block
       integer(int16), pointer :: xp(:), yp(:), resp(:)
 
-      call extract(x, xp, flatten=.true.)
-      call extract(y, yp, flatten=.true.)
-      call extract(res, resp, flatten=.true.)
+      call extract(x, xp)
+      call extract(y, yp)
+      call extract(res, resp)
       resp = xp * yp
     end block
   case (NC_INT)
     block
       integer(int32), pointer :: xp(:), yp(:), resp(:)
 
-      call extract(x, xp, flatten=.true.)
-      call extract(y, yp, flatten=.true.)
-      call extract(res, resp, flatten=.true.)
+      call extract(x, xp)
+      call extract(y, yp)
+      call extract(res, resp)
       resp = xp * yp
     end block
   case (NC_INT64)
     block
       integer(int64), pointer :: xp(:), yp(:), resp(:)
 
-      call extract(x, xp, flatten=.true.)
-      call extract(y, yp, flatten=.true.)
-      call extract(res, resp, flatten=.true.)
+      call extract(x, xp)
+      call extract(y, yp)
+      call extract(res, resp)
       resp = xp * yp
     end block
   case (NC_FLOAT)
     block
       real(real32), pointer :: xp(:), yp(:), resp(:)
 
-      call extract(x, xp, flatten=.true.)
-      call extract(y, yp, flatten=.true.)
-      call extract(res, resp, flatten=.true.)
+      call extract(x, xp)
+      call extract(y, yp)
+      call extract(res, resp)
       resp = xp * yp
     end block
   case (NC_DOUBLE)
     block
       real(real64), pointer :: xp(:), yp(:), resp(:)
 
-      call extract(x, xp, flatten=.true.)
-      call extract(y, yp, flatten=.true.)
-      call extract(res, resp, flatten=.true.)
+      call extract(x, xp)
+      call extract(y, yp)
+      call extract(res, resp)
       resp = xp * yp
     end block
   end select
@@ -576,8 +576,8 @@ module function mul_var_int8(x, y) result(res)
     & "[mul_var_int8] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=x)
-  call extract(x, xp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(x, xp)
+  call extract(res, resp)
   resp = xp * y
 end function mul_var_int8
 
@@ -591,8 +591,8 @@ module function mul_int8_var(x, y) result(res)
     & "[mul_var_int8] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=y)
-  call extract(y, yp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(y, yp)
+  call extract(res, resp)
   resp = x * yp
 end function mul_int8_var
 
@@ -606,8 +606,8 @@ module function mul_var_int16(x, y) result(res)
     & "[mul_var_int16] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=x)
-  call extract(x, xp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(x, xp)
+  call extract(res, resp)
   resp = xp * y
 end function mul_var_int16
 
@@ -621,8 +621,8 @@ module function mul_int16_var(x, y) result(res)
     & "[mul_var_int16] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=y)
-  call extract(y, yp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(y, yp)
+  call extract(res, resp)
   resp = x * yp
 end function mul_int16_var
 
@@ -636,8 +636,8 @@ module function mul_var_int32(x, y) result(res)
     & "[mul_var_int32] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=x)
-  call extract(x, xp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(x, xp)
+  call extract(res, resp)
   resp = xp * y
 end function mul_var_int32
 
@@ -651,8 +651,8 @@ module function mul_int32_var(x, y) result(res)
     & "[mul_var_int32] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=y)
-  call extract(y, yp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(y, yp)
+  call extract(res, resp)
   resp = x * yp
 end function mul_int32_var
 
@@ -666,8 +666,8 @@ module function mul_var_int64(x, y) result(res)
     & "[mul_var_int64] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=x)
-  call extract(x, xp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(x, xp)
+  call extract(res, resp)
   resp = xp * y
 end function mul_var_int64
 
@@ -681,8 +681,8 @@ module function mul_int64_var(x, y) result(res)
     & "[mul_var_int64] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=y)
-  call extract(y, yp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(y, yp)
+  call extract(res, resp)
   resp = x * yp
 end function mul_int64_var
 
@@ -696,8 +696,8 @@ module function mul_var_real32(x, y) result(res)
     & "[mul_var_real32] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=x)
-  call extract(x, xp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(x, xp)
+  call extract(res, resp)
   resp = xp * y
 end function mul_var_real32
 
@@ -711,8 +711,8 @@ module function mul_real32_var(x, y) result(res)
     & "[mul_var_real32] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=y)
-  call extract(y, yp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(y, yp)
+  call extract(res, resp)
   resp = x * yp
 end function mul_real32_var
 
@@ -726,8 +726,8 @@ module function mul_var_real64(x, y) result(res)
     & "[mul_var_real64] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=x)
-  call extract(x, xp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(x, xp)
+  call extract(res, resp)
   resp = xp * y
 end function mul_var_real64
 
@@ -741,8 +741,8 @@ module function mul_real64_var(x, y) result(res)
     & "[mul_var_real64] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=y)
-  call extract(y, yp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(y, yp)
+  call extract(res, resp)
   resp = x * yp
 end function mul_real64_var
 
@@ -761,54 +761,54 @@ module function div_vars(x, y) result(res)
     block
       integer(int8), pointer :: xp(:), yp(:), resp(:)
 
-      call extract(x, xp, flatten=.true.)
-      call extract(y, yp, flatten=.true.)
-      call extract(res, resp, flatten=.true.)
+      call extract(x, xp)
+      call extract(y, yp)
+      call extract(res, resp)
       resp = xp / yp
     end block
   case (NC_SHORT)
     block
       integer(int16), pointer :: xp(:), yp(:), resp(:)
 
-      call extract(x, xp, flatten=.true.)
-      call extract(y, yp, flatten=.true.)
-      call extract(res, resp, flatten=.true.)
+      call extract(x, xp)
+      call extract(y, yp)
+      call extract(res, resp)
       resp = xp / yp
     end block
   case (NC_INT)
     block
       integer(int32), pointer :: xp(:), yp(:), resp(:)
 
-      call extract(x, xp, flatten=.true.)
-      call extract(y, yp, flatten=.true.)
-      call extract(res, resp, flatten=.true.)
+      call extract(x, xp)
+      call extract(y, yp)
+      call extract(res, resp)
       resp = xp / yp
     end block
   case (NC_INT64)
     block
       integer(int64), pointer :: xp(:), yp(:), resp(:)
 
-      call extract(x, xp, flatten=.true.)
-      call extract(y, yp, flatten=.true.)
-      call extract(res, resp, flatten=.true.)
+      call extract(x, xp)
+      call extract(y, yp)
+      call extract(res, resp)
       resp = xp / yp
     end block
   case (NC_FLOAT)
     block
       real(real32), pointer :: xp(:), yp(:), resp(:)
 
-      call extract(x, xp, flatten=.true.)
-      call extract(y, yp, flatten=.true.)
-      call extract(res, resp, flatten=.true.)
+      call extract(x, xp)
+      call extract(y, yp)
+      call extract(res, resp)
       resp = xp / yp
     end block
   case (NC_DOUBLE)
     block
       real(real64), pointer :: xp(:), yp(:), resp(:)
 
-      call extract(x, xp, flatten=.true.)
-      call extract(y, yp, flatten=.true.)
-      call extract(res, resp, flatten=.true.)
+      call extract(x, xp)
+      call extract(y, yp)
+      call extract(res, resp)
       resp = xp / yp
     end block
   end select
@@ -824,8 +824,8 @@ module function div_var_int8(x, y) result(res)
     & "[div_var_int8] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=x)
-  call extract(x, xp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(x, xp)
+  call extract(res, resp)
   resp = xp / y
 end function div_var_int8
 
@@ -839,8 +839,8 @@ module function div_int8_var(x, y) result(res)
     & "[div_var_int8] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=y)
-  call extract(y, yp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(y, yp)
+  call extract(res, resp)
   resp = x / yp
 end function div_int8_var
 
@@ -854,8 +854,8 @@ module function div_var_int16(x, y) result(res)
     & "[div_var_int16] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=x)
-  call extract(x, xp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(x, xp)
+  call extract(res, resp)
   resp = xp / y
 end function div_var_int16
 
@@ -869,8 +869,8 @@ module function div_int16_var(x, y) result(res)
     & "[div_var_int16] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=y)
-  call extract(y, yp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(y, yp)
+  call extract(res, resp)
   resp = x / yp
 end function div_int16_var
 
@@ -884,8 +884,8 @@ module function div_var_int32(x, y) result(res)
     & "[div_var_int32] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=x)
-  call extract(x, xp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(x, xp)
+  call extract(res, resp)
   resp = xp / y
 end function div_var_int32
 
@@ -899,8 +899,8 @@ module function div_int32_var(x, y) result(res)
     & "[div_var_int32] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=y)
-  call extract(y, yp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(y, yp)
+  call extract(res, resp)
   resp = x / yp
 end function div_int32_var
 
@@ -914,8 +914,8 @@ module function div_var_int64(x, y) result(res)
     & "[div_var_int64] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=x)
-  call extract(x, xp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(x, xp)
+  call extract(res, resp)
   resp = xp / y
 end function div_var_int64
 
@@ -929,8 +929,8 @@ module function div_int64_var(x, y) result(res)
     & "[div_var_int64] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=y)
-  call extract(y, yp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(y, yp)
+  call extract(res, resp)
   resp = x / yp
 end function div_int64_var
 
@@ -944,8 +944,8 @@ module function div_var_real32(x, y) result(res)
     & "[div_var_real32] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=x)
-  call extract(x, xp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(x, xp)
+  call extract(res, resp)
   resp = xp / y
 end function div_var_real32
 
@@ -959,8 +959,8 @@ module function div_real32_var(x, y) result(res)
     & "[div_var_real32] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=y)
-  call extract(y, yp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(y, yp)
+  call extract(res, resp)
   resp = x / yp
 end function div_real32_var
 
@@ -974,8 +974,8 @@ module function div_var_real64(x, y) result(res)
     & "[div_var_real64] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=x)
-  call extract(x, xp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(x, xp)
+  call extract(res, resp)
   resp = xp / y
 end function div_var_real64
 
@@ -989,8 +989,8 @@ module function div_real64_var(x, y) result(res)
     & "[div_var_real64] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=y)
-  call extract(y, yp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(y, yp)
+  call extract(res, resp)
   resp = x / yp
 end function div_real64_var
 
@@ -1009,54 +1009,54 @@ module function pow_vars(x, y) result(res)
     block
       integer(int8), pointer :: xp(:), yp(:), resp(:)
 
-      call extract(x, xp, flatten=.true.)
-      call extract(y, yp, flatten=.true.)
-      call extract(res, resp, flatten=.true.)
+      call extract(x, xp)
+      call extract(y, yp)
+      call extract(res, resp)
       resp = xp ** yp
     end block
   case (NC_SHORT)
     block
       integer(int16), pointer :: xp(:), yp(:), resp(:)
 
-      call extract(x, xp, flatten=.true.)
-      call extract(y, yp, flatten=.true.)
-      call extract(res, resp, flatten=.true.)
+      call extract(x, xp)
+      call extract(y, yp)
+      call extract(res, resp)
       resp = xp ** yp
     end block
   case (NC_INT)
     block
       integer(int32), pointer :: xp(:), yp(:), resp(:)
 
-      call extract(x, xp, flatten=.true.)
-      call extract(y, yp, flatten=.true.)
-      call extract(res, resp, flatten=.true.)
+      call extract(x, xp)
+      call extract(y, yp)
+      call extract(res, resp)
       resp = xp ** yp
     end block
   case (NC_INT64)
     block
       integer(int64), pointer :: xp(:), yp(:), resp(:)
 
-      call extract(x, xp, flatten=.true.)
-      call extract(y, yp, flatten=.true.)
-      call extract(res, resp, flatten=.true.)
+      call extract(x, xp)
+      call extract(y, yp)
+      call extract(res, resp)
       resp = xp ** yp
     end block
   case (NC_FLOAT)
     block
       real(real32), pointer :: xp(:), yp(:), resp(:)
 
-      call extract(x, xp, flatten=.true.)
-      call extract(y, yp, flatten=.true.)
-      call extract(res, resp, flatten=.true.)
+      call extract(x, xp)
+      call extract(y, yp)
+      call extract(res, resp)
       resp = xp ** yp
     end block
   case (NC_DOUBLE)
     block
       real(real64), pointer :: xp(:), yp(:), resp(:)
 
-      call extract(x, xp, flatten=.true.)
-      call extract(y, yp, flatten=.true.)
-      call extract(res, resp, flatten=.true.)
+      call extract(x, xp)
+      call extract(y, yp)
+      call extract(res, resp)
       resp = xp ** yp
     end block
   end select
@@ -1072,8 +1072,8 @@ module function pow_var_int8(x, y) result(res)
     & "[pow_var_int8] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=x)
-  call extract(x, xp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(x, xp)
+  call extract(res, resp)
   resp = xp ** y
 end function pow_var_int8
 
@@ -1087,8 +1087,8 @@ module function pow_int8_var(x, y) result(res)
     & "[pow_var_int8] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=y)
-  call extract(y, yp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(y, yp)
+  call extract(res, resp)
   resp = x ** yp
 end function pow_int8_var
 
@@ -1102,8 +1102,8 @@ module function pow_var_int16(x, y) result(res)
     & "[pow_var_int16] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=x)
-  call extract(x, xp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(x, xp)
+  call extract(res, resp)
   resp = xp ** y
 end function pow_var_int16
 
@@ -1117,8 +1117,8 @@ module function pow_int16_var(x, y) result(res)
     & "[pow_var_int16] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=y)
-  call extract(y, yp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(y, yp)
+  call extract(res, resp)
   resp = x ** yp
 end function pow_int16_var
 
@@ -1132,8 +1132,8 @@ module function pow_var_int32(x, y) result(res)
     & "[pow_var_int32] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=x)
-  call extract(x, xp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(x, xp)
+  call extract(res, resp)
   resp = xp ** y
 end function pow_var_int32
 
@@ -1147,8 +1147,8 @@ module function pow_int32_var(x, y) result(res)
     & "[pow_var_int32] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=y)
-  call extract(y, yp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(y, yp)
+  call extract(res, resp)
   resp = x ** yp
 end function pow_int32_var
 
@@ -1162,8 +1162,8 @@ module function pow_var_int64(x, y) result(res)
     & "[pow_var_int64] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=x)
-  call extract(x, xp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(x, xp)
+  call extract(res, resp)
   resp = xp ** y
 end function pow_var_int64
 
@@ -1177,8 +1177,8 @@ module function pow_int64_var(x, y) result(res)
     & "[pow_var_int64] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=y)
-  call extract(y, yp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(y, yp)
+  call extract(res, resp)
   resp = x ** yp
 end function pow_int64_var
 
@@ -1192,8 +1192,8 @@ module function pow_var_real32(x, y) result(res)
     & "[pow_var_real32] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=x)
-  call extract(x, xp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(x, xp)
+  call extract(res, resp)
   resp = xp ** y
 end function pow_var_real32
 
@@ -1207,8 +1207,8 @@ module function pow_real32_var(x, y) result(res)
     & "[pow_var_real32] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=y)
-  call extract(y, yp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(y, yp)
+  call extract(res, resp)
   resp = x ** yp
 end function pow_real32_var
 
@@ -1222,8 +1222,8 @@ module function pow_var_real64(x, y) result(res)
     & "[pow_var_real64] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=x)
-  call extract(x, xp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(x, xp)
+  call extract(res, resp)
   resp = xp ** y
 end function pow_var_real64
 
@@ -1237,8 +1237,8 @@ module function pow_real64_var(x, y) result(res)
     & "[pow_var_real64] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=y)
-  call extract(y, yp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(y, yp)
+  call extract(res, resp)
   resp = x ** yp
 end function pow_real64_var
 

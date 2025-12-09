@@ -20,9 +20,9 @@ module function ${N}$_vars(x, y) result(res)
     block
       ${T}$(${K}$), pointer :: xp(:), yp(:), resp(:)
 
-      call extract(x, xp, flatten=.true.)
-      call extract(y, yp, flatten=.true.)
-      call extract(res, resp, flatten=.true.)
+      call extract(x, xp)
+      call extract(y, yp)
+      call extract(res, resp)
       resp = xp ${O}$ yp
     end block
     #: endfor
@@ -40,8 +40,8 @@ module function ${N}$_var_${K1}$(x, y) result(res)
     & "[${N}$_var_${K1}$] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=x)
-  call extract(x, xp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(x, xp)
+  call extract(res, resp)
   resp = xp ${O}$ y
 end function ${N}$_var_${K1}$
 
@@ -55,8 +55,8 @@ module function ${N}$_${K1}$_var(x, y) result(res)
     & "[${N}$_var_${K1}$] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=y)
-  call extract(y, yp, flatten=.true.)
-  call extract(res, resp, flatten=.true.)
+  call extract(y, yp)
+  call extract(res, resp)
   resp = x ${O}$ yp
 end function ${N}$_${K1}$_var${NEWLINE(not (N == 'pow' and K1 == 'read64'))}$
 #: endfor

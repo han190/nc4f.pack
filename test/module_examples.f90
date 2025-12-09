@@ -100,7 +100,7 @@ subroutine sfc_pres_temp_rd(passed)
   print "(dt)", var
   if (.not. passed) return
 
-  var = get_variable(nc, "temperature", exist)
+  var = get_variable(nc, "temperature", exist) - 273.15
   associate (dims => var%dims)
     passed = exist .and. &
       & dims(2)%name == "latitude" .and. &
