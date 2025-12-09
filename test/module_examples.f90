@@ -89,7 +89,7 @@ subroutine sfc_pres_temp_rd(passed)
   logical :: exist
 
   nc = open_dataset("sfc_pres_temp_wr.nc", "r")
-  var = inquire_variable(nc, "pressure", exist)
+  var = get_variable(nc, "pressure", exist)
   associate (dims => var%dims)
     passed = exist .and. &
       & dims(2)%name == "latitude" .and. &
@@ -100,7 +100,7 @@ subroutine sfc_pres_temp_rd(passed)
   print "(dt)", var
   if (.not. passed) return
 
-  var = inquire_variable(nc, "temperature", exist)
+  var = get_variable(nc, "temperature", exist)
   associate (dims => var%dims)
     passed = exist .and. &
       & dims(2)%name == "latitude" .and. &

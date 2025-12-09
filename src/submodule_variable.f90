@@ -6,27 +6,21 @@ module impure elemental function get_var(nc, name, exist) result(var)
   type(netcdf_type), intent(in) :: nc
   character(len=*), intent(in) :: name
   logical, optional, intent(out) :: exist
-  type(variable_type) :: var
-
-  var = get_var_(nc%id, name, exist)
-end function get_var
-
-impure elemental function get_var_(ncid, name, exist) result(var)
-  integer(c_int), intent(in) :: ncid
-  character(len=*), intent(in) :: name
-  logical, intent(out) :: exist
   type(variable_type), target :: var
+  type(c_ptr) :: cptr
 
-  var = inq_var_(ncid, name, exist)
+  var = inq_var(nc, name, exist)
   zero_size_var: if (var%len == 0) then
     if (allocated(var%buffer)) deallocate (var%buffer)
     return
   end if zero_size_var
 
   call allocate_buffer(var)
-  call handle_error(nc_get_var(ncid, var%id, c_loc(var%buffer(1))), &
-    & "[get_var_] Invalid variable.")
-end function get_var_
+  cptr = c_loc(var%buffer(1))
+  associate (err_msg => "[get_var] Invalid variable: "//name)
+    call handle_error(nc_get_var(nc%id, var%id, cptr), err_msg)
+  end associate
+end function get_var
 
 module impure elemental function inq_var(nc, name, exist) result(var)
   type(netcdf_type), intent(in) :: nc
@@ -36,7 +30,9 @@ module impure elemental function inq_var(nc, name, exist) result(var)
   logical :: atts_exist
   integer :: i
 
-  var = inq_var_(nc%id, name, exist)
+  var%name = trim(adjustl(name))
+  var%id = inq_varid(nc%id, var%name, exist)
+  var%dtype = inq_vartype(nc%id, var%id)
   var%atts = get_atts_var(nc, var, atts_exist)
   if (.not. atts_exist .and. allocated(var%atts)) deallocate (var%atts)
   var%dims = inq_dims_var(nc, var)
@@ -46,22 +42,27 @@ module impure elemental function inq_var(nc, name, exist) result(var)
   end do
 end function inq_var
 
-impure elemental function inq_var_(ncid, name, exist) result(var)
+impure elemental function inq_vartype(ncid, varid) result(vartype)
+  integer(c_int), intent(in) :: ncid, varid
+  integer(c_int) :: vartype
+
+  call handle_error(nc_inq_vartype(ncid, varid, vartype))
+end function inq_vartype
+
+impure elemental function inq_varid(ncid, name, exist) result(varid)
   integer(c_int), intent(in) :: ncid
   character(len=*), intent(in) :: name
   logical, optional, intent(out) :: exist
-  type(variable_type) :: var
+  integer(c_int) :: varid
   integer(c_int) :: stat
 
-  var%name = trim(adjustl(name))
-  stat = nc_inq_varid(ncid, f2cstr(var%name), var%id)
+  stat = nc_inq_varid(ncid, f2cstr(name), varid)
   if (present(exist)) then
     exist = stat == NC_NOERR
     if (.not. exist) return
   end if
   call handle_error(stat)
-  call handle_error(nc_inq_vartype(ncid, var%id, var%dtype))
-end function inq_var_
+end function inq_varid
 
 module impure elemental subroutine put_var(nc, var)
   type(netcdf_type), intent(in) :: nc

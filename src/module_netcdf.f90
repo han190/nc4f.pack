@@ -379,7 +379,7 @@ interface
     type(netcdf_type), intent(in) :: nc
     character(len=*), intent(in) :: name
     logical, intent(out), optional :: exist
-    type(variable_type) :: var
+    type(variable_type), target :: var
   end function get_var
 
   module impure elemental function inq_var(nc, name, exist) result(var)
