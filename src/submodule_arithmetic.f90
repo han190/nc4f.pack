@@ -1246,18 +1246,92 @@ end function pow_real64_var
 module function sum_vars(vars) result(s)
   type(variable_type), intent(in) :: vars(:)
   type(variable_type) :: s
-  integer :: i
+  integer :: i, n
 
-  select case (size(vars))
+  !> Assuming vars share same dimensions and type.
+  n = size(vars)
+  select case (n)
   case (1)
     s = vars(1)
-  case (2)
-    s = vars(1) + vars(2)
-  case (3:)
-    s = vars(1)
-    do i = 2, size(vars)
-      s = s + vars(i)
+  case (2:)
+    do i = 2, n
+      if (any(vars(1)%dims /= vars(i)%dims)) &
+        & error stop "[sum_vars] Invalid dims."
+      if (vars(1)%dtype /= vars(i)%dtype) &
+        & error stop "[sum_vars] Invalid type."
     end do
+
+    call allocate_variable(s, mold=vars(1))
+    select case (s%dtype)
+    case (NC_BYTE)
+      block
+        integer(int8), pointer :: s_ptr(:), v_ptr(:)
+
+        call extract(s, s_ptr)
+        s_ptr = 0
+        do i = 1, n
+          call extract(vars(i), v_ptr)
+          s_ptr = s_ptr + v_ptr
+        end do
+      end block
+    case (NC_SHORT)
+      block
+        integer(int16), pointer :: s_ptr(:), v_ptr(:)
+
+        call extract(s, s_ptr)
+        s_ptr = 0
+        do i = 1, n
+          call extract(vars(i), v_ptr)
+          s_ptr = s_ptr + v_ptr
+        end do
+      end block
+    case (NC_INT)
+      block
+        integer(int32), pointer :: s_ptr(:), v_ptr(:)
+
+        call extract(s, s_ptr)
+        s_ptr = 0
+        do i = 1, n
+          call extract(vars(i), v_ptr)
+          s_ptr = s_ptr + v_ptr
+        end do
+      end block
+    case (NC_INT64)
+      block
+        integer(int64), pointer :: s_ptr(:), v_ptr(:)
+
+        call extract(s, s_ptr)
+        s_ptr = 0
+        do i = 1, n
+          call extract(vars(i), v_ptr)
+          s_ptr = s_ptr + v_ptr
+        end do
+      end block
+    case (NC_FLOAT)
+      block
+        real(real32), pointer :: s_ptr(:), v_ptr(:)
+
+        call extract(s, s_ptr)
+        s_ptr = 0
+        do i = 1, n
+          call extract(vars(i), v_ptr)
+          s_ptr = s_ptr + v_ptr
+        end do
+      end block
+    case (NC_DOUBLE)
+      block
+        real(real64), pointer :: s_ptr(:), v_ptr(:)
+
+        call extract(s, s_ptr)
+        s_ptr = 0
+        do i = 1, n
+          call extract(vars(i), v_ptr)
+          s_ptr = s_ptr + v_ptr
+        end do
+      end block
+    case default
+      error stop "[sum_vars] Invalid type."
+    end select
   case default
     error stop "[sum_vars] Invalid size."
   end select
