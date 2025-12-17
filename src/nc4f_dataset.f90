@@ -1,4 +1,4 @@
-submodule(module_netcdf) submodule_dataset
+submodule(nc4f) nc4f_dataset
 implicit none (type, external)
 contains
 
@@ -85,4 +85,4 @@ module subroutine to_netcdf_var(filename, var, atts)
   call close_dataset(nc)
 end subroutine to_netcdf_var
 
-end submodule submodule_dataset
+end submodule nc4f_dataset

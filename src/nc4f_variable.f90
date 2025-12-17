@@ -1,4 +1,4 @@
-submodule(module_netcdf) submodule_variable
+submodule(nc4f) nc4f_variable
 implicit none (type, external)
 contains
 
@@ -227,4 +227,4 @@ module elemental logical function neq_var(x, y)
   neq_var = .not. eq_var(x, y)
 end function neq_var
 
-end submodule submodule_variable
+end submodule nc4f_variable

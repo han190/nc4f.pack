@@ -1,4 +1,4 @@
-submodule(module_netcdf) submodule_variable_constructor
+submodule(nc4f) nc4f_variable_constructor
 implicit none (type, external)
 contains
 
@@ -548,4 +548,4 @@ module function new_var_real64_7d(name, values, dims, atts) result(var)
   var_ptr = values
 end function new_var_real64_7d
 
-end submodule submodule_variable_constructor
+end submodule nc4f_variable_constructor

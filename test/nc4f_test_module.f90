@@ -1,4 +1,4 @@
-module module_test
+module nc4f_test_module
 implicit none (type, external)
 
 public :: test_type
@@ -26,12 +26,12 @@ subroutine run_tests(tests)
   do i = 1, size(tests)
     call tests(i)%test(tests(i)%passed)
     if (tests(i)%passed) then
-      print "(a)", "Test "//tests(i)%name//". Passed."
+      print "(a)", "[test] "//tests(i)%name//": Passed."
     else
-      print "(a)", "Test "//tests(i)%name//". Failed."
+      print "(a)", "[test] "//tests(i)%name//": Failed."
     end if
   end do
 end subroutine run_tests
 
-end module module_test
+end module nc4f_test_module
 

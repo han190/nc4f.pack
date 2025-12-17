@@ -1,5 +1,5 @@
-module module_examples
-use, non_intrinsic :: module_netcdf
+module nc4f_examples
+use, non_intrinsic :: nc4f
 implicit none (type, external)
 
 public :: simple_wr
@@ -17,14 +17,15 @@ subroutine simple_wr(passed)
   integer, parameter :: nx = 47, ny = 83
   real :: values(nx, ny)
   integer :: x, y
+  character(len=1024) :: stdout
 
   do concurrent(y=1:ny, x=1:nx)
     values(x, y) = sqrt((x - 0.5*nx)**2 + (y - 0.5*ny)**2)
   end do
   var = data_array("data", values, ["x".dim.nx, "y".dim.ny])
   call to_netcdf("simple_wr.nc", var)
-  print "(dt)", var
-  passed = .true.
+  write (stdout, "(dt)") var
+  passed = trim(stdout) == "real(real32)::data (x:47, y:83)"
 end subroutine simple_wr
 
 subroutine simple_rd(passed)
@@ -34,15 +35,14 @@ subroutine simple_rd(passed)
   type(variable_type) :: var
   integer, parameter :: nx = 47, ny = 83
   logical :: exist
+  character(len=1024) :: stdout
 
   nc = open_dataset("simple_wr.nc", "r")
   var = inquire_variable(nc, "data", exist)
-  print "(dt)", var
-  passed = &
-    var%dims(1)%name == "x" .and. &
-    var%dims(1)%len == nx .and. &
-    var%dims(2)%name == "y" .and. &
-    var%dims(2)%len == ny
+  write (stdout, "(dt)") var
+  passed = var%name == "data" .and. &
+         & all(var%dims == ["x".dim.nx, "y".dim.ny]) .and. &
+         & trim(stdout) == "real(real32)::data (x:47, y:83)"
   call close_dataset(nc)
 end subroutine simple_rd
 
@@ -76,7 +76,6 @@ subroutine sfc_pres_temp_wr(passed)
       data_array("pressure", pres, [lon_dim, lat_dim], &
         & ["units".att."hPa"])]
   end associate
-  print "(dt)", vars
   call to_netcdf("sfc_pres_temp_wr.nc", vars)
   passed = .true.
 end subroutine sfc_pres_temp_wr
@@ -87,28 +86,20 @@ subroutine sfc_pres_temp_rd(passed)
   type(netcdf_type) :: nc
   type(variable_type) :: var
   logical :: exist
+  type(dimension_type) :: default_dims(2)
 
+  default_dims = ["latitude".dim.47, "longitude".dim.360]
   nc = open_dataset("sfc_pres_temp_wr.nc", "r")
   var = get_variable(nc, "pressure", exist)
-  associate (dims => var%dims)
-    passed = exist .and. &
-      & dims(2)%name == "latitude" .and. &
-      & dims(2)%len == 47 .and. &
-      & dims(1)%name == "longitude" .and. &
-      & dims(1)%len == 360
-  end associate
-  print "(dt)", var
+  passed = all(var%dims == default_dims) .and. &
+         & var%name == "pressure" .and. &
+         & all(var%atts == ["units".att."hPa"])
   if (.not. passed) return
 
   var = get_variable(nc, "temperature", exist) - 273.15
-  associate (dims => var%dims)
-    passed = exist .and. &
-      & dims(2)%name == "latitude" .and. &
-      & dims(2)%len == 47 .and. &
-      & dims(1)%name == "longitude" .and. &
-      & dims(1)%len == 360
-  end associate
-  print "(dt)", var
+  passed = all(var%dims == default_dims) .and. &
+         & var%name == "temperature" .and. &
+         & all(var%atts == ["units".att."celsius"])
 end subroutine sfc_pres_temp_rd
 
-end module module_examples
+end module nc4f_examples

@@ -1,4 +1,4 @@
-module module_c_interface
+module nc4f_c_interface
 
 use, intrinsic :: iso_c_binding, only: c_int, c_ptr, c_char, c_size_t, c_long
 implicit none (type, external)
@@ -574,4 +574,4 @@ interface
   end function nc_put_var
 end interface
 
-end module module_c_interface
+end module nc4f_c_interface

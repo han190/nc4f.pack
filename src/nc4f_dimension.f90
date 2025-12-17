@@ -1,4 +1,4 @@
-submodule(module_netcdf) submodule_dimension
+submodule(nc4f) nc4f_dimension
 implicit none (type, external)
 contains
 
@@ -141,4 +141,4 @@ module elemental logical function neq_dim(x, y)
     & (x%len /= y%len) .or. (x%name /= y%name)
 end function neq_dim
 
-end submodule submodule_dimension
+end submodule nc4f_dimension

@@ -1,7 +1,7 @@
 program main
 
-use, non_intrinsic :: module_test
-use, non_intrinsic :: module_examples
+use, non_intrinsic :: nc4f_test_module
+use, non_intrinsic :: nc4f_examples
 implicit none (type, external)
 
 type(test_type), allocatable :: tests(:)

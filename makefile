@@ -27,12 +27,40 @@ else ifeq ($(FC),flang)
 	endif
 endif
 
-FYPP_INC := $(sort $(wildcard $(FYPP_DIR)/interface_*.fypp))
-FYPP_F90 := $(sort $(wildcard $(FYPP_DIR)/submodule_*.fypp))
-SRC_INC := $(patsubst $(FYPP_DIR)/%.fypp,$(SRC_DIR)/%.inc,$(FYPP_INC))
-SRC_F90 := $(patsubst $(FYPP_DIR)/%.fypp,$(SRC_DIR)/%.f90,$(FYPP_F90))
-SRC := $(sort $(wildcard $(SRC_DIR)/*.f90) $(SRC_F90))
-TEST := $(sort $(wildcard $(TEST_DIR)/*.f90))
+FYPP_FILESTEMS = \
+	nc4f_arithmetic \
+	nc4f_attribute_constructor \
+	nc4f_extract \
+	nc4f_variable_constructor
+FYPP_INC := $(addprefix $(FYPP_DIR)/, \
+	$(addsuffix _interface.fypp, $(FYPP_FILESTEMS)))
+FYPP_F90 := $(addprefix $(FYPP_DIR)/, \
+	$(addsuffix .fypp, $(FYPP_FILESTEMS)))
+SRC_INC := $(patsubst $(FYPP_DIR)/%_interface.fypp, \
+	$(SRC_DIR)/%.inc,$(FYPP_INC))
+SRC_F90 := $(patsubst $(FYPP_DIR)/%.fypp, \
+	$(SRC_DIR)/%.f90,$(FYPP_F90))
+
+SRC_FILES = \
+  nc4f_c_interface.f90 \
+	nc4f.f90 \
+	nc4f_arithmetic.f90 \
+	nc4f_attribute_constructor.f90 \
+	nc4f_attribute.f90 \
+	nc4f_dataset.f90 \
+	nc4f_dimension.f90 \
+	nc4f_extract.f90 \
+	nc4f_io.f90 \
+	nc4f_utility.f90 \
+	nc4f_variable.f90 \
+	nc4f_variable_constructor.f90
+SRC := $(addprefix $(SRC_DIR)/, $(SRC_FILES))
+
+TEST_FILES = \
+	nc4f_examples.f90 \
+	nc4f_test_module.f90 \
+	nc4f_test.f90
+TEST := $(addprefix $(TEST_DIR)/, $(TEST_FILES))
 
 OBJS := $(patsubst $(SRC_DIR)/%.f90,$(BUILD_DIR)/%.o,$(SRC))
 TEST_OBJS := $(patsubst $(TEST_DIR)/%.f90,$(BUILD_DIR)/%.o,$(TEST))
@@ -64,7 +92,7 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.f90
 	@echo "[compile] $<"
 	@$(FC) -c $(FFLAGS) $< -o $@
 
-$(SRC_DIR)/%.inc: $(FYPP_DIR)/%.fypp
+$(SRC_DIR)/%.inc: $(FYPP_DIR)/%_interface.fypp
 	@echo "[preproc] $<"
 	@fypp $< > $@
 

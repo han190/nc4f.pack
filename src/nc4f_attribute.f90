@@ -1,4 +1,4 @@
-submodule(module_netcdf) submodule_attribute
+submodule(nc4f) nc4f_attribute
 implicit none (type, external)
 contains
 
@@ -168,4 +168,4 @@ module elemental logical function neq_att(x, y)
     & x%len /= y%len .or. any(x%buffer /= y%buffer)
 end function neq_att
 
-end submodule submodule_attribute
+end submodule nc4f_attribute

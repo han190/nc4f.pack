@@ -1,8 +1,9 @@
-module module_netcdf
+module nc4f
 
-use, intrinsic :: iso_fortran_env, only: int8, int16, int32, int64, real32, real64
+use, intrinsic :: iso_fortran_env, only: &
+  & int8, int16, int32, int64, real32, real64
 use, intrinsic :: iso_c_binding
-use, non_intrinsic :: module_c_interface
+use, non_intrinsic :: nc4f_c_interface
 implicit none (type, external)
 
 !> Types
@@ -432,9 +433,9 @@ interface
   end function neq_var
 end interface
 
-include "interface_arithmetic.inc"
-include "interface_extract.inc"
-include "interface_variable_constructor.inc"
-include "interface_attribute_constructor.inc"
+include "nc4f_arithmetic.inc"
+include "nc4f_extract.inc"
+include "nc4f_variable_constructor.inc"
+include "nc4f_attribute_constructor.inc"
 
-end module module_netcdf
+end module nc4f

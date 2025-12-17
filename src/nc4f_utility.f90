@@ -1,4 +1,4 @@
-submodule(module_netcdf) submodule_utility
+submodule(nc4f) nc4f_utility
 implicit none (type, external)
 contains
 
@@ -93,4 +93,4 @@ module elemental function get_buffer_size(dtype, len) result(buffer_size)
   buffer_size = len*st_size/8
 end function get_buffer_size
 
-end submodule submodule_utility
+end submodule nc4f_utility

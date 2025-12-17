@@ -1,4 +1,4 @@
-submodule(module_netcdf) submodule_arithmetic
+submodule(nc4f) nc4f_arithmetic
 implicit none (type, external)
 contains
 
@@ -516,7 +516,7 @@ module function mul_vars(x, y) result(res)
       call extract(x, xp)
       call extract(y, yp)
       call extract(res, resp)
-      resp = xp * yp
+      resp = xp*yp
     end block
   case (NC_SHORT)
     block
@@ -525,7 +525,7 @@ module function mul_vars(x, y) result(res)
       call extract(x, xp)
       call extract(y, yp)
       call extract(res, resp)
-      resp = xp * yp
+      resp = xp*yp
     end block
   case (NC_INT)
     block
@@ -534,7 +534,7 @@ module function mul_vars(x, y) result(res)
       call extract(x, xp)
       call extract(y, yp)
       call extract(res, resp)
-      resp = xp * yp
+      resp = xp*yp
     end block
   case (NC_INT64)
     block
@@ -543,7 +543,7 @@ module function mul_vars(x, y) result(res)
       call extract(x, xp)
       call extract(y, yp)
       call extract(res, resp)
-      resp = xp * yp
+      resp = xp*yp
     end block
   case (NC_FLOAT)
     block
@@ -552,7 +552,7 @@ module function mul_vars(x, y) result(res)
       call extract(x, xp)
       call extract(y, yp)
       call extract(res, resp)
-      resp = xp * yp
+      resp = xp*yp
     end block
   case (NC_DOUBLE)
     block
@@ -561,7 +561,7 @@ module function mul_vars(x, y) result(res)
       call extract(x, xp)
       call extract(y, yp)
       call extract(res, resp)
-      resp = xp * yp
+      resp = xp*yp
     end block
   end select
 end function mul_vars
@@ -578,7 +578,7 @@ module function mul_var_int8(x, y) result(res)
   call allocate_variable(res, mold=x)
   call extract(x, xp)
   call extract(res, resp)
-  resp = xp * y
+  resp = xp*y
 end function mul_var_int8
 
 module function mul_int8_var(x, y) result(res)
@@ -593,7 +593,7 @@ module function mul_int8_var(x, y) result(res)
   call allocate_variable(res, mold=y)
   call extract(y, yp)
   call extract(res, resp)
-  resp = x * yp
+  resp = x*yp
 end function mul_int8_var
 
 module function mul_var_int16(x, y) result(res)
@@ -608,7 +608,7 @@ module function mul_var_int16(x, y) result(res)
   call allocate_variable(res, mold=x)
   call extract(x, xp)
   call extract(res, resp)
-  resp = xp * y
+  resp = xp*y
 end function mul_var_int16
 
 module function mul_int16_var(x, y) result(res)
@@ -623,7 +623,7 @@ module function mul_int16_var(x, y) result(res)
   call allocate_variable(res, mold=y)
   call extract(y, yp)
   call extract(res, resp)
-  resp = x * yp
+  resp = x*yp
 end function mul_int16_var
 
 module function mul_var_int32(x, y) result(res)
@@ -638,7 +638,7 @@ module function mul_var_int32(x, y) result(res)
   call allocate_variable(res, mold=x)
   call extract(x, xp)
   call extract(res, resp)
-  resp = xp * y
+  resp = xp*y
 end function mul_var_int32
 
 module function mul_int32_var(x, y) result(res)
@@ -653,7 +653,7 @@ module function mul_int32_var(x, y) result(res)
   call allocate_variable(res, mold=y)
   call extract(y, yp)
   call extract(res, resp)
-  resp = x * yp
+  resp = x*yp
 end function mul_int32_var
 
 module function mul_var_int64(x, y) result(res)
@@ -668,7 +668,7 @@ module function mul_var_int64(x, y) result(res)
   call allocate_variable(res, mold=x)
   call extract(x, xp)
   call extract(res, resp)
-  resp = xp * y
+  resp = xp*y
 end function mul_var_int64
 
 module function mul_int64_var(x, y) result(res)
@@ -683,7 +683,7 @@ module function mul_int64_var(x, y) result(res)
   call allocate_variable(res, mold=y)
   call extract(y, yp)
   call extract(res, resp)
-  resp = x * yp
+  resp = x*yp
 end function mul_int64_var
 
 module function mul_var_real32(x, y) result(res)
@@ -698,7 +698,7 @@ module function mul_var_real32(x, y) result(res)
   call allocate_variable(res, mold=x)
   call extract(x, xp)
   call extract(res, resp)
-  resp = xp * y
+  resp = xp*y
 end function mul_var_real32
 
 module function mul_real32_var(x, y) result(res)
@@ -713,7 +713,7 @@ module function mul_real32_var(x, y) result(res)
   call allocate_variable(res, mold=y)
   call extract(y, yp)
   call extract(res, resp)
-  resp = x * yp
+  resp = x*yp
 end function mul_real32_var
 
 module function mul_var_real64(x, y) result(res)
@@ -728,7 +728,7 @@ module function mul_var_real64(x, y) result(res)
   call allocate_variable(res, mold=x)
   call extract(x, xp)
   call extract(res, resp)
-  resp = xp * y
+  resp = xp*y
 end function mul_var_real64
 
 module function mul_real64_var(x, y) result(res)
@@ -743,7 +743,7 @@ module function mul_real64_var(x, y) result(res)
   call allocate_variable(res, mold=y)
   call extract(y, yp)
   call extract(res, resp)
-  resp = x * yp
+  resp = x*yp
 end function mul_real64_var
 
 module function div_vars(x, y) result(res)
@@ -764,7 +764,7 @@ module function div_vars(x, y) result(res)
       call extract(x, xp)
       call extract(y, yp)
       call extract(res, resp)
-      resp = xp / yp
+      resp = xp/yp
     end block
   case (NC_SHORT)
     block
@@ -773,7 +773,7 @@ module function div_vars(x, y) result(res)
       call extract(x, xp)
       call extract(y, yp)
       call extract(res, resp)
-      resp = xp / yp
+      resp = xp/yp
     end block
   case (NC_INT)
     block
@@ -782,7 +782,7 @@ module function div_vars(x, y) result(res)
       call extract(x, xp)
       call extract(y, yp)
       call extract(res, resp)
-      resp = xp / yp
+      resp = xp/yp
     end block
   case (NC_INT64)
     block
@@ -791,7 +791,7 @@ module function div_vars(x, y) result(res)
       call extract(x, xp)
       call extract(y, yp)
       call extract(res, resp)
-      resp = xp / yp
+      resp = xp/yp
     end block
   case (NC_FLOAT)
     block
@@ -800,7 +800,7 @@ module function div_vars(x, y) result(res)
       call extract(x, xp)
       call extract(y, yp)
       call extract(res, resp)
-      resp = xp / yp
+      resp = xp/yp
     end block
   case (NC_DOUBLE)
     block
@@ -809,7 +809,7 @@ module function div_vars(x, y) result(res)
       call extract(x, xp)
       call extract(y, yp)
       call extract(res, resp)
-      resp = xp / yp
+      resp = xp/yp
     end block
   end select
 end function div_vars
@@ -826,7 +826,7 @@ module function div_var_int8(x, y) result(res)
   call allocate_variable(res, mold=x)
   call extract(x, xp)
   call extract(res, resp)
-  resp = xp / y
+  resp = xp/y
 end function div_var_int8
 
 module function div_int8_var(x, y) result(res)
@@ -841,7 +841,7 @@ module function div_int8_var(x, y) result(res)
   call allocate_variable(res, mold=y)
   call extract(y, yp)
   call extract(res, resp)
-  resp = x / yp
+  resp = x/yp
 end function div_int8_var
 
 module function div_var_int16(x, y) result(res)
@@ -856,7 +856,7 @@ module function div_var_int16(x, y) result(res)
   call allocate_variable(res, mold=x)
   call extract(x, xp)
   call extract(res, resp)
-  resp = xp / y
+  resp = xp/y
 end function div_var_int16
 
 module function div_int16_var(x, y) result(res)
@@ -871,7 +871,7 @@ module function div_int16_var(x, y) result(res)
   call allocate_variable(res, mold=y)
   call extract(y, yp)
   call extract(res, resp)
-  resp = x / yp
+  resp = x/yp
 end function div_int16_var
 
 module function div_var_int32(x, y) result(res)
@@ -886,7 +886,7 @@ module function div_var_int32(x, y) result(res)
   call allocate_variable(res, mold=x)
   call extract(x, xp)
   call extract(res, resp)
-  resp = xp / y
+  resp = xp/y
 end function div_var_int32
 
 module function div_int32_var(x, y) result(res)
@@ -901,7 +901,7 @@ module function div_int32_var(x, y) result(res)
   call allocate_variable(res, mold=y)
   call extract(y, yp)
   call extract(res, resp)
-  resp = x / yp
+  resp = x/yp
 end function div_int32_var
 
 module function div_var_int64(x, y) result(res)
@@ -916,7 +916,7 @@ module function div_var_int64(x, y) result(res)
   call allocate_variable(res, mold=x)
   call extract(x, xp)
   call extract(res, resp)
-  resp = xp / y
+  resp = xp/y
 end function div_var_int64
 
 module function div_int64_var(x, y) result(res)
@@ -931,7 +931,7 @@ module function div_int64_var(x, y) result(res)
   call allocate_variable(res, mold=y)
   call extract(y, yp)
   call extract(res, resp)
-  resp = x / yp
+  resp = x/yp
 end function div_int64_var
 
 module function div_var_real32(x, y) result(res)
@@ -946,7 +946,7 @@ module function div_var_real32(x, y) result(res)
   call allocate_variable(res, mold=x)
   call extract(x, xp)
   call extract(res, resp)
-  resp = xp / y
+  resp = xp/y
 end function div_var_real32
 
 module function div_real32_var(x, y) result(res)
@@ -961,7 +961,7 @@ module function div_real32_var(x, y) result(res)
   call allocate_variable(res, mold=y)
   call extract(y, yp)
   call extract(res, resp)
-  resp = x / yp
+  resp = x/yp
 end function div_real32_var
 
 module function div_var_real64(x, y) result(res)
@@ -976,7 +976,7 @@ module function div_var_real64(x, y) result(res)
   call allocate_variable(res, mold=x)
   call extract(x, xp)
   call extract(res, resp)
-  resp = xp / y
+  resp = xp/y
 end function div_var_real64
 
 module function div_real64_var(x, y) result(res)
@@ -991,7 +991,7 @@ module function div_real64_var(x, y) result(res)
   call allocate_variable(res, mold=y)
   call extract(y, yp)
   call extract(res, resp)
-  resp = x / yp
+  resp = x/yp
 end function div_real64_var
 
 module function pow_vars(x, y) result(res)
@@ -1012,7 +1012,7 @@ module function pow_vars(x, y) result(res)
       call extract(x, xp)
       call extract(y, yp)
       call extract(res, resp)
-      resp = xp ** yp
+      resp = xp**yp
     end block
   case (NC_SHORT)
     block
@@ -1021,7 +1021,7 @@ module function pow_vars(x, y) result(res)
       call extract(x, xp)
       call extract(y, yp)
       call extract(res, resp)
-      resp = xp ** yp
+      resp = xp**yp
     end block
   case (NC_INT)
     block
@@ -1030,7 +1030,7 @@ module function pow_vars(x, y) result(res)
       call extract(x, xp)
       call extract(y, yp)
       call extract(res, resp)
-      resp = xp ** yp
+      resp = xp**yp
     end block
   case (NC_INT64)
     block
@@ -1039,7 +1039,7 @@ module function pow_vars(x, y) result(res)
       call extract(x, xp)
       call extract(y, yp)
       call extract(res, resp)
-      resp = xp ** yp
+      resp = xp**yp
     end block
   case (NC_FLOAT)
     block
@@ -1048,7 +1048,7 @@ module function pow_vars(x, y) result(res)
       call extract(x, xp)
       call extract(y, yp)
       call extract(res, resp)
-      resp = xp ** yp
+      resp = xp**yp
     end block
   case (NC_DOUBLE)
     block
@@ -1057,7 +1057,7 @@ module function pow_vars(x, y) result(res)
       call extract(x, xp)
       call extract(y, yp)
       call extract(res, resp)
-      resp = xp ** yp
+      resp = xp**yp
     end block
   end select
 end function pow_vars
@@ -1074,7 +1074,7 @@ module function pow_var_int8(x, y) result(res)
   call allocate_variable(res, mold=x)
   call extract(x, xp)
   call extract(res, resp)
-  resp = xp ** y
+  resp = xp**y
 end function pow_var_int8
 
 module function pow_int8_var(x, y) result(res)
@@ -1089,7 +1089,7 @@ module function pow_int8_var(x, y) result(res)
   call allocate_variable(res, mold=y)
   call extract(y, yp)
   call extract(res, resp)
-  resp = x ** yp
+  resp = x**yp
 end function pow_int8_var
 
 module function pow_var_int16(x, y) result(res)
@@ -1104,7 +1104,7 @@ module function pow_var_int16(x, y) result(res)
   call allocate_variable(res, mold=x)
   call extract(x, xp)
   call extract(res, resp)
-  resp = xp ** y
+  resp = xp**y
 end function pow_var_int16
 
 module function pow_int16_var(x, y) result(res)
@@ -1119,7 +1119,7 @@ module function pow_int16_var(x, y) result(res)
   call allocate_variable(res, mold=y)
   call extract(y, yp)
   call extract(res, resp)
-  resp = x ** yp
+  resp = x**yp
 end function pow_int16_var
 
 module function pow_var_int32(x, y) result(res)
@@ -1134,7 +1134,7 @@ module function pow_var_int32(x, y) result(res)
   call allocate_variable(res, mold=x)
   call extract(x, xp)
   call extract(res, resp)
-  resp = xp ** y
+  resp = xp**y
 end function pow_var_int32
 
 module function pow_int32_var(x, y) result(res)
@@ -1149,7 +1149,7 @@ module function pow_int32_var(x, y) result(res)
   call allocate_variable(res, mold=y)
   call extract(y, yp)
   call extract(res, resp)
-  resp = x ** yp
+  resp = x**yp
 end function pow_int32_var
 
 module function pow_var_int64(x, y) result(res)
@@ -1164,7 +1164,7 @@ module function pow_var_int64(x, y) result(res)
   call allocate_variable(res, mold=x)
   call extract(x, xp)
   call extract(res, resp)
-  resp = xp ** y
+  resp = xp**y
 end function pow_var_int64
 
 module function pow_int64_var(x, y) result(res)
@@ -1179,7 +1179,7 @@ module function pow_int64_var(x, y) result(res)
   call allocate_variable(res, mold=y)
   call extract(y, yp)
   call extract(res, resp)
-  resp = x ** yp
+  resp = x**yp
 end function pow_int64_var
 
 module function pow_var_real32(x, y) result(res)
@@ -1194,7 +1194,7 @@ module function pow_var_real32(x, y) result(res)
   call allocate_variable(res, mold=x)
   call extract(x, xp)
   call extract(res, resp)
-  resp = xp ** y
+  resp = xp**y
 end function pow_var_real32
 
 module function pow_real32_var(x, y) result(res)
@@ -1209,7 +1209,7 @@ module function pow_real32_var(x, y) result(res)
   call allocate_variable(res, mold=y)
   call extract(y, yp)
   call extract(res, resp)
-  resp = x ** yp
+  resp = x**yp
 end function pow_real32_var
 
 module function pow_var_real64(x, y) result(res)
@@ -1224,7 +1224,7 @@ module function pow_var_real64(x, y) result(res)
   call allocate_variable(res, mold=x)
   call extract(x, xp)
   call extract(res, resp)
-  resp = xp ** y
+  resp = xp**y
 end function pow_var_real64
 
 module function pow_real64_var(x, y) result(res)
@@ -1239,9 +1239,8 @@ module function pow_real64_var(x, y) result(res)
   call allocate_variable(res, mold=y)
   call extract(y, yp)
   call extract(res, resp)
-  resp = x ** yp
+  resp = x**yp
 end function pow_real64_var
-
 
 module function sum_vars(vars) result(s)
   type(variable_type), intent(in) :: vars(:)
@@ -1337,4 +1336,4 @@ module function sum_vars(vars) result(s)
   end select
 end function sum_vars
 
-end submodule submodule_arithmetic
+end submodule nc4f_arithmetic

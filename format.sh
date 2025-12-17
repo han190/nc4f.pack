@@ -24,7 +24,7 @@ fi
 # 4) Indent lines starting with "module procedure :: write_frmt_*" by 2 spaces
 
 find "$ROOT" -type f \( -name "*.f90" -o -name "*.fypp" \) -print0 | while IFS= read -r -d '' f; do
-  sed -i '' \
+  sed -i'' \
     -e 's/implicit none(type, external)/implicit none (type, external)/g' \
     -e 's/write (formatted)/write(formatted)/g' \
     -e 's/( \.and\. )/(\.and\.)/g' \

@@ -1,4 +1,4 @@
-submodule(module_netcdf) submodule_extract
+submodule(nc4f) nc4f_extract
 implicit none (type, external)
 contains
 
@@ -841,4 +841,4 @@ pure function nc2kind(nc_type) result(kind_val)
   end select
 end function nc2kind
 
-end submodule submodule_extract
+end submodule nc4f_extract

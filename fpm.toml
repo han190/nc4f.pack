@@ -25,7 +25,7 @@ source-dir = "src"
 [[test]]
 name = "test"
 source-dir = "test"
-main = "test.f90"
+main = "nc4f_test.f90"
 
 [extra.fortitude.check]
 ignore = ['C002', 'C071', 'C072', 'C121']

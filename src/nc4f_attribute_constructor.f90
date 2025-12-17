@@ -1,4 +1,4 @@
-submodule(module_netcdf) submodule_attribute_constructor
+submodule(nc4f) nc4f_attribute_constructor
 implicit none (type, external)
 contains
 
@@ -143,4 +143,4 @@ module function new_att_character(name, value) result(att)
   end do
 end function new_att_character
 
-end submodule submodule_attribute_constructor
+end submodule nc4f_attribute_constructor

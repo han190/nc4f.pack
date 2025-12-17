@@ -1,4 +1,4 @@
-submodule(module_netcdf) submodule_io
+submodule(nc4f) nc4f_io
 implicit none (type, external)
 contains
 
@@ -160,4 +160,4 @@ pure subroutine type_kind_str(nc_type, str)
   end select
 end subroutine type_kind_str
 
-end submodule submodule_io
+end submodule nc4f_io

@@ -1,5 +1,5 @@
 #: include 'common.fypp'
-submodule(module_netcdf) submodule_variable_constructor
+submodule(nc4f) nc4f_variable_constructor
 implicit none (type, external)
 contains
 
@@ -19,4 +19,4 @@ module function new_var_${K}$_${R}$d(name, values, dims, atts) result(var)
 end function new_var_${K}$_${R}$d${NEWLINE()}$
 #: endfor
 #: endfor
-end submodule submodule_variable_constructor
+end submodule nc4f_variable_constructor

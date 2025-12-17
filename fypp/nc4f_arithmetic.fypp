@@ -1,5 +1,5 @@
 #: include 'common.fypp'
-submodule(module_netcdf) submodule_arithmetic
+submodule(nc4f) nc4f_arithmetic
 implicit none (type, external)
 contains
 
@@ -103,4 +103,4 @@ module function sum_vars(vars) result(s)
   end select
 end function sum_vars
 
-end submodule submodule_arithmetic
+end submodule nc4f_arithmetic
