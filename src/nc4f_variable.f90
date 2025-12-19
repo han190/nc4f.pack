@@ -8,6 +8,7 @@ module impure elemental function get_var(nc, name, exist) result(var)
   logical, optional, intent(out) :: exist
   type(variable_type), target :: var
   type(c_ptr) :: cptr
+  character(len=128) :: msg
 
   var = inq_var(nc, name, exist)
   zero_size_var: if (var%len == 0) then
@@ -17,9 +18,8 @@ module impure elemental function get_var(nc, name, exist) result(var)
 
   call allocate_buffer(var)
   cptr = c_loc(var%buffer(1))
-  associate (err_msg => "[get_var] Invalid variable: "//name)
-    call handle_error(nc_get_var(nc%id, var%id, cptr), err_msg)
-  end associate
+  write (msg, "('[get_var] Invalid variable:', 1x, a)") name
+  call handle_error(nc_get_var(nc%id, var%id, cptr), trim(msg))
 end function get_var
 
 module impure elemental function inq_var(nc, name, exist) result(var)
@@ -45,8 +45,11 @@ end function inq_var
 impure elemental function inq_vartype(ncid, varid) result(vartype)
   integer(c_int), intent(in) :: ncid, varid
   integer(c_int) :: vartype
+  character(len=128) :: msg, fmt
 
-  call handle_error(nc_inq_vartype(ncid, varid, vartype))
+  fmt = "('[inq_vartype]', 2(1x, a, 1x, i0))"
+  write (msg, fmt) "NCID", ncid, "VARID", varid
+  call handle_error(nc_inq_vartype(ncid, varid, vartype), trim(msg))
 end function inq_vartype
 
 impure elemental function inq_varid(ncid, name, exist) result(varid)
@@ -55,13 +58,16 @@ impure elemental function inq_varid(ncid, name, exist) result(varid)
   logical, optional, intent(out) :: exist
   integer(c_int) :: varid
   integer(c_int) :: stat
+  character(len=128) :: msg
 
   stat = nc_inq_varid(ncid, f2cstr(name), varid)
   if (present(exist)) then
     exist = stat == NC_NOERR
     if (.not. exist) return
   end if
-  call handle_error(stat)
+
+  write (msg, "('[inq_varid]', 1x, a)") name
+  call handle_error(stat, trim(msg))
 end function inq_varid
 
 module impure elemental subroutine put_var(nc, var)

@@ -20,7 +20,8 @@ module impure elemental subroutine handle_error(status, error_message)
     if (inull /= 0) iptr = inull - 1
     iptr = max(1, min(iptr, NC_MAX_NAME))
     if (present(error_message)) then
-      write (err_msg, "(a, '(', a, ')')") fptr(1:iptr), error_message
+      write (err_msg, "(a, a, '(', a, ')')") &
+        & fptr(1:iptr), new_line('a'), error_message
       error stop trim(adjustl(err_msg))
     else
       error stop fptr(1:iptr)
