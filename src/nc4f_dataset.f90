@@ -1,12 +1,24 @@
 submodule(nc4f) nc4f_dataset
 implicit none (type, external)
+!
+!> Submodule: nc4f_dataset.
+!>
+!> High-level dataset helpers for opening, closing, and writing
+!> collections of variables and their attributes to netCDF files.
+!
 contains
 
+!> Open or create a dataset and return a `netcdf_type` handle.
 module function open_dataset(filename, mode, inq_dims, inq_atts) result(nc)
+  !> Path to the dataset file.
   character(len=*), intent(in) :: filename
+  !> Mode to open the file in: 'r' for read, 'w' for write.
   character(len=*), intent(in) :: mode
+  !> When true, inquire dimensions after opening the file.
   logical, intent(in), optional :: inq_dims
+  !> When true, inquire global attributes after opening the file.
   logical, intent(in), optional :: inq_atts
+  !> Returned `netcdf_type` describing the opened dataset.
   type(netcdf_type) :: nc
   logical :: atts_exist
   character(len=1024) :: msg
@@ -50,17 +62,24 @@ elemental logical function optval(default, opt) result(val)
   end if
 end function optval
 
+!> Close a dataset and free associated allocatables.
 module subroutine close_dataset(nc)
+  !> `netcdf_type` representing the open dataset to close.
   type(netcdf_type), intent(inout) :: nc
   call handle_error(nc_close(nc%id))
   if (allocated(nc%atts)) deallocate (nc%atts)
   if (allocated(nc%dims)) deallocate (nc%dims)
 end subroutine close_dataset
 
+!> Create a netCDF file from an array of `variable_type` objects.
 module subroutine to_netcdf_vars(filename, vars, atts)
+  !> Output filename to create.
   character(len=*), intent(in) :: filename
+  !> Array of variables to write into the file.
   type(variable_type), intent(in) :: vars(:)
+  !> Optional array of global attributes to attach to the dataset.
   type(attribute_type), intent(in), optional :: atts(:)
+  !> Internal `netcdf_type` handle used during writing.
   type(netcdf_type) :: nc
 
   nc = open_dataset(filename, "w")
@@ -72,10 +91,15 @@ module subroutine to_netcdf_vars(filename, vars, atts)
   call close_dataset(nc)
 end subroutine to_netcdf_vars
 
+!> Create a netCDF file and write a single `variable_type` object.
 module subroutine to_netcdf_var(filename, var, atts)
+  !> Output filename to create.
   character(len=*), intent(in) :: filename
+  !> Variable to write into the file.
   type(variable_type), intent(in) :: var
+  !> Optional array of global attributes to attach to the dataset.
   type(attribute_type), intent(in), optional :: atts(:)
+  !> Internal `netcdf_type` handle used during writing.
   type(netcdf_type) :: nc
 
   nc = open_dataset(filename, "w")

@@ -1,13 +1,28 @@
 submodule(nc4f) nc4f_io
 implicit none (type, external)
+
+!> Submodule: nc4f_io.
+!>
+!> Formatting and I/O helpers for `variable_type`, `attribute_type`, and
+!> `dimension_type`. These routines implement formatted output used by the
+!> high-level `write(formatted)` interface as well as a small helper to map
+!> netCDF type codes to Fortran type-kind strings.
+!
 contains
 
+!> Write a `variable_type` in list-directed (Fortran `DT`) format.
 module subroutine write_frmt_var(var, unit, iotype, v_list, iostat, iomsg)
+  !> Variable object to format and write.
   class(variable_type), intent(in) :: var
+  !> Output unit number.
   integer, intent(in) :: unit
+  !> I/O type string (e.g. 'LISTDIRECTED' or 'DT').
   character(len=*), intent(in) :: iotype
+  !> Optional list descriptor (passed by the formatted write interface).
   integer, intent(in) :: v_list(:)
+  !> I/O status returned (0 for success).
   integer, intent(out) :: iostat
+  !> I/O message buffer (in/out).
   character(len=*), intent(inout) :: iomsg
   integer :: i, n
   character(len=MAX_CHAR_LEN) :: title, dims, ndims, fmt, type_kind
@@ -38,12 +53,19 @@ module subroutine write_frmt_var(var, unit, iotype, v_list, iostat, iomsg)
   end if
 end subroutine write_frmt_var
 
+!> Write an `attribute_type` in list-directed (Fortran `DT`) format.
 module subroutine write_frmt_att(att, unit, iotype, v_list, iostat, iomsg)
+  !> Attribute object to format and write.
   class(attribute_type), intent(in) :: att
+  !> Output unit number.
   integer, intent(in) :: unit
+  !> I/O type string (e.g. 'LISTDIRECTED' or 'DT').
   character(len=*), intent(in) :: iotype
+  !> Optional list descriptor (passed by the formatted write interface).
   integer, intent(in) :: v_list(:)
+  !> I/O status returned (0 for success).
   integer, intent(out) :: iostat
+  !> I/O message buffer (in/out).
   character(len=*), intent(inout) :: iomsg
   character(len=MAX_CHAR_LEN) :: type_kind, fmt
 
@@ -112,13 +134,21 @@ module subroutine write_frmt_att(att, unit, iotype, v_list, iostat, iomsg)
   end if
 end subroutine write_frmt_att
 
+!> Write a `dimension_type` in list-directed (Fortran `DT`) format.
 module subroutine write_frmt_dim(dim, unit, iotype, v_list, iostat, iomsg)
+  !> Dimension object to format and write.
   class(dimension_type), intent(in) :: dim
+  !> Output unit number.
   integer, intent(in) :: unit
+  !> I/O type string (e.g. 'LISTDIRECTED' or 'DT').
   character(len=*), intent(in) :: iotype
+  !> Optional list descriptor (passed by the formatted write interface).
   integer, intent(in) :: v_list(:)
+  !> I/O status returned (0 for success).
   integer, intent(out) :: iostat
+  !> I/O message buffer (in/out).
   character(len=*), intent(inout) :: iomsg
+  !> Temporary format buffer.
   character(len=MAX_CHAR_LEN) :: fmt
 
   associate (v_list_ => v_list, iomsg_ => iomsg)
@@ -136,8 +166,11 @@ module subroutine write_frmt_dim(dim, unit, iotype, v_list, iostat, iomsg)
   end if
 end subroutine write_frmt_dim
 
+!> Map a netCDF type code (NC_*) to a human-readable Fortran type-kind string.
 pure subroutine type_kind_str(nc_type, str)
+  !> NetCDF type code to map.
   integer, intent(in) :: nc_type
+  !> Output string describing the Fortran type-kind.
   character(len=*), intent(out) :: str
 
   select case (nc_type)

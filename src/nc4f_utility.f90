@@ -2,13 +2,17 @@ submodule(nc4f) nc4f_utility
 implicit none (type, external)
 contains
 
-!> NetCDF error handler.
+!> Handle errors from netCDF C API calls and raise Fortran errors.
 module impure elemental subroutine handle_error(status, error_message)
+  !> Status code returned by a netCDF C API call.
   integer(c_int), intent(in) :: status
+  !> Optional user message to include in the error text.
   character(*), intent(in), optional :: error_message
+  !> Pointer to a C string returned by `nc_strerror`.
   character(len=MAX_CHAR_LEN + 1), pointer :: fptr
   type(c_ptr) :: cptr
   integer :: inull, iptr
+  !> Message buffer used to assemble the Fortran error string.
   character(len=MAX_CHAR_LEN) :: err_msg
 
   if (status /= NC_NOERR) then
@@ -30,9 +34,11 @@ module impure elemental subroutine handle_error(status, error_message)
   nullify (fptr)
 end subroutine handle_error
 
-!> Convert C string to Fortran string.
+!> Convert a NUL-terminated C string to a Fortran allocatable string.
 module pure function c2fstr(cstr) result(fstr)
+  !> C-style NUL-terminated string to convert.
   character(kind=c_char, len=*), intent(in) :: cstr
+  !> Fortran allocatable result string.
   character(len=:), allocatable :: fstr
   integer :: inull, str_len
 
@@ -43,18 +49,22 @@ module pure function c2fstr(cstr) result(fstr)
   fstr = cstr(1:str_len)
 end function c2fstr
 
-!> Convert Fortran string to C string.
+!> Convert a Fortran string to a NUL-terminated C string.
 module pure function f2cstr(fstr) result(cstr)
+  !> Fortran string to convert.
   character(len=*), intent(in) :: fstr
+  !> NUL-terminated C string result.
   character(kind=c_char, len=:), allocatable :: cstr
 
   cstr = trim(fstr)//c_null_char
 end function f2cstr
 
-!> Check if a buffer re-allocation is required
-!> by comparing buffer size with a target size (`bsize`).
+!> Check whether re-allocation of a buffer is required.
+!> This compares the current buffer size with the requested target size.
 module pure logical function allocation_required(buffer, bsize)
+  !> Buffer array to check.
   integer(int8), allocatable, intent(in) :: buffer(:)
+  !> Target buffer size required.
   integer(int64), intent(in) :: bsize
 
   allocation_required = .false.
@@ -65,10 +75,14 @@ module pure logical function allocation_required(buffer, bsize)
   end if
 end function allocation_required
 
-!> Compute buffer size based on data type and length.
+!> Compute the buffer size in bytes for a given netCDF data type and
+!> number of elements.
 module elemental function get_buffer_size(dtype, len) result(buffer_size)
+  !> NetCDF data type code (NC_* constants).
   integer(int32), intent(in) :: dtype
+  !> Number of elements of the given type.
   integer(int64), intent(in) :: len
+  !> Result buffer size.
   integer(int64) :: buffer_size
   character(len=NC_MAX_NAME) :: data_name
   integer(int64) :: st_size

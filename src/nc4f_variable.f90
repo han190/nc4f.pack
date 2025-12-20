@@ -2,12 +2,19 @@ submodule(nc4f) nc4f_variable
 implicit none (type, external)
 contains
 
+!> Read a variable's data from a netCDF dataset into a `variable_type`.
 module impure elemental function get_var(nc, name, exist) result(var)
+  !> High-level `netcdf_type` representing the open file.
   type(netcdf_type), intent(in) :: nc
+  !> Name of the variable to read.
   character(len=*), intent(in) :: name
+  !> Optional output flag set to true if the variable exists.
   logical, optional, intent(out) :: exist
+  !> Variable object that will contain metadata and the data buffer.
   type(variable_type), target :: var
+  !> C pointer to pass to the C API for reading raw data.
   type(c_ptr) :: cptr
+  !> Temporary message buffer used for error reporting.
   character(len=128) :: msg
 
   var = inq_var(nc, name, exist)
@@ -22,12 +29,19 @@ module impure elemental function get_var(nc, name, exist) result(var)
   call handle_error(nc_get_var(nc%id, var%id, cptr), trim(msg))
 end function get_var
 
+!> Inquire a variable's metadata without reading its data buffer.
 module impure elemental function inq_var(nc, name, exist) result(var)
+  !> High-level `netcdf_type` representing the open file.
   type(netcdf_type), intent(in) :: nc
+  !> Name of the variable to inquire.
   character(len=*), intent(in) :: name
+  !> Optional output flag set to true if the variable exists.
   logical, optional, intent(out) :: exist
+  !> Variable object containing metadata (name, type, dims, atts, len).
   type(variable_type) :: var
+  !> Internal flag set when attributes are present for the variable.
   logical :: atts_exist
+  !> Loop index.
   integer :: i
 
   var%name = trim(adjustl(name))
@@ -42,9 +56,13 @@ module impure elemental function inq_var(nc, name, exist) result(var)
   end do
 end function inq_var
 
+!> Inquire the netCDF data type of a variable given `ncid` and `varid`.
 impure elemental function inq_vartype(ncid, varid) result(vartype)
+  !> C `ncid` for the dataset or group.
   integer(c_int), intent(in) :: ncid, varid
+  !> Returned netCDF data type code (NC_* constant).
   integer(c_int) :: vartype
+  !> Temporary message and format buffer used for error reporting.
   character(len=128) :: msg, fmt
 
   fmt = "('[inq_vartype]', 2(1x, a, 1x, i0))"
@@ -52,12 +70,19 @@ impure elemental function inq_vartype(ncid, varid) result(vartype)
   call handle_error(nc_inq_vartype(ncid, varid, vartype), trim(msg))
 end function inq_vartype
 
+!> Inquire the C `varid` for a variable name in a dataset.
 impure elemental function inq_varid(ncid, name, exist) result(varid)
+  !> C `ncid` for the dataset or group.
   integer(c_int), intent(in) :: ncid
+  !> Name of the variable to lookup.
   character(len=*), intent(in) :: name
+  !> Optional output flag set to true if the variable exists.
   logical, optional, intent(out) :: exist
+  !> Returned C `varid` for the variable.
   integer(c_int) :: varid
+  !> Status code returned by the C inquiry call.
   integer(c_int) :: stat
+  !> Temporary message buffer used for error reporting.
   character(len=128) :: msg
 
   stat = nc_inq_varid(ncid, f2cstr(name), varid)
@@ -70,9 +95,13 @@ impure elemental function inq_varid(ncid, name, exist) result(varid)
   call handle_error(stat, trim(msg))
 end function inq_varid
 
+!> Write a variable's data and metadata to a netCDF dataset.
 module impure elemental subroutine put_var(nc, var)
+  !> High-level `netcdf_type` representing the open file.
   type(netcdf_type), intent(in) :: nc
+  !> Variable object containing metadata and a data buffer to write.
   type(variable_type), target, intent(in) :: var
+  !> Temporary variable object used for definition and writing.
   type(variable_type) :: tmp
 
   tmp = def_var_(nc, var)
@@ -80,13 +109,21 @@ module impure elemental subroutine put_var(nc, var)
   call handle_error(nc_put_var(nc%id, tmp%id, c_loc(var%buffer(1))))
 end subroutine put_var
 
+!> Define a variable in the netCDF file and return its `variable_type`.
 impure elemental function def_var_(nc, var) result(new_var)
+  !> High-level `netcdf_type` representing the open file.
   type(netcdf_type), intent(in) :: nc
+  !> Variable template describing the variable to define.
   type(variable_type), target, intent(in) :: var
+  !> Returned `variable_type` representing the defined variable.
   type(variable_type) :: new_var
+  !> Returned C `varid` assigned by the C API.
   integer(c_int) :: varid
+  !> Array of C dimension ids used for the new variable (reversed order).
   integer(c_int), allocatable :: new_dimids(:)
+  !> Array of `dimension_type` used to create the variable.
   type(dimension_type), allocatable :: new_dims(:)
+  !> Number of dimensions and loop indices.
   integer :: n, i, j
 
   n = size(var%dims)
@@ -104,10 +141,15 @@ impure elemental function def_var_(nc, var) result(new_var)
   if (allocated(var%atts)) new_var%atts = var%atts
 end function def_var_
 
+!> Return the number of elements for the whole variable or a single dim.
 module pure function get_size(var, dim) result(n)
+  !> Variable object to inspect.
   type(variable_type), intent(in) :: var
+  !> Optional 1-based dimension index. If absent, return total size.
   integer, optional, intent(in) :: dim
+  !> Number of elements returned (int64).
   integer(int64) :: n
+  !> Local normalized dimension index and loop index.
   integer :: dim_, i
 
   if (.not. allocated(var%dims)) &
@@ -133,9 +175,13 @@ module pure function get_size(var, dim) result(n)
   end select
 end function get_size
 
+!> Return the shape (lengths) of the variable's dimensions.
 module pure function get_shape(var) result(n)
+  !> Variable object to inspect.
   type(variable_type), intent(in) :: var
+  !> Allocatable array of dimension lengths returned (int64 each).
   integer(int64), allocatable :: n(:)
+  !> Number of dimensions and loop index.
   integer :: ndims, i
 
   if (.not. allocated(var%dims)) &
@@ -153,8 +199,11 @@ module pure function get_shape(var) result(n)
   end do
 end function get_shape
 
+!> Allocate a variable `var` using metadata from `mold`.
 module pure subroutine allocate_var_mold(var, mold)
+  !> Variable to allocate and initialize.
   type(variable_type), intent(inout) :: var
+  !> Mold containing metadata to copy into `var`.
   type(variable_type), intent(in) :: mold
 
   if (allocated(mold%atts)) then
@@ -166,12 +215,19 @@ module pure subroutine allocate_var_mold(var, mold)
   end if
 end subroutine allocate_var_mold
 
+!> Allocate variable metadata and prepare its data buffer.
 module pure subroutine allocate_var_meta(var, name, dtype, len, dims, atts)
+  !> Variable to initialize and allocate.
   type(variable_type), intent(inout) :: var
+  !> Name to assign to the variable.
   character(len=*), intent(in) :: name
+  !> NetCDF data type code (NC_* constant) for the variable.
   integer(int32), intent(in) :: dtype
+  !> Total number of elements for the variable.
   integer(int64), intent(in) :: len
+  !> Array of dimensions describing the variable's shape.
   type(dimension_type), intent(in) :: dims(:)
+  !> Optional array of attributes to copy into the variable.
   type(attribute_type), optional, intent(in) :: atts(:)
 
   var%name = name
@@ -182,8 +238,11 @@ module pure subroutine allocate_var_meta(var, name, dtype, len, dims, atts)
   call allocate_buffer_var(var)
 end subroutine allocate_var_meta
 
+!> Allocate or resize the variable's data buffer according to its type.
 module pure subroutine allocate_buffer_var(var)
+  !> Variable whose data buffer will be allocated or resized.
   type(variable_type), intent(inout) :: var
+  !> Calculated buffer size in bytes.
   integer(int64) :: buffer_size
 
   !> Assuming var%dtype and var%len is properly initialized.
@@ -194,43 +253,54 @@ module pure subroutine allocate_buffer_var(var)
   end if
 end subroutine allocate_buffer_var
 
-module elemental logical function eq_var(x, y)
-  type(variable_type), intent(in) :: x, y
+!> Compare two `variable_type` values for deep equality of metadata and
+!> contents. Returns true when name, type, length, dims, attributes and
+!> buffer contents are equal.
+module elemental logical function eq_var(x, y) result(res)
+  !> Left-hand variable to compare.
+  type(variable_type), intent(in) :: x
+  !> Right-hand variable to compare.
+  type(variable_type), intent(in) :: y
+  !> Internal flags for allocation checks.
   logical :: is_alloc(2)
 
-  eq_var = (x%name == y%name) .and. &
+  res = (x%name == y%name) .and. &
     & (x%dtype == y%dtype) .and. (x%len == y%len)
-  if (.not. eq_var) return
+  if (.not. res) return
 
   is_alloc(1) = allocated(x%dims)
   is_alloc(2) = allocated(y%dims)
 
   if (all(is_alloc)) then
-    eq_var = all(x%dims == y%dims)
+    res = all(x%dims == y%dims)
   else
-    eq_var = .false.
+    res = .false.
   end if
-  if (.not. eq_var) return
+  if (.not. res) return
 
   is_alloc(1) = allocated(x%atts)
   is_alloc(2) = allocated(y%atts)
 
   if (all(is_alloc)) then
-    eq_var = all(x%atts == y%atts)
+    res = all(x%atts == y%atts)
   else if (.not. any(is_alloc)) then
-    eq_var = .true.
+    res = .true.
   else
-    eq_var = .false.
+    res = .false.
   end if
-  if (.not. eq_var) return
+  if (.not. res) return
 
-  eq_var = all(x%buffer == y%buffer)
+  res = all(x%buffer == y%buffer)
 end function eq_var
 
-module elemental logical function neq_var(x, y)
-  type(variable_type), intent(in) :: x, y
+!> Return true when two `variable_type` values differ.
+module elemental logical function neq_var(x, y) result(res)
+  !> Left-hand variable to compare.
+  type(variable_type), intent(in) :: x
+  !> Right-hand variable to compare.
+  type(variable_type), intent(in) :: y
 
-  neq_var = .not. eq_var(x, y)
+  res = .not. eq_var(x, y)
 end function neq_var
 
 end submodule nc4f_variable
