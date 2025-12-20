@@ -505,12 +505,4 @@ interface
     !> Output pointer with matching element kind and rank.
     real(real64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :)
   end subroutine extract_var_real64_7d
-
-  !> Map a netCDF integer type code to a Fortran `kind` value.
-  pure function nc2kind(nc_type) result(kind_val)
-    !> NetCDF integer type code (NC_* constant) to map.
-    integer(c_int), intent(in) :: nc_type
-    !> Returned Fortran `kind` corresponding to the netCDF type.
-    integer :: kind_val
-  end function nc2kind
 end interface

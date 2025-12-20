@@ -59,12 +59,4 @@ interface
   end subroutine extract_var_${K}$_${R}$d${NEWLINE(not (K == 'real64' and R == MAX_RANK))}$
   #: endfor
   #: endfor
-
-  !> Map a netCDF integer type code to a Fortran `kind` value.
-  pure function nc2kind(nc_type) result(kind_val)
-    !> NetCDF integer type code (NC_* constant) to map.
-    integer(c_int), intent(in) :: nc_type
-    !> Returned Fortran `kind` corresponding to the netCDF type.
-    integer :: kind_val
-  end function nc2kind
 end interface
