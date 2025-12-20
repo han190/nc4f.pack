@@ -88,7 +88,7 @@ subroutine sfc_pres_temp_rd(passed)
   logical :: exist
   type(dimension_type) :: default_dims(2)
 
-  default_dims = ["latitude".dim.47, "longitude".dim.360]
+  default_dims = ["longitude".dim.360, "latitude".dim.47]
   nc = open_dataset("sfc_pres_temp_wr.nc", "r")
   var = get_variable(nc, "pressure", exist)
   passed = all(var%dims == default_dims) .and. &
