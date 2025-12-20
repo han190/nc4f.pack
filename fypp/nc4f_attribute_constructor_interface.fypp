@@ -9,21 +9,33 @@ end interface operator(.att.)
 
 interface
   #: for T, K in zip(types, kinds)
+  !> Create an `attribute_type` from an array of `${T}$` of kind `${K}$`.
   module function new_att_${K}$(name, values) result(att)
+    !> Attribute name to assign (will be trimmed).
     character(len=*), intent(in) :: name
+    !> Values to store in the attribute (1D array of `${T}$` of kind `${K}$`).
     ${T}$(${K}$), intent(in) :: values(:)
+    !> Resulting attribute object containing metadata and buffer.
     type(attribute_type) :: att
   end function new_att_${K}$
 
+  !> Create a scalar `attribute_type` from a single `${T}$` value.
   module function new_att_${K}$_scalar(name, value) result(att)
+    !> Attribute name to assign (will be trimmed).
     character(len=*), intent(in) :: name
+    !> Scalar value to store in the attribute.
     ${T}$(${K}$), intent(in) :: value
+    !> Resulting attribute object containing metadata and buffer.
     type(attribute_type) :: att
   end function new_att_${K}$_scalar${NEWLINE(not (K == 'real64'))}$
   #: endfor
 
+  !> Create an `attribute_type` containing character data from a
+  !> Fortran string.
   module function new_att_character(name, value) result(att)
+    !> Attribute name to assign (will be trimmed).
     character(len=*), intent(in) :: name, value
+    !> Resulting attribute containing character buffer (NC_CHAR type).
     type(attribute_type), target :: att
   end function new_att_character
 end interface

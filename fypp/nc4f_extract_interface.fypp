@@ -15,33 +15,56 @@ end interface extract
 
 interface
   #: for T, K in zip(types, kinds)
+  !> Extract attribute data of kind `${K}$` as a vector.
   module subroutine extract_att_${K}$_vector(att, ptr)
+    !> Source attribute to extract from.
     type(attribute_type), target, intent(in) :: att
+    !> Output vector of `${T}$` of kind `${K}$`.
     ${T}$(${K}$), pointer, intent(out) :: ptr(:)
   end subroutine extract_att_${K}$_vector
 
+  !> Extract attribute data of kind `${K}$` as a scalar.
   module subroutine extract_att_${K}$_scalar(att, ptr)
+    !> Source attribute to extract from.
     type(attribute_type), target, intent(in) :: att
+    !> Output scalar `${T}$` of kind `${K}$`.
     ${T}$(${K}$), pointer, intent(out) :: ptr
   end subroutine extract_att_${K}$_scalar${NEWLINE(not (K == 'real64'))}$
   #: endfor
 
+  !> Extract attribute data as a vector of characters.
   module subroutine extract_att_char_vector(att, ptr)
+    !> Source attribute to extract from.
     type(attribute_type), target, intent(in) :: att
+    !> Output vector of characters.
     character, pointer, intent(out) :: ptr(:)
   end subroutine extract_att_char_vector
 
+  !> Extract attribute data as an allocated scalar string.
   module subroutine extract_att_char_scalar(att, ptr)
+    !> Source attribute to extract from.
     type(attribute_type), target, intent(in) :: att
+    !> Output scalar string (allocated by caller via pointer assignment).
     character(len=:), pointer, intent(out) :: ptr
   end subroutine extract_att_char_scalar
 
   #: for T, K in zip(types, kinds)
   #: for R in range(1, MAX_RANK+1)
+  !> Extract variable data of kind `${K}$` and rank ${R}$ into `ptr`.
   module subroutine extract_var_${K}$_${R}$d(var, ptr)
+    !> Source variable whose buffer will be mapped.
     type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
     ${T}$(${K}$), pointer, intent(out) :: ptr(${COLONS(R)}$)
   end subroutine extract_var_${K}$_${R}$d${NEWLINE(not (K == 'real64' and R == MAX_RANK))}$
   #: endfor
   #: endfor
+
+  !> Map a netCDF integer type code to a Fortran `kind` value.
+  pure function nc2kind(nc_type) result(kind_val)
+    !> NetCDF integer type code (NC_* constant) to map.
+    integer(c_int), intent(in) :: nc_type
+    !> Returned Fortran `kind` corresponding to the netCDF type.
+    integer :: kind_val
+  end function nc2kind
 end interface

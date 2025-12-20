@@ -4,8 +4,11 @@ implicit none (type, external)
 contains
 
 #: for O, N in zip(ops, op_names)
+!> Element-wise operator `${O}$` for two `variable_type` values.
 module function ${N}$_vars(x, y) result(res)
+  !> Left operand variable.
   type(variable_type), target, intent(in) :: x, y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
 
   if (any(x%dims /= y%dims)) &
@@ -18,6 +21,7 @@ module function ${N}$_vars(x, y) result(res)
     #: for C, T, K in zip(nc_types, types, kinds)
   case (${C}$)
     block
+      !> Typed pointer view for operands and result.
       ${T}$(${K}$), pointer :: xp(:), yp(:), resp(:)
 
       call extract(x, xp)
@@ -30,10 +34,15 @@ module function ${N}$_vars(x, y) result(res)
 end function ${N}$_vars
 
 #: for C1, T1, K1 in zip(nc_types, types, kinds)
+!> Operator `${O}$` between a `variable_type` and a scalar `${T1}$`.
 module function ${N}$_var_${K1}$(x, y) result(res)
+  !> Variable left operand.
   type(variable_type), target, intent(in) :: x
+  !> Scalar right operand of type `${T1}$` kind `${K1}$`.
   ${T1}$(${K1}$), intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   ${T1}$(${K1}$), pointer :: xp(:), resp(:)
 
   if (x%dtype /= ${C1}$) error stop &
@@ -45,10 +54,15 @@ module function ${N}$_var_${K1}$(x, y) result(res)
   resp = xp ${O}$ y
 end function ${N}$_var_${K1}$
 
+!> Operator `${O}$` between a scalar `${T1}$` and a `variable_type`.
 module function ${N}$_${K1}$_var(x, y) result(res)
+  !> Scalar left operand of type `${T1}$` kind `${K1}$`.
   ${T1}$(${K1}$), intent(in) :: x
+  !> Variable right operand.
   type(variable_type), target, intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   ${T1}$(${K1}$), pointer :: yp(:), resp(:)
 
   if (y%dtype /= ${C1}$) error stop &

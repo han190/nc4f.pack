@@ -2,8 +2,11 @@ submodule(nc4f) nc4f_arithmetic
 implicit none (type, external)
 contains
 
+!> Element-wise operator `+` for two `variable_type` values.
 module function add_vars(x, y) result(res)
+  !> Left operand variable.
   type(variable_type), target, intent(in) :: x, y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
 
   if (any(x%dims /= y%dims)) &
@@ -15,6 +18,7 @@ module function add_vars(x, y) result(res)
   select case (x%dtype)
   case (NC_BYTE)
     block
+      !> Typed pointer view for operands and result.
       integer(int8), pointer :: xp(:), yp(:), resp(:)
 
       call extract(x, xp)
@@ -24,6 +28,7 @@ module function add_vars(x, y) result(res)
     end block
   case (NC_SHORT)
     block
+      !> Typed pointer view for operands and result.
       integer(int16), pointer :: xp(:), yp(:), resp(:)
 
       call extract(x, xp)
@@ -33,6 +38,7 @@ module function add_vars(x, y) result(res)
     end block
   case (NC_INT)
     block
+      !> Typed pointer view for operands and result.
       integer(int32), pointer :: xp(:), yp(:), resp(:)
 
       call extract(x, xp)
@@ -42,6 +48,7 @@ module function add_vars(x, y) result(res)
     end block
   case (NC_INT64)
     block
+      !> Typed pointer view for operands and result.
       integer(int64), pointer :: xp(:), yp(:), resp(:)
 
       call extract(x, xp)
@@ -51,6 +58,7 @@ module function add_vars(x, y) result(res)
     end block
   case (NC_FLOAT)
     block
+      !> Typed pointer view for operands and result.
       real(real32), pointer :: xp(:), yp(:), resp(:)
 
       call extract(x, xp)
@@ -60,6 +68,7 @@ module function add_vars(x, y) result(res)
     end block
   case (NC_DOUBLE)
     block
+      !> Typed pointer view for operands and result.
       real(real64), pointer :: xp(:), yp(:), resp(:)
 
       call extract(x, xp)
@@ -70,10 +79,15 @@ module function add_vars(x, y) result(res)
   end select
 end function add_vars
 
+!> Operator `+` between a `variable_type` and a scalar `integer`.
 module function add_var_int8(x, y) result(res)
+  !> Variable left operand.
   type(variable_type), target, intent(in) :: x
+  !> Scalar right operand of type `integer` kind `int8`.
   integer(int8), intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int8), pointer :: xp(:), resp(:)
 
   if (x%dtype /= NC_BYTE) error stop &
@@ -85,10 +99,15 @@ module function add_var_int8(x, y) result(res)
   resp = xp + y
 end function add_var_int8
 
+!> Operator `+` between a scalar `integer` and a `variable_type`.
 module function add_int8_var(x, y) result(res)
+  !> Scalar left operand of type `integer` kind `int8`.
   integer(int8), intent(in) :: x
+  !> Variable right operand.
   type(variable_type), target, intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int8), pointer :: yp(:), resp(:)
 
   if (y%dtype /= NC_BYTE) error stop &
@@ -100,10 +119,15 @@ module function add_int8_var(x, y) result(res)
   resp = x + yp
 end function add_int8_var
 
+!> Operator `+` between a `variable_type` and a scalar `integer`.
 module function add_var_int16(x, y) result(res)
+  !> Variable left operand.
   type(variable_type), target, intent(in) :: x
+  !> Scalar right operand of type `integer` kind `int16`.
   integer(int16), intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int16), pointer :: xp(:), resp(:)
 
   if (x%dtype /= NC_SHORT) error stop &
@@ -115,10 +139,15 @@ module function add_var_int16(x, y) result(res)
   resp = xp + y
 end function add_var_int16
 
+!> Operator `+` between a scalar `integer` and a `variable_type`.
 module function add_int16_var(x, y) result(res)
+  !> Scalar left operand of type `integer` kind `int16`.
   integer(int16), intent(in) :: x
+  !> Variable right operand.
   type(variable_type), target, intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int16), pointer :: yp(:), resp(:)
 
   if (y%dtype /= NC_SHORT) error stop &
@@ -130,10 +159,15 @@ module function add_int16_var(x, y) result(res)
   resp = x + yp
 end function add_int16_var
 
+!> Operator `+` between a `variable_type` and a scalar `integer`.
 module function add_var_int32(x, y) result(res)
+  !> Variable left operand.
   type(variable_type), target, intent(in) :: x
+  !> Scalar right operand of type `integer` kind `int32`.
   integer(int32), intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int32), pointer :: xp(:), resp(:)
 
   if (x%dtype /= NC_INT) error stop &
@@ -145,10 +179,15 @@ module function add_var_int32(x, y) result(res)
   resp = xp + y
 end function add_var_int32
 
+!> Operator `+` between a scalar `integer` and a `variable_type`.
 module function add_int32_var(x, y) result(res)
+  !> Scalar left operand of type `integer` kind `int32`.
   integer(int32), intent(in) :: x
+  !> Variable right operand.
   type(variable_type), target, intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int32), pointer :: yp(:), resp(:)
 
   if (y%dtype /= NC_INT) error stop &
@@ -160,10 +199,15 @@ module function add_int32_var(x, y) result(res)
   resp = x + yp
 end function add_int32_var
 
+!> Operator `+` between a `variable_type` and a scalar `integer`.
 module function add_var_int64(x, y) result(res)
+  !> Variable left operand.
   type(variable_type), target, intent(in) :: x
+  !> Scalar right operand of type `integer` kind `int64`.
   integer(int64), intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int64), pointer :: xp(:), resp(:)
 
   if (x%dtype /= NC_INT64) error stop &
@@ -175,10 +219,15 @@ module function add_var_int64(x, y) result(res)
   resp = xp + y
 end function add_var_int64
 
+!> Operator `+` between a scalar `integer` and a `variable_type`.
 module function add_int64_var(x, y) result(res)
+  !> Scalar left operand of type `integer` kind `int64`.
   integer(int64), intent(in) :: x
+  !> Variable right operand.
   type(variable_type), target, intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int64), pointer :: yp(:), resp(:)
 
   if (y%dtype /= NC_INT64) error stop &
@@ -190,10 +239,15 @@ module function add_int64_var(x, y) result(res)
   resp = x + yp
 end function add_int64_var
 
+!> Operator `+` between a `variable_type` and a scalar `real`.
 module function add_var_real32(x, y) result(res)
+  !> Variable left operand.
   type(variable_type), target, intent(in) :: x
+  !> Scalar right operand of type `real` kind `real32`.
   real(real32), intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   real(real32), pointer :: xp(:), resp(:)
 
   if (x%dtype /= NC_FLOAT) error stop &
@@ -205,10 +259,15 @@ module function add_var_real32(x, y) result(res)
   resp = xp + y
 end function add_var_real32
 
+!> Operator `+` between a scalar `real` and a `variable_type`.
 module function add_real32_var(x, y) result(res)
+  !> Scalar left operand of type `real` kind `real32`.
   real(real32), intent(in) :: x
+  !> Variable right operand.
   type(variable_type), target, intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   real(real32), pointer :: yp(:), resp(:)
 
   if (y%dtype /= NC_FLOAT) error stop &
@@ -220,10 +279,15 @@ module function add_real32_var(x, y) result(res)
   resp = x + yp
 end function add_real32_var
 
+!> Operator `+` between a `variable_type` and a scalar `real`.
 module function add_var_real64(x, y) result(res)
+  !> Variable left operand.
   type(variable_type), target, intent(in) :: x
+  !> Scalar right operand of type `real` kind `real64`.
   real(real64), intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   real(real64), pointer :: xp(:), resp(:)
 
   if (x%dtype /= NC_DOUBLE) error stop &
@@ -235,10 +299,15 @@ module function add_var_real64(x, y) result(res)
   resp = xp + y
 end function add_var_real64
 
+!> Operator `+` between a scalar `real` and a `variable_type`.
 module function add_real64_var(x, y) result(res)
+  !> Scalar left operand of type `real` kind `real64`.
   real(real64), intent(in) :: x
+  !> Variable right operand.
   type(variable_type), target, intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   real(real64), pointer :: yp(:), resp(:)
 
   if (y%dtype /= NC_DOUBLE) error stop &
@@ -250,8 +319,11 @@ module function add_real64_var(x, y) result(res)
   resp = x + yp
 end function add_real64_var
 
+!> Element-wise operator `-` for two `variable_type` values.
 module function sub_vars(x, y) result(res)
+  !> Left operand variable.
   type(variable_type), target, intent(in) :: x, y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
 
   if (any(x%dims /= y%dims)) &
@@ -263,6 +335,7 @@ module function sub_vars(x, y) result(res)
   select case (x%dtype)
   case (NC_BYTE)
     block
+      !> Typed pointer view for operands and result.
       integer(int8), pointer :: xp(:), yp(:), resp(:)
 
       call extract(x, xp)
@@ -272,6 +345,7 @@ module function sub_vars(x, y) result(res)
     end block
   case (NC_SHORT)
     block
+      !> Typed pointer view for operands and result.
       integer(int16), pointer :: xp(:), yp(:), resp(:)
 
       call extract(x, xp)
@@ -281,6 +355,7 @@ module function sub_vars(x, y) result(res)
     end block
   case (NC_INT)
     block
+      !> Typed pointer view for operands and result.
       integer(int32), pointer :: xp(:), yp(:), resp(:)
 
       call extract(x, xp)
@@ -290,6 +365,7 @@ module function sub_vars(x, y) result(res)
     end block
   case (NC_INT64)
     block
+      !> Typed pointer view for operands and result.
       integer(int64), pointer :: xp(:), yp(:), resp(:)
 
       call extract(x, xp)
@@ -299,6 +375,7 @@ module function sub_vars(x, y) result(res)
     end block
   case (NC_FLOAT)
     block
+      !> Typed pointer view for operands and result.
       real(real32), pointer :: xp(:), yp(:), resp(:)
 
       call extract(x, xp)
@@ -308,6 +385,7 @@ module function sub_vars(x, y) result(res)
     end block
   case (NC_DOUBLE)
     block
+      !> Typed pointer view for operands and result.
       real(real64), pointer :: xp(:), yp(:), resp(:)
 
       call extract(x, xp)
@@ -318,10 +396,15 @@ module function sub_vars(x, y) result(res)
   end select
 end function sub_vars
 
+!> Operator `-` between a `variable_type` and a scalar `integer`.
 module function sub_var_int8(x, y) result(res)
+  !> Variable left operand.
   type(variable_type), target, intent(in) :: x
+  !> Scalar right operand of type `integer` kind `int8`.
   integer(int8), intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int8), pointer :: xp(:), resp(:)
 
   if (x%dtype /= NC_BYTE) error stop &
@@ -333,10 +416,15 @@ module function sub_var_int8(x, y) result(res)
   resp = xp - y
 end function sub_var_int8
 
+!> Operator `-` between a scalar `integer` and a `variable_type`.
 module function sub_int8_var(x, y) result(res)
+  !> Scalar left operand of type `integer` kind `int8`.
   integer(int8), intent(in) :: x
+  !> Variable right operand.
   type(variable_type), target, intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int8), pointer :: yp(:), resp(:)
 
   if (y%dtype /= NC_BYTE) error stop &
@@ -348,10 +436,15 @@ module function sub_int8_var(x, y) result(res)
   resp = x - yp
 end function sub_int8_var
 
+!> Operator `-` between a `variable_type` and a scalar `integer`.
 module function sub_var_int16(x, y) result(res)
+  !> Variable left operand.
   type(variable_type), target, intent(in) :: x
+  !> Scalar right operand of type `integer` kind `int16`.
   integer(int16), intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int16), pointer :: xp(:), resp(:)
 
   if (x%dtype /= NC_SHORT) error stop &
@@ -363,10 +456,15 @@ module function sub_var_int16(x, y) result(res)
   resp = xp - y
 end function sub_var_int16
 
+!> Operator `-` between a scalar `integer` and a `variable_type`.
 module function sub_int16_var(x, y) result(res)
+  !> Scalar left operand of type `integer` kind `int16`.
   integer(int16), intent(in) :: x
+  !> Variable right operand.
   type(variable_type), target, intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int16), pointer :: yp(:), resp(:)
 
   if (y%dtype /= NC_SHORT) error stop &
@@ -378,10 +476,15 @@ module function sub_int16_var(x, y) result(res)
   resp = x - yp
 end function sub_int16_var
 
+!> Operator `-` between a `variable_type` and a scalar `integer`.
 module function sub_var_int32(x, y) result(res)
+  !> Variable left operand.
   type(variable_type), target, intent(in) :: x
+  !> Scalar right operand of type `integer` kind `int32`.
   integer(int32), intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int32), pointer :: xp(:), resp(:)
 
   if (x%dtype /= NC_INT) error stop &
@@ -393,10 +496,15 @@ module function sub_var_int32(x, y) result(res)
   resp = xp - y
 end function sub_var_int32
 
+!> Operator `-` between a scalar `integer` and a `variable_type`.
 module function sub_int32_var(x, y) result(res)
+  !> Scalar left operand of type `integer` kind `int32`.
   integer(int32), intent(in) :: x
+  !> Variable right operand.
   type(variable_type), target, intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int32), pointer :: yp(:), resp(:)
 
   if (y%dtype /= NC_INT) error stop &
@@ -408,10 +516,15 @@ module function sub_int32_var(x, y) result(res)
   resp = x - yp
 end function sub_int32_var
 
+!> Operator `-` between a `variable_type` and a scalar `integer`.
 module function sub_var_int64(x, y) result(res)
+  !> Variable left operand.
   type(variable_type), target, intent(in) :: x
+  !> Scalar right operand of type `integer` kind `int64`.
   integer(int64), intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int64), pointer :: xp(:), resp(:)
 
   if (x%dtype /= NC_INT64) error stop &
@@ -423,10 +536,15 @@ module function sub_var_int64(x, y) result(res)
   resp = xp - y
 end function sub_var_int64
 
+!> Operator `-` between a scalar `integer` and a `variable_type`.
 module function sub_int64_var(x, y) result(res)
+  !> Scalar left operand of type `integer` kind `int64`.
   integer(int64), intent(in) :: x
+  !> Variable right operand.
   type(variable_type), target, intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int64), pointer :: yp(:), resp(:)
 
   if (y%dtype /= NC_INT64) error stop &
@@ -438,10 +556,15 @@ module function sub_int64_var(x, y) result(res)
   resp = x - yp
 end function sub_int64_var
 
+!> Operator `-` between a `variable_type` and a scalar `real`.
 module function sub_var_real32(x, y) result(res)
+  !> Variable left operand.
   type(variable_type), target, intent(in) :: x
+  !> Scalar right operand of type `real` kind `real32`.
   real(real32), intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   real(real32), pointer :: xp(:), resp(:)
 
   if (x%dtype /= NC_FLOAT) error stop &
@@ -453,10 +576,15 @@ module function sub_var_real32(x, y) result(res)
   resp = xp - y
 end function sub_var_real32
 
+!> Operator `-` between a scalar `real` and a `variable_type`.
 module function sub_real32_var(x, y) result(res)
+  !> Scalar left operand of type `real` kind `real32`.
   real(real32), intent(in) :: x
+  !> Variable right operand.
   type(variable_type), target, intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   real(real32), pointer :: yp(:), resp(:)
 
   if (y%dtype /= NC_FLOAT) error stop &
@@ -468,10 +596,15 @@ module function sub_real32_var(x, y) result(res)
   resp = x - yp
 end function sub_real32_var
 
+!> Operator `-` between a `variable_type` and a scalar `real`.
 module function sub_var_real64(x, y) result(res)
+  !> Variable left operand.
   type(variable_type), target, intent(in) :: x
+  !> Scalar right operand of type `real` kind `real64`.
   real(real64), intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   real(real64), pointer :: xp(:), resp(:)
 
   if (x%dtype /= NC_DOUBLE) error stop &
@@ -483,10 +616,15 @@ module function sub_var_real64(x, y) result(res)
   resp = xp - y
 end function sub_var_real64
 
+!> Operator `-` between a scalar `real` and a `variable_type`.
 module function sub_real64_var(x, y) result(res)
+  !> Scalar left operand of type `real` kind `real64`.
   real(real64), intent(in) :: x
+  !> Variable right operand.
   type(variable_type), target, intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   real(real64), pointer :: yp(:), resp(:)
 
   if (y%dtype /= NC_DOUBLE) error stop &
@@ -498,8 +636,11 @@ module function sub_real64_var(x, y) result(res)
   resp = x - yp
 end function sub_real64_var
 
+!> Element-wise operator `*` for two `variable_type` values.
 module function mul_vars(x, y) result(res)
+  !> Left operand variable.
   type(variable_type), target, intent(in) :: x, y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
 
   if (any(x%dims /= y%dims)) &
@@ -511,6 +652,7 @@ module function mul_vars(x, y) result(res)
   select case (x%dtype)
   case (NC_BYTE)
     block
+      !> Typed pointer view for operands and result.
       integer(int8), pointer :: xp(:), yp(:), resp(:)
 
       call extract(x, xp)
@@ -520,6 +662,7 @@ module function mul_vars(x, y) result(res)
     end block
   case (NC_SHORT)
     block
+      !> Typed pointer view for operands and result.
       integer(int16), pointer :: xp(:), yp(:), resp(:)
 
       call extract(x, xp)
@@ -529,6 +672,7 @@ module function mul_vars(x, y) result(res)
     end block
   case (NC_INT)
     block
+      !> Typed pointer view for operands and result.
       integer(int32), pointer :: xp(:), yp(:), resp(:)
 
       call extract(x, xp)
@@ -538,6 +682,7 @@ module function mul_vars(x, y) result(res)
     end block
   case (NC_INT64)
     block
+      !> Typed pointer view for operands and result.
       integer(int64), pointer :: xp(:), yp(:), resp(:)
 
       call extract(x, xp)
@@ -547,6 +692,7 @@ module function mul_vars(x, y) result(res)
     end block
   case (NC_FLOAT)
     block
+      !> Typed pointer view for operands and result.
       real(real32), pointer :: xp(:), yp(:), resp(:)
 
       call extract(x, xp)
@@ -556,6 +702,7 @@ module function mul_vars(x, y) result(res)
     end block
   case (NC_DOUBLE)
     block
+      !> Typed pointer view for operands and result.
       real(real64), pointer :: xp(:), yp(:), resp(:)
 
       call extract(x, xp)
@@ -566,10 +713,15 @@ module function mul_vars(x, y) result(res)
   end select
 end function mul_vars
 
+!> Operator `*` between a `variable_type` and a scalar `integer`.
 module function mul_var_int8(x, y) result(res)
+  !> Variable left operand.
   type(variable_type), target, intent(in) :: x
+  !> Scalar right operand of type `integer` kind `int8`.
   integer(int8), intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int8), pointer :: xp(:), resp(:)
 
   if (x%dtype /= NC_BYTE) error stop &
@@ -581,10 +733,15 @@ module function mul_var_int8(x, y) result(res)
   resp = xp*y
 end function mul_var_int8
 
+!> Operator `*` between a scalar `integer` and a `variable_type`.
 module function mul_int8_var(x, y) result(res)
+  !> Scalar left operand of type `integer` kind `int8`.
   integer(int8), intent(in) :: x
+  !> Variable right operand.
   type(variable_type), target, intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int8), pointer :: yp(:), resp(:)
 
   if (y%dtype /= NC_BYTE) error stop &
@@ -596,10 +753,15 @@ module function mul_int8_var(x, y) result(res)
   resp = x*yp
 end function mul_int8_var
 
+!> Operator `*` between a `variable_type` and a scalar `integer`.
 module function mul_var_int16(x, y) result(res)
+  !> Variable left operand.
   type(variable_type), target, intent(in) :: x
+  !> Scalar right operand of type `integer` kind `int16`.
   integer(int16), intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int16), pointer :: xp(:), resp(:)
 
   if (x%dtype /= NC_SHORT) error stop &
@@ -611,10 +773,15 @@ module function mul_var_int16(x, y) result(res)
   resp = xp*y
 end function mul_var_int16
 
+!> Operator `*` between a scalar `integer` and a `variable_type`.
 module function mul_int16_var(x, y) result(res)
+  !> Scalar left operand of type `integer` kind `int16`.
   integer(int16), intent(in) :: x
+  !> Variable right operand.
   type(variable_type), target, intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int16), pointer :: yp(:), resp(:)
 
   if (y%dtype /= NC_SHORT) error stop &
@@ -626,10 +793,15 @@ module function mul_int16_var(x, y) result(res)
   resp = x*yp
 end function mul_int16_var
 
+!> Operator `*` between a `variable_type` and a scalar `integer`.
 module function mul_var_int32(x, y) result(res)
+  !> Variable left operand.
   type(variable_type), target, intent(in) :: x
+  !> Scalar right operand of type `integer` kind `int32`.
   integer(int32), intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int32), pointer :: xp(:), resp(:)
 
   if (x%dtype /= NC_INT) error stop &
@@ -641,10 +813,15 @@ module function mul_var_int32(x, y) result(res)
   resp = xp*y
 end function mul_var_int32
 
+!> Operator `*` between a scalar `integer` and a `variable_type`.
 module function mul_int32_var(x, y) result(res)
+  !> Scalar left operand of type `integer` kind `int32`.
   integer(int32), intent(in) :: x
+  !> Variable right operand.
   type(variable_type), target, intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int32), pointer :: yp(:), resp(:)
 
   if (y%dtype /= NC_INT) error stop &
@@ -656,10 +833,15 @@ module function mul_int32_var(x, y) result(res)
   resp = x*yp
 end function mul_int32_var
 
+!> Operator `*` between a `variable_type` and a scalar `integer`.
 module function mul_var_int64(x, y) result(res)
+  !> Variable left operand.
   type(variable_type), target, intent(in) :: x
+  !> Scalar right operand of type `integer` kind `int64`.
   integer(int64), intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int64), pointer :: xp(:), resp(:)
 
   if (x%dtype /= NC_INT64) error stop &
@@ -671,10 +853,15 @@ module function mul_var_int64(x, y) result(res)
   resp = xp*y
 end function mul_var_int64
 
+!> Operator `*` between a scalar `integer` and a `variable_type`.
 module function mul_int64_var(x, y) result(res)
+  !> Scalar left operand of type `integer` kind `int64`.
   integer(int64), intent(in) :: x
+  !> Variable right operand.
   type(variable_type), target, intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int64), pointer :: yp(:), resp(:)
 
   if (y%dtype /= NC_INT64) error stop &
@@ -686,10 +873,15 @@ module function mul_int64_var(x, y) result(res)
   resp = x*yp
 end function mul_int64_var
 
+!> Operator `*` between a `variable_type` and a scalar `real`.
 module function mul_var_real32(x, y) result(res)
+  !> Variable left operand.
   type(variable_type), target, intent(in) :: x
+  !> Scalar right operand of type `real` kind `real32`.
   real(real32), intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   real(real32), pointer :: xp(:), resp(:)
 
   if (x%dtype /= NC_FLOAT) error stop &
@@ -701,10 +893,15 @@ module function mul_var_real32(x, y) result(res)
   resp = xp*y
 end function mul_var_real32
 
+!> Operator `*` between a scalar `real` and a `variable_type`.
 module function mul_real32_var(x, y) result(res)
+  !> Scalar left operand of type `real` kind `real32`.
   real(real32), intent(in) :: x
+  !> Variable right operand.
   type(variable_type), target, intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   real(real32), pointer :: yp(:), resp(:)
 
   if (y%dtype /= NC_FLOAT) error stop &
@@ -716,10 +913,15 @@ module function mul_real32_var(x, y) result(res)
   resp = x*yp
 end function mul_real32_var
 
+!> Operator `*` between a `variable_type` and a scalar `real`.
 module function mul_var_real64(x, y) result(res)
+  !> Variable left operand.
   type(variable_type), target, intent(in) :: x
+  !> Scalar right operand of type `real` kind `real64`.
   real(real64), intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   real(real64), pointer :: xp(:), resp(:)
 
   if (x%dtype /= NC_DOUBLE) error stop &
@@ -731,10 +933,15 @@ module function mul_var_real64(x, y) result(res)
   resp = xp*y
 end function mul_var_real64
 
+!> Operator `*` between a scalar `real` and a `variable_type`.
 module function mul_real64_var(x, y) result(res)
+  !> Scalar left operand of type `real` kind `real64`.
   real(real64), intent(in) :: x
+  !> Variable right operand.
   type(variable_type), target, intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   real(real64), pointer :: yp(:), resp(:)
 
   if (y%dtype /= NC_DOUBLE) error stop &
@@ -746,8 +953,11 @@ module function mul_real64_var(x, y) result(res)
   resp = x*yp
 end function mul_real64_var
 
+!> Element-wise operator `/` for two `variable_type` values.
 module function div_vars(x, y) result(res)
+  !> Left operand variable.
   type(variable_type), target, intent(in) :: x, y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
 
   if (any(x%dims /= y%dims)) &
@@ -759,6 +969,7 @@ module function div_vars(x, y) result(res)
   select case (x%dtype)
   case (NC_BYTE)
     block
+      !> Typed pointer view for operands and result.
       integer(int8), pointer :: xp(:), yp(:), resp(:)
 
       call extract(x, xp)
@@ -768,6 +979,7 @@ module function div_vars(x, y) result(res)
     end block
   case (NC_SHORT)
     block
+      !> Typed pointer view for operands and result.
       integer(int16), pointer :: xp(:), yp(:), resp(:)
 
       call extract(x, xp)
@@ -777,6 +989,7 @@ module function div_vars(x, y) result(res)
     end block
   case (NC_INT)
     block
+      !> Typed pointer view for operands and result.
       integer(int32), pointer :: xp(:), yp(:), resp(:)
 
       call extract(x, xp)
@@ -786,6 +999,7 @@ module function div_vars(x, y) result(res)
     end block
   case (NC_INT64)
     block
+      !> Typed pointer view for operands and result.
       integer(int64), pointer :: xp(:), yp(:), resp(:)
 
       call extract(x, xp)
@@ -795,6 +1009,7 @@ module function div_vars(x, y) result(res)
     end block
   case (NC_FLOAT)
     block
+      !> Typed pointer view for operands and result.
       real(real32), pointer :: xp(:), yp(:), resp(:)
 
       call extract(x, xp)
@@ -804,6 +1019,7 @@ module function div_vars(x, y) result(res)
     end block
   case (NC_DOUBLE)
     block
+      !> Typed pointer view for operands and result.
       real(real64), pointer :: xp(:), yp(:), resp(:)
 
       call extract(x, xp)
@@ -814,10 +1030,15 @@ module function div_vars(x, y) result(res)
   end select
 end function div_vars
 
+!> Operator `/` between a `variable_type` and a scalar `integer`.
 module function div_var_int8(x, y) result(res)
+  !> Variable left operand.
   type(variable_type), target, intent(in) :: x
+  !> Scalar right operand of type `integer` kind `int8`.
   integer(int8), intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int8), pointer :: xp(:), resp(:)
 
   if (x%dtype /= NC_BYTE) error stop &
@@ -829,10 +1050,15 @@ module function div_var_int8(x, y) result(res)
   resp = xp/y
 end function div_var_int8
 
+!> Operator `/` between a scalar `integer` and a `variable_type`.
 module function div_int8_var(x, y) result(res)
+  !> Scalar left operand of type `integer` kind `int8`.
   integer(int8), intent(in) :: x
+  !> Variable right operand.
   type(variable_type), target, intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int8), pointer :: yp(:), resp(:)
 
   if (y%dtype /= NC_BYTE) error stop &
@@ -844,10 +1070,15 @@ module function div_int8_var(x, y) result(res)
   resp = x/yp
 end function div_int8_var
 
+!> Operator `/` between a `variable_type` and a scalar `integer`.
 module function div_var_int16(x, y) result(res)
+  !> Variable left operand.
   type(variable_type), target, intent(in) :: x
+  !> Scalar right operand of type `integer` kind `int16`.
   integer(int16), intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int16), pointer :: xp(:), resp(:)
 
   if (x%dtype /= NC_SHORT) error stop &
@@ -859,10 +1090,15 @@ module function div_var_int16(x, y) result(res)
   resp = xp/y
 end function div_var_int16
 
+!> Operator `/` between a scalar `integer` and a `variable_type`.
 module function div_int16_var(x, y) result(res)
+  !> Scalar left operand of type `integer` kind `int16`.
   integer(int16), intent(in) :: x
+  !> Variable right operand.
   type(variable_type), target, intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int16), pointer :: yp(:), resp(:)
 
   if (y%dtype /= NC_SHORT) error stop &
@@ -874,10 +1110,15 @@ module function div_int16_var(x, y) result(res)
   resp = x/yp
 end function div_int16_var
 
+!> Operator `/` between a `variable_type` and a scalar `integer`.
 module function div_var_int32(x, y) result(res)
+  !> Variable left operand.
   type(variable_type), target, intent(in) :: x
+  !> Scalar right operand of type `integer` kind `int32`.
   integer(int32), intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int32), pointer :: xp(:), resp(:)
 
   if (x%dtype /= NC_INT) error stop &
@@ -889,10 +1130,15 @@ module function div_var_int32(x, y) result(res)
   resp = xp/y
 end function div_var_int32
 
+!> Operator `/` between a scalar `integer` and a `variable_type`.
 module function div_int32_var(x, y) result(res)
+  !> Scalar left operand of type `integer` kind `int32`.
   integer(int32), intent(in) :: x
+  !> Variable right operand.
   type(variable_type), target, intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int32), pointer :: yp(:), resp(:)
 
   if (y%dtype /= NC_INT) error stop &
@@ -904,10 +1150,15 @@ module function div_int32_var(x, y) result(res)
   resp = x/yp
 end function div_int32_var
 
+!> Operator `/` between a `variable_type` and a scalar `integer`.
 module function div_var_int64(x, y) result(res)
+  !> Variable left operand.
   type(variable_type), target, intent(in) :: x
+  !> Scalar right operand of type `integer` kind `int64`.
   integer(int64), intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int64), pointer :: xp(:), resp(:)
 
   if (x%dtype /= NC_INT64) error stop &
@@ -919,10 +1170,15 @@ module function div_var_int64(x, y) result(res)
   resp = xp/y
 end function div_var_int64
 
+!> Operator `/` between a scalar `integer` and a `variable_type`.
 module function div_int64_var(x, y) result(res)
+  !> Scalar left operand of type `integer` kind `int64`.
   integer(int64), intent(in) :: x
+  !> Variable right operand.
   type(variable_type), target, intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int64), pointer :: yp(:), resp(:)
 
   if (y%dtype /= NC_INT64) error stop &
@@ -934,10 +1190,15 @@ module function div_int64_var(x, y) result(res)
   resp = x/yp
 end function div_int64_var
 
+!> Operator `/` between a `variable_type` and a scalar `real`.
 module function div_var_real32(x, y) result(res)
+  !> Variable left operand.
   type(variable_type), target, intent(in) :: x
+  !> Scalar right operand of type `real` kind `real32`.
   real(real32), intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   real(real32), pointer :: xp(:), resp(:)
 
   if (x%dtype /= NC_FLOAT) error stop &
@@ -949,10 +1210,15 @@ module function div_var_real32(x, y) result(res)
   resp = xp/y
 end function div_var_real32
 
+!> Operator `/` between a scalar `real` and a `variable_type`.
 module function div_real32_var(x, y) result(res)
+  !> Scalar left operand of type `real` kind `real32`.
   real(real32), intent(in) :: x
+  !> Variable right operand.
   type(variable_type), target, intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   real(real32), pointer :: yp(:), resp(:)
 
   if (y%dtype /= NC_FLOAT) error stop &
@@ -964,10 +1230,15 @@ module function div_real32_var(x, y) result(res)
   resp = x/yp
 end function div_real32_var
 
+!> Operator `/` between a `variable_type` and a scalar `real`.
 module function div_var_real64(x, y) result(res)
+  !> Variable left operand.
   type(variable_type), target, intent(in) :: x
+  !> Scalar right operand of type `real` kind `real64`.
   real(real64), intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   real(real64), pointer :: xp(:), resp(:)
 
   if (x%dtype /= NC_DOUBLE) error stop &
@@ -979,10 +1250,15 @@ module function div_var_real64(x, y) result(res)
   resp = xp/y
 end function div_var_real64
 
+!> Operator `/` between a scalar `real` and a `variable_type`.
 module function div_real64_var(x, y) result(res)
+  !> Scalar left operand of type `real` kind `real64`.
   real(real64), intent(in) :: x
+  !> Variable right operand.
   type(variable_type), target, intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   real(real64), pointer :: yp(:), resp(:)
 
   if (y%dtype /= NC_DOUBLE) error stop &
@@ -994,8 +1270,11 @@ module function div_real64_var(x, y) result(res)
   resp = x/yp
 end function div_real64_var
 
+!> Element-wise operator `**` for two `variable_type` values.
 module function pow_vars(x, y) result(res)
+  !> Left operand variable.
   type(variable_type), target, intent(in) :: x, y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
 
   if (any(x%dims /= y%dims)) &
@@ -1007,6 +1286,7 @@ module function pow_vars(x, y) result(res)
   select case (x%dtype)
   case (NC_BYTE)
     block
+      !> Typed pointer view for operands and result.
       integer(int8), pointer :: xp(:), yp(:), resp(:)
 
       call extract(x, xp)
@@ -1016,6 +1296,7 @@ module function pow_vars(x, y) result(res)
     end block
   case (NC_SHORT)
     block
+      !> Typed pointer view for operands and result.
       integer(int16), pointer :: xp(:), yp(:), resp(:)
 
       call extract(x, xp)
@@ -1025,6 +1306,7 @@ module function pow_vars(x, y) result(res)
     end block
   case (NC_INT)
     block
+      !> Typed pointer view for operands and result.
       integer(int32), pointer :: xp(:), yp(:), resp(:)
 
       call extract(x, xp)
@@ -1034,6 +1316,7 @@ module function pow_vars(x, y) result(res)
     end block
   case (NC_INT64)
     block
+      !> Typed pointer view for operands and result.
       integer(int64), pointer :: xp(:), yp(:), resp(:)
 
       call extract(x, xp)
@@ -1043,6 +1326,7 @@ module function pow_vars(x, y) result(res)
     end block
   case (NC_FLOAT)
     block
+      !> Typed pointer view for operands and result.
       real(real32), pointer :: xp(:), yp(:), resp(:)
 
       call extract(x, xp)
@@ -1052,6 +1336,7 @@ module function pow_vars(x, y) result(res)
     end block
   case (NC_DOUBLE)
     block
+      !> Typed pointer view for operands and result.
       real(real64), pointer :: xp(:), yp(:), resp(:)
 
       call extract(x, xp)
@@ -1062,10 +1347,15 @@ module function pow_vars(x, y) result(res)
   end select
 end function pow_vars
 
+!> Operator `**` between a `variable_type` and a scalar `integer`.
 module function pow_var_int8(x, y) result(res)
+  !> Variable left operand.
   type(variable_type), target, intent(in) :: x
+  !> Scalar right operand of type `integer` kind `int8`.
   integer(int8), intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int8), pointer :: xp(:), resp(:)
 
   if (x%dtype /= NC_BYTE) error stop &
@@ -1077,10 +1367,15 @@ module function pow_var_int8(x, y) result(res)
   resp = xp**y
 end function pow_var_int8
 
+!> Operator `**` between a scalar `integer` and a `variable_type`.
 module function pow_int8_var(x, y) result(res)
+  !> Scalar left operand of type `integer` kind `int8`.
   integer(int8), intent(in) :: x
+  !> Variable right operand.
   type(variable_type), target, intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int8), pointer :: yp(:), resp(:)
 
   if (y%dtype /= NC_BYTE) error stop &
@@ -1092,10 +1387,15 @@ module function pow_int8_var(x, y) result(res)
   resp = x**yp
 end function pow_int8_var
 
+!> Operator `**` between a `variable_type` and a scalar `integer`.
 module function pow_var_int16(x, y) result(res)
+  !> Variable left operand.
   type(variable_type), target, intent(in) :: x
+  !> Scalar right operand of type `integer` kind `int16`.
   integer(int16), intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int16), pointer :: xp(:), resp(:)
 
   if (x%dtype /= NC_SHORT) error stop &
@@ -1107,10 +1407,15 @@ module function pow_var_int16(x, y) result(res)
   resp = xp**y
 end function pow_var_int16
 
+!> Operator `**` between a scalar `integer` and a `variable_type`.
 module function pow_int16_var(x, y) result(res)
+  !> Scalar left operand of type `integer` kind `int16`.
   integer(int16), intent(in) :: x
+  !> Variable right operand.
   type(variable_type), target, intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int16), pointer :: yp(:), resp(:)
 
   if (y%dtype /= NC_SHORT) error stop &
@@ -1122,10 +1427,15 @@ module function pow_int16_var(x, y) result(res)
   resp = x**yp
 end function pow_int16_var
 
+!> Operator `**` between a `variable_type` and a scalar `integer`.
 module function pow_var_int32(x, y) result(res)
+  !> Variable left operand.
   type(variable_type), target, intent(in) :: x
+  !> Scalar right operand of type `integer` kind `int32`.
   integer(int32), intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int32), pointer :: xp(:), resp(:)
 
   if (x%dtype /= NC_INT) error stop &
@@ -1137,10 +1447,15 @@ module function pow_var_int32(x, y) result(res)
   resp = xp**y
 end function pow_var_int32
 
+!> Operator `**` between a scalar `integer` and a `variable_type`.
 module function pow_int32_var(x, y) result(res)
+  !> Scalar left operand of type `integer` kind `int32`.
   integer(int32), intent(in) :: x
+  !> Variable right operand.
   type(variable_type), target, intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int32), pointer :: yp(:), resp(:)
 
   if (y%dtype /= NC_INT) error stop &
@@ -1152,10 +1467,15 @@ module function pow_int32_var(x, y) result(res)
   resp = x**yp
 end function pow_int32_var
 
+!> Operator `**` between a `variable_type` and a scalar `integer`.
 module function pow_var_int64(x, y) result(res)
+  !> Variable left operand.
   type(variable_type), target, intent(in) :: x
+  !> Scalar right operand of type `integer` kind `int64`.
   integer(int64), intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int64), pointer :: xp(:), resp(:)
 
   if (x%dtype /= NC_INT64) error stop &
@@ -1167,10 +1487,15 @@ module function pow_var_int64(x, y) result(res)
   resp = xp**y
 end function pow_var_int64
 
+!> Operator `**` between a scalar `integer` and a `variable_type`.
 module function pow_int64_var(x, y) result(res)
+  !> Scalar left operand of type `integer` kind `int64`.
   integer(int64), intent(in) :: x
+  !> Variable right operand.
   type(variable_type), target, intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   integer(int64), pointer :: yp(:), resp(:)
 
   if (y%dtype /= NC_INT64) error stop &
@@ -1182,10 +1507,15 @@ module function pow_int64_var(x, y) result(res)
   resp = x**yp
 end function pow_int64_var
 
+!> Operator `**` between a `variable_type` and a scalar `real`.
 module function pow_var_real32(x, y) result(res)
+  !> Variable left operand.
   type(variable_type), target, intent(in) :: x
+  !> Scalar right operand of type `real` kind `real32`.
   real(real32), intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   real(real32), pointer :: xp(:), resp(:)
 
   if (x%dtype /= NC_FLOAT) error stop &
@@ -1197,10 +1527,15 @@ module function pow_var_real32(x, y) result(res)
   resp = xp**y
 end function pow_var_real32
 
+!> Operator `**` between a scalar `real` and a `variable_type`.
 module function pow_real32_var(x, y) result(res)
+  !> Scalar left operand of type `real` kind `real32`.
   real(real32), intent(in) :: x
+  !> Variable right operand.
   type(variable_type), target, intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   real(real32), pointer :: yp(:), resp(:)
 
   if (y%dtype /= NC_FLOAT) error stop &
@@ -1212,10 +1547,15 @@ module function pow_real32_var(x, y) result(res)
   resp = x**yp
 end function pow_real32_var
 
+!> Operator `**` between a `variable_type` and a scalar `real`.
 module function pow_var_real64(x, y) result(res)
+  !> Variable left operand.
   type(variable_type), target, intent(in) :: x
+  !> Scalar right operand of type `real` kind `real64`.
   real(real64), intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   real(real64), pointer :: xp(:), resp(:)
 
   if (x%dtype /= NC_DOUBLE) error stop &
@@ -1227,10 +1567,15 @@ module function pow_var_real64(x, y) result(res)
   resp = xp**y
 end function pow_var_real64
 
+!> Operator `**` between a scalar `real` and a `variable_type`.
 module function pow_real64_var(x, y) result(res)
+  !> Scalar left operand of type `real` kind `real64`.
   real(real64), intent(in) :: x
+  !> Variable right operand.
   type(variable_type), target, intent(in) :: y
+  !> Resulting variable containing the element-wise result.
   type(variable_type), target :: res
+  !> Pointer view of the variable's data.
   real(real64), pointer :: yp(:), resp(:)
 
   if (y%dtype /= NC_DOUBLE) error stop &
