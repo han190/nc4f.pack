@@ -1,5 +1,5 @@
 submodule(nc4f) nc4f_variable
-implicit none (type, external)
+implicit none
 contains
 
 !> Read a variable's data from a netCDF dataset into a `variable_type`.
@@ -16,8 +16,15 @@ module impure elemental function get_var(nc, name, exist) result(var)
   type(c_ptr) :: cptr
   !> Temporary message buffer used for error reporting.
   character(len=128) :: msg
+  logical :: var_exist
 
-  var = inq_var(nc, name, exist)
+  var = inq_var(nc, name, var_exist)
+  if (present(exist)) then
+    if (.not. var_exist) return
+  else if (.not. var_exist) then
+    error stop "[get_var] Variable "//name// "does not exist."
+  end if
+
   zero_size_var: if (var%len == 0) then
     if (allocated(var%buffer)) deallocate (var%buffer)
     return
