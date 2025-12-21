@@ -100,6 +100,10 @@ subroutine sfc_pres_temp_rd(passed)
   passed = all(var%dims == default_dims) .and. &
          & var%name == "temperature" .and. &
          & all(var%atts == ["units".att."celsius"])
+  if (.not. passed) return
+
+  var = inquire_variable(nc, "relative_humidity", exist)
+  passed = .not. exist
 end subroutine sfc_pres_temp_rd
 
 end module nc4f_examples

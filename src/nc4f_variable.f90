@@ -46,6 +46,7 @@ module impure elemental function inq_var(nc, name, exist) result(var)
 
   var%name = trim(adjustl(name))
   var%id = inq_varid(nc%id, var%name, exist)
+  if (.not. exist) return
   var%dtype = inq_vartype(nc%id, var%id)
   var%atts = get_atts_var(nc, var, atts_exist)
   if (.not. atts_exist .and. allocated(var%atts)) deallocate (var%atts)
