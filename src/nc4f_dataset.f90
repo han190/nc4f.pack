@@ -9,26 +9,41 @@ implicit none (type, external)
 contains
 
 !> Open or create a dataset and return a `netcdf_type` handle.
-module function open_dataset(filename, mode, inq_dims, inq_atts) result(nc)
+module function open_dataset(filename, mode, inq_dims, inq_atts, exist) result(nc)
   !> Path to the dataset file.
   character(len=*), intent(in) :: filename
   !> Mode to open the file in: 'r' for read, 'w' for write.
-  character(len=*), intent(in) :: mode
+  character(len=*), intent(in), optional :: mode
   !> When true, inquire dimensions after opening the file.
   logical, intent(in), optional :: inq_dims
   !> When true, inquire global attributes after opening the file.
   logical, intent(in), optional :: inq_atts
+  !> Check if file exists (only valid when mode is 'r').
+  logical, intent(out), optional :: exist
   !> Returned `netcdf_type` describing the opened dataset.
   type(netcdf_type) :: nc
   logical :: atts_exist
-  character(len=1024) :: msg
+  character(len=1024) :: msg, open_mode
+  integer(c_int) :: stat
 
-  select case (mode)
+  if (present(mode)) then
+    open_mode = trim(mode)
+  else
+    open_mode = "r"
+  end if
+
+  select case (trim(open_mode))
   case ("r", "read")
 
     nc%filename = trim(adjustl(filename))
+    stat = nc_open(f2cstr(nc%filename), NC_NOWRITE, nc%id)
+    if (present(exist)) then
+      exist = stat == NC_NOERR
+      if (.not. exist) return
+    end if
+
     write (msg, "('[open_dataset]', 1x, a)") nc%filename
-    call handle_error(nc_open(f2cstr(nc%filename), NC_NOWRITE, nc%id), trim(msg))
+    call handle_error(stat, trim(msg))
     nc%mode = NC_NOWRITE
     if (optval(.false., inq_dims)) nc%dims = inq_dims_nc(nc)
     if (optval(.false., inq_atts)) then

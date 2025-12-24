@@ -22,7 +22,7 @@ module impure elemental function get_var(nc, name, exist) result(var)
   if (present(exist)) then
     if (.not. var_exist) return
   else if (.not. var_exist) then
-    error stop "[get_var] Variable "//name// "does not exist."
+    error stop "[get_var] Variable "//name//"does not exist."
   end if
 
   zero_size_var: if (var%len == 0) then

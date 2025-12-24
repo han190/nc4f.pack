@@ -37,6 +37,11 @@ subroutine simple_rd(passed)
   logical :: exist
   character(len=1024) :: stdout
 
+  !> Check existence of a file.
+  nc = open_dataset("file_that_does_not_exist.nc", exist=exist)
+  passed = .not. exist
+  if (.not. passed) return
+
   nc = open_dataset("simple_wr.nc", "r")
   var = inquire_variable(nc, "data", exist)
   write (stdout, "(dt)") var

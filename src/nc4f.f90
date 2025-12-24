@@ -288,15 +288,17 @@ interface
   !> ---------------------
 
   !> Open or create a dataset and return a `netcdf_type` handle.
-  module function open_dataset(filename, mode, inq_dims, inq_atts) result(nc)
+  module function open_dataset(filename, mode, inq_dims, inq_atts, exist) result(nc)
     !> Path to the dataset file.
     character(len=*), intent(in) :: filename
     !> Mode to open the file in: 'r' for read, 'w' for write.
-    character(len=*), intent(in) :: mode
+    character(len=*), intent(in), optional :: mode
     !> When true, inquire dimensions after opening the file.
     logical, intent(in), optional :: inq_dims
     !> When true, inquire global attributes after opening the file.
     logical, intent(in), optional :: inq_atts
+    !> Check if file exists (only valid when mode is 'r').
+    logical, intent(out), optional :: exist
     !> Returned `netcdf_type` describing the opened dataset.
     type(netcdf_type) :: nc
   end function open_dataset
