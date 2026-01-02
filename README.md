@@ -1,5 +1,5 @@
-# netcdf.pack
-Fortran NetCDF package
+# nc4f
+A Fortran NetCDF4 library.
 
 ## Quickstart
 ### Write to NetCDF4
@@ -51,60 +51,76 @@ values from `variable_type` and `attribute_type`, it is inconvinient and
 counter-intuitive to `call extract(var, vals)` everytime you want to do some
 calculations from the data you read. Thus, this library provides simple functions and operators like `sum` and `+`. For example, if one would like to compute temperature from a [WRF](https://github.com/wrf-model/WRF) output file. There are four steps:
 1. Load data from a WRF output file, which is a netcdf file.
-2. Extract pressure and perturbed pressure from the "wrfout" file, add them
+2. Extract 4-dimensional (west-east, sourh-north, bottom-top, time) pressure and perturbed pressure from the "wrfout" file and element wise add them
    together to compute model pressure ($P_\text{tot} = P + \tilde{P}$).
-3. Extract perturbed temperature (a constant $\theta_0=300$) and add base
-   temperature to get potential temperature ($\theta = \theta_0 + \tilde{\theta}$).
+3. Extract 4-dimensional perturbed temperature and add base
+   temperature (a constant $\theta_0=300$) to get potential temperature ($\theta = \theta_0 + \tilde{\theta}$).
 4. Convert potential temperature to temperature through $T = \theta [(p/p_0)^{R/C_p}]$.
 5. Save the output to a new netcdf file.
 
-If you would like to "extract", you could do
+There are two ways to do it with this library:
+#### The classical approach
 ```advanced.f90
 program main
 
-use, non_intrinsic :: module_netcdf
+use, non_intrinsic :: nc4f
 implicit none (type, external)
 
-real, parameter :: THETA0 = 300.0, R = 287.0, CP = 1004.0, P0 = 1000.0 * 100
+!> Constants.
+real, parameter :: R = 287.0, CP = 1004.0
+real, parameter :: THETA0 = 300.0, P0 = 1000.0 * 100
+!> nc4f derived types.
 type(netcdf_type) :: nc
 type(variable_type) :: vars(3), output
+!> Pointers that points to the actual values.
 real, dimension(:, :, :, :), pointer :: P, PB, THETA, T
 
+!> Open a NetCDF4 file.
 nc = open_dataset("wrfout_d01_2000-01-01_00_00_00", "r")
+!> Use impure elemental function `get_variable` to load all
+!> you want with a one-liner.
 vars = get_variable(nc, [character(len=2) :: "P", "PB", "T"])
 
+!> Extract values from variables.
 call extract(vars(1), P)
 call extract(vars(2), PB)
 call extract(vars(3), THETA)
+!> Allocate output variable.
 call allocate_variable(output, mold=P)
 call extract(output, T)
 
+!> Computation.
 T = (THETA + THETA0)*(P/P0)**(R/CP)
+!> Save the variable output to a new NetCDF4 file.
 call to_netcdf("output.nc", output)
 
 end program main
 ```
-With this library, you can also do this very intuitively,
+#### An intuitive approach
 ```advanced.f90
 program main
 
 use, non_intrinsic :: module_netcdf
 implicit none (type, external)
 
-real, parameter :: THETA0 = 300.0, R = 287.0, CP = 1004.0, P0 = 1000.0 * 100
+!> Constants.
+real, parameter :: R = 287.0, CP = 1004.0
+real, parameter :: THETA0 = 300.0, P0 = 1000.0 * 100
+!> nc4f derived types.
 type(netcdf_type) :: nc
 type(variable_type) :: P, THETA, T
 
+!> Open a NetCDF4 file.
 nc = open_dataset("wrfout_d01_2000-01-01_00_00_00", "r")
 P = sum(get_variable(nc, [character(len=2) :: "P", "PB"]))
 THETA = get_variable(nc, "T")
 
+!> The `variable_type` can be used in arithmetic operations.
 T = (THETA + THETA0)*(P/P0)**(R/CP)
 call to_netcdf("output.nc", T)
 
 end program main
 ```
-Note that the function `get_variable` is `impure elemental`, so you can read multiple variables at once. The `sum` function will aggregate all variables together. 
 
 ## Currently supported types
 | Data type       | Attribute | Variable  |

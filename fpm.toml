@@ -1,9 +1,9 @@
-name = "netcdf4pack"
+name = "nc4f"
 version = "0.0.1"
 license = "MIT"
 maintainer = "limpid.mazarine@gmail.com"
 author = "Han Tang"
-copyright = "Copyright 2019-2025 Han Tang"
+copyright = "Copyright 2019-2026 Han Tang"
 description = "NetCDF Fortran Library"
 keywords = ["fortran", "modern-fortran", "NetCDF"]
 homepage = "https://github.com/han190/netcdf.pack"
@@ -11,10 +11,6 @@ homepage = "https://github.com/han190/netcdf.pack"
 [build]
 external-modules = ["netcdf"]
 link = ["netcdf"]
-
-[dependencies]
-netcdf = "*"
-# openmp = "*"
 
 [install]
 library = true
