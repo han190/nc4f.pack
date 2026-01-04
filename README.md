@@ -100,7 +100,7 @@ end program main
 ```advanced.f90
 program main
 
-use, non_intrinsic :: module_netcdf
+use, non_intrinsic :: nc4f
 implicit none (type, external)
 
 !> Constants.

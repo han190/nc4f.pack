@@ -6,7 +6,7 @@ author = "Han Tang"
 copyright = "Copyright 2019-2026 Han Tang"
 description = "NetCDF Fortran Library"
 keywords = ["fortran", "modern-fortran", "NetCDF"]
-homepage = "https://github.com/han190/netcdf.pack"
+homepage = "https://github.com/han190/nc4f.pack"
 
 [build]
 external-modules = ["netcdf"]
