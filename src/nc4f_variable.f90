@@ -1,5 +1,5 @@
 submodule(nc4f) nc4f_variable
-implicit none
+implicit none (type, external)
 contains
 
 !> Read a variable's data from a netCDF dataset into a `variable_type`.
@@ -15,7 +15,7 @@ module impure elemental function get_var(nc, name, exist) result(var)
   !> C pointer to pass to the C API for reading raw data.
   type(c_ptr) :: cptr
   !> Temporary message buffer used for error reporting.
-  character(len=128) :: msg
+  character(len=MAX_CHAR_LEN) :: msg
   logical :: var_exist
 
   var = inq_var(nc, name, var_exist)
@@ -71,7 +71,7 @@ impure elemental function inq_vartype(ncid, varid) result(vartype)
   !> Returned netCDF data type code (NC_* constant).
   integer(c_int) :: vartype
   !> Temporary message and format buffer used for error reporting.
-  character(len=128) :: msg, fmt
+  character(len=MAX_CHAR_LEN) :: msg, fmt
 
   fmt = "('[inq_vartype]', 2(1x, a, 1x, i0))"
   write (msg, fmt) "NCID", ncid, "VARID", varid
@@ -91,7 +91,7 @@ impure elemental function inq_varid(ncid, name, exist) result(varid)
   !> Status code returned by the C inquiry call.
   integer(c_int) :: stat
   !> Temporary message buffer used for error reporting.
-  character(len=128) :: msg
+  character(len=MAX_CHAR_LEN) :: msg
 
   stat = nc_inq_varid(ncid, f2cstr(name), varid)
   if (present(exist)) then

@@ -23,7 +23,7 @@ module function open_dataset(filename, mode, inq_dims, inq_atts, exist) result(n
   !> Returned `netcdf_type` describing the opened dataset.
   type(netcdf_type) :: nc
   logical :: atts_exist
-  character(len=1024) :: msg, open_mode
+  character(len=MAX_CHAR_LEN) :: msg, open_mode
   integer(c_int) :: stat
 
   if (present(mode)) then

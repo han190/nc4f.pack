@@ -13,7 +13,7 @@ module impure elemental subroutine handle_error(status, error_message)
   type(c_ptr) :: cptr
   integer :: inull, iptr
   !> Message buffer used to assemble the Fortran error string.
-  character(len=MAX_CHAR_LEN) :: err_msg
+  character(len=MAX_CHAR_LEN) :: msg
 
   if (status /= NC_NOERR) then
     cptr = nc_strerror(status)
@@ -24,9 +24,9 @@ module impure elemental subroutine handle_error(status, error_message)
     if (inull /= 0) iptr = inull - 1
     iptr = max(1, min(iptr, NC_MAX_NAME))
     if (present(error_message)) then
-      write (err_msg, "(a, a, '(', a, ')')") &
+      write (msg, "(a, a, '(', a, ')')") &
         & fptr(1:iptr), new_line('a'), error_message
-      error stop trim(adjustl(err_msg))
+      error stop trim(msg)
     else
       error stop fptr(1:iptr)
     end if
