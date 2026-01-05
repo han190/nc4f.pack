@@ -1,11 +1,5 @@
 submodule(nc4f) nc4f_dataset
 implicit none (type, external)
-!
-!> Submodule: nc4f_dataset.
-!>
-!> High-level dataset helpers for opening, closing, and writing
-!> collections of variables and their attributes to netCDF files.
-!
 contains
 
 !> Open or create a dataset and return a `netcdf_type` handle.

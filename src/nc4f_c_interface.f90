@@ -1,5 +1,4 @@
 module nc4f_c_interface
-
 use, intrinsic :: iso_c_binding, only: c_int, c_ptr, c_char, c_size_t, c_long
 implicit none (type, external)
 public

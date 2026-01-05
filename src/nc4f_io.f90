@@ -1,13 +1,5 @@
 submodule(nc4f) nc4f_io
 implicit none (type, external)
-
-!> Submodule: nc4f_io.
-!>
-!> Formatting and I/O helpers for `variable_type`, `attribute_type`, and
-!> `dimension_type`. These routines implement formatted output used by the
-!> high-level `write(formatted)` interface as well as a small helper to map
-!> netCDF type codes to Fortran type-kind strings.
-!
 contains
 
 !> Write a `variable_type` in list-directed (Fortran `DT`) format.
