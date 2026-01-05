@@ -29,7 +29,7 @@ module function open_dataset(filename, mode, inq_dims, inq_atts, exist) result(n
   select case (trim(open_mode))
   case ("r", "read")
 
-    nc%filename = trim(adjustl(filename))
+    nc%filename = clip(filename)
     stat = nc_open(f2cstr(nc%filename), NC_NOWRITE, nc%id)
     if (present(exist)) then
       exist = stat == NC_NOERR
@@ -37,7 +37,7 @@ module function open_dataset(filename, mode, inq_dims, inq_atts, exist) result(n
     end if
 
     write (msg, "('[open_dataset]', 1x, a)") nc%filename
-    call handle_error(stat, trim(msg))
+    call handle_error(stat, msg)
     nc%mode = NC_NOWRITE
     if (optval(.false., inq_dims)) nc%dims = inq_dims_nc(nc)
     if (optval(.false., inq_atts)) then
@@ -47,9 +47,9 @@ module function open_dataset(filename, mode, inq_dims, inq_atts, exist) result(n
 
   case ("w", "write")
 
-    nc%filename = trim(adjustl(filename))
+    nc%filename = clip(filename)
     write (msg, "('[open_dataset]', 1x, a)") nc%filename
-    call handle_error(nc_create(f2cstr(nc%filename), NC_NETCDF4, nc%id), trim(msg))
+    call handle_error(nc_create(f2cstr(nc%filename), NC_NETCDF4, nc%id), msg)
     nc%mode = NC_NETCDF4
     if (allocated(nc%atts)) deallocate (nc%atts)
     if (allocated(nc%dims)) deallocate (nc%dims)

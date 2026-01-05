@@ -25,7 +25,7 @@ module impure elemental subroutine handle_error(status, error_message)
     iptr = max(1, min(iptr, NC_MAX_NAME))
     if (present(error_message)) then
       write (msg, "(a, a, '(', a, ')')") &
-        & fptr(1:iptr), new_line('a'), error_message
+        & fptr(1:iptr), new_line('a'), clip(error_message)
       error stop trim(msg)
     else
       error stop fptr(1:iptr)
@@ -33,6 +33,16 @@ module impure elemental subroutine handle_error(status, error_message)
   end if
   nullify (fptr)
 end subroutine handle_error
+
+!> Trim left and right space of a character variable.
+module pure function clip(string) result(clipped)
+  !> The input string.
+  character(len=*), intent(in) :: string
+  !> The output string.
+  character(len=:), allocatable :: clipped
+
+  clipped = trim(adjustl(string))
+end function clip
 
 !> Convert a NUL-terminated C string to a Fortran allocatable string.
 module pure function c2fstr(cstr) result(fstr)

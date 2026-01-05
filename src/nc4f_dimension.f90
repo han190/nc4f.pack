@@ -39,7 +39,7 @@ module elemental function new_dim_len_int64(name, len) result(dim)
   !> Result dimension.
   type(dimension_type) :: dim
 
-  dim%name = trim(adjustl(name))
+  dim%name = clip(name)
   dim%len = len
   dim%is_unlim = .false.
 end function new_dim_len_int64
@@ -53,7 +53,7 @@ module elemental function new_dim_len_int32(name, len) result(dim)
   !> Result dimension.
   type(dimension_type) :: dim
 
-  dim%name = trim(adjustl(name))
+  dim%name = clip(name)
   dim%len = len
   dim%is_unlim = .false.
 end function new_dim_len_int32
@@ -66,7 +66,7 @@ module elemental function new_dim_args(name, args) result(dim)
   type(dimension_argument_type), intent(in) :: args
   type(dimension_type) :: dim
 
-  dim%name = trim(adjustl(name))
+  dim%name = clip(name)
   dim%len = args%len
   dim%is_unlim = args%is_unlim
 end function new_dim_args
@@ -133,7 +133,7 @@ function inq_dims_(ncid, varid) result(dims)
     dims(j)%id = dimids(i)
     call handle_error(nc_inq_dimname(ncid, dimids(i), dim_name))
     call handle_error(nc_inq_dimlen(ncid, dimids(i), dims(j)%len))
-    dims(j)%name = trim(adjustl(c2fstr(dim_name)))
+    dims(j)%name = clip(c2fstr(dim_name))
     dims(j)%is_unlim = dimids(i) == unlimdimidp
     if (dims(j)%is_unlim) nunlim = nunlim + 1
   end do

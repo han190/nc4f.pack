@@ -11,7 +11,7 @@ module impure elemental function get_att_nc(nc, name) result(att)
   !> Returned attribute object.
   type(attribute_type) :: att
 
-  att = get_att_(nc%id, NC_GLOBAL, f2cstr(trim(adjustl(name))))
+  att = get_att_(nc%id, NC_GLOBAL, f2cstr(clip(name)))
 end function get_att_nc
 
 !> Return all global attributes for a dataset.
@@ -115,7 +115,7 @@ impure elemental function get_att_(ncid, varid, name) result(att)
   !> Length (number of elements) of the attribute returned by the C API.
   integer(c_size_t) :: len
 
-  att%name = trim(adjustl(name))
+  att%name = clip(name)
   call handle_error(nc_inq_att(ncid, varid, &
     & f2cstr(att%name), xtypep=dtype, lenp=len), &
     & "[get_att_] Invalid attribute: "//att%name//".")

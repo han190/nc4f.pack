@@ -1,12 +1,7 @@
 #!/usr/bin/env bash
 
-# Usage: ./fix-format.sh /path/to/project
 set -euo pipefail
-
 ROOT="${1:-.}"
-
-# If `fprettify` or `perl` exist, detect once and reuse the result
-
 for cmd in fprettify perl; do
   if ! command -v "$cmd" >/dev/null 2>&1; then
     echo "$cmd not found."
@@ -18,8 +13,10 @@ echo "Format source codes through fprettify..."
 patterns=( -name "*.inc" -o -name "*.f90" -o -name "*.fypp" )
 find "$ROOT" -type f \( "${patterns[@]}" \) -print0 | \
   while IFS= read -r -d '' f; do
+  printf "\r\033[2KFormat $f"
   fprettify --indent=2 --disable-indent-mod --strict-indent "$f"
 done
+printf "\r\033[2K"
 
 # 1) implicit none(type, external) -> implicit none (type, external)
 # 2) write (formatted) -> write(formatted)
@@ -29,6 +26,7 @@ echo "Polish source codes using perl..."
 patterns=( -name "*.f90" -o -name "*.fypp" )
 find "$ROOT" -type f \( "${patterns[@]}" \) -print0 | \
   while IFS= read -r -d '' f; do
+  printf "\r\033[2KPolish $f"
   perl -i -pe '
     s/implicit none\(type, external\)/implicit none (type, external)/g;
     s/write \(formatted\)/write(formatted)/g;
@@ -40,5 +38,4 @@ find "$ROOT" -type f \( "${patterns[@]}" \) -print0 | \
     s/x \$\{O\}\$yp/x \$\{O\}\$ yp/g;
   ' "$f"
 done
-
-echo "Format finished."
+printf "\r\033[2KFormat finished.\n"

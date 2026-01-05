@@ -69,7 +69,7 @@ TEST_OBJS := $(patsubst $(TEST_DIR)/%.f90,$(BUILD_DIR)/%.o,$(TEST))
 
 all: prepare preprocess build library
 test: $(TEST_OBJS) $(TEST_TARGET)
-	@echo "[test] run test: $(TEST_TARGET)"
+	@printf "\r\033[2K[test] run test: $(TEST_TARGET)\n"
 	@$(TEST_TARGET)
 library: build create_static_link
 build: preprocess $(OBJS)
@@ -77,37 +77,37 @@ preprocess: prepare $(SRC_INC) $(SRC_F90)
 prepare: create_build_dir
 
 $(TEST_TARGET): $(TEST_OBJS)
-	@echo "[test] create executable: $(TEST_TARGET)"
+	@printf "\r\033[2K[test] create executable: $(TEST_TARGET)"
 	@$(FC) -o $(TEST_TARGET) $(TEST_OBJS) $(LIB) $(FFLAGS)
 
 $(BUILD_DIR)/%.o: $(TEST_DIR)/%.f90
-	@echo "[compile] $<"
+	@printf "\r\033[2K[compile] $<"
 	@$(FC) -c $(FFLAGS) $< -o $@
 
 create_static_link:
-	@echo "[link] create static library: $(LIB)"
+	@printf "\r\033[2K[link] create static library: $(LIB)\n"
 	@$(AR) rcs $(LIB) $(OBJS)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.f90
-	@echo "[compile] $<"
+	@printf "\r\033[2K[compile] $<"
 	@$(FC) -c $(FFLAGS) $< -o $@
 
 $(SRC_DIR)/%.inc: $(FYPP_DIR)/%_interface.fypp
-	@echo "[preproc] $<"
+	@printf "\r\033[2K[preproc] $<"
 	@fypp $< > $@
 
 $(SRC_DIR)/%.f90: $(FYPP_DIR)/%.fypp
-	@echo "[preproc] $<"
+	@printf "\r\033[2K[preproc] $<"
 	@fypp $< > $@
 
 create_build_dir:
-	@echo "[prepare] create directory $(BUILD_DIR)"
+	@printf "\r\033[2K[prepare] create directory $(BUILD_DIR)"
 	@mkdir -p $(BUILD_DIR)
 
 clean:
-	@echo "[clean] remove temporary files."
+	@printf "\r\033[2K[clean] remove temporary files."
 	@$(RM) *.nc
-	@echo "[clean] remove generated source files."
+	@printf "\r\033[2K[clean] remove generated source files."
 	@$(RM) $(SRC_INC) $(SRC_F90)
-	@echo "[clean] remove directory $(BUILD_DIR)"
+	@printf "\r\033[2K[clean] remove directory $(BUILD_DIR)\n"
 	@$(RM) -r $(BUILD_DIR)/

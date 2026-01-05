@@ -496,6 +496,14 @@ interface
     character(*), intent(in), optional :: error_message
   end subroutine handle_error
 
+  !> Trim left and right space of a character variable.
+  module pure function clip(string) result(clipped)
+    !> The input string.
+    character(len=*), intent(in) :: string
+    !> The output string.
+    character(len=:), allocatable :: clipped
+  end function clip
+
   !> Convert a NUL-terminated C string to a Fortran allocatable string.
   module pure function c2fstr(cstr) result(fstr)
     !> C-style NUL-terminated string to convert.

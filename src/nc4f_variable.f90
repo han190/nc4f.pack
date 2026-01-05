@@ -33,7 +33,7 @@ module impure elemental function get_var(nc, name, exist) result(var)
   call allocate_buffer(var)
   cptr = c_loc(var%buffer(1))
   write (msg, "('[get_var] Invalid variable:', 1x, a)") name
-  call handle_error(nc_get_var(nc%id, var%id, cptr), trim(msg))
+  call handle_error(nc_get_var(nc%id, var%id, cptr), msg)
 end function get_var
 
 !> Inquire a variable's metadata without reading its data buffer.
@@ -51,7 +51,7 @@ module impure elemental function inq_var(nc, name, exist) result(var)
   !> Loop index.
   integer :: i
 
-  var%name = trim(adjustl(name))
+  var%name = clip(name)
   var%id = inq_varid(nc%id, var%name, exist)
   if (.not. exist) return
   var%dtype = inq_vartype(nc%id, var%id)
@@ -75,7 +75,7 @@ impure elemental function inq_vartype(ncid, varid) result(vartype)
 
   fmt = "('[inq_vartype]', 2(1x, a, 1x, i0))"
   write (msg, fmt) "NCID", ncid, "VARID", varid
-  call handle_error(nc_inq_vartype(ncid, varid, vartype), trim(msg))
+  call handle_error(nc_inq_vartype(ncid, varid, vartype), msg)
 end function inq_vartype
 
 !> Inquire the C `varid` for a variable name in a dataset.
@@ -100,7 +100,7 @@ impure elemental function inq_varid(ncid, name, exist) result(varid)
   end if
 
   write (msg, "('[inq_varid]', 1x, a)") name
-  call handle_error(stat, trim(msg))
+  call handle_error(stat, msg)
 end function inq_varid
 
 !> Write a variable's data and metadata to a netCDF dataset.
