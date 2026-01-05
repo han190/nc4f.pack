@@ -7,7 +7,7 @@ Write to a NetCDF4 file:
 ```simple_wr.f90
 program main
 
-use, non_intrinsic :: module_netcdf
+use, non_intrinsic :: nc4f
 implicit none (type, external)
 
 type(variable_type) :: var
@@ -31,7 +31,7 @@ Read from a NetCDF4 file:
 ```simple_rd.f90
 program main
 
-use, non_intrinsic :: module_netcdf
+use, non_intrinsic :: nc4f
 implicit none (type, external)
 
 type(netcdf_type) :: nc
