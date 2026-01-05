@@ -46,20 +46,16 @@ end program main
 ```
 
 ### A slightly more advanced example
-While this library provides generic `extract` that can extract the actual
-values from `variable_type` and `attribute_type`, it is inconvinient and
-counter-intuitive to `call extract(var, vals)` everytime you want to do some
-calculations from the data you read. Thus, this library provides simple functions and operators like `sum` and `+`. For example, if one would like to compute temperature from a [WRF](https://github.com/wrf-model/WRF) output file. There are four steps:
+Let’s walk through a classic workflow: computing temperature (K) from a [WRF](https://github.com/wrf-model/WRF) output file.
 1. Load data from a WRF output file, which is a netcdf file.
-2. Extract 4-dimensional (west-east, sourh-north, bottom-top, time) pressure and perturbed pressure from the "wrfout" file and element wise add them
-   together to compute model pressure ($P_\text{tot} = P + \tilde{P}$).
-3. Extract 4-dimensional perturbed temperature and add base
-   temperature (a constant $\theta_0=300$) to get potential temperature ($\theta = \theta_0 + \tilde{\theta}$).
+2. Extract 4D (west-east, sourh-north, bottom-top, time) base pressure and perturbation pressure and then add them element-wise to obtain model pressure ($p = p_0 + \tilde{p}$).
+3. Extract 4D perturbation potential temperature and add the base potential temperature (a constant $\theta_0=300$) to get potential temperature ($\theta = \theta_0 + \tilde{\theta}$).
 4. Convert potential temperature to temperature through $T = \theta [(p/p_0)^{R/C_p}]$.
 5. Save the output to a new netcdf file.
 
 There are two ways to do it with this library:
 #### The classical approach
+This library provides generic subroutine `extract` which allows you to extract values (as pointers) from a `variable_type` or an `attribute_type`. Also note that `get_variable` is an _impure elemental_ function, meaning you can load multiple variables into an array of `variable_type` in a single call.
 ```advanced.f90
 program main
 
@@ -96,7 +92,8 @@ call to_netcdf("output.nc", output)
 
 end program main
 ```
-#### An intuitive approach
+#### A slightly more intuitive approach
+The library also overloads several Fortran intrinsic operators. So, you can use familiar constructs such as `sum`, `operator(*)`, `operator(+)`, `operator(/)`, and `operator(**)` to streamline both extraction and computation.
 ```advanced.f90
 program main
 
