@@ -1,4 +1,4 @@
-submodule(nc4f) nc4f_attribute_constructor
+submodule(nc4f_data_struct) nc4f_data_struct_att_ctor
 implicit none (type, external)
 contains
 
@@ -13,7 +13,7 @@ module function new_att_int8(name, values) result(att)
   !> Pointer view into the attribute buffer for efficient copy.
   integer(int8), pointer :: ptr(:)
 
-  call allocate_attribute(att, name, NC_BYTE, size(values, kind=int64))
+  call allocate_attribute(att, name, BYTE_TYPE, size(values, kind=int64))
   call extract(att, ptr)
   ptr = values
 end function new_att_int8
@@ -44,7 +44,7 @@ module function new_att_int16(name, values) result(att)
   !> Pointer view into the attribute buffer for efficient copy.
   integer(int16), pointer :: ptr(:)
 
-  call allocate_attribute(att, name, NC_SHORT, size(values, kind=int64))
+  call allocate_attribute(att, name, SHORT_TYPE, size(values, kind=int64))
   call extract(att, ptr)
   ptr = values
 end function new_att_int16
@@ -75,7 +75,7 @@ module function new_att_int32(name, values) result(att)
   !> Pointer view into the attribute buffer for efficient copy.
   integer(int32), pointer :: ptr(:)
 
-  call allocate_attribute(att, name, NC_INT, size(values, kind=int64))
+  call allocate_attribute(att, name, INT_TYPE, size(values, kind=int64))
   call extract(att, ptr)
   ptr = values
 end function new_att_int32
@@ -106,7 +106,7 @@ module function new_att_int64(name, values) result(att)
   !> Pointer view into the attribute buffer for efficient copy.
   integer(int64), pointer :: ptr(:)
 
-  call allocate_attribute(att, name, NC_INT64, size(values, kind=int64))
+  call allocate_attribute(att, name, INT64_TYPE, size(values, kind=int64))
   call extract(att, ptr)
   ptr = values
 end function new_att_int64
@@ -137,7 +137,7 @@ module function new_att_real32(name, values) result(att)
   !> Pointer view into the attribute buffer for efficient copy.
   real(real32), pointer :: ptr(:)
 
-  call allocate_attribute(att, name, NC_FLOAT, size(values, kind=int64))
+  call allocate_attribute(att, name, FLOAT_TYPE, size(values, kind=int64))
   call extract(att, ptr)
   ptr = values
 end function new_att_real32
@@ -168,7 +168,7 @@ module function new_att_real64(name, values) result(att)
   !> Pointer view into the attribute buffer for efficient copy.
   real(real64), pointer :: ptr(:)
 
-  call allocate_attribute(att, name, NC_DOUBLE, size(values, kind=int64))
+  call allocate_attribute(att, name, DOUBLE_TYPE, size(values, kind=int64))
   call extract(att, ptr)
   ptr = values
 end function new_att_real64
@@ -202,7 +202,7 @@ module function new_att_character(name, value) result(att)
   !> Loop index used when copying characters.
   integer(int64) :: i
 
-  call allocate_attribute(att, name, NC_CHAR, len(value, kind=int64))
+  call allocate_attribute(att, name, CHAR_TYPE, len(value, kind=int64))
   cptr = c_loc(att%buffer(1))
   call c_f_pointer(cptr, fptr, [att%len])
   do i = 1, att%len
@@ -210,4 +210,4 @@ module function new_att_character(name, value) result(att)
   end do
 end function new_att_character
 
-end submodule nc4f_attribute_constructor
+end submodule nc4f_data_struct_att_ctor

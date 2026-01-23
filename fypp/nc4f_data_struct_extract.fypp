@@ -1,5 +1,5 @@
 #: include 'common.fypp'
-submodule(nc4f) nc4f_extract
+submodule(nc4f_data_struct) nc4f_data_struct_extract
 implicit none (type, external)
 contains
 
@@ -67,7 +67,7 @@ module subroutine extract_var_${K}$_${R}$d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_${K}$_${R}$d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_${K}$_${R}$d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -81,32 +81,32 @@ end subroutine extract_var_${K}$_${R}$d${NEWLINE(not (K == 'real64' and R == MAX
 #: endfor
 
 !> Map a netCDF integer type code to a Fortran `kind` value.
-pure function nc2kind(nc_type) result(kind_val)
+pure function dtype2kind(dtype) result(kind_val)
   !> NetCDF integer type code (NC_* constant) to map.
-  integer(c_int), intent(in) :: nc_type
+  integer(data_type), intent(in) :: dtype
   !> Returned Fortran `kind` corresponding to the netCDF type.
   integer :: kind_val
 
-  select case (nc_type)
-  case (NC_NAT)
-    error stop "[nc2kind] Not a type."
-  case (NC_BYTE)
+  select case (dtype)
+  case (NAT_TYPE)
+    error stop "[dtype2kind] Not a type."
+  case (BYTE_TYPE)
     kind_val = kind(0_int8)
-  case (NC_CHAR)
+  case (CHAR_TYPE)
     kind_val = kind('')
-  case (NC_SHORT)
+  case (SHORT_TYPE)
     kind_val = kind(0_int16)
-  case (NC_INT)
+  case (INT_TYPE)
     kind_val = kind(0_int32)
-  case (NC_FLOAT)
+  case (FLOAT_TYPE)
     kind_val = kind(0._real32)
-  case (NC_DOUBLE)
+  case (DOUBLE_TYPE)
     kind_val = kind(0._real64)
-  case (NC_INT64)
+  case (INT64_TYPE)
     kind_val = kind(0._int64)
   case default
-    error stop "[nc2kind] Unsupported type."
+    error stop "[dtype2kind] Unsupported type."
   end select
-end function nc2kind
+end function dtype2kind
 
-end submodule nc4f_extract
+end submodule nc4f_data_struct_extract

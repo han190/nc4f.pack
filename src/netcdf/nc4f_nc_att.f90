@@ -1,4 +1,4 @@
-submodule(nc4f) nc4f_attribute
+submodule(nc4f_nc) nc4f_nc_att
 implicit none (type, external)
 contains
 
@@ -69,7 +69,7 @@ function get_atts_(ncid, varid, exist) result(atts)
   !> Loop index for attribute enumeration.
   integer(c_int) :: i
   !> Temporary C-style name buffer for attribute names.
-  character(kind=c_char, len=MAX_CHAR_LEN) :: name
+  character(kind=c_char, len=NC_MAX_NAME) :: name
   !> Status code returned by C inquiries.
   integer(c_int) :: stat
 
@@ -127,7 +127,7 @@ impure elemental function get_att_(ncid, varid, name) result(att)
     return
   end if zero_size_attr
 
-  call allocate_buffer_att(att)
+  call allocate_attribute(att)
   call handle_error(nc_get_att(ncid, varid, &
     & f2cstr(att%name), c_loc(att%buffer(1))), &
     & "[get_att_] Invalid attribute.")
@@ -168,68 +168,4 @@ module impure elemental subroutine put_att_nc(nc)
   end do
 end subroutine put_att_nc
 
-!> Initialize `att` from an attribute mold, allocating its buffer.
-module pure subroutine allocate_att_mold(att, mold)
-  !> Attribute to allocate and initialize.
-  type(attribute_type), intent(inout) :: att
-  !> Mold attribute providing metadata to copy.
-  type(attribute_type), intent(in) :: mold
-
-  call allocate_att_meta(att, mold%name, mold%dtype, mold%len)
-end subroutine allocate_att_mold
-
-!> Initialize attribute metadata and allocate its buffer.
-module pure subroutine allocate_att_meta(att, name, dtype, len)
-  !> Attribute to initialize.
-  type(attribute_type), intent(inout) :: att
-  !> Name to assign to the attribute.
-  character(len=*), intent(in) :: name
-  !> NetCDF data type code (NC_* constant) for the attribute.
-  integer(int32), intent(in) :: dtype
-  !> Number of elements for the attribute.
-  integer(int64), intent(in) :: len
-
-  att%name = name
-  att%dtype = dtype
-  att%len = len
-  call allocate_buffer_att(att)
-end subroutine allocate_att_meta
-
-!> Allocate or resize the attribute's data buffer based on its type.
-module pure subroutine allocate_buffer_att(att)
-  !> Attribute whose buffer will be allocated or resized.
-  type(attribute_type), intent(inout) :: att
-  !> Calculated buffer size in bytes.
-  integer(int64) :: buffer_size
-
-  !> Assume that `att%dtype` and `att%len` are properly initialized.
-  buffer_size = get_buffer_size(att%dtype, att%len)
-  if (allocation_required(att%buffer, buffer_size)) then
-    if (allocated(att%buffer)) deallocate (att%buffer)
-    allocate (att%buffer(buffer_size))
-  end if
-end subroutine allocate_buffer_att
-
-!> Return true when two `attribute_type` values are identical.
-module elemental logical function eq_att(x, y) result(res)
-  !> Left-hand attribute to compare.
-  type(attribute_type), intent(in) :: x
-  !> Right-hand attribute to compare.
-  type(attribute_type), intent(in) :: y
-
-  res = x%name == y%name .and. x%dtype == y%dtype .and. &
-    & x%len == y%len .and. all(x%buffer == y%buffer)
-end function eq_att
-
-!> Return true when two `attribute_type` values differ.
-module elemental logical function neq_att(x, y) result(resn)
-  !> Left-hand attribute to compare.
-  type(attribute_type), intent(in) :: x
-  !> Right-hand attribute to compare.
-  type(attribute_type), intent(in) :: y
-
-  resn = x%name /= y%name .or. x%dtype /= y%dtype .or. &
-    & x%len /= y%len .or. any(x%buffer /= y%buffer)
-end function neq_att
-
-end submodule nc4f_attribute
+end submodule nc4f_nc_att

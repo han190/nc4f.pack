@@ -5,8 +5,7 @@
 #: set op_names = ['add', 'sub', 'mul', 'div', 'pow']
 #: set kinds = ['int8', 'int16', 'int32', 'int64', 'real32', 'real64']
 #: set types = ['integer', 'integer', 'integer', 'integer', 'real', 'real']
-#: set nc_types = ['NC_BYTE', 'NC_SHORT', 'NC_INT', 'NC_INT64', 'NC_FLOAT', 'NC_DOUBLE']
-#: set ckinds = ['c_int8_t', 'c_int16_t', 'c_int32_t', 'c_int64_t', 'c_float', 'c_double']
+#: set dtypes = ['BYTE_TYPE', 'SHORT_TYPE', 'INT_TYPE', 'INT64_TYPE', 'FLOAT_TYPE', 'DOUBLE_TYPE']
 
 #! Conditionally create a new line.
 #: def NEWLINE(cond=None)

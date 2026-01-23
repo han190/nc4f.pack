@@ -1,5 +1,5 @@
 #: include 'common.fypp'
-submodule(nc4f) nc4f_arithmetic
+submodule(nc4f_data_struct) nc4f_data_struct_arith
 implicit none (type, external)
 contains
 
@@ -18,8 +18,8 @@ module function ${N}$_vars(x, y) result(res)
 
   call allocate_variable(res, mold=x)
   select case (x%dtype)
-    #: for C, T, K in zip(nc_types, types, kinds)
-  case (${C}$)
+    #: for D, T, K in zip(dtypes, types, kinds)
+  case (${D}$)
     block
       !> Typed pointer view for operands and result.
       ${T}$(${K}$), pointer :: xp(:), yp(:), resp(:)
@@ -33,7 +33,7 @@ module function ${N}$_vars(x, y) result(res)
   end select
 end function ${N}$_vars
 
-#: for C1, T1, K1 in zip(nc_types, types, kinds)
+#: for D1, T1, K1 in zip(dtypes, types, kinds)
 !> Operator `${O}$` between a `variable_type` and a scalar `${T1}$`.
 module function ${N}$_var_${K1}$(x, y) result(res)
   !> Variable left operand.
@@ -45,7 +45,7 @@ module function ${N}$_var_${K1}$(x, y) result(res)
   !> Pointer view of the variable's data.
   ${T1}$(${K1}$), pointer :: xp(:), resp(:)
 
-  if (x%dtype /= ${C1}$) error stop &
+  if (x%dtype /= ${D1}$) error stop &
     & "[${N}$_var_${K1}$] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=x)
@@ -65,7 +65,7 @@ module function ${N}$_${K1}$_var(x, y) result(res)
   !> Pointer view of the variable's data.
   ${T1}$(${K1}$), pointer :: yp(:), resp(:)
 
-  if (y%dtype /= ${C1}$) error stop &
+  if (y%dtype /= ${D1}$) error stop &
     & "[${N}$_var_${K1}$] typeof(x) /= typeof(y)."
 
   call allocate_variable(res, mold=y)
@@ -96,8 +96,8 @@ module function sum_vars(vars) result(s)
 
     call allocate_variable(s, mold=vars(1))
     select case (s%dtype)
-      #: for C, T, K in zip(nc_types, types, kinds)
-    case (${C}$)
+      #: for D, T, K in zip(dtypes, types, kinds)
+    case (${D}$)
       block
         ${T}$(${K}$), pointer :: s_ptr(:), v_ptr(:)
 
@@ -117,4 +117,4 @@ module function sum_vars(vars) result(s)
   end select
 end function sum_vars
 
-end submodule nc4f_arithmetic
+end submodule nc4f_data_struct_arith

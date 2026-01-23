@@ -54,7 +54,8 @@ end subroutine simple_rd
 subroutine sfc_pres_temp_wr(passed)
   logical, intent(inout) :: passed
   !> Example: sfc_pres_temp_wr
-  integer, parameter :: nlat = 47, nlon = 360
+  integer, parameter :: nlat = 181, nlon = 361
+  real, parameter :: lat_max = 90.0, lon_max = 180.0
   real, allocatable :: pres(:, :), temp(:, :)
   real :: lats(nlat), lons(nlon)
   integer :: ilat, ilon
@@ -62,8 +63,8 @@ subroutine sfc_pres_temp_wr(passed)
 
   allocate (pres(nlon, nlat), temp(nlon, nlat))
   do concurrent(ilon=1:nlon, ilat=1:nlat)
-    lats(ilat) = 90.0 - ilat + 1
-    lons(ilon) = merge(ilon - 360, ilon, ilon > 180)
+    lats(ilat) = lat_max - ilat + 1
+    lons(ilon) = merge(ilon - lon_max*2 + 1, real(ilon), ilon > lon_max)
     pres(ilon, ilat) = 900.0 + 0.5*ilat - 0.5*ilon
     temp(ilon, ilat) = 9.0 + 0.5*ilat - 0.5*ilon
   end do

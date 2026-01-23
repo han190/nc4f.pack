@@ -1,4 +1,4 @@
-submodule(nc4f) nc4f_extract
+submodule(nc4f_data_struct) nc4f_data_struct_extract
 implicit none (type, external)
 contains
 
@@ -213,7 +213,7 @@ module subroutine extract_var_int8_1d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_int8_1d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_int8_1d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -233,7 +233,7 @@ module subroutine extract_var_int8_2d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_int8_2d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_int8_2d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -253,7 +253,7 @@ module subroutine extract_var_int8_3d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_int8_3d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_int8_3d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -273,7 +273,7 @@ module subroutine extract_var_int8_4d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_int8_4d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_int8_4d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -293,7 +293,7 @@ module subroutine extract_var_int8_5d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_int8_5d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_int8_5d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -313,7 +313,7 @@ module subroutine extract_var_int8_6d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_int8_6d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_int8_6d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -333,7 +333,7 @@ module subroutine extract_var_int8_7d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_int8_7d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_int8_7d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -353,7 +353,7 @@ module subroutine extract_var_int16_1d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_int16_1d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_int16_1d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -373,7 +373,7 @@ module subroutine extract_var_int16_2d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_int16_2d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_int16_2d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -393,7 +393,7 @@ module subroutine extract_var_int16_3d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_int16_3d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_int16_3d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -413,7 +413,7 @@ module subroutine extract_var_int16_4d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_int16_4d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_int16_4d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -433,7 +433,7 @@ module subroutine extract_var_int16_5d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_int16_5d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_int16_5d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -453,7 +453,7 @@ module subroutine extract_var_int16_6d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_int16_6d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_int16_6d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -473,7 +473,7 @@ module subroutine extract_var_int16_7d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_int16_7d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_int16_7d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -493,7 +493,7 @@ module subroutine extract_var_int32_1d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_int32_1d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_int32_1d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -513,7 +513,7 @@ module subroutine extract_var_int32_2d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_int32_2d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_int32_2d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -533,7 +533,7 @@ module subroutine extract_var_int32_3d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_int32_3d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_int32_3d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -553,7 +553,7 @@ module subroutine extract_var_int32_4d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_int32_4d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_int32_4d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -573,7 +573,7 @@ module subroutine extract_var_int32_5d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_int32_5d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_int32_5d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -593,7 +593,7 @@ module subroutine extract_var_int32_6d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_int32_6d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_int32_6d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -613,7 +613,7 @@ module subroutine extract_var_int32_7d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_int32_7d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_int32_7d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -633,7 +633,7 @@ module subroutine extract_var_int64_1d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_int64_1d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_int64_1d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -653,7 +653,7 @@ module subroutine extract_var_int64_2d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_int64_2d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_int64_2d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -673,7 +673,7 @@ module subroutine extract_var_int64_3d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_int64_3d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_int64_3d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -693,7 +693,7 @@ module subroutine extract_var_int64_4d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_int64_4d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_int64_4d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -713,7 +713,7 @@ module subroutine extract_var_int64_5d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_int64_5d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_int64_5d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -733,7 +733,7 @@ module subroutine extract_var_int64_6d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_int64_6d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_int64_6d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -753,7 +753,7 @@ module subroutine extract_var_int64_7d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_int64_7d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_int64_7d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -773,7 +773,7 @@ module subroutine extract_var_real32_1d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_real32_1d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_real32_1d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -793,7 +793,7 @@ module subroutine extract_var_real32_2d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_real32_2d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_real32_2d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -813,7 +813,7 @@ module subroutine extract_var_real32_3d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_real32_3d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_real32_3d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -833,7 +833,7 @@ module subroutine extract_var_real32_4d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_real32_4d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_real32_4d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -853,7 +853,7 @@ module subroutine extract_var_real32_5d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_real32_5d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_real32_5d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -873,7 +873,7 @@ module subroutine extract_var_real32_6d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_real32_6d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_real32_6d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -893,7 +893,7 @@ module subroutine extract_var_real32_7d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_real32_7d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_real32_7d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -913,7 +913,7 @@ module subroutine extract_var_real64_1d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_real64_1d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_real64_1d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -933,7 +933,7 @@ module subroutine extract_var_real64_2d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_real64_2d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_real64_2d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -953,7 +953,7 @@ module subroutine extract_var_real64_3d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_real64_3d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_real64_3d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -973,7 +973,7 @@ module subroutine extract_var_real64_4d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_real64_4d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_real64_4d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -993,7 +993,7 @@ module subroutine extract_var_real64_5d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_real64_5d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_real64_5d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -1013,7 +1013,7 @@ module subroutine extract_var_real64_6d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_real64_6d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_real64_6d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -1033,7 +1033,7 @@ module subroutine extract_var_real64_7d(var, ptr)
     if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
       & "[extract_var_real64_7d] Invalid rank."
   end associate
-  if (nc2kind(var%dtype) /= kind(ptr)) error stop &
+  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
     & "[extract_var_real64_7d] Invalid kind."
 
   cptr = c_loc(var%buffer(1))
@@ -1041,32 +1041,32 @@ module subroutine extract_var_real64_7d(var, ptr)
 end subroutine extract_var_real64_7d
 
 !> Map a netCDF integer type code to a Fortran `kind` value.
-pure function nc2kind(nc_type) result(kind_val)
+pure function dtype2kind(dtype) result(kind_val)
   !> NetCDF integer type code (NC_* constant) to map.
-  integer(c_int), intent(in) :: nc_type
+  integer(data_type), intent(in) :: dtype
   !> Returned Fortran `kind` corresponding to the netCDF type.
   integer :: kind_val
 
-  select case (nc_type)
-  case (NC_NAT)
-    error stop "[nc2kind] Not a type."
-  case (NC_BYTE)
+  select case (dtype)
+  case (NAT_TYPE)
+    error stop "[dtype2kind] Not a type."
+  case (BYTE_TYPE)
     kind_val = kind(0_int8)
-  case (NC_CHAR)
+  case (CHAR_TYPE)
     kind_val = kind('')
-  case (NC_SHORT)
+  case (SHORT_TYPE)
     kind_val = kind(0_int16)
-  case (NC_INT)
+  case (INT_TYPE)
     kind_val = kind(0_int32)
-  case (NC_FLOAT)
+  case (FLOAT_TYPE)
     kind_val = kind(0._real32)
-  case (NC_DOUBLE)
+  case (DOUBLE_TYPE)
     kind_val = kind(0._real64)
-  case (NC_INT64)
+  case (INT64_TYPE)
     kind_val = kind(0._int64)
   case default
-    error stop "[nc2kind] Unsupported type."
+    error stop "[dtype2kind] Unsupported type."
   end select
-end function nc2kind
+end function dtype2kind
 
-end submodule nc4f_extract
+end submodule nc4f_data_struct_extract

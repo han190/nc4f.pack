@@ -1,4 +1,4 @@
-submodule(nc4f) nc4f_io
+submodule(nc4f_data_struct) nc4f_data_struct_io
 implicit none (type, external)
 contains
 
@@ -68,52 +68,52 @@ module subroutine write_frmt_att(att, unit, iotype, v_list, iostat, iomsg)
   if (iotype == 'LISTDIRECTED' .or. iotype == 'DT') then
     call type_kind_str(att%dtype, type_kind)
     select case (att%dtype)
-    case (NC_FLOAT, NC_DOUBLE)
+    case (FLOAT_TYPE, DOUBLE_TYPE)
       fmt = "(a, '::', a, 1x, '=', *(1x, g0.6))"
-    case (NC_BYTE, NC_SHORT, NC_INT, NC_INT64)
+    case (BYTE_TYPE, SHORT_TYPE, INT_TYPE, INT64_TYPE)
       fmt = "(a, '::', a, 1x, '=', *(1x, i0))"
-    case (NC_CHAR)
+    case (CHAR_TYPE)
       fmt = "(4(g0), 1x, '=', 1x, *(a))"
     end select
 
     select case (att%dtype)
-    case (NC_FLOAT)
+    case (FLOAT_TYPE)
       block
         real(real32), pointer :: ptr(:)
         call extract(att, ptr)
         write (unit, fmt) trim(type_kind), att%name, ptr
       end block
-    case (NC_DOUBLE)
+    case (DOUBLE_TYPE)
       block
         real(real64), pointer :: ptr(:)
         call extract(att, ptr)
         write (unit, fmt) trim(type_kind), att%name, ptr
       end block
-    case (NC_BYTE)
+    case (BYTE_TYPE)
       block
         integer(int8), pointer :: ptr(:)
         call extract(att, ptr)
         write (unit, fmt) trim(type_kind), att%name, ptr
       end block
-    case (NC_SHORT)
+    case (SHORT_TYPE)
       block
         integer(int16), pointer :: ptr(:)
         call extract(att, ptr)
         write (unit, fmt) trim(type_kind), att%name, ptr
       end block
-    case (NC_INT)
+    case (INT_TYPE)
       block
         integer(int32), pointer :: ptr(:)
         call extract(att, ptr)
         write (unit, fmt) trim(type_kind), att%name, ptr
       end block
-    case (NC_INT64)
+    case (INT64_TYPE)
       block
         integer(int64), pointer :: ptr(:)
         call extract(att, ptr)
         write (unit, fmt) trim(type_kind), att%name, ptr
       end block
-    case (NC_CHAR)
+    case (CHAR_TYPE)
       block
         character, pointer :: ptr(:)
         call extract(att, ptr)
@@ -159,30 +159,30 @@ module subroutine write_frmt_dim(dim, unit, iotype, v_list, iostat, iomsg)
 end subroutine write_frmt_dim
 
 !> Map a netCDF type code (NC_*) to a human-readable Fortran type-kind string.
-pure subroutine type_kind_str(nc_type, str)
+pure subroutine type_kind_str(dtype, str)
   !> NetCDF type code to map.
-  integer, intent(in) :: nc_type
+  integer(data_type), intent(in) :: dtype
   !> Output string describing the Fortran type-kind.
   character(len=*), intent(out) :: str
 
-  select case (nc_type)
-  case (NC_FLOAT)
+  select case (dtype)
+  case (FLOAT_TYPE)
     str = 'real(real32)'
-  case (NC_DOUBLE)
+  case (DOUBLE_TYPE)
     str = 'real(real64)'
-  case (NC_BYTE)
+  case (BYTE_TYPE)
     str = 'integer(int8)'
-  case (NC_SHORT)
+  case (SHORT_TYPE)
     str = 'integer(int16)'
-  case (NC_INT)
+  case (INT_TYPE)
     str = 'integer(int32)'
-  case (NC_INT64)
+  case (INT64_TYPE)
     str = 'integer(int64)'
-  case (NC_CHAR)
+  case (CHAR_TYPE)
     str = 'character(len=*)'
   case default
-    error stop "[type_kind_str] Invalid NC type."
+    error stop "[type_kind_str] Unsupported type."
   end select
 end subroutine type_kind_str
 
-end submodule nc4f_io
+end submodule nc4f_data_struct_io
