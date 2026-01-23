@@ -19,7 +19,7 @@ module pure subroutine alloc_att_meta(att, name, dtype, len)
   !> Name to assign to the attribute.
   character(len=*), intent(in) :: name
   !> NetCDF data type code (NC_* constant) for the attribute.
-  integer(int32), intent(in) :: dtype
+  integer(data_type), intent(in) :: dtype
   !> Number of elements for the attribute.
   integer(int64), intent(in) :: len
 

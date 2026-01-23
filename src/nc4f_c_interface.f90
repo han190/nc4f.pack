@@ -288,7 +288,7 @@ interface
     integer(c_int), value :: ncid
     !> Variable ID, or NC_GLOBAL for a global attribute.
     integer(c_int), value :: varid
-    !>         Attribute NetCDF Names.
+    !> Attribute NetCDF Names.
     character(kind=c_char), intent(in) :: name(*)
     !> The type of attribute to write. Data will be converted to this type.
     integer(c_int), value :: xtype

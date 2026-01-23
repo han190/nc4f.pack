@@ -27,10 +27,6 @@ else ifeq ($(FC),flang)
 	endif
 endif
 
-C_INTERFACE_DIR := $(SRC_DIR)/c_interface
-DATA_STRUCTURE_DIR := $(SRC_DIR)/data_structure
-NETCDF_DIR := $(SRC_DIR)/netcdf
-
 FYPP_FILESTEMS = \
 	nc4f_data_struct_arith \
 	nc4f_data_struct_att_ctor \
@@ -41,28 +37,28 @@ FYPP_INC := $(addprefix $(FYPP_DIR)/, \
 FYPP_F90 := $(addprefix $(FYPP_DIR)/, \
 	$(addsuffix .fypp, $(FYPP_FILESTEMS)))
 SRC_INC := $(patsubst $(FYPP_DIR)/%_inc.fypp, \
-	$(DATA_STRUCTURE_DIR)/%.inc,$(FYPP_INC))
+	$(SRC_DIR)/%.inc,$(FYPP_INC))
 SRC_F90 := $(patsubst $(FYPP_DIR)/%.fypp, \
-	$(DATA_STRUCTURE_DIR)/%.f90,$(FYPP_F90))
+	$(SRC_DIR)/%.f90,$(FYPP_F90))
 
 SRC = \
-  $(C_INTERFACE_DIR)/nc4f_c_interface.f90 \
-	$(DATA_STRUCTURE_DIR)/nc4f_data_struct.f90 \
-	$(DATA_STRUCTURE_DIR)/nc4f_data_struct_arith.f90 \
-	$(DATA_STRUCTURE_DIR)/nc4f_data_struct_att_ctor.f90 \
-	$(DATA_STRUCTURE_DIR)/nc4f_data_struct_att.f90 \
-	$(DATA_STRUCTURE_DIR)/nc4f_data_struct_dim.f90 \
-	$(DATA_STRUCTURE_DIR)/nc4f_data_struct_extract.f90 \
-	$(DATA_STRUCTURE_DIR)/nc4f_data_struct_io.f90 \
-	$(DATA_STRUCTURE_DIR)/nc4f_data_struct_util.f90 \
-	$(DATA_STRUCTURE_DIR)/nc4f_data_struct_var_ctor.f90 \
-	$(DATA_STRUCTURE_DIR)/nc4f_data_struct_var.f90 \
-	$(NETCDF_DIR)/nc4f_nc.f90 \
-	$(NETCDF_DIR)/nc4f_nc_att.f90 \
-	$(NETCDF_DIR)/nc4f_nc_dataset.f90 \
-	$(NETCDF_DIR)/nc4f_nc_dim.f90 \
-	$(NETCDF_DIR)/nc4f_nc_util.f90 \
-	$(NETCDF_DIR)/nc4f_nc_var.f90 \
+  $(SRC_DIR)/nc4f_c_interface.f90 \
+	$(SRC_DIR)/nc4f_data_struct.f90 \
+	$(SRC_DIR)/nc4f_data_struct_arith.f90 \
+	$(SRC_DIR)/nc4f_data_struct_att_ctor.f90 \
+	$(SRC_DIR)/nc4f_data_struct_att.f90 \
+	$(SRC_DIR)/nc4f_data_struct_dim.f90 \
+	$(SRC_DIR)/nc4f_data_struct_extract.f90 \
+	$(SRC_DIR)/nc4f_data_struct_io.f90 \
+	$(SRC_DIR)/nc4f_data_struct_util.f90 \
+	$(SRC_DIR)/nc4f_data_struct_var_ctor.f90 \
+	$(SRC_DIR)/nc4f_data_struct_var.f90 \
+	$(SRC_DIR)/nc4f_nc.f90 \
+	$(SRC_DIR)/nc4f_nc_att.f90 \
+	$(SRC_DIR)/nc4f_nc_dataset.f90 \
+	$(SRC_DIR)/nc4f_nc_dim.f90 \
+	$(SRC_DIR)/nc4f_nc_util.f90 \
+	$(SRC_DIR)/nc4f_nc_var.f90 \
 	$(SRC_DIR)/nc4f.90
 
 TEST_FILES = \
@@ -115,27 +111,27 @@ create_static_link:
 	@printf "\r\033[2K[link] create static library: $(LIB)\n"
 	@$(AR) rcs $(LIB) $(OBJS)
 
-$(BUILD_DIR)/%.o: $(C_INTERFACE_DIR)/%.f90
-	@printf "\r\033[2K[compile] $<"
-	@$(FC) -c $(FFLAGS) $< -o $@
+# $(BUILD_DIR)/%.o: $(C_INTERFACE_DIR)/%.f90
+# 	@printf "\r\033[2K[compile] $<"
+# 	@$(FC) -c $(FFLAGS) $< -o $@
 
-$(BUILD_DIR)/%.o: $(DATA_STRUCTURE_DIR)/%.f90
-	@printf "\r\033[2K[compile] $<"
-	@$(FC) -c $(FFLAGS) $< -o $@
+# $(BUILD_DIR)/%.o: $(DATA_STRUCTURE_DIR)/%.f90
+# 	@printf "\r\033[2K[compile] $<"
+# 	@$(FC) -c $(FFLAGS) $< -o $@
 
-$(BUILD_DIR)/%.o: $(NETCDF_DIR)/%.f90
-	@printf "\r\033[2K[compile] $<"
-	@$(FC) -c $(FFLAGS) $< -o $@
+# $(BUILD_DIR)/%.o: $(NETCDF_DIR)/%.f90
+# 	@printf "\r\033[2K[compile] $<"
+# 	@$(FC) -c $(FFLAGS) $< -o $@
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.f90
 	@printf "\r\033[2K[compile] $<"
 	@$(FC) -c $(FFLAGS) $< -o $@
 
-$(DATA_STRUCTURE_DIR)/%.inc: $(FYPP_DIR)/%_inc.fypp
+$(SRC_DIR)/%.inc: $(FYPP_DIR)/%_inc.fypp
 	@printf "\r\033[2K[preproc] $<"
 	@fypp $< > $@
 
-$(DATA_STRUCTURE_DIR)/%.f90: $(FYPP_DIR)/%.fypp
+$(SRC_DIR)/%.f90: $(FYPP_DIR)/%.fypp
 	@printf "\r\033[2K[preproc] $<"
 	@fypp $< > $@
 

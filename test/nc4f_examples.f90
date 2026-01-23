@@ -2,17 +2,16 @@ module nc4f_examples
 use, non_intrinsic :: nc4f
 implicit none (type, external)
 
-public :: simple_wr
-public :: simple_rd
+public :: simple_wr, simple_rd
 public :: sfc_pres_temp_wr
 public :: sfc_pres_temp_rd
 private
 
 contains
 
+!> Example: simple_wr
 subroutine simple_wr(passed)
   logical, intent(inout) :: passed
-  !> Example: simple_wr
   type(variable_type) :: var
   integer, parameter :: nx = 47, ny = 83
   real :: values(nx, ny)
@@ -28,9 +27,9 @@ subroutine simple_wr(passed)
   passed = trim(stdout) == "real(real32)::data (x:47, y:83)"
 end subroutine simple_wr
 
+!> Example: simple_rd
 subroutine simple_rd(passed)
   logical, intent(inout) :: passed
-  !> Example: simple_rd
   type(netcdf_type) :: nc
   type(variable_type) :: var
   integer, parameter :: nx = 47, ny = 83
@@ -51,9 +50,9 @@ subroutine simple_rd(passed)
   call close_dataset(nc)
 end subroutine simple_rd
 
+!> Example: sfc_pres_temp_wr
 subroutine sfc_pres_temp_wr(passed)
   logical, intent(inout) :: passed
-  !> Example: sfc_pres_temp_wr
   integer, parameter :: nlat = 181, nlon = 361
   real, parameter :: lat_max = 90.0, lon_max = 180.0
   real, allocatable :: pres(:, :), temp(:, :)
@@ -71,30 +70,32 @@ subroutine sfc_pres_temp_wr(passed)
 
   associate ( &
     & lat_dim => "latitude".dim.nlat, &
-    & lon_dim => "longitude".dim.nlon)
+    & lon_dim => "longitude".dim.nlon, &
+    & degN => "units".att."degree_north", &
+    & degE => "units".att."degree_east", &
+    & degC => "units".att."celsius", &
+    & hPa => "units".att."hPa")
+
     vars = [ &
-      data_array("latitude", lats, [lat_dim], &
-        & ["units".att."degree_north"]), &
-      data_array("longitude", lons, [lon_dim], &
-        & ["units".att."degree_east"]), &
-      data_array("temperature", temp, [lon_dim, lat_dim], &
-        & ["units".att."celsius"]), &
-      data_array("pressure", pres, [lon_dim, lat_dim], &
-        & ["units".att."hPa"])]
+           data_array("latitude", lats, [lat_dim], [degN]), &
+           data_array("longitude", lons, [lon_dim], [degE]), &
+           data_array("temperature", temp, [lon_dim, lat_dim], [degC]), &
+           data_array("pressure", pres, [lon_dim, lat_dim], [hPa])]
   end associate
   call to_netcdf("sfc_pres_temp_wr.nc", vars)
   passed = .true.
 end subroutine sfc_pres_temp_wr
 
+!> Example sfc_pres_temp_rd
 subroutine sfc_pres_temp_rd(passed)
   logical, intent(inout) :: passed
-  !> Example sfc_pres_temp_rd
   type(netcdf_type) :: nc
   type(variable_type) :: var
   logical :: exist
   type(dimension_type) :: default_dims(2)
+  integer, parameter :: nlat = 181, nlon = 361
 
-  default_dims = ["longitude".dim.360, "latitude".dim.47]
+  default_dims = ["longitude".dim.nlon, "latitude".dim.nlat]
   nc = open_dataset("sfc_pres_temp_wr.nc", "r")
   var = get_variable(nc, "pressure", exist)
   passed = all(var%dims == default_dims) .and. &

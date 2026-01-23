@@ -7,15 +7,11 @@ use, non_intrinsic :: nc4f_c_interface
 use, non_intrinsic :: nc4f_data_struct
 implicit none (type, external)
 
-public :: get_attribute
-public :: get_variable
-public :: put_attribute
-public :: put_variable
-public :: inquire_dimensions
-public :: inquire_variable
-public :: open_dataset
-public :: close_dataset
-public :: to_netcdf
+public :: &
+  open_dataset, close_dataset, to_netcdf, &
+  inquire_dimensions, inquire_variable, &
+  get_attribute, get_variable, &
+  put_attribute, put_variable
 private
 
 !> Public APIs (IE: Impure Elemental)

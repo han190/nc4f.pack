@@ -5,22 +5,20 @@ use, intrinsic :: iso_fortran_env, only: &
 use, intrinsic :: iso_c_binding, only: c_char, c_ptr, c_loc, c_f_pointer
 implicit none (type, external)
 
-public :: netcdf_type, variable_type, attribute_type, dimension_type
-public :: size, shape, sum, extract, data_array
-public :: allocate_variable, allocate_attribute
-public :: MAX_CHAR_LEN
-
-public :: operator(+), operator(-), operator(*), operator(/), operator(**)
-public :: operator(.att.), operator(.dim.), operator(.and.)
-public :: operator(==), operator(/=)
-public :: write(formatted)
+public :: &
+  netcdf_type, variable_type, attribute_type, dimension_type, &
+  allocate_variable, allocate_attribute, extract, &
+  data_array, size, shape, sum, MAX_CHAR_LEN, &
+  operator(+), operator(-), operator(*), operator(/), operator(**), &
+  operator(.att.), operator(.dim.), operator(.and.), &
+  operator(==), operator(/=), write(formatted)
 private
 
-integer, parameter :: MAX_CHAR_LEN = 1024
-integer(int8), parameter :: BYTE = 0_int8
+integer(int32), parameter :: MAX_CHAR_LEN = 1024
 integer(int32), parameter :: INVALID_INT32 = -2147483647_int32
 integer(int64), parameter :: INVALID_INT64 = -9223372036854775807_int64
 
+!> Type constant.
 enum, bind(c)
   enumerator :: NAT_TYPE = 0
   enumerator :: BYTE_TYPE = 1
@@ -29,12 +27,12 @@ enum, bind(c)
   enumerator :: INT_TYPE = 4
   enumerator :: FLOAT_TYPE = 5
   enumerator :: DOUBLE_TYPE = 6
-  enumerator :: UBYTE_TYPE = 7
-  enumerator :: USHORT_TYPE = 8
-  enumerator :: UINT_TYPE = 9
+  enumerator :: UBYTE_TYPE = 7 ! N/A
+  enumerator :: USHORT_TYPE = 8 ! N/A
+  enumerator :: UINT_TYPE = 9 ! N/A
   enumerator :: INT64_TYPE = 10
-  enumerator :: UINT64_TYPE = 11
-  enumerator :: STRING_TYPE = 12
+  enumerator :: UINT64_TYPE = 11 ! N/A
+  enumerator :: STRING_TYPE = 12 ! N/A
 end enum
 integer, parameter :: data_type = kind(NAT_TYPE)
 
@@ -150,7 +148,7 @@ interface
     !> Name to assign to the attribute.
     character(len=*), intent(in) :: name
     !> NetCDF data type code (NC_* constant) for the attribute.
-    integer(int32), intent(in) :: dtype
+    integer(data_type), intent(in) :: dtype
     !> Number of elements for the attribute.
     integer(int64), intent(in) :: len
   end subroutine alloc_att_meta
@@ -278,7 +276,7 @@ interface
     !> Name to assign to the variable.
     character(len=*), intent(in) :: name
     !> NetCDF data type code (NC_* constant) for the variable.
-    integer(int32), intent(in) :: dtype
+    integer(data_type), intent(in) :: dtype
     !> Total number of elements for the variable.
     integer(int64), intent(in) :: len
     !> Array of dimensions describing the variable's shape.

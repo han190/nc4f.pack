@@ -83,7 +83,7 @@ module pure subroutine alloc_var_meta(var, name, dtype, len, dims, atts)
   !> Name to assign to the variable.
   character(len=*), intent(in) :: name
   !> NetCDF data type code (NC_* constant) for the variable.
-  integer(int32), intent(in) :: dtype
+  integer(data_type), intent(in) :: dtype
   !> Total number of elements for the variable.
   integer(int64), intent(in) :: len
   !> Array of dimensions describing the variable's shape.
