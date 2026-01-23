@@ -27,19 +27,29 @@ else ifeq ($(FC),flang)
 	endif
 endif
 
-FYPP_FILESTEMS = \
-	nc4f_data_struct_arith \
-	nc4f_data_struct_att_ctor \
-	nc4f_data_struct_extract \
-	nc4f_data_struct_var_ctor
-FYPP_INC := $(addprefix $(FYPP_DIR)/, \
-	$(addsuffix _inc.fypp, $(FYPP_FILESTEMS)))
-FYPP_F90 := $(addprefix $(FYPP_DIR)/, \
-	$(addsuffix .fypp, $(FYPP_FILESTEMS)))
-SRC_INC := $(patsubst $(FYPP_DIR)/%_inc.fypp, \
-	$(SRC_DIR)/%.inc,$(FYPP_INC))
-SRC_F90 := $(patsubst $(FYPP_DIR)/%.fypp, \
-	$(SRC_DIR)/%.f90,$(FYPP_F90))
+FYPP_INC = \
+	$(FYPP_DIR)/nc4f_data_struct_arith_inc.fypp \
+	$(FYPP_DIR)/nc4f_data_struct_att_ctor_inc.fypp \
+	$(FYPP_DIR)/nc4f_data_struct_extract_inc.fypp \
+	$(FYPP_DIR)/nc4f_data_struct_var_ctor_inc.fypp
+
+SRC_INC = \
+	$(SRC_DIR)/nc4f_data_struct_arith.inc \
+	$(SRC_DIR)/nc4f_data_struct_att_ctor.inc \
+	$(SRC_DIR)/nc4f_data_struct_extract.inc \
+	$(SRC_DIR)/nc4f_data_struct_var_ctor.inc
+
+FYPP_F90 = \
+	$(FYPP_DIR)/nc4f_data_struct_arith.fypp \
+	$(FYPP_DIR)/nc4f_data_struct_att_ctor.fypp \
+	$(FYPP_DIR)/nc4f_data_struct_extract.fypp \
+	$(FYPP_DIR)/nc4f_data_struct_var_ctor.fypp
+
+SRC_F90 = \
+	$(SRC_DIR)/nc4f_data_struct_arith.f90 \
+	$(SRC_DIR)/nc4f_data_struct_att_ctor.f90 \
+	$(SRC_DIR)/nc4f_data_struct_extract.f90 \
+	$(SRC_DIR)/nc4f_data_struct_var_ctor.f90
 
 SRC = \
   $(SRC_DIR)/nc4f_c_interface.f90 \
@@ -61,13 +71,7 @@ SRC = \
 	$(SRC_DIR)/nc4f_nc_var.f90 \
 	$(SRC_DIR)/nc4f.90
 
-TEST_FILES = \
-	nc4f_examples.f90 \
-	nc4f_test_module.f90 \
-	nc4f_test.f90
-TEST := $(addprefix $(TEST_DIR)/, $(TEST_FILES))
-
-OBJS = \
+OBJ = \
 	$(BUILD_DIR)/nc4f_c_interface.o \
 	$(BUILD_DIR)/nc4f_data_struct.o \
 	$(BUILD_DIR)/nc4f_data_struct_arith.o \
@@ -86,16 +90,21 @@ OBJS = \
 	$(BUILD_DIR)/nc4f_nc_util.o \
 	$(BUILD_DIR)/nc4f_nc_var.o \
 	$(BUILD_DIR)/nc4f.o
+
+TEST_FILES = \
+	nc4f_examples.f90 \
+	nc4f_test_module.f90 \
+	nc4f_test.f90
+TEST := $(addprefix $(TEST_DIR)/, $(TEST_FILES))
 TEST_OBJS := $(patsubst $(TEST_DIR)/%.f90,$(BUILD_DIR)/%.o,$(TEST))
 
 .PHONY: all prepare preprocess build library test clean 
-
 all: prepare preprocess build library
 test: $(TEST_OBJS) $(TEST_TARGET)
 	@printf "\r\033[2K[test] run test: $(TEST_TARGET)\n"
 	@$(TEST_TARGET)
 library: build create_static_link
-build: preprocess $(OBJS)
+build: preprocess $(OBJ)
 preprocess: prepare $(SRC_INC) $(SRC_F90)
 prepare: create_build_dir
 
@@ -109,19 +118,7 @@ $(BUILD_DIR)/%.o: $(TEST_DIR)/%.f90
 
 create_static_link:
 	@printf "\r\033[2K[link] create static library: $(LIB)\n"
-	@$(AR) rcs $(LIB) $(OBJS)
-
-# $(BUILD_DIR)/%.o: $(C_INTERFACE_DIR)/%.f90
-# 	@printf "\r\033[2K[compile] $<"
-# 	@$(FC) -c $(FFLAGS) $< -o $@
-
-# $(BUILD_DIR)/%.o: $(DATA_STRUCTURE_DIR)/%.f90
-# 	@printf "\r\033[2K[compile] $<"
-# 	@$(FC) -c $(FFLAGS) $< -o $@
-
-# $(BUILD_DIR)/%.o: $(NETCDF_DIR)/%.f90
-# 	@printf "\r\033[2K[compile] $<"
-# 	@$(FC) -c $(FFLAGS) $< -o $@
+	@$(AR) rcs $(LIB) $(OBJ)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.f90
 	@printf "\r\033[2K[compile] $<"

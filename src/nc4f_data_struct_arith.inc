@@ -12,7 +12,7 @@ interface operator(+)
   module procedure :: add_real32_var
   module procedure :: add_var_real64
   module procedure :: add_real64_var
-end interface operator(+)
+end interface operator(+) 
 
 interface operator(-)
   module procedure :: sub_vars
@@ -28,7 +28,7 @@ interface operator(-)
   module procedure :: sub_real32_var
   module procedure :: sub_var_real64
   module procedure :: sub_real64_var
-end interface operator(-)
+end interface operator(-) 
 
 interface operator(*)
   module procedure :: mul_vars
@@ -44,7 +44,7 @@ interface operator(*)
   module procedure :: mul_real32_var
   module procedure :: mul_var_real64
   module procedure :: mul_real64_var
-end interface operator(*)
+end interface operator(*) 
 
 interface operator(/)
   module procedure :: div_vars
@@ -60,7 +60,7 @@ interface operator(/)
   module procedure :: div_real32_var
   module procedure :: div_var_real64
   module procedure :: div_real64_var
-end interface operator(/)
+end interface operator(/) 
 
 interface operator(**)
   module procedure :: pow_vars
@@ -76,7 +76,7 @@ interface operator(**)
   module procedure :: pow_real32_var
   module procedure :: pow_var_real64
   module procedure :: pow_real64_var
-end interface operator(**)
+end interface operator(**) 
 
 interface sum
   module procedure :: sum_vars

@@ -658,7 +658,7 @@ module function mul_vars(x, y) result(res)
       call extract(x, xp)
       call extract(y, yp)
       call extract(res, resp)
-      resp = xp*yp
+      resp = xp * yp
     end block
   case (SHORT_TYPE)
     block
@@ -668,7 +668,7 @@ module function mul_vars(x, y) result(res)
       call extract(x, xp)
       call extract(y, yp)
       call extract(res, resp)
-      resp = xp*yp
+      resp = xp * yp
     end block
   case (INT_TYPE)
     block
@@ -678,7 +678,7 @@ module function mul_vars(x, y) result(res)
       call extract(x, xp)
       call extract(y, yp)
       call extract(res, resp)
-      resp = xp*yp
+      resp = xp * yp
     end block
   case (INT64_TYPE)
     block
@@ -688,7 +688,7 @@ module function mul_vars(x, y) result(res)
       call extract(x, xp)
       call extract(y, yp)
       call extract(res, resp)
-      resp = xp*yp
+      resp = xp * yp
     end block
   case (FLOAT_TYPE)
     block
@@ -698,7 +698,7 @@ module function mul_vars(x, y) result(res)
       call extract(x, xp)
       call extract(y, yp)
       call extract(res, resp)
-      resp = xp*yp
+      resp = xp * yp
     end block
   case (DOUBLE_TYPE)
     block
@@ -708,7 +708,7 @@ module function mul_vars(x, y) result(res)
       call extract(x, xp)
       call extract(y, yp)
       call extract(res, resp)
-      resp = xp*yp
+      resp = xp * yp
     end block
   end select
 end function mul_vars
@@ -730,7 +730,7 @@ module function mul_var_int8(x, y) result(res)
   call allocate_variable(res, mold=x)
   call extract(x, xp)
   call extract(res, resp)
-  resp = xp*y
+  resp = xp * y
 end function mul_var_int8
 
 !> Operator `*` between a scalar `integer` and a `variable_type`.
@@ -750,7 +750,7 @@ module function mul_int8_var(x, y) result(res)
   call allocate_variable(res, mold=y)
   call extract(y, yp)
   call extract(res, resp)
-  resp = x*yp
+  resp = x * yp
 end function mul_int8_var
 
 !> Operator `*` between a `variable_type` and a scalar `integer`.
@@ -770,7 +770,7 @@ module function mul_var_int16(x, y) result(res)
   call allocate_variable(res, mold=x)
   call extract(x, xp)
   call extract(res, resp)
-  resp = xp*y
+  resp = xp * y
 end function mul_var_int16
 
 !> Operator `*` between a scalar `integer` and a `variable_type`.
@@ -790,7 +790,7 @@ module function mul_int16_var(x, y) result(res)
   call allocate_variable(res, mold=y)
   call extract(y, yp)
   call extract(res, resp)
-  resp = x*yp
+  resp = x * yp
 end function mul_int16_var
 
 !> Operator `*` between a `variable_type` and a scalar `integer`.
@@ -810,7 +810,7 @@ module function mul_var_int32(x, y) result(res)
   call allocate_variable(res, mold=x)
   call extract(x, xp)
   call extract(res, resp)
-  resp = xp*y
+  resp = xp * y
 end function mul_var_int32
 
 !> Operator `*` between a scalar `integer` and a `variable_type`.
@@ -830,7 +830,7 @@ module function mul_int32_var(x, y) result(res)
   call allocate_variable(res, mold=y)
   call extract(y, yp)
   call extract(res, resp)
-  resp = x*yp
+  resp = x * yp
 end function mul_int32_var
 
 !> Operator `*` between a `variable_type` and a scalar `integer`.
@@ -850,7 +850,7 @@ module function mul_var_int64(x, y) result(res)
   call allocate_variable(res, mold=x)
   call extract(x, xp)
   call extract(res, resp)
-  resp = xp*y
+  resp = xp * y
 end function mul_var_int64
 
 !> Operator `*` between a scalar `integer` and a `variable_type`.
@@ -870,7 +870,7 @@ module function mul_int64_var(x, y) result(res)
   call allocate_variable(res, mold=y)
   call extract(y, yp)
   call extract(res, resp)
-  resp = x*yp
+  resp = x * yp
 end function mul_int64_var
 
 !> Operator `*` between a `variable_type` and a scalar `real`.
@@ -890,7 +890,7 @@ module function mul_var_real32(x, y) result(res)
   call allocate_variable(res, mold=x)
   call extract(x, xp)
   call extract(res, resp)
-  resp = xp*y
+  resp = xp * y
 end function mul_var_real32
 
 !> Operator `*` between a scalar `real` and a `variable_type`.
@@ -910,7 +910,7 @@ module function mul_real32_var(x, y) result(res)
   call allocate_variable(res, mold=y)
   call extract(y, yp)
   call extract(res, resp)
-  resp = x*yp
+  resp = x * yp
 end function mul_real32_var
 
 !> Operator `*` between a `variable_type` and a scalar `real`.
@@ -930,7 +930,7 @@ module function mul_var_real64(x, y) result(res)
   call allocate_variable(res, mold=x)
   call extract(x, xp)
   call extract(res, resp)
-  resp = xp*y
+  resp = xp * y
 end function mul_var_real64
 
 !> Operator `*` between a scalar `real` and a `variable_type`.
@@ -950,7 +950,7 @@ module function mul_real64_var(x, y) result(res)
   call allocate_variable(res, mold=y)
   call extract(y, yp)
   call extract(res, resp)
-  resp = x*yp
+  resp = x * yp
 end function mul_real64_var
 
 !> Element-wise operator `/` for two `variable_type` values.
@@ -975,7 +975,7 @@ module function div_vars(x, y) result(res)
       call extract(x, xp)
       call extract(y, yp)
       call extract(res, resp)
-      resp = xp/yp
+      resp = xp / yp
     end block
   case (SHORT_TYPE)
     block
@@ -985,7 +985,7 @@ module function div_vars(x, y) result(res)
       call extract(x, xp)
       call extract(y, yp)
       call extract(res, resp)
-      resp = xp/yp
+      resp = xp / yp
     end block
   case (INT_TYPE)
     block
@@ -995,7 +995,7 @@ module function div_vars(x, y) result(res)
       call extract(x, xp)
       call extract(y, yp)
       call extract(res, resp)
-      resp = xp/yp
+      resp = xp / yp
     end block
   case (INT64_TYPE)
     block
@@ -1005,7 +1005,7 @@ module function div_vars(x, y) result(res)
       call extract(x, xp)
       call extract(y, yp)
       call extract(res, resp)
-      resp = xp/yp
+      resp = xp / yp
     end block
   case (FLOAT_TYPE)
     block
@@ -1015,7 +1015,7 @@ module function div_vars(x, y) result(res)
       call extract(x, xp)
       call extract(y, yp)
       call extract(res, resp)
-      resp = xp/yp
+      resp = xp / yp
     end block
   case (DOUBLE_TYPE)
     block
@@ -1025,7 +1025,7 @@ module function div_vars(x, y) result(res)
       call extract(x, xp)
       call extract(y, yp)
       call extract(res, resp)
-      resp = xp/yp
+      resp = xp / yp
     end block
   end select
 end function div_vars
@@ -1047,7 +1047,7 @@ module function div_var_int8(x, y) result(res)
   call allocate_variable(res, mold=x)
   call extract(x, xp)
   call extract(res, resp)
-  resp = xp/y
+  resp = xp / y
 end function div_var_int8
 
 !> Operator `/` between a scalar `integer` and a `variable_type`.
@@ -1067,7 +1067,7 @@ module function div_int8_var(x, y) result(res)
   call allocate_variable(res, mold=y)
   call extract(y, yp)
   call extract(res, resp)
-  resp = x/yp
+  resp = x / yp
 end function div_int8_var
 
 !> Operator `/` between a `variable_type` and a scalar `integer`.
@@ -1087,7 +1087,7 @@ module function div_var_int16(x, y) result(res)
   call allocate_variable(res, mold=x)
   call extract(x, xp)
   call extract(res, resp)
-  resp = xp/y
+  resp = xp / y
 end function div_var_int16
 
 !> Operator `/` between a scalar `integer` and a `variable_type`.
@@ -1107,7 +1107,7 @@ module function div_int16_var(x, y) result(res)
   call allocate_variable(res, mold=y)
   call extract(y, yp)
   call extract(res, resp)
-  resp = x/yp
+  resp = x / yp
 end function div_int16_var
 
 !> Operator `/` between a `variable_type` and a scalar `integer`.
@@ -1127,7 +1127,7 @@ module function div_var_int32(x, y) result(res)
   call allocate_variable(res, mold=x)
   call extract(x, xp)
   call extract(res, resp)
-  resp = xp/y
+  resp = xp / y
 end function div_var_int32
 
 !> Operator `/` between a scalar `integer` and a `variable_type`.
@@ -1147,7 +1147,7 @@ module function div_int32_var(x, y) result(res)
   call allocate_variable(res, mold=y)
   call extract(y, yp)
   call extract(res, resp)
-  resp = x/yp
+  resp = x / yp
 end function div_int32_var
 
 !> Operator `/` between a `variable_type` and a scalar `integer`.
@@ -1167,7 +1167,7 @@ module function div_var_int64(x, y) result(res)
   call allocate_variable(res, mold=x)
   call extract(x, xp)
   call extract(res, resp)
-  resp = xp/y
+  resp = xp / y
 end function div_var_int64
 
 !> Operator `/` between a scalar `integer` and a `variable_type`.
@@ -1187,7 +1187,7 @@ module function div_int64_var(x, y) result(res)
   call allocate_variable(res, mold=y)
   call extract(y, yp)
   call extract(res, resp)
-  resp = x/yp
+  resp = x / yp
 end function div_int64_var
 
 !> Operator `/` between a `variable_type` and a scalar `real`.
@@ -1207,7 +1207,7 @@ module function div_var_real32(x, y) result(res)
   call allocate_variable(res, mold=x)
   call extract(x, xp)
   call extract(res, resp)
-  resp = xp/y
+  resp = xp / y
 end function div_var_real32
 
 !> Operator `/` between a scalar `real` and a `variable_type`.
@@ -1227,7 +1227,7 @@ module function div_real32_var(x, y) result(res)
   call allocate_variable(res, mold=y)
   call extract(y, yp)
   call extract(res, resp)
-  resp = x/yp
+  resp = x / yp
 end function div_real32_var
 
 !> Operator `/` between a `variable_type` and a scalar `real`.
@@ -1247,7 +1247,7 @@ module function div_var_real64(x, y) result(res)
   call allocate_variable(res, mold=x)
   call extract(x, xp)
   call extract(res, resp)
-  resp = xp/y
+  resp = xp / y
 end function div_var_real64
 
 !> Operator `/` between a scalar `real` and a `variable_type`.
@@ -1267,7 +1267,7 @@ module function div_real64_var(x, y) result(res)
   call allocate_variable(res, mold=y)
   call extract(y, yp)
   call extract(res, resp)
-  resp = x/yp
+  resp = x / yp
 end function div_real64_var
 
 !> Element-wise operator `**` for two `variable_type` values.
@@ -1292,7 +1292,7 @@ module function pow_vars(x, y) result(res)
       call extract(x, xp)
       call extract(y, yp)
       call extract(res, resp)
-      resp = xp**yp
+      resp = xp ** yp
     end block
   case (SHORT_TYPE)
     block
@@ -1302,7 +1302,7 @@ module function pow_vars(x, y) result(res)
       call extract(x, xp)
       call extract(y, yp)
       call extract(res, resp)
-      resp = xp**yp
+      resp = xp ** yp
     end block
   case (INT_TYPE)
     block
@@ -1312,7 +1312,7 @@ module function pow_vars(x, y) result(res)
       call extract(x, xp)
       call extract(y, yp)
       call extract(res, resp)
-      resp = xp**yp
+      resp = xp ** yp
     end block
   case (INT64_TYPE)
     block
@@ -1322,7 +1322,7 @@ module function pow_vars(x, y) result(res)
       call extract(x, xp)
       call extract(y, yp)
       call extract(res, resp)
-      resp = xp**yp
+      resp = xp ** yp
     end block
   case (FLOAT_TYPE)
     block
@@ -1332,7 +1332,7 @@ module function pow_vars(x, y) result(res)
       call extract(x, xp)
       call extract(y, yp)
       call extract(res, resp)
-      resp = xp**yp
+      resp = xp ** yp
     end block
   case (DOUBLE_TYPE)
     block
@@ -1342,7 +1342,7 @@ module function pow_vars(x, y) result(res)
       call extract(x, xp)
       call extract(y, yp)
       call extract(res, resp)
-      resp = xp**yp
+      resp = xp ** yp
     end block
   end select
 end function pow_vars
@@ -1364,7 +1364,7 @@ module function pow_var_int8(x, y) result(res)
   call allocate_variable(res, mold=x)
   call extract(x, xp)
   call extract(res, resp)
-  resp = xp**y
+  resp = xp ** y
 end function pow_var_int8
 
 !> Operator `**` between a scalar `integer` and a `variable_type`.
@@ -1384,7 +1384,7 @@ module function pow_int8_var(x, y) result(res)
   call allocate_variable(res, mold=y)
   call extract(y, yp)
   call extract(res, resp)
-  resp = x**yp
+  resp = x ** yp
 end function pow_int8_var
 
 !> Operator `**` between a `variable_type` and a scalar `integer`.
@@ -1404,7 +1404,7 @@ module function pow_var_int16(x, y) result(res)
   call allocate_variable(res, mold=x)
   call extract(x, xp)
   call extract(res, resp)
-  resp = xp**y
+  resp = xp ** y
 end function pow_var_int16
 
 !> Operator `**` between a scalar `integer` and a `variable_type`.
@@ -1424,7 +1424,7 @@ module function pow_int16_var(x, y) result(res)
   call allocate_variable(res, mold=y)
   call extract(y, yp)
   call extract(res, resp)
-  resp = x**yp
+  resp = x ** yp
 end function pow_int16_var
 
 !> Operator `**` between a `variable_type` and a scalar `integer`.
@@ -1444,7 +1444,7 @@ module function pow_var_int32(x, y) result(res)
   call allocate_variable(res, mold=x)
   call extract(x, xp)
   call extract(res, resp)
-  resp = xp**y
+  resp = xp ** y
 end function pow_var_int32
 
 !> Operator `**` between a scalar `integer` and a `variable_type`.
@@ -1464,7 +1464,7 @@ module function pow_int32_var(x, y) result(res)
   call allocate_variable(res, mold=y)
   call extract(y, yp)
   call extract(res, resp)
-  resp = x**yp
+  resp = x ** yp
 end function pow_int32_var
 
 !> Operator `**` between a `variable_type` and a scalar `integer`.
@@ -1484,7 +1484,7 @@ module function pow_var_int64(x, y) result(res)
   call allocate_variable(res, mold=x)
   call extract(x, xp)
   call extract(res, resp)
-  resp = xp**y
+  resp = xp ** y
 end function pow_var_int64
 
 !> Operator `**` between a scalar `integer` and a `variable_type`.
@@ -1504,7 +1504,7 @@ module function pow_int64_var(x, y) result(res)
   call allocate_variable(res, mold=y)
   call extract(y, yp)
   call extract(res, resp)
-  resp = x**yp
+  resp = x ** yp
 end function pow_int64_var
 
 !> Operator `**` between a `variable_type` and a scalar `real`.
@@ -1524,7 +1524,7 @@ module function pow_var_real32(x, y) result(res)
   call allocate_variable(res, mold=x)
   call extract(x, xp)
   call extract(res, resp)
-  resp = xp**y
+  resp = xp ** y
 end function pow_var_real32
 
 !> Operator `**` between a scalar `real` and a `variable_type`.
@@ -1544,7 +1544,7 @@ module function pow_real32_var(x, y) result(res)
   call allocate_variable(res, mold=y)
   call extract(y, yp)
   call extract(res, resp)
-  resp = x**yp
+  resp = x ** yp
 end function pow_real32_var
 
 !> Operator `**` between a `variable_type` and a scalar `real`.
@@ -1564,7 +1564,7 @@ module function pow_var_real64(x, y) result(res)
   call allocate_variable(res, mold=x)
   call extract(x, xp)
   call extract(res, resp)
-  resp = xp**y
+  resp = xp ** y
 end function pow_var_real64
 
 !> Operator `**` between a scalar `real` and a `variable_type`.
@@ -1584,8 +1584,9 @@ module function pow_real64_var(x, y) result(res)
   call allocate_variable(res, mold=y)
   call extract(y, yp)
   call extract(res, resp)
-  resp = x**yp
+  resp = x ** yp
 end function pow_real64_var
+
 
 module function sum_vars(vars) result(s)
   type(variable_type), intent(in) :: vars(:)
