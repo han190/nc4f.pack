@@ -7,11 +7,11 @@ implicit none (type, external)
 
 public :: &
   netcdf_type, variable_type, attribute_type, dimension_type, &
-  allocate_variable, allocate_attribute, extract, &
-  data_array, size, shape, sum, MAX_CHAR_LEN, &
+  allocate_memory, extract, data_array, MAX_CHAR_LEN
+public :: &
   operator(+), operator(-), operator(*), operator(/), operator(**), &
   operator(.att.), operator(.dim.), operator(.and.), &
-  operator(==), operator(/=), write(formatted)
+  operator(==), operator(/=), write(formatted), size, shape, sum
 private
 
 integer(int32), parameter :: MAX_CHAR_LEN = 1024
@@ -114,17 +114,14 @@ interface shape
   module procedure :: get_shape
 end interface shape
 
-interface allocate_attribute
+interface allocate_memory
   module procedure :: alloc_att_buf
   module procedure :: alloc_att_meta
   module procedure :: alloc_att_mold
-end interface allocate_attribute
-
-interface allocate_variable
   module procedure :: alloc_var_buf
   module procedure :: alloc_var_meta
   module procedure :: alloc_var_mold
-end interface allocate_variable
+end interface allocate_memory
 
 interface write(formatted)
   module procedure :: write_frmt_var

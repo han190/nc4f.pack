@@ -127,7 +127,7 @@ impure elemental function get_att_(ncid, varid, name) result(att)
     return
   end if zero_size_attr
 
-  call allocate_attribute(att)
+  call allocate_memory(att)
   call handle_error(nc_get_att(ncid, varid, &
     & f2cstr(att%name), c_loc(att%buffer(1))), &
     & "[get_att_] Invalid attribute.")

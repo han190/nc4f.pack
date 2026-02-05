@@ -82,7 +82,7 @@ call extract(vars(1), P)
 call extract(vars(2), PB)
 call extract(vars(3), THETA)
 !> Allocate output variable.
-call allocate_variable(output, mold=P)
+call allocate_memory(output, mold=P)
 call extract(output, T)
 
 !> Computation.

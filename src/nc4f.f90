@@ -2,7 +2,7 @@ module nc4f
 
 use :: nc4f_data_struct, only: &
   netcdf_type, variable_type, attribute_type, dimension_type, &
-  allocate_variable, allocate_attribute, extract, &
+  allocate_memory, allocate_memory, extract, &
   data_array, size, shape, sum, &
   operator(+), operator(-), operator(*), operator(/), operator(**), &
   operator(.att.), operator(.dim.), operator(.and.), &

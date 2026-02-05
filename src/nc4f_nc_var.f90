@@ -30,7 +30,7 @@ module impure elemental function get_var(nc, name, exist) result(var)
     return
   end if zero_size_var
 
-  call allocate_variable(var)
+  call allocate_memory(var)
   cptr = c_loc(var%buffer(1))
   write (msg, "('[get_var] Invalid variable:', 1x, a)") name
   call handle_error(nc_get_var(nc%id, var%id, cptr), msg)
