@@ -10,7 +10,9 @@ tests = [&
   & test_type("simple_rd", simple_rd), &
   & test_type("sfc_pres_temp_wr", sfc_pres_temp_wr), &
   & test_type("sfc_pres_temp_rd", sfc_pres_temp_rd), &
-  & test_type("buffer_edges", buffer_edges)]
+  & test_type("buffer_edges", buffer_edges), &
+  & test_type("extensive_wr", extensive_wr), &
+  & test_type("extensive_rd", extensive_rd)]
 call run_tests(tests)
 
 end program main
