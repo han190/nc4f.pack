@@ -53,6 +53,13 @@ integer(c_int), parameter :: NC_UINT64 = 11_c_int ! N/A
 integer(c_int), parameter :: NC_STRING = 12_c_int ! N/A
 
 interface
+  !> Return the length of a NUL-terminated C string.
+  function c_strlen(str) bind(c, name="strlen") result(length)
+    import :: c_ptr, c_size_t
+    type(c_ptr), value :: str
+    integer(c_size_t) :: length
+  end function c_strlen
+
   !> Given an error number, return an error message.
   function nc_strerror(ncerr1) bind(c, name="nc_strerror")
     import :: c_int, c_ptr
@@ -143,7 +150,7 @@ interface
     integer(c_int), value :: varid
     !> Pointer to the location for the returned attribute NetCDF Names.
     !> Ignored if NULL.
-    character(kind=c_char), intent(in) :: name(*)
+    character(kind=c_char), intent(in) :: name
     !> Pointer to location for returned attribute data type. Ignored if NULL.
     integer(c_int), intent(out) :: xtypep
     !> Pointer to location for returned number of values currently stored in
@@ -326,7 +333,7 @@ interface
   !> Retrieve a list of dimension ids associated with a group.
   function nc_inq_dimids(ncid, ndims, dimids, include_parents) &
     & bind(c, name="nc_inq_dimids")
-    import :: c_int
+    import :: c_int, c_ptr
     !> The ncid of the group in question.
     integer(c_int), value :: ncid
     !> Pointer to memory to contain the number of dimids associated with the
@@ -334,7 +341,7 @@ interface
     integer(c_int), intent(out) :: ndims
     !> Pointer to memory to contain the number of dimensions associated with
     !> the group.
-    integer(c_int), intent(out) :: dimids(*)
+    type(c_ptr), value :: dimids
     !> If non-zero, parent groups are also traversed.
     integer(c_int), value :: include_parents
     !> Error code or NC_NOERR for no error.
@@ -401,7 +408,7 @@ interface
     !> nc_def_grp(), or associated inquiry functions such as nc_inq_ncid().
     integer(c_int), value :: ncid
     !> Name of the dimension to be created.
-    character(kind=c_char), intent(in) :: name
+    character(kind=c_char), intent(in) :: name(*)
     !> Length of the dimension to be created. Use NC_UNLIMITED for unlimited
     !> dimensions.
     integer(c_size_t), value :: len

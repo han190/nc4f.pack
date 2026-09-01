@@ -326,6 +326,28 @@ interface
     integer(int64) :: buffer_size
   end function get_buffer_size
 
+  !> Validate an attribute's metadata and backing byte buffer.
+  module pure subroutine validate_att_data(att, expected_dtype, context)
+    type(attribute_type), intent(in) :: att
+    integer(data_type), intent(in) :: expected_dtype
+    character(len=*), intent(in) :: context
+  end subroutine validate_att_data
+
+  !> Validate a variable's metadata and backing byte buffer.
+  module pure subroutine validate_var_data(var, expected_dtype, expected_rank, context)
+    type(variable_type), intent(in) :: var
+    integer(data_type), intent(in) :: expected_dtype
+    integer, intent(in) :: expected_rank
+    character(len=*), intent(in) :: context
+  end subroutine validate_var_data
+
+  !> Compute a dimension product while checking invalid lengths and overflow.
+  module pure function checked_dim_product(dims, context) result(element_count)
+    type(dimension_type), intent(in) :: dims(:)
+    character(len=*), intent(in) :: context
+    integer(int64) :: element_count
+  end function checked_dim_product
+
   !> Write a `variable_type` in list-directed (Fortran `DT`) format.
   module subroutine write_frmt_var(var, unit, iotype, v_list, iostat, iomsg)
     !> Variable object to format and write.

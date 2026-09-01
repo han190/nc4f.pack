@@ -16,8 +16,10 @@ module function new_att_${K}$(name, values) result(att)
   ${T}$(${K}$), pointer :: ptr(:)
 
   call allocate_memory(att, name, ${D}$, size(values, kind=int64))
-  call extract(att, ptr)
-  ptr = values
+  if (size(values) > 0) then
+    call extract(att, ptr)
+    ptr = values
+  end if
 end function new_att_${K}$
 
 !> Create a scalar `attribute_type` from a single `${T}$` value.
@@ -50,6 +52,8 @@ module function new_att_character(name, value) result(att)
   integer(int64) :: i
 
   call allocate_memory(att, name, CHAR_TYPE, len(value, kind=int64))
+  call validate_att_data(att, CHAR_TYPE, "[new_att_character]")
+  if (att%len == 0) return
   cptr = c_loc(att%buffer(1))
   call c_f_pointer(cptr, fptr, [att%len])
   do i = 1, att%len

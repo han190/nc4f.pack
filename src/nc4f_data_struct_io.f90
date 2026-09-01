@@ -39,8 +39,10 @@ module subroutine write_frmt_var(var, unit, iotype, v_list, iostat, iomsg)
     end if
     write (dims, fmt) (var%dims(i), i=1, n)
     write (unit, "(a)") trim(title)//trim(dims)
-    if (allocated(var%atts) .and. size(var%atts) > 0) &
-      & write (unit, "(/, *(4x, DT))") var%atts
+    if (allocated(var%atts)) then
+      if (size(var%atts) > 0) &
+        & write (unit, "(/, *(4x, DT))") var%atts
+    end if
     iostat = 0
   end if
 end subroutine write_frmt_var

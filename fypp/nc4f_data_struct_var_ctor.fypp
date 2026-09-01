@@ -23,8 +23,10 @@ module function new_var_${K}$_${R}$d(name, values, dims, atts) result(var)
   ${T}$(${K}$), pointer :: var_ptr(${COLONS(R)}$)
 
   call allocate_memory(var, name, ${D}$, size(values, kind=int64), dims, atts)
-  call extract(var, var_ptr)
-  var_ptr = values
+  if (size(values) > 0) then
+    call extract(var, var_ptr)
+    var_ptr = values
+  end if
 end function new_var_${K}$_${R}$d${NEWLINE()}$
 #: endfor
 #: endfor

@@ -25,10 +25,10 @@ module pure function get_size(var, dim) result(n)
   n = 1
   select case (dim_)
   case (0)
-    do i = 1, size(var%dims)
-      n = n*var%dims(i)%len
-    end do
+    n = checked_dim_product(var%dims, "[get_size]")
   case (1:)
+    if (dim_ > size(var%dims)) &
+      & error stop "[get_size] Invalid dim."
     i = size(var%dims) - dim_ + 1
     n = var%dims(i)%len
   case default
@@ -96,6 +96,8 @@ module pure subroutine alloc_var_meta(var, name, dtype, len, dims, atts)
   var%len = len
   var%dims = dims
   if (present(atts)) var%atts = atts
+  if (checked_dim_product(var%dims, "[alloc_var_meta]") /= var%len) &
+    & error stop "[alloc_var_meta] Dimension product differs from variable length."
   call alloc_var_buf(var)
 end subroutine alloc_var_meta
 

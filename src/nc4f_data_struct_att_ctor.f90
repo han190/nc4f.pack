@@ -14,8 +14,10 @@ module function new_att_int8(name, values) result(att)
   integer(int8), pointer :: ptr(:)
 
   call allocate_memory(att, name, BYTE_TYPE, size(values, kind=int64))
-  call extract(att, ptr)
-  ptr = values
+  if (size(values) > 0) then
+    call extract(att, ptr)
+    ptr = values
+  end if
 end function new_att_int8
 
 !> Create a scalar `attribute_type` from a single `integer` value.
@@ -45,8 +47,10 @@ module function new_att_int16(name, values) result(att)
   integer(int16), pointer :: ptr(:)
 
   call allocate_memory(att, name, SHORT_TYPE, size(values, kind=int64))
-  call extract(att, ptr)
-  ptr = values
+  if (size(values) > 0) then
+    call extract(att, ptr)
+    ptr = values
+  end if
 end function new_att_int16
 
 !> Create a scalar `attribute_type` from a single `integer` value.
@@ -76,8 +80,10 @@ module function new_att_int32(name, values) result(att)
   integer(int32), pointer :: ptr(:)
 
   call allocate_memory(att, name, INT_TYPE, size(values, kind=int64))
-  call extract(att, ptr)
-  ptr = values
+  if (size(values) > 0) then
+    call extract(att, ptr)
+    ptr = values
+  end if
 end function new_att_int32
 
 !> Create a scalar `attribute_type` from a single `integer` value.
@@ -107,8 +113,10 @@ module function new_att_int64(name, values) result(att)
   integer(int64), pointer :: ptr(:)
 
   call allocate_memory(att, name, INT64_TYPE, size(values, kind=int64))
-  call extract(att, ptr)
-  ptr = values
+  if (size(values) > 0) then
+    call extract(att, ptr)
+    ptr = values
+  end if
 end function new_att_int64
 
 !> Create a scalar `attribute_type` from a single `integer` value.
@@ -138,8 +146,10 @@ module function new_att_real32(name, values) result(att)
   real(real32), pointer :: ptr(:)
 
   call allocate_memory(att, name, FLOAT_TYPE, size(values, kind=int64))
-  call extract(att, ptr)
-  ptr = values
+  if (size(values) > 0) then
+    call extract(att, ptr)
+    ptr = values
+  end if
 end function new_att_real32
 
 !> Create a scalar `attribute_type` from a single `real` value.
@@ -169,8 +179,10 @@ module function new_att_real64(name, values) result(att)
   real(real64), pointer :: ptr(:)
 
   call allocate_memory(att, name, DOUBLE_TYPE, size(values, kind=int64))
-  call extract(att, ptr)
-  ptr = values
+  if (size(values) > 0) then
+    call extract(att, ptr)
+    ptr = values
+  end if
 end function new_att_real64
 
 !> Create a scalar `attribute_type` from a single `real` value.
@@ -203,6 +215,8 @@ module function new_att_character(name, value) result(att)
   integer(int64) :: i
 
   call allocate_memory(att, name, CHAR_TYPE, len(value, kind=int64))
+  call validate_att_data(att, CHAR_TYPE, "[new_att_character]")
+  if (att%len == 0) return
   cptr = c_loc(att%buffer(1))
   call c_f_pointer(cptr, fptr, [att%len])
   do i = 1, att%len

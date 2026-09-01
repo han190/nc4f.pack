@@ -11,6 +11,11 @@ module subroutine extract_att_int8_vector(att, ptr)
   !> C pointer used to map the attribute buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
+  call validate_att_data(att, BYTE_TYPE, "[extract_att_int8_vector]")
+  if (att%len == 0) then
+    nullify (ptr)
+    return
+  end if
   cptr = c_loc(att%buffer(1))
   call c_f_pointer(cptr, ptr, [att%len])
 end subroutine extract_att_int8_vector
@@ -24,6 +29,7 @@ module subroutine extract_att_int8_scalar(att, ptr)
   !> C pointer used to map the attribute buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
+  call validate_att_data(att, BYTE_TYPE, "[extract_att_int8_scalar]")
   if (att%len /= 1) error stop &
     & "[extract_att_int8_scalar] Not a scalar."
   cptr = c_loc(att%buffer(1))
@@ -39,6 +45,11 @@ module subroutine extract_att_int16_vector(att, ptr)
   !> C pointer used to map the attribute buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
+  call validate_att_data(att, SHORT_TYPE, "[extract_att_int16_vector]")
+  if (att%len == 0) then
+    nullify (ptr)
+    return
+  end if
   cptr = c_loc(att%buffer(1))
   call c_f_pointer(cptr, ptr, [att%len])
 end subroutine extract_att_int16_vector
@@ -52,6 +63,7 @@ module subroutine extract_att_int16_scalar(att, ptr)
   !> C pointer used to map the attribute buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
+  call validate_att_data(att, SHORT_TYPE, "[extract_att_int16_scalar]")
   if (att%len /= 1) error stop &
     & "[extract_att_int16_scalar] Not a scalar."
   cptr = c_loc(att%buffer(1))
@@ -67,6 +79,11 @@ module subroutine extract_att_int32_vector(att, ptr)
   !> C pointer used to map the attribute buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
+  call validate_att_data(att, INT_TYPE, "[extract_att_int32_vector]")
+  if (att%len == 0) then
+    nullify (ptr)
+    return
+  end if
   cptr = c_loc(att%buffer(1))
   call c_f_pointer(cptr, ptr, [att%len])
 end subroutine extract_att_int32_vector
@@ -80,6 +97,7 @@ module subroutine extract_att_int32_scalar(att, ptr)
   !> C pointer used to map the attribute buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
+  call validate_att_data(att, INT_TYPE, "[extract_att_int32_scalar]")
   if (att%len /= 1) error stop &
     & "[extract_att_int32_scalar] Not a scalar."
   cptr = c_loc(att%buffer(1))
@@ -95,6 +113,11 @@ module subroutine extract_att_int64_vector(att, ptr)
   !> C pointer used to map the attribute buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
+  call validate_att_data(att, INT64_TYPE, "[extract_att_int64_vector]")
+  if (att%len == 0) then
+    nullify (ptr)
+    return
+  end if
   cptr = c_loc(att%buffer(1))
   call c_f_pointer(cptr, ptr, [att%len])
 end subroutine extract_att_int64_vector
@@ -108,6 +131,7 @@ module subroutine extract_att_int64_scalar(att, ptr)
   !> C pointer used to map the attribute buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
+  call validate_att_data(att, INT64_TYPE, "[extract_att_int64_scalar]")
   if (att%len /= 1) error stop &
     & "[extract_att_int64_scalar] Not a scalar."
   cptr = c_loc(att%buffer(1))
@@ -123,6 +147,11 @@ module subroutine extract_att_real32_vector(att, ptr)
   !> C pointer used to map the attribute buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
+  call validate_att_data(att, FLOAT_TYPE, "[extract_att_real32_vector]")
+  if (att%len == 0) then
+    nullify (ptr)
+    return
+  end if
   cptr = c_loc(att%buffer(1))
   call c_f_pointer(cptr, ptr, [att%len])
 end subroutine extract_att_real32_vector
@@ -136,6 +165,7 @@ module subroutine extract_att_real32_scalar(att, ptr)
   !> C pointer used to map the attribute buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
+  call validate_att_data(att, FLOAT_TYPE, "[extract_att_real32_scalar]")
   if (att%len /= 1) error stop &
     & "[extract_att_real32_scalar] Not a scalar."
   cptr = c_loc(att%buffer(1))
@@ -151,6 +181,11 @@ module subroutine extract_att_real64_vector(att, ptr)
   !> C pointer used to map the attribute buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
+  call validate_att_data(att, DOUBLE_TYPE, "[extract_att_real64_vector]")
+  if (att%len == 0) then
+    nullify (ptr)
+    return
+  end if
   cptr = c_loc(att%buffer(1))
   call c_f_pointer(cptr, ptr, [att%len])
 end subroutine extract_att_real64_vector
@@ -164,6 +199,7 @@ module subroutine extract_att_real64_scalar(att, ptr)
   !> C pointer used to map the attribute buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
+  call validate_att_data(att, DOUBLE_TYPE, "[extract_att_real64_scalar]")
   if (att%len /= 1) error stop &
     & "[extract_att_real64_scalar] Not a scalar."
   cptr = c_loc(att%buffer(1))
@@ -179,6 +215,11 @@ module subroutine extract_att_char_vector(att, ptr)
   !> C pointer used to map the attribute buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
+  call validate_att_data(att, CHAR_TYPE, "[extract_att_char_vector]")
+  if (att%len == 0) then
+    nullify (ptr)
+    return
+  end if
   cptr = c_loc(att%buffer(1))
   call c_f_pointer(cptr, ptr, [att%len])
 end subroutine extract_att_char_vector
@@ -194,6 +235,9 @@ module subroutine extract_att_char_scalar(att, ptr)
   !> Loop index for copying characters.
   integer :: i
 
+  call validate_att_data(att, CHAR_TYPE, "[extract_att_char_scalar]")
+  allocate (character(len=att%len) :: ptr)
+  if (att%len == 0) return
   call extract_att_char_vector(att, ptrs)
   do i = 1, size(ptrs)
     ptr(i:i) = ptrs(i)
@@ -209,12 +253,11 @@ module subroutine extract_var_int8_1d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_int8_1d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_int8_1d] Invalid kind."
+  call validate_var_data(var, BYTE_TYPE, 1, "[extract_var_int8_1d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, [var%len])
@@ -229,12 +272,11 @@ module subroutine extract_var_int8_2d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_int8_2d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_int8_2d] Invalid kind."
+  call validate_var_data(var, BYTE_TYPE, 2, "[extract_var_int8_2d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
@@ -249,12 +291,11 @@ module subroutine extract_var_int8_3d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_int8_3d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_int8_3d] Invalid kind."
+  call validate_var_data(var, BYTE_TYPE, 3, "[extract_var_int8_3d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
@@ -269,12 +310,11 @@ module subroutine extract_var_int8_4d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_int8_4d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_int8_4d] Invalid kind."
+  call validate_var_data(var, BYTE_TYPE, 4, "[extract_var_int8_4d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
@@ -289,12 +329,11 @@ module subroutine extract_var_int8_5d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_int8_5d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_int8_5d] Invalid kind."
+  call validate_var_data(var, BYTE_TYPE, 5, "[extract_var_int8_5d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
@@ -309,12 +348,11 @@ module subroutine extract_var_int8_6d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_int8_6d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_int8_6d] Invalid kind."
+  call validate_var_data(var, BYTE_TYPE, 6, "[extract_var_int8_6d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
@@ -329,12 +367,11 @@ module subroutine extract_var_int8_7d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_int8_7d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_int8_7d] Invalid kind."
+  call validate_var_data(var, BYTE_TYPE, 7, "[extract_var_int8_7d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
@@ -349,12 +386,11 @@ module subroutine extract_var_int16_1d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_int16_1d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_int16_1d] Invalid kind."
+  call validate_var_data(var, SHORT_TYPE, 1, "[extract_var_int16_1d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, [var%len])
@@ -369,12 +405,11 @@ module subroutine extract_var_int16_2d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_int16_2d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_int16_2d] Invalid kind."
+  call validate_var_data(var, SHORT_TYPE, 2, "[extract_var_int16_2d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
@@ -389,12 +424,11 @@ module subroutine extract_var_int16_3d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_int16_3d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_int16_3d] Invalid kind."
+  call validate_var_data(var, SHORT_TYPE, 3, "[extract_var_int16_3d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
@@ -409,12 +443,11 @@ module subroutine extract_var_int16_4d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_int16_4d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_int16_4d] Invalid kind."
+  call validate_var_data(var, SHORT_TYPE, 4, "[extract_var_int16_4d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
@@ -429,12 +462,11 @@ module subroutine extract_var_int16_5d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_int16_5d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_int16_5d] Invalid kind."
+  call validate_var_data(var, SHORT_TYPE, 5, "[extract_var_int16_5d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
@@ -449,12 +481,11 @@ module subroutine extract_var_int16_6d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_int16_6d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_int16_6d] Invalid kind."
+  call validate_var_data(var, SHORT_TYPE, 6, "[extract_var_int16_6d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
@@ -469,12 +500,11 @@ module subroutine extract_var_int16_7d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_int16_7d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_int16_7d] Invalid kind."
+  call validate_var_data(var, SHORT_TYPE, 7, "[extract_var_int16_7d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
@@ -489,12 +519,11 @@ module subroutine extract_var_int32_1d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_int32_1d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_int32_1d] Invalid kind."
+  call validate_var_data(var, INT_TYPE, 1, "[extract_var_int32_1d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, [var%len])
@@ -509,12 +538,11 @@ module subroutine extract_var_int32_2d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_int32_2d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_int32_2d] Invalid kind."
+  call validate_var_data(var, INT_TYPE, 2, "[extract_var_int32_2d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
@@ -529,12 +557,11 @@ module subroutine extract_var_int32_3d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_int32_3d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_int32_3d] Invalid kind."
+  call validate_var_data(var, INT_TYPE, 3, "[extract_var_int32_3d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
@@ -549,12 +576,11 @@ module subroutine extract_var_int32_4d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_int32_4d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_int32_4d] Invalid kind."
+  call validate_var_data(var, INT_TYPE, 4, "[extract_var_int32_4d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
@@ -569,12 +595,11 @@ module subroutine extract_var_int32_5d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_int32_5d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_int32_5d] Invalid kind."
+  call validate_var_data(var, INT_TYPE, 5, "[extract_var_int32_5d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
@@ -589,12 +614,11 @@ module subroutine extract_var_int32_6d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_int32_6d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_int32_6d] Invalid kind."
+  call validate_var_data(var, INT_TYPE, 6, "[extract_var_int32_6d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
@@ -609,12 +633,11 @@ module subroutine extract_var_int32_7d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_int32_7d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_int32_7d] Invalid kind."
+  call validate_var_data(var, INT_TYPE, 7, "[extract_var_int32_7d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
@@ -629,12 +652,11 @@ module subroutine extract_var_int64_1d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_int64_1d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_int64_1d] Invalid kind."
+  call validate_var_data(var, INT64_TYPE, 1, "[extract_var_int64_1d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, [var%len])
@@ -649,12 +671,11 @@ module subroutine extract_var_int64_2d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_int64_2d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_int64_2d] Invalid kind."
+  call validate_var_data(var, INT64_TYPE, 2, "[extract_var_int64_2d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
@@ -669,12 +690,11 @@ module subroutine extract_var_int64_3d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_int64_3d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_int64_3d] Invalid kind."
+  call validate_var_data(var, INT64_TYPE, 3, "[extract_var_int64_3d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
@@ -689,12 +709,11 @@ module subroutine extract_var_int64_4d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_int64_4d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_int64_4d] Invalid kind."
+  call validate_var_data(var, INT64_TYPE, 4, "[extract_var_int64_4d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
@@ -709,12 +728,11 @@ module subroutine extract_var_int64_5d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_int64_5d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_int64_5d] Invalid kind."
+  call validate_var_data(var, INT64_TYPE, 5, "[extract_var_int64_5d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
@@ -729,12 +747,11 @@ module subroutine extract_var_int64_6d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_int64_6d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_int64_6d] Invalid kind."
+  call validate_var_data(var, INT64_TYPE, 6, "[extract_var_int64_6d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
@@ -749,12 +766,11 @@ module subroutine extract_var_int64_7d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_int64_7d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_int64_7d] Invalid kind."
+  call validate_var_data(var, INT64_TYPE, 7, "[extract_var_int64_7d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
@@ -769,12 +785,11 @@ module subroutine extract_var_real32_1d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_real32_1d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_real32_1d] Invalid kind."
+  call validate_var_data(var, FLOAT_TYPE, 1, "[extract_var_real32_1d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, [var%len])
@@ -789,12 +804,11 @@ module subroutine extract_var_real32_2d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_real32_2d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_real32_2d] Invalid kind."
+  call validate_var_data(var, FLOAT_TYPE, 2, "[extract_var_real32_2d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
@@ -809,12 +823,11 @@ module subroutine extract_var_real32_3d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_real32_3d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_real32_3d] Invalid kind."
+  call validate_var_data(var, FLOAT_TYPE, 3, "[extract_var_real32_3d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
@@ -829,12 +842,11 @@ module subroutine extract_var_real32_4d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_real32_4d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_real32_4d] Invalid kind."
+  call validate_var_data(var, FLOAT_TYPE, 4, "[extract_var_real32_4d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
@@ -849,12 +861,11 @@ module subroutine extract_var_real32_5d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_real32_5d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_real32_5d] Invalid kind."
+  call validate_var_data(var, FLOAT_TYPE, 5, "[extract_var_real32_5d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
@@ -869,12 +880,11 @@ module subroutine extract_var_real32_6d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_real32_6d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_real32_6d] Invalid kind."
+  call validate_var_data(var, FLOAT_TYPE, 6, "[extract_var_real32_6d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
@@ -889,12 +899,11 @@ module subroutine extract_var_real32_7d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_real32_7d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_real32_7d] Invalid kind."
+  call validate_var_data(var, FLOAT_TYPE, 7, "[extract_var_real32_7d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
@@ -909,12 +918,11 @@ module subroutine extract_var_real64_1d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_real64_1d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_real64_1d] Invalid kind."
+  call validate_var_data(var, DOUBLE_TYPE, 1, "[extract_var_real64_1d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, [var%len])
@@ -929,12 +937,11 @@ module subroutine extract_var_real64_2d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_real64_2d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_real64_2d] Invalid kind."
+  call validate_var_data(var, DOUBLE_TYPE, 2, "[extract_var_real64_2d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
@@ -949,12 +956,11 @@ module subroutine extract_var_real64_3d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_real64_3d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_real64_3d] Invalid kind."
+  call validate_var_data(var, DOUBLE_TYPE, 3, "[extract_var_real64_3d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
@@ -969,12 +975,11 @@ module subroutine extract_var_real64_4d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_real64_4d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_real64_4d] Invalid kind."
+  call validate_var_data(var, DOUBLE_TYPE, 4, "[extract_var_real64_4d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
@@ -989,12 +994,11 @@ module subroutine extract_var_real64_5d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_real64_5d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_real64_5d] Invalid kind."
+  call validate_var_data(var, DOUBLE_TYPE, 5, "[extract_var_real64_5d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
@@ -1009,12 +1013,11 @@ module subroutine extract_var_real64_6d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_real64_6d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_real64_6d] Invalid kind."
+  call validate_var_data(var, DOUBLE_TYPE, 6, "[extract_var_real64_6d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
@@ -1029,12 +1032,11 @@ module subroutine extract_var_real64_7d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_real64_7d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_real64_7d] Invalid kind."
+  call validate_var_data(var, DOUBLE_TYPE, 7, "[extract_var_real64_7d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))

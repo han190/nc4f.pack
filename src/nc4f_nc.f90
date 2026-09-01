@@ -49,6 +49,11 @@ interface to_netcdf
   module procedure :: to_netcdf_vars
 end interface to_netcdf
 
+interface validate_buffer
+  module procedure :: validate_var_buffer
+  module procedure :: validate_att_buffer
+end interface validate_buffer
+
 interface
   !> Read a global attribute by name and return it.
   module impure elemental function get_att_nc(nc, name) result(att)
@@ -252,6 +257,25 @@ interface
     !> NUL-terminated C string result.
     character(kind=c_char, len=:), allocatable :: cstr
   end function f2cstr
+
+  !> Validate a variable before exposing its byte buffer to the C API.
+  module subroutine validate_var_buffer(var, context)
+    type(variable_type), intent(in) :: var
+    character(len=*), intent(in) :: context
+  end subroutine validate_var_buffer
+
+  !> Validate an attribute before exposing its byte buffer to the C API.
+  module subroutine validate_att_buffer(att, context)
+    type(attribute_type), intent(in) :: att
+    character(len=*), intent(in) :: context
+  end subroutine validate_att_buffer
+
+  !> Compute a checked element count from a list of dimensions.
+  module function checked_dim_count(dims, context) result(element_count)
+    type(dimension_type), intent(in) :: dims(:)
+    character(len=*), intent(in) :: context
+    integer(int64) :: element_count
+  end function checked_dim_count
 
   !> ----------------------
   !> submodule_variable.f90

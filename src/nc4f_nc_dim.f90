@@ -35,17 +35,22 @@ function inq_dims_(ncid, varid) result(dims)
   !> Allocatable array of `dimension_type` in Fortran ordering
   !> (reversed relative to the C API ordering).
   type(dimension_type), allocatable :: dims(:)
-  integer(c_int) :: dimids(NC_MAX_DIMS)
-  character(len=NC_MAX_NAME, kind=c_char) :: dim_name
+  integer(c_int), allocatable, target :: dimids(:)
+  character(len=NC_MAX_NAME + 1, kind=c_char) :: dim_name
   integer(c_int) :: i, j, unlimdimidp, nunlim, ndims
   integer(c_int), parameter :: include_parents = 0_c_int
 
   if (present(varid)) then
-    call handle_error(nc_inq_vardimid(ncid, varid, dimids))
     call handle_error(nc_inq_varndims(ncid, varid, ndims))
+    allocate (dimids(ndims))
+    if (ndims > 0) &
+      & call handle_error(nc_inq_vardimid(ncid, varid, dimids))
   else
     call handle_error(nc_inq_dimids( &
-      & ncid, ndims, dimids, include_parents))
+      & ncid, ndims, c_null_ptr, include_parents))
+    allocate (dimids(ndims))
+    if (ndims > 0) call handle_error(nc_inq_dimids( &
+      & ncid, ndims, c_loc(dimids(1)), include_parents))
   end if
   call handle_error(nc_inq_unlimdim(ncid, unlimdimidp))
 
@@ -95,7 +100,7 @@ module impure elemental function def_dim(nc, dim) result(new_dim)
 
   len = merge(NC_UNLIMITED, dim%len, dim%is_unlim)
   call handle_error(nc_def_dim( &
-    & nc%id, f2cstr(dim%name), dim%len, dimid), &
+    & nc%id, f2cstr(dim%name), len, dimid), &
     & "[def_dim] Dimension: "//trim(dim%name)//".")
   new_dim = dimension_type(dimid, dim%name, dim%len, dim%is_unlim)
 end function def_dim

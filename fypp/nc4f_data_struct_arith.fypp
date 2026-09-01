@@ -17,6 +17,7 @@ module function ${N}$_vars(x, y) result(res)
     & error stop "[add_vars] Unequal data type."
 
   call allocate_memory(res, mold=x)
+  if (res%len == 0) return
   select case (x%dtype)
     #: for D, T, K in zip(dtypes, types, kinds)
   case (${D}$)
@@ -49,6 +50,7 @@ module function ${N}$_var_${K1}$(x, y) result(res)
     & "[${N}$_var_${K1}$] typeof(x) /= typeof(y)."
 
   call allocate_memory(res, mold=x)
+  if (res%len == 0) return
   call extract(x, xp)
   call extract(res, resp)
   resp = xp ${O}$ y
@@ -69,6 +71,7 @@ module function ${N}$_${K1}$_var(x, y) result(res)
     & "[${N}$_var_${K1}$] typeof(x) /= typeof(y)."
 
   call allocate_memory(res, mold=y)
+  if (res%len == 0) return
   call extract(y, yp)
   call extract(res, resp)
   resp = x ${O}$ yp
@@ -95,6 +98,7 @@ module function sum_vars(vars) result(s)
     end do
 
     call allocate_memory(s, mold=vars(1))
+    if (s%len == 0) return
     select case (s%dtype)
       #: for D, T, K in zip(dtypes, types, kinds)
     case (${D}$)

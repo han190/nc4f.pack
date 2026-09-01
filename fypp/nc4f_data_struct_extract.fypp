@@ -3,7 +3,7 @@ submodule(nc4f_data_struct) nc4f_data_struct_extract
 implicit none (type, external)
 contains
 
-#: for T, K in zip(types + ['char'], kinds + ['char'])
+#: for D, T, K in zip(dtypes + ['CHAR_TYPE'], types + ['char'], kinds + ['char'])
 #: for R in ('vector', 'scalar')
 !> Extract attribute data of kind `${K}$` as a `${R}$` from `att`.
 module subroutine extract_att_${K}$_${R}$(att, ptr)
@@ -32,16 +32,23 @@ module subroutine extract_att_${K}$_${R}$(att, ptr)
   type(c_ptr) :: cptr
   #: endif
 
+  call validate_att_data(att, ${D}$, "[extract_att_${K}$_${R}$]")
   #: if R == 'scalar' and T != 'char'
   if (att%len /= 1) error stop &
     & "[extract_att_${K}$_scalar] Not a scalar."
   #: endif
   #: if K == 'char' and R == 'scalar'
+  allocate (character(len=att%len) :: ptr)
+  if (att%len == 0) return
   call extract_att_char_vector(att, ptrs)
   do i = 1, size(ptrs)
     ptr(i:i) = ptrs(i)
   end do
   #: elif R == 'vector'
+  if (att%len == 0) then
+    nullify (ptr)
+    return
+  end if
   cptr = c_loc(att%buffer(1))
   call c_f_pointer(cptr, ptr, [att%len])
   #: elif R == 'scalar'
@@ -52,7 +59,7 @@ end subroutine extract_att_${K}$_${R}$${NEWLINE(not (K == 'char' and R == 'scala
 #: endfor
 #: endfor
 
-#: for T, K in zip(types, kinds)
+#: for D, T, K in zip(dtypes, types, kinds)
 #: for R in range(1, MAX_RANK+1)
 !> Extract variable data of kind `${K}$` and rank ${R}$ into `ptr`.
 module subroutine extract_var_${K}$_${R}$d(var, ptr)
@@ -63,12 +70,11 @@ module subroutine extract_var_${K}$_${R}$d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  associate (rank_ptr => rank(ptr))
-    if (rank_ptr > 1 .and. rank_ptr /= size(shape(var))) error stop &
-      & "[extract_var_${K}$_${R}$d] Invalid rank."
-  end associate
-  if (dtype2kind(var%dtype) /= kind(ptr)) error stop &
-    & "[extract_var_${K}$_${R}$d] Invalid kind."
+  call validate_var_data(var, ${D}$, ${R}$, "[extract_var_${K}$_${R}$d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
 
   cptr = c_loc(var%buffer(1))
   #: if R == 1

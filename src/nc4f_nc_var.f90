@@ -26,11 +26,13 @@ module impure elemental function get_var(nc, name, exist) result(var)
   end if
 
   zero_size_var: if (var%len == 0) then
+    call validate_buffer(var, "[get_var]")
     if (allocated(var%buffer)) deallocate (var%buffer)
     return
   end if zero_size_var
 
   call allocate_memory(var)
+  call validate_buffer(var, "[get_var]")
   cptr = c_loc(var%buffer(1))
   write (msg, "('[get_var] Invalid variable:', 1x, a)") name
   call handle_error(nc_get_var(nc%id, var%id, cptr), msg)
@@ -48,9 +50,6 @@ module impure elemental function inq_var(nc, name, exist) result(var)
   type(variable_type) :: var
   !> Internal flag set when attributes are present for the variable.
   logical :: atts_exist
-  !> Loop index.
-  integer :: i
-
   var%name = clip(name)
   var%id = inq_varid(nc%id, var%name, exist)
   if (.not. exist) return
@@ -58,10 +57,7 @@ module impure elemental function inq_var(nc, name, exist) result(var)
   var%atts = get_atts_var(nc, var, atts_exist)
   if (.not. atts_exist .and. allocated(var%atts)) deallocate (var%atts)
   var%dims = inq_dims_var(nc, var)
-  var%len = 1
-  do i = 1, size(var%dims)
-    var%len = var%len*var%dims(i)%len
-  end do
+  var%len = checked_dim_count(var%dims, "[inq_var]")
 end function inq_var
 
 !> Inquire the netCDF data type of a variable given `ncid` and `varid`.
@@ -112,9 +108,11 @@ module impure elemental subroutine put_var(nc, var)
   !> Temporary variable object used for definition and writing.
   type(variable_type) :: tmp
 
+  call validate_buffer(var, "[put_var]")
   tmp = def_var_(nc, var)
   if (allocated(var%atts)) call put_att_var(nc, tmp)
-  call handle_error(nc_put_var(nc%id, tmp%id, c_loc(var%buffer(1))))
+  if (var%len > 0) &
+    & call handle_error(nc_put_var(nc%id, tmp%id, c_loc(var%buffer(1))))
 end subroutine put_var
 
 !> Define a variable in the netCDF file and return its `variable_type`.

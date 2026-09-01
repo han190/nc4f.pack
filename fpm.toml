@@ -9,7 +9,7 @@ keywords = ["fortran", "modern-fortran", "NetCDF"]
 homepage = "https://github.com/han190/nc4f.pack"
 
 [build]
-external-modules = "netcdf"
+# external-modules = "netcdf"
 link = "netcdf"
 auto-tests = false
 

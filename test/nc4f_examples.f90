@@ -5,6 +5,7 @@ implicit none (type, external)
 public :: simple_wr, simple_rd
 public :: sfc_pres_temp_wr
 public :: sfc_pres_temp_rd
+public :: buffer_edges
 private
 
 contains
@@ -112,5 +113,40 @@ subroutine sfc_pres_temp_rd(passed)
   var = inquire_variable(nc, "relative_humidity", exist)
   passed = .not. exist
 end subroutine sfc_pres_temp_rd
+
+!> Exercise character extraction and boundary-length netCDF names.
+subroutine buffer_edges(passed)
+  logical, intent(inout) :: passed
+  character(len=256) :: dim_name, att_name, var_name
+  character(len=:), pointer :: text
+  real, parameter :: values(2) = [1.0, 2.0]
+  real, pointer :: read_values(:)
+  type(attribute_type) :: empty_att
+  type(variable_type) :: var
+  type(netcdf_type) :: nc
+
+  empty_att = "empty".att.""
+  call extract(empty_att, text)
+  passed = associated(text) .and. len(text) == 0
+  if (associated(text)) deallocate (text)
+  if (.not. passed) return
+
+  dim_name = repeat("d", len(dim_name) - 1)
+  att_name = repeat("a", len(att_name) - 1)
+  var_name = repeat("v", len(var_name) - 1)
+  var = data_array(var_name, values, [dim_name.dim.2], &
+    & [att_name.att."maximum-length name"])
+  call to_netcdf("buffer_edges.nc", var)
+
+  nc = open_dataset("buffer_edges.nc", "r", inq_dims=.true.)
+  var = get_variable(nc, var_name)
+  call extract(var, read_values)
+  passed = var%name == var_name .and. &
+    & nc%dims(1)%name == dim_name .and. &
+    & var%dims(1)%name == dim_name .and. &
+    & var%atts(1)%name == att_name .and. &
+    & all(abs(read_values - values) <= epsilon(values))
+  call close_dataset(nc)
+end subroutine buffer_edges
 
 end module nc4f_examples

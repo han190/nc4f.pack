@@ -11,7 +11,7 @@ module impure elemental function get_att_nc(nc, name) result(att)
   !> Returned attribute object.
   type(attribute_type) :: att
 
-  att = get_att_(nc%id, NC_GLOBAL, f2cstr(clip(name)))
+  att = get_att_(nc%id, NC_GLOBAL, clip(name))
 end function get_att_nc
 
 !> Return all global attributes for a dataset.
@@ -69,7 +69,7 @@ function get_atts_(ncid, varid, exist) result(atts)
   !> Loop index for attribute enumeration.
   integer(c_int) :: i
   !> Temporary C-style name buffer for attribute names.
-  character(kind=c_char, len=NC_MAX_NAME) :: name
+  character(kind=c_char, len=NC_MAX_NAME + 1) :: name
   !> Status code returned by C inquiries.
   integer(c_int) :: stat
 
@@ -123,11 +123,13 @@ impure elemental function get_att_(ncid, varid, name) result(att)
   att%dtype = dtype
 
   zero_size_attr: if (att%len == 0) then
+    call validate_buffer(att, "[get_att_]")
     if (allocated(att%buffer)) deallocate (att%buffer)
     return
   end if zero_size_attr
 
   call allocate_memory(att)
+  call validate_buffer(att, "[get_att_]")
   call handle_error(nc_get_att(ncid, varid, &
     & f2cstr(att%name), c_loc(att%buffer(1))), &
     & "[get_att_] Invalid attribute.")
@@ -141,11 +143,18 @@ module impure elemental subroutine put_att_var(nc, var)
   type(variable_type), target, intent(in) :: var
   !> Loop index for iterating attributes.
   integer :: i
+  type(c_ptr) :: cptr
 
   do i = 1, size(var%atts)
     associate (att => var%atts(i))
+      call validate_buffer(att, "[put_att_var]")
+      if (att%len == 0) then
+        cptr = c_null_ptr
+      else
+        cptr = c_loc(att%buffer(1))
+      end if
       call handle_error(nc_put_att(nc%id, var%id, f2cstr(att%name), &
-        & att%dtype, att%len, c_loc(att%buffer(1))), &
+        & att%dtype, att%len, cptr), &
         & "[put_att_] Invalid attribute.")
     end associate
   end do
@@ -157,12 +166,19 @@ module impure elemental subroutine put_att_nc(nc)
   type(netcdf_type), target, intent(in) :: nc
   !> Loop index for iterating dataset attributes.
   integer(int64) :: i
+  type(c_ptr) :: cptr
 
   if (.not. allocated(nc%atts)) return
   do i = 1, size(nc%atts, kind=int64)
     associate (att => nc%atts(i))
+      call validate_buffer(att, "[put_att_nc]")
+      if (att%len == 0) then
+        cptr = c_null_ptr
+      else
+        cptr = c_loc(att%buffer(1))
+      end if
       call handle_error(nc_put_att(nc%id, NC_GLOBAL, f2cstr(att%name), &
-        & att%dtype, att%len, c_loc(att%buffer(1))), &
+        & att%dtype, att%len, cptr), &
         & "[put_att_] Invalid attribute.")
     end associate
   end do
