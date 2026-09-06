@@ -5,10 +5,10 @@ TEST_DIR := test
 LIB := $(BUILD_DIR)/ncpack.a
 TEST_TARGET := $(BUILD_DIR)/test
 PROFILE ?= debug
-FC := gfortran
+FC ?= gfortran
 NCFLAGS := $(shell pkg-config --cflags --libs netcdf)
 
-ifeq ($(FC),gfortran)
+ifneq (,$(findstring gfortran,$(notdir $(FC))))
 	ifeq ($(PROFILE),release)
 		FFLAGS ?= -O3 -funroll-loops -Wimplicit-interface -fPIC -fmax-errors=1 \
 			-fcoarray=single -J$(BUILD_DIR) -I$(SRC_DIR) $(NCFLAGS)
@@ -17,7 +17,7 @@ ifeq ($(FC),gfortran)
 			-fcheck=array-temps -fbacktrace -fcoarray=single \
 			-J$(BUILD_DIR) -I$(SRC_DIR) $(NCFLAGS)
 	endif
-else ifeq ($(FC),flang)
+else ifneq (,$(findstring flang,$(notdir $(FC))))
 	ifeq ($(PROFILE),release)
 		FFLAGS ?= -O3 -funroll-loops -fimplicit-none -fPIC \
 			-J$(BUILD_DIR) -I$(SRC_DIR) $(NCFLAGS)

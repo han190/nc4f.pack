@@ -5,6 +5,8 @@ on: [push]
 jobs:
   Test-NetCDF4-PACK:
     runs-on: ubuntu-latest
+    env:
+      FC: gfortran-14
 
     steps:
       - name: Use Checkout
@@ -13,7 +15,10 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install --yes gfortran libnetcdf-dev pkg-config fypp
+          sudo apt-get install --yes gfortran-14 libnetcdf-dev pkg-config fypp
+
+      - name: Report compiler
+        run: $FC --version
 
       - name: Build
         run: PROFILE=release make
