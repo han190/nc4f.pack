@@ -17,6 +17,7 @@ private
 !> Public APIs (IE: Impure Elemental)
 interface get_variable
   module procedure :: get_var !> IE
+  module procedure :: get_vara
 end interface get_variable
 
 interface put_variable
@@ -292,6 +293,22 @@ interface
     !> Variable object that will contain metadata and the data buffer.
     type(variable_type), target :: var
   end function get_var
+
+  !> Read a contiguous Fortran-order hyperslab into a `variable_type`.
+  module function get_vara(nc, name, start, count, exist) result(var)
+    !> High-level `netcdf_type` representing the open file.
+    type(netcdf_type), intent(in) :: nc
+    !> Name of the variable to read.
+    character(len=*), intent(in) :: name
+    !> One-based start indices in the variable's Fortran dimension order.
+    integer, intent(in) :: start(:)
+    !> Number of elements to read along each Fortran-order dimension.
+    integer, intent(in) :: count(:)
+    !> Optional output flag set to true if the variable exists.
+    logical, optional, intent(out) :: exist
+    !> Materialized variable containing the selected data.
+    type(variable_type), target :: var
+  end function get_vara
 
   !> Inquire a variable's metadata without reading its data buffer.
   module impure elemental function inq_var(nc, name, exist) result(var)

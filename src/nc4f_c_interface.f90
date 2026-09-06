@@ -518,6 +518,24 @@ interface
     integer(c_int) :: nc_get_var
   end function nc_get_var
 
+  !> Read a contiguous hyperslab of a variable.
+  function nc_get_vara(ncid, varid, startp, countp, ip) &
+    & bind(c, name="nc_get_vara")
+    import :: c_int, c_ptr
+    !> NetCDF or group ID, from a previous open or create call.
+    integer(c_int), value :: ncid
+    !> Variable ID.
+    integer(c_int), value :: varid
+    !> Pointer to zero-based C-order start indices (`size_t *`).
+    type(c_ptr), value :: startp
+    !> Pointer to C-order edge lengths (`size_t *`).
+    type(c_ptr), value :: countp
+    !> Pointer where the data will be copied. Memory must already exist.
+    type(c_ptr), value :: ip
+    !> NetCDF status code.
+    integer(c_int) :: nc_get_vara
+  end function nc_get_vara
+
   !> Define a new variable.
   function nc_def_var(ncid, name, xtype, ndims, dimidsp, varidp) &
     & bind(c, name="nc_def_var")
@@ -578,6 +596,24 @@ interface
     !> - NC_EBADID Bad ncid.
     integer(c_int) :: nc_put_var
   end function nc_put_var
+
+  !> Write a contiguous hyperslab of a variable.
+  function nc_put_vara(ncid, varid, startp, countp, op) &
+    & bind(c, name="nc_put_vara")
+    import :: c_int, c_ptr
+    !> NetCDF or group ID, from a previous open or create call.
+    integer(c_int), value :: ncid
+    !> Variable ID.
+    integer(c_int), value :: varid
+    !> Pointer to zero-based C-order start indices (`size_t *`).
+    type(c_ptr), value :: startp
+    !> Pointer to C-order edge lengths (`size_t *`).
+    type(c_ptr), value :: countp
+    !> Pointer from where the data will be copied.
+    type(c_ptr), value :: op
+    !> NetCDF status code.
+    integer(c_int) :: nc_put_vara
+  end function nc_put_vara
 end interface
 
 end module nc4f_c_interface

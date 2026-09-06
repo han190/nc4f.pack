@@ -38,6 +38,76 @@ module impure elemental function get_var(nc, name, exist) result(var)
   call handle_error(nc_get_var(nc%id, var%id, cptr), msg)
 end function get_var
 
+!> Read a contiguous Fortran-order hyperslab into a `variable_type`.
+module function get_vara(nc, name, start, count, exist) result(var)
+  !> High-level `netcdf_type` representing the open file.
+  type(netcdf_type), intent(in) :: nc
+  !> Name of the variable to read.
+  character(len=*), intent(in) :: name
+  !> One-based start indices in the variable's Fortran dimension order.
+  integer, intent(in) :: start(:)
+  !> Number of elements to read along each Fortran-order dimension.
+  integer, intent(in) :: count(:)
+  !> Optional output flag set to true if the variable exists.
+  logical, optional, intent(out) :: exist
+  !> Materialized variable containing the selected data.
+  type(variable_type), target :: var
+  !> C-order, zero-based start indices and edge lengths.
+  integer(c_size_t), allocatable, target :: c_start(:), c_count(:)
+  !> C pointers to the selection vectors (NULL for scalar variables).
+  type(c_ptr) :: startp, countp, datap
+  !> Temporary message buffer used for error reporting.
+  character(len=MAX_CHAR_LEN) :: msg
+  integer :: i, j, ndims
+  integer(int64) :: f_start, f_count
+  logical :: var_exist
+
+  var = inq_var(nc, name, var_exist)
+  if (present(exist)) then
+    exist = var_exist
+    if (.not. var_exist) return
+  else if (.not. var_exist) then
+    error stop "[get_vara] Variable "//name//" does not exist."
+  end if
+
+  ndims = size(var%dims)
+  if (size(start) /= ndims .or. size(count) /= ndims) then
+    error stop "[get_vara] start and count must have one entry per dimension."
+  end if
+
+  allocate (c_start(ndims), c_count(ndims))
+  do i = 1, ndims
+    f_start = int(start(i), int64)
+    f_count = int(count(i), int64)
+    if (f_start < 1) error stop "[get_vara] start indices must be positive."
+    if (f_count <= 0) error stop "[get_vara] count entries must be positive."
+    if (f_start > var%dims(i)%len .or. &
+      & f_count > var%dims(i)%len - f_start + 1_int64) then
+      error stop "[get_vara] Requested hyperslab exceeds a dimension bound."
+    end if
+
+    j = ndims - i + 1
+    c_start(j) = int(f_start - 1_int64, c_size_t)
+    c_count(j) = int(f_count, c_size_t)
+    var%dims(i)%len = f_count
+    var%dims(i)%is_unlim = .false.
+  end do
+  var%len = checked_dim_count(var%dims, "[get_vara]")
+  call allocate_memory(var)
+  call validate_buffer(var, "[get_vara]")
+
+  if (ndims > 0) then
+    startp = c_loc(c_start(1))
+    countp = c_loc(c_count(1))
+  else
+    startp = c_null_ptr
+    countp = c_null_ptr
+  end if
+  datap = c_loc(var%buffer(1))
+  write (msg, "('[get_vara] Invalid variable:', 1x, a)") name
+  call handle_error(nc_get_vara(nc%id, var%id, startp, countp, datap), msg)
+end function get_vara
+
 !> Inquire a variable's metadata without reading its data buffer.
 module impure elemental function inq_var(nc, name, exist) result(var)
   !> High-level `netcdf_type` representing the open file.
@@ -107,12 +177,33 @@ module impure elemental subroutine put_var(nc, var)
   type(variable_type), target, intent(in) :: var
   !> Temporary variable object used for definition and writing.
   type(variable_type) :: tmp
+  !> C-order zero-based start indices and edge lengths.
+  integer(c_size_t), allocatable, target :: c_start(:), c_count(:)
+  !> C pointers to the selection vectors (NULL for scalar variables).
+  type(c_ptr) :: startp, countp
+  integer :: i, j, ndims
 
   call validate_buffer(var, "[put_var]")
   tmp = def_var_(nc, var)
   if (allocated(var%atts)) call put_att_var(nc, tmp)
-  if (var%len > 0) &
-    & call handle_error(nc_put_var(nc%id, tmp%id, c_loc(var%buffer(1))))
+  if (var%len <= 0) return
+
+  ndims = size(var%dims)
+  allocate (c_start(ndims), c_count(ndims))
+  do i = 1, ndims
+    j = ndims - i + 1
+    c_start(j) = 0_c_size_t
+    c_count(j) = int(var%dims(i)%len, c_size_t)
+  end do
+  if (ndims > 0) then
+    startp = c_loc(c_start(1))
+    countp = c_loc(c_count(1))
+  else
+    startp = c_null_ptr
+    countp = c_null_ptr
+  end if
+  call handle_error(nc_put_vara(nc%id, tmp%id, startp, countp, &
+    & c_loc(var%buffer(1))))
 end subroutine put_var
 
 !> Define a variable in the netCDF file and return its `variable_type`.

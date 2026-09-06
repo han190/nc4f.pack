@@ -5,11 +5,14 @@ use, non_intrinsic :: nc4f
 implicit none (type, external)
 
 public :: simple_wr, simple_rd
+public :: hyperslab_rd, unlimited_wr
 public :: sfc_pres_temp_wr
 public :: sfc_pres_temp_rd
 public :: buffer_edges
 public :: extensive_wr, extensive_rd
 private
+
+character(*), parameter :: TEST_RESULTS_DIR = "build/test-results/"
 
 contains
 
@@ -26,7 +29,7 @@ subroutine simple_wr(passed)
     values(x, y) = sqrt((x - 0.5*nx)**2 + (y - 0.5*ny)**2)
   end do
   var = data_array("data", values, ["x".dim.nx, "y".dim.ny])
-  call to_netcdf("simple_wr.nc", var)
+  call to_netcdf(TEST_RESULTS_DIR//"simple_wr.nc", var)
   write (stdout, "(dt)") var
   passed = trim(stdout) == "real(real32)::data (x:47, y:83)"
 end subroutine simple_wr
@@ -41,11 +44,11 @@ subroutine simple_rd(passed)
   character(len=1024) :: stdout
 
   !> Check existence of a file.
-  nc = open_dataset("file_that_does_not_exist.nc", exist=exist)
+  nc = open_dataset(TEST_RESULTS_DIR//"file_that_does_not_exist.nc", exist=exist)
   passed = .not. exist
   if (.not. passed) return
 
-  nc = open_dataset("simple_wr.nc", "r")
+  nc = open_dataset(TEST_RESULTS_DIR//"simple_wr.nc", "r")
   var = inquire_variable(nc, "data", exist)
   write (stdout, "(dt)") var
   passed = var%name == "data" .and. &
@@ -53,6 +56,56 @@ subroutine simple_rd(passed)
          & trim(stdout) == "real(real32)::data (x:47, y:83)"
   call close_dataset(nc)
 end subroutine simple_rd
+
+!> Read and persist a selected Fortran-order hyperslab.
+subroutine hyperslab_rd(passed)
+  logical, intent(inout) :: passed
+  integer, parameter :: nx = 47, ny = 83
+  real :: expected(3, 2)
+  real, pointer :: values(:, :)
+  type(netcdf_type) :: nc
+  type(variable_type) :: actual, round_trip
+  integer :: x, y
+
+  nc = open_dataset(TEST_RESULTS_DIR//"simple_wr.nc", "r")
+  actual = get_variable(nc, "data", [4, 6], [3, 2])
+  call close_dataset(nc)
+  call extract(actual, values)
+
+  do concurrent(y=1:2, x=1:3)
+    expected(x, y) = sqrt((x + 3 - 0.5*nx)**2 + (y + 5 - 0.5*ny)**2)
+  end do
+  passed = all(actual%dims == ["x".dim.3, "y".dim.2]) .and. &
+    & all(abs(values - expected) <= epsilon(expected))
+  if (.not. passed) return
+
+  call to_netcdf(TEST_RESULTS_DIR//"hyperslab.nc", actual)
+  nc = open_dataset(TEST_RESULTS_DIR//"hyperslab.nc", "r")
+  round_trip = get_variable(nc, "data")
+  call close_dataset(nc)
+  passed = round_trip == actual
+end subroutine hyperslab_rd
+
+!> Writing with an unlimited dimension must extend it to the buffer extent.
+subroutine unlimited_wr(passed)
+  logical, intent(inout) :: passed
+  integer(int32), parameter :: values(2, 3) = reshape([ &
+    & 1_int32, 2_int32, 3_int32, 4_int32, 5_int32, 6_int32], [2, 3])
+  integer(int32), pointer :: actual_values(:, :)
+  type(netcdf_type) :: nc
+  type(variable_type) :: actual, var
+
+  var = data_array("records", values, ["x".dim.2, "time".dim.3])
+  var%dims(2)%is_unlim = .true.
+  call to_netcdf(TEST_RESULTS_DIR//"unlimited.nc", var)
+
+  nc = open_dataset(TEST_RESULTS_DIR//"unlimited.nc", "r")
+  actual = get_variable(nc, "records")
+  call close_dataset(nc)
+  call extract(actual, actual_values)
+  passed = actual%dims(2)%is_unlim .and. &
+    & all(actual%dims == var%dims) .and. all(actual_values == values)
+end subroutine unlimited_wr
 
 !> Example: sfc_pres_temp_wr
 subroutine sfc_pres_temp_wr(passed)
@@ -86,7 +139,7 @@ subroutine sfc_pres_temp_wr(passed)
            data_array("temperature", temp, [lon_dim, lat_dim], [degC]), &
            data_array("pressure", pres, [lon_dim, lat_dim], [hPa])]
   end associate
-  call to_netcdf("sfc_pres_temp_wr.nc", vars)
+  call to_netcdf(TEST_RESULTS_DIR//"sfc_pres_temp_wr.nc", vars)
   passed = .true.
 end subroutine sfc_pres_temp_wr
 
@@ -100,7 +153,7 @@ subroutine sfc_pres_temp_rd(passed)
   integer, parameter :: nlat = 181, nlon = 361
 
   default_dims = ["longitude".dim.nlon, "latitude".dim.nlat]
-  nc = open_dataset("sfc_pres_temp_wr.nc", "r")
+  nc = open_dataset(TEST_RESULTS_DIR//"sfc_pres_temp_wr.nc", "r")
   var = get_variable(nc, "pressure", exist)
   passed = all(var%dims == default_dims) .and. &
          & var%name == "pressure" .and. &
@@ -139,9 +192,9 @@ subroutine buffer_edges(passed)
   var_name = repeat("v", len(var_name) - 1)
   var = data_array(var_name, values, [dim_name.dim.2], &
     & [att_name.att."maximum-length name"])
-  call to_netcdf("buffer_edges.nc", var)
+  call to_netcdf(TEST_RESULTS_DIR//"buffer_edges.nc", var)
 
-  nc = open_dataset("buffer_edges.nc", "r", inq_dims=.true.)
+  nc = open_dataset(TEST_RESULTS_DIR//"buffer_edges.nc", "r", inq_dims=.true.)
   var = get_variable(nc, var_name)
   call extract(var, read_values)
   passed = var%name == var_name .and. &
@@ -160,8 +213,8 @@ subroutine extensive_wr(passed)
   integer(int64) :: file_size
 
   vars = extensive_variables()
-  call to_netcdf("extensive.nc", vars, extensive_attributes())
-  inquire (file="extensive.nc", exist=file_exists, size=file_size)
+  call to_netcdf(TEST_RESULTS_DIR//"extensive.nc", vars, extensive_attributes())
+  inquire (file=TEST_RESULTS_DIR//"extensive.nc", exist=file_exists, size=file_size)
   passed = file_exists
   if (passed) passed = file_size > 0
 end subroutine extensive_wr
@@ -180,7 +233,7 @@ subroutine extensive_rd(passed)
 
   expected = extensive_variables()
   expected_atts = extensive_attributes()
-  nc = open_dataset("extensive.nc", "r", inq_dims=.true., inq_atts=.true.)
+  nc = open_dataset(TEST_RESULTS_DIR//"extensive.nc", "r", inq_dims=.true., inq_atts=.true.)
   actual = get_variable(nc, names)
 
   passed = size(actual) == size(expected)

@@ -8,7 +8,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        gcc_version: [13]
+        gcc_version: [15]
     env:
       FC: gfortran-${{ matrix.gcc_version }}
 

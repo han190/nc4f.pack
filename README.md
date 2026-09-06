@@ -1,6 +1,17 @@
 # nc4f
 A Fortran NetCDF4 library.
 
+## Build and test
+
+`nc4f` calls the NetCDF C API directly. With `fpm` and `pkg-config`, build
+and run the test suite with:
+
+```sh
+fpm test --profile debug --flag "$(pkg-config --cflags --libs netcdf)"
+```
+
+Generated NetCDF test artifacts are written to `build/test-results/`.
+
 ## Quickstart
 ### Write to NetCDF4
 Write to a NetCDF4 file:
@@ -45,6 +56,16 @@ call extract(var, vals)
 end program main
 ```
 
+Read a contiguous subset by supplying one-based `start` indices and `count`
+edge lengths in Fortran (column-major) dimension order:
+
+```fortran
+var = get_variable(nc, "data", start=[4, 6], count=[3, 2])
+```
+
+The resulting `variable_type` is a materialized array with shape `[3, 2]`;
+its dimensions describe the selected data rather than the source variable.
+
 ### A slightly more advanced example
 Let’s walk through a classic workflow: computing temperature (K) from a [WRF](https://github.com/wrf-model/WRF) output file.
 1. Load data from a WRF output file, which is a netcdf file.
@@ -55,7 +76,12 @@ Let’s walk through a classic workflow: computing temperature (K) from a [WRF](
 
 There are two ways to do it with this library:
 #### The classical approach
-This library provides generic subroutine `extract` which allows you to extract values (as pointers) from a `variable_type` or an `attribute_type`. Also note that `get_variable` is an _impure elemental_ function, meaning you can load multiple variables into an array of `variable_type` in a single call.
+This library provides generic subroutine `extract` which allows you to extract
+values (as pointers) from a `variable_type` or an `attribute_type`. The
+whole-variable `get_variable(nc, name)` overload is _impure elemental_,
+meaning you can load multiple variables into an array of `variable_type` in a
+single call. The hyperslab overload accepts scalar `nc` and `name` arguments
+plus `start` and `count` vectors.
 ```advanced.f90
 program main
 
