@@ -377,6 +377,158 @@ module subroutine extract_var_int8_7d(var, ptr)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int8_7d
 
+!> Extract variable data of kind `int8` and rank 8 into `ptr`.
+module subroutine extract_var_int8_8d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  integer(int8), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, BYTE_TYPE, 8, "[extract_var_int8_8d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_int8_8d
+
+!> Extract variable data of kind `int8` and rank 9 into `ptr`.
+module subroutine extract_var_int8_9d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  integer(int8), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, BYTE_TYPE, 9, "[extract_var_int8_9d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_int8_9d
+
+!> Extract variable data of kind `int8` and rank 10 into `ptr`.
+module subroutine extract_var_int8_10d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  integer(int8), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, BYTE_TYPE, 10, "[extract_var_int8_10d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_int8_10d
+
+!> Extract variable data of kind `int8` and rank 11 into `ptr`.
+module subroutine extract_var_int8_11d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  integer(int8), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, BYTE_TYPE, 11, "[extract_var_int8_11d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_int8_11d
+
+!> Extract variable data of kind `int8` and rank 12 into `ptr`.
+module subroutine extract_var_int8_12d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  integer(int8), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, BYTE_TYPE, 12, "[extract_var_int8_12d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_int8_12d
+
+!> Extract variable data of kind `int8` and rank 13 into `ptr`.
+module subroutine extract_var_int8_13d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  integer(int8), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, BYTE_TYPE, 13, "[extract_var_int8_13d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_int8_13d
+
+!> Extract variable data of kind `int8` and rank 14 into `ptr`.
+module subroutine extract_var_int8_14d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  integer(int8), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, BYTE_TYPE, 14, "[extract_var_int8_14d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_int8_14d
+
+!> Extract variable data of kind `int8` and rank 15 into `ptr`.
+module subroutine extract_var_int8_15d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  integer(int8), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, BYTE_TYPE, 15, "[extract_var_int8_15d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_int8_15d
+
 !> Extract variable data of kind `int16` and rank 1 into `ptr`.
 module subroutine extract_var_int16_1d(var, ptr)
   !> Source variable whose buffer will be mapped.
@@ -509,6 +661,158 @@ module subroutine extract_var_int16_7d(var, ptr)
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int16_7d
+
+!> Extract variable data of kind `int16` and rank 8 into `ptr`.
+module subroutine extract_var_int16_8d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  integer(int16), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, SHORT_TYPE, 8, "[extract_var_int16_8d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_int16_8d
+
+!> Extract variable data of kind `int16` and rank 9 into `ptr`.
+module subroutine extract_var_int16_9d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  integer(int16), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, SHORT_TYPE, 9, "[extract_var_int16_9d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_int16_9d
+
+!> Extract variable data of kind `int16` and rank 10 into `ptr`.
+module subroutine extract_var_int16_10d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  integer(int16), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, SHORT_TYPE, 10, "[extract_var_int16_10d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_int16_10d
+
+!> Extract variable data of kind `int16` and rank 11 into `ptr`.
+module subroutine extract_var_int16_11d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  integer(int16), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, SHORT_TYPE, 11, "[extract_var_int16_11d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_int16_11d
+
+!> Extract variable data of kind `int16` and rank 12 into `ptr`.
+module subroutine extract_var_int16_12d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  integer(int16), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, SHORT_TYPE, 12, "[extract_var_int16_12d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_int16_12d
+
+!> Extract variable data of kind `int16` and rank 13 into `ptr`.
+module subroutine extract_var_int16_13d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  integer(int16), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, SHORT_TYPE, 13, "[extract_var_int16_13d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_int16_13d
+
+!> Extract variable data of kind `int16` and rank 14 into `ptr`.
+module subroutine extract_var_int16_14d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  integer(int16), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, SHORT_TYPE, 14, "[extract_var_int16_14d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_int16_14d
+
+!> Extract variable data of kind `int16` and rank 15 into `ptr`.
+module subroutine extract_var_int16_15d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  integer(int16), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, SHORT_TYPE, 15, "[extract_var_int16_15d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_int16_15d
 
 !> Extract variable data of kind `int32` and rank 1 into `ptr`.
 module subroutine extract_var_int32_1d(var, ptr)
@@ -643,6 +947,158 @@ module subroutine extract_var_int32_7d(var, ptr)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int32_7d
 
+!> Extract variable data of kind `int32` and rank 8 into `ptr`.
+module subroutine extract_var_int32_8d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  integer(int32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, INT_TYPE, 8, "[extract_var_int32_8d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_int32_8d
+
+!> Extract variable data of kind `int32` and rank 9 into `ptr`.
+module subroutine extract_var_int32_9d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  integer(int32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, INT_TYPE, 9, "[extract_var_int32_9d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_int32_9d
+
+!> Extract variable data of kind `int32` and rank 10 into `ptr`.
+module subroutine extract_var_int32_10d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  integer(int32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, INT_TYPE, 10, "[extract_var_int32_10d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_int32_10d
+
+!> Extract variable data of kind `int32` and rank 11 into `ptr`.
+module subroutine extract_var_int32_11d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  integer(int32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, INT_TYPE, 11, "[extract_var_int32_11d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_int32_11d
+
+!> Extract variable data of kind `int32` and rank 12 into `ptr`.
+module subroutine extract_var_int32_12d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  integer(int32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, INT_TYPE, 12, "[extract_var_int32_12d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_int32_12d
+
+!> Extract variable data of kind `int32` and rank 13 into `ptr`.
+module subroutine extract_var_int32_13d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  integer(int32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, INT_TYPE, 13, "[extract_var_int32_13d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_int32_13d
+
+!> Extract variable data of kind `int32` and rank 14 into `ptr`.
+module subroutine extract_var_int32_14d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  integer(int32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, INT_TYPE, 14, "[extract_var_int32_14d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_int32_14d
+
+!> Extract variable data of kind `int32` and rank 15 into `ptr`.
+module subroutine extract_var_int32_15d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  integer(int32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, INT_TYPE, 15, "[extract_var_int32_15d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_int32_15d
+
 !> Extract variable data of kind `int64` and rank 1 into `ptr`.
 module subroutine extract_var_int64_1d(var, ptr)
   !> Source variable whose buffer will be mapped.
@@ -775,6 +1231,158 @@ module subroutine extract_var_int64_7d(var, ptr)
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int64_7d
+
+!> Extract variable data of kind `int64` and rank 8 into `ptr`.
+module subroutine extract_var_int64_8d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  integer(int64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, INT64_TYPE, 8, "[extract_var_int64_8d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_int64_8d
+
+!> Extract variable data of kind `int64` and rank 9 into `ptr`.
+module subroutine extract_var_int64_9d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  integer(int64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, INT64_TYPE, 9, "[extract_var_int64_9d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_int64_9d
+
+!> Extract variable data of kind `int64` and rank 10 into `ptr`.
+module subroutine extract_var_int64_10d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  integer(int64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, INT64_TYPE, 10, "[extract_var_int64_10d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_int64_10d
+
+!> Extract variable data of kind `int64` and rank 11 into `ptr`.
+module subroutine extract_var_int64_11d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  integer(int64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, INT64_TYPE, 11, "[extract_var_int64_11d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_int64_11d
+
+!> Extract variable data of kind `int64` and rank 12 into `ptr`.
+module subroutine extract_var_int64_12d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  integer(int64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, INT64_TYPE, 12, "[extract_var_int64_12d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_int64_12d
+
+!> Extract variable data of kind `int64` and rank 13 into `ptr`.
+module subroutine extract_var_int64_13d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  integer(int64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, INT64_TYPE, 13, "[extract_var_int64_13d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_int64_13d
+
+!> Extract variable data of kind `int64` and rank 14 into `ptr`.
+module subroutine extract_var_int64_14d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  integer(int64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, INT64_TYPE, 14, "[extract_var_int64_14d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_int64_14d
+
+!> Extract variable data of kind `int64` and rank 15 into `ptr`.
+module subroutine extract_var_int64_15d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  integer(int64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, INT64_TYPE, 15, "[extract_var_int64_15d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_int64_15d
 
 !> Extract variable data of kind `real32` and rank 1 into `ptr`.
 module subroutine extract_var_real32_1d(var, ptr)
@@ -909,6 +1517,158 @@ module subroutine extract_var_real32_7d(var, ptr)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_real32_7d
 
+!> Extract variable data of kind `real32` and rank 8 into `ptr`.
+module subroutine extract_var_real32_8d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  real(real32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, FLOAT_TYPE, 8, "[extract_var_real32_8d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_real32_8d
+
+!> Extract variable data of kind `real32` and rank 9 into `ptr`.
+module subroutine extract_var_real32_9d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  real(real32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, FLOAT_TYPE, 9, "[extract_var_real32_9d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_real32_9d
+
+!> Extract variable data of kind `real32` and rank 10 into `ptr`.
+module subroutine extract_var_real32_10d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  real(real32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, FLOAT_TYPE, 10, "[extract_var_real32_10d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_real32_10d
+
+!> Extract variable data of kind `real32` and rank 11 into `ptr`.
+module subroutine extract_var_real32_11d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  real(real32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, FLOAT_TYPE, 11, "[extract_var_real32_11d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_real32_11d
+
+!> Extract variable data of kind `real32` and rank 12 into `ptr`.
+module subroutine extract_var_real32_12d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  real(real32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, FLOAT_TYPE, 12, "[extract_var_real32_12d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_real32_12d
+
+!> Extract variable data of kind `real32` and rank 13 into `ptr`.
+module subroutine extract_var_real32_13d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  real(real32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, FLOAT_TYPE, 13, "[extract_var_real32_13d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_real32_13d
+
+!> Extract variable data of kind `real32` and rank 14 into `ptr`.
+module subroutine extract_var_real32_14d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  real(real32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, FLOAT_TYPE, 14, "[extract_var_real32_14d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_real32_14d
+
+!> Extract variable data of kind `real32` and rank 15 into `ptr`.
+module subroutine extract_var_real32_15d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  real(real32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, FLOAT_TYPE, 15, "[extract_var_real32_15d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_real32_15d
+
 !> Extract variable data of kind `real64` and rank 1 into `ptr`.
 module subroutine extract_var_real64_1d(var, ptr)
   !> Source variable whose buffer will be mapped.
@@ -1041,6 +1801,158 @@ module subroutine extract_var_real64_7d(var, ptr)
   cptr = c_loc(var%buffer(1))
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_real64_7d
+
+!> Extract variable data of kind `real64` and rank 8 into `ptr`.
+module subroutine extract_var_real64_8d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  real(real64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, DOUBLE_TYPE, 8, "[extract_var_real64_8d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_real64_8d
+
+!> Extract variable data of kind `real64` and rank 9 into `ptr`.
+module subroutine extract_var_real64_9d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  real(real64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, DOUBLE_TYPE, 9, "[extract_var_real64_9d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_real64_9d
+
+!> Extract variable data of kind `real64` and rank 10 into `ptr`.
+module subroutine extract_var_real64_10d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  real(real64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, DOUBLE_TYPE, 10, "[extract_var_real64_10d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_real64_10d
+
+!> Extract variable data of kind `real64` and rank 11 into `ptr`.
+module subroutine extract_var_real64_11d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  real(real64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, DOUBLE_TYPE, 11, "[extract_var_real64_11d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_real64_11d
+
+!> Extract variable data of kind `real64` and rank 12 into `ptr`.
+module subroutine extract_var_real64_12d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  real(real64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, DOUBLE_TYPE, 12, "[extract_var_real64_12d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_real64_12d
+
+!> Extract variable data of kind `real64` and rank 13 into `ptr`.
+module subroutine extract_var_real64_13d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  real(real64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, DOUBLE_TYPE, 13, "[extract_var_real64_13d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_real64_13d
+
+!> Extract variable data of kind `real64` and rank 14 into `ptr`.
+module subroutine extract_var_real64_14d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  real(real64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, DOUBLE_TYPE, 14, "[extract_var_real64_14d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_real64_14d
+
+!> Extract variable data of kind `real64` and rank 15 into `ptr`.
+module subroutine extract_var_real64_15d(var, ptr)
+  !> Source variable whose buffer will be mapped.
+  type(variable_type), target, intent(in) :: var
+  !> Output pointer with matching element kind and rank.
+  real(real64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  !> C pointer used to map the variable buffer into the Fortran pointer.
+  type(c_ptr) :: cptr
+
+  call validate_var_data(var, DOUBLE_TYPE, 15, "[extract_var_real64_15d]")
+  if (var%len == 0) then
+    nullify (ptr)
+    return
+  end if
+
+  cptr = c_loc(var%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(var))
+end subroutine extract_var_real64_15d
 
 !> Map a netCDF integer type code to a Fortran `kind` value.
 pure function dtype2kind(dtype) result(kind_val)

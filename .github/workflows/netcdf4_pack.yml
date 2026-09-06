@@ -4,27 +4,19 @@ on: [push]
 
 jobs:
   Test-NetCDF4-PACK:
-    runs-on : ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        gcc_version: [15]
-    env:
-      FC: gfortran-${{ matrix.gcc_version }}
+    runs-on: ubuntu-latest
 
-    
     steps:
       - name: Use Checkout
         uses: actions/checkout@v6
 
       - name: Install dependencies
-        if: contains( matrix.os, 'ubuntu' )
-        run: sudo apt install gfortran-${{ matrix.gcc_version }} libnetcdf-dev pkg-config
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes gfortran libnetcdf-dev pkg-config fypp
 
       - name: Build
-        if: contains( matrix.os, 'ubuntu' )
         run: PROFILE=release make
 
       - name: Test
-        if: contains( matrix.os, 'ubuntu' )
         run: PROFILE=release make test

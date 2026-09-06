@@ -1,6 +1,6 @@
 #: mute
 
-#: set MAX_RANK = 7
+#: set MAX_RANK = 15
 #: set ops = ['+', '-', '*', '/', '**']
 #: set op_names = ['add', 'sub', 'mul', 'div', 'pow']
 #: set kinds = ['int8', 'int16', 'int32', 'int64', 'real32', 'real64']

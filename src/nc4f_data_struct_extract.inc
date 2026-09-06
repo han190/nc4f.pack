@@ -20,6 +20,14 @@ interface extract
   module procedure :: extract_var_int8_5d
   module procedure :: extract_var_int8_6d
   module procedure :: extract_var_int8_7d
+  module procedure :: extract_var_int8_8d
+  module procedure :: extract_var_int8_9d
+  module procedure :: extract_var_int8_10d
+  module procedure :: extract_var_int8_11d
+  module procedure :: extract_var_int8_12d
+  module procedure :: extract_var_int8_13d
+  module procedure :: extract_var_int8_14d
+  module procedure :: extract_var_int8_15d
   module procedure :: extract_var_int16_1d
   module procedure :: extract_var_int16_2d
   module procedure :: extract_var_int16_3d
@@ -27,6 +35,14 @@ interface extract
   module procedure :: extract_var_int16_5d
   module procedure :: extract_var_int16_6d
   module procedure :: extract_var_int16_7d
+  module procedure :: extract_var_int16_8d
+  module procedure :: extract_var_int16_9d
+  module procedure :: extract_var_int16_10d
+  module procedure :: extract_var_int16_11d
+  module procedure :: extract_var_int16_12d
+  module procedure :: extract_var_int16_13d
+  module procedure :: extract_var_int16_14d
+  module procedure :: extract_var_int16_15d
   module procedure :: extract_var_int32_1d
   module procedure :: extract_var_int32_2d
   module procedure :: extract_var_int32_3d
@@ -34,6 +50,14 @@ interface extract
   module procedure :: extract_var_int32_5d
   module procedure :: extract_var_int32_6d
   module procedure :: extract_var_int32_7d
+  module procedure :: extract_var_int32_8d
+  module procedure :: extract_var_int32_9d
+  module procedure :: extract_var_int32_10d
+  module procedure :: extract_var_int32_11d
+  module procedure :: extract_var_int32_12d
+  module procedure :: extract_var_int32_13d
+  module procedure :: extract_var_int32_14d
+  module procedure :: extract_var_int32_15d
   module procedure :: extract_var_int64_1d
   module procedure :: extract_var_int64_2d
   module procedure :: extract_var_int64_3d
@@ -41,6 +65,14 @@ interface extract
   module procedure :: extract_var_int64_5d
   module procedure :: extract_var_int64_6d
   module procedure :: extract_var_int64_7d
+  module procedure :: extract_var_int64_8d
+  module procedure :: extract_var_int64_9d
+  module procedure :: extract_var_int64_10d
+  module procedure :: extract_var_int64_11d
+  module procedure :: extract_var_int64_12d
+  module procedure :: extract_var_int64_13d
+  module procedure :: extract_var_int64_14d
+  module procedure :: extract_var_int64_15d
   module procedure :: extract_var_real32_1d
   module procedure :: extract_var_real32_2d
   module procedure :: extract_var_real32_3d
@@ -48,6 +80,14 @@ interface extract
   module procedure :: extract_var_real32_5d
   module procedure :: extract_var_real32_6d
   module procedure :: extract_var_real32_7d
+  module procedure :: extract_var_real32_8d
+  module procedure :: extract_var_real32_9d
+  module procedure :: extract_var_real32_10d
+  module procedure :: extract_var_real32_11d
+  module procedure :: extract_var_real32_12d
+  module procedure :: extract_var_real32_13d
+  module procedure :: extract_var_real32_14d
+  module procedure :: extract_var_real32_15d
   module procedure :: extract_var_real64_1d
   module procedure :: extract_var_real64_2d
   module procedure :: extract_var_real64_3d
@@ -55,6 +95,14 @@ interface extract
   module procedure :: extract_var_real64_5d
   module procedure :: extract_var_real64_6d
   module procedure :: extract_var_real64_7d
+  module procedure :: extract_var_real64_8d
+  module procedure :: extract_var_real64_9d
+  module procedure :: extract_var_real64_10d
+  module procedure :: extract_var_real64_11d
+  module procedure :: extract_var_real64_12d
+  module procedure :: extract_var_real64_13d
+  module procedure :: extract_var_real64_14d
+  module procedure :: extract_var_real64_15d
 end interface extract
 
 interface
@@ -226,6 +274,70 @@ interface
     integer(int8), pointer, intent(out) :: ptr(:, :, :, :, :, :, :)
   end subroutine extract_var_int8_7d
 
+  !> Extract variable data of kind `int8` and rank 8 into `ptr`.
+  module subroutine extract_var_int8_8d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    integer(int8), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :)
+  end subroutine extract_var_int8_8d
+
+  !> Extract variable data of kind `int8` and rank 9 into `ptr`.
+  module subroutine extract_var_int8_9d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    integer(int8), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_int8_9d
+
+  !> Extract variable data of kind `int8` and rank 10 into `ptr`.
+  module subroutine extract_var_int8_10d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    integer(int8), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_int8_10d
+
+  !> Extract variable data of kind `int8` and rank 11 into `ptr`.
+  module subroutine extract_var_int8_11d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    integer(int8), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_int8_11d
+
+  !> Extract variable data of kind `int8` and rank 12 into `ptr`.
+  module subroutine extract_var_int8_12d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    integer(int8), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_int8_12d
+
+  !> Extract variable data of kind `int8` and rank 13 into `ptr`.
+  module subroutine extract_var_int8_13d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    integer(int8), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_int8_13d
+
+  !> Extract variable data of kind `int8` and rank 14 into `ptr`.
+  module subroutine extract_var_int8_14d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    integer(int8), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_int8_14d
+
+  !> Extract variable data of kind `int8` and rank 15 into `ptr`.
+  module subroutine extract_var_int8_15d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    integer(int8), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_int8_15d
+
   !> Extract variable data of kind `int16` and rank 1 into `ptr`.
   module subroutine extract_var_int16_1d(var, ptr)
     !> Source variable whose buffer will be mapped.
@@ -281,6 +393,70 @@ interface
     !> Output pointer with matching element kind and rank.
     integer(int16), pointer, intent(out) :: ptr(:, :, :, :, :, :, :)
   end subroutine extract_var_int16_7d
+
+  !> Extract variable data of kind `int16` and rank 8 into `ptr`.
+  module subroutine extract_var_int16_8d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    integer(int16), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :)
+  end subroutine extract_var_int16_8d
+
+  !> Extract variable data of kind `int16` and rank 9 into `ptr`.
+  module subroutine extract_var_int16_9d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    integer(int16), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_int16_9d
+
+  !> Extract variable data of kind `int16` and rank 10 into `ptr`.
+  module subroutine extract_var_int16_10d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    integer(int16), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_int16_10d
+
+  !> Extract variable data of kind `int16` and rank 11 into `ptr`.
+  module subroutine extract_var_int16_11d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    integer(int16), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_int16_11d
+
+  !> Extract variable data of kind `int16` and rank 12 into `ptr`.
+  module subroutine extract_var_int16_12d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    integer(int16), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_int16_12d
+
+  !> Extract variable data of kind `int16` and rank 13 into `ptr`.
+  module subroutine extract_var_int16_13d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    integer(int16), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_int16_13d
+
+  !> Extract variable data of kind `int16` and rank 14 into `ptr`.
+  module subroutine extract_var_int16_14d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    integer(int16), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_int16_14d
+
+  !> Extract variable data of kind `int16` and rank 15 into `ptr`.
+  module subroutine extract_var_int16_15d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    integer(int16), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_int16_15d
 
   !> Extract variable data of kind `int32` and rank 1 into `ptr`.
   module subroutine extract_var_int32_1d(var, ptr)
@@ -338,6 +514,70 @@ interface
     integer(int32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :)
   end subroutine extract_var_int32_7d
 
+  !> Extract variable data of kind `int32` and rank 8 into `ptr`.
+  module subroutine extract_var_int32_8d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    integer(int32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :)
+  end subroutine extract_var_int32_8d
+
+  !> Extract variable data of kind `int32` and rank 9 into `ptr`.
+  module subroutine extract_var_int32_9d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    integer(int32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_int32_9d
+
+  !> Extract variable data of kind `int32` and rank 10 into `ptr`.
+  module subroutine extract_var_int32_10d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    integer(int32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_int32_10d
+
+  !> Extract variable data of kind `int32` and rank 11 into `ptr`.
+  module subroutine extract_var_int32_11d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    integer(int32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_int32_11d
+
+  !> Extract variable data of kind `int32` and rank 12 into `ptr`.
+  module subroutine extract_var_int32_12d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    integer(int32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_int32_12d
+
+  !> Extract variable data of kind `int32` and rank 13 into `ptr`.
+  module subroutine extract_var_int32_13d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    integer(int32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_int32_13d
+
+  !> Extract variable data of kind `int32` and rank 14 into `ptr`.
+  module subroutine extract_var_int32_14d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    integer(int32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_int32_14d
+
+  !> Extract variable data of kind `int32` and rank 15 into `ptr`.
+  module subroutine extract_var_int32_15d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    integer(int32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_int32_15d
+
   !> Extract variable data of kind `int64` and rank 1 into `ptr`.
   module subroutine extract_var_int64_1d(var, ptr)
     !> Source variable whose buffer will be mapped.
@@ -393,6 +633,70 @@ interface
     !> Output pointer with matching element kind and rank.
     integer(int64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :)
   end subroutine extract_var_int64_7d
+
+  !> Extract variable data of kind `int64` and rank 8 into `ptr`.
+  module subroutine extract_var_int64_8d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    integer(int64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :)
+  end subroutine extract_var_int64_8d
+
+  !> Extract variable data of kind `int64` and rank 9 into `ptr`.
+  module subroutine extract_var_int64_9d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    integer(int64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_int64_9d
+
+  !> Extract variable data of kind `int64` and rank 10 into `ptr`.
+  module subroutine extract_var_int64_10d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    integer(int64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_int64_10d
+
+  !> Extract variable data of kind `int64` and rank 11 into `ptr`.
+  module subroutine extract_var_int64_11d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    integer(int64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_int64_11d
+
+  !> Extract variable data of kind `int64` and rank 12 into `ptr`.
+  module subroutine extract_var_int64_12d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    integer(int64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_int64_12d
+
+  !> Extract variable data of kind `int64` and rank 13 into `ptr`.
+  module subroutine extract_var_int64_13d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    integer(int64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_int64_13d
+
+  !> Extract variable data of kind `int64` and rank 14 into `ptr`.
+  module subroutine extract_var_int64_14d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    integer(int64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_int64_14d
+
+  !> Extract variable data of kind `int64` and rank 15 into `ptr`.
+  module subroutine extract_var_int64_15d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    integer(int64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_int64_15d
 
   !> Extract variable data of kind `real32` and rank 1 into `ptr`.
   module subroutine extract_var_real32_1d(var, ptr)
@@ -450,6 +754,70 @@ interface
     real(real32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :)
   end subroutine extract_var_real32_7d
 
+  !> Extract variable data of kind `real32` and rank 8 into `ptr`.
+  module subroutine extract_var_real32_8d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    real(real32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :)
+  end subroutine extract_var_real32_8d
+
+  !> Extract variable data of kind `real32` and rank 9 into `ptr`.
+  module subroutine extract_var_real32_9d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    real(real32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_real32_9d
+
+  !> Extract variable data of kind `real32` and rank 10 into `ptr`.
+  module subroutine extract_var_real32_10d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    real(real32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_real32_10d
+
+  !> Extract variable data of kind `real32` and rank 11 into `ptr`.
+  module subroutine extract_var_real32_11d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    real(real32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_real32_11d
+
+  !> Extract variable data of kind `real32` and rank 12 into `ptr`.
+  module subroutine extract_var_real32_12d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    real(real32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_real32_12d
+
+  !> Extract variable data of kind `real32` and rank 13 into `ptr`.
+  module subroutine extract_var_real32_13d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    real(real32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_real32_13d
+
+  !> Extract variable data of kind `real32` and rank 14 into `ptr`.
+  module subroutine extract_var_real32_14d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    real(real32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_real32_14d
+
+  !> Extract variable data of kind `real32` and rank 15 into `ptr`.
+  module subroutine extract_var_real32_15d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    real(real32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_real32_15d
+
   !> Extract variable data of kind `real64` and rank 1 into `ptr`.
   module subroutine extract_var_real64_1d(var, ptr)
     !> Source variable whose buffer will be mapped.
@@ -505,4 +873,68 @@ interface
     !> Output pointer with matching element kind and rank.
     real(real64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :)
   end subroutine extract_var_real64_7d
+
+  !> Extract variable data of kind `real64` and rank 8 into `ptr`.
+  module subroutine extract_var_real64_8d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    real(real64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :)
+  end subroutine extract_var_real64_8d
+
+  !> Extract variable data of kind `real64` and rank 9 into `ptr`.
+  module subroutine extract_var_real64_9d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    real(real64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_real64_9d
+
+  !> Extract variable data of kind `real64` and rank 10 into `ptr`.
+  module subroutine extract_var_real64_10d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    real(real64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_real64_10d
+
+  !> Extract variable data of kind `real64` and rank 11 into `ptr`.
+  module subroutine extract_var_real64_11d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    real(real64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_real64_11d
+
+  !> Extract variable data of kind `real64` and rank 12 into `ptr`.
+  module subroutine extract_var_real64_12d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    real(real64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_real64_12d
+
+  !> Extract variable data of kind `real64` and rank 13 into `ptr`.
+  module subroutine extract_var_real64_13d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    real(real64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_real64_13d
+
+  !> Extract variable data of kind `real64` and rank 14 into `ptr`.
+  module subroutine extract_var_real64_14d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    real(real64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_real64_14d
+
+  !> Extract variable data of kind `real64` and rank 15 into `ptr`.
+  module subroutine extract_var_real64_15d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching element kind and rank.
+    real(real64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_real64_15d
 end interface
