@@ -10,6 +10,7 @@ tests = [&
   & test_type("simple_rd", simple_rd), &
   & test_type("hyperslab_rd", hyperslab_rd), &
   & test_type("unlimited_wr", unlimited_wr), &
+  & test_type("sum_vars", sum_vars_test), &
   & test_type("sfc_pres_temp_wr", sfc_pres_temp_wr), &
   & test_type("sfc_pres_temp_rd", sfc_pres_temp_rd), &
   & test_type("buffer_edges", buffer_edges), &

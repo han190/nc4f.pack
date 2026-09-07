@@ -5,7 +5,9 @@ TEST_DIR := test
 LIB := $(BUILD_DIR)/ncpack.a
 TEST_TARGET := $(BUILD_DIR)/test
 PROFILE ?= debug
-FC ?= gfortran
+ifeq ($(origin FC), default)
+  FC := gfortran
+endif
 NCFLAGS := $(shell pkg-config --cflags --libs netcdf)
 
 ifneq (,$(findstring gfortran,$(notdir $(FC))))
@@ -28,25 +30,21 @@ else ifneq (,$(findstring flang,$(notdir $(FC))))
 endif
 
 FYPP_INC = \
-	$(FYPP_DIR)/nc4f_data_struct_arith_inc.fypp \
 	$(FYPP_DIR)/nc4f_data_struct_att_ctor_inc.fypp \
 	$(FYPP_DIR)/nc4f_data_struct_extract_inc.fypp \
 	$(FYPP_DIR)/nc4f_data_struct_var_ctor_inc.fypp
 
 SRC_INC = \
-	$(SRC_DIR)/nc4f_data_struct_arith.inc \
 	$(SRC_DIR)/nc4f_data_struct_att_ctor.inc \
 	$(SRC_DIR)/nc4f_data_struct_extract.inc \
 	$(SRC_DIR)/nc4f_data_struct_var_ctor.inc
 
 FYPP_F90 = \
-	$(FYPP_DIR)/nc4f_data_struct_arith.fypp \
 	$(FYPP_DIR)/nc4f_data_struct_att_ctor.fypp \
 	$(FYPP_DIR)/nc4f_data_struct_extract.fypp \
 	$(FYPP_DIR)/nc4f_data_struct_var_ctor.fypp
 
 SRC_F90 = \
-	$(SRC_DIR)/nc4f_data_struct_arith.f90 \
 	$(SRC_DIR)/nc4f_data_struct_att_ctor.f90 \
 	$(SRC_DIR)/nc4f_data_struct_extract.f90 \
 	$(SRC_DIR)/nc4f_data_struct_var_ctor.f90

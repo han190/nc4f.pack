@@ -9,7 +9,6 @@ public :: &
   netcdf_type, variable_type, attribute_type, dimension_type, &
   allocate_memory, extract, data_array, MAX_CHAR_LEN
 public :: &
-  operator(+), operator(-), operator(*), operator(/), operator(**), &
   operator(.att.), operator(.dim.), operator(.and.), &
   operator(==), operator(/=), write(formatted), size, shape, sum
 private
@@ -397,7 +396,18 @@ interface
   end subroutine write_frmt_dim
 end interface
 
-include "nc4f_data_struct_arith.inc"
+interface sum
+  module procedure :: sum_vars
+end interface sum
+
+interface
+  !> Return the element-wise sum of variables with matching dimensions and type.
+  module function sum_vars(vars) result(s)
+    type(variable_type), intent(in) :: vars(:)
+    type(variable_type) :: s
+  end function sum_vars
+end interface
+
 include "nc4f_data_struct_att_ctor.inc"
 include "nc4f_data_struct_extract.inc"
 include "nc4f_data_struct_var_ctor.inc"

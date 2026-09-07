@@ -6,6 +6,7 @@ implicit none (type, external)
 
 public :: simple_wr, simple_rd
 public :: hyperslab_rd, unlimited_wr
+public :: sum_vars_test
 public :: sfc_pres_temp_wr
 public :: sfc_pres_temp_rd
 public :: buffer_edges
@@ -15,6 +16,27 @@ private
 character(*), parameter :: TEST_RESULTS_DIR = "build/test-results/"
 
 contains
+
+!> Element-wise summation materializes one output buffer.
+subroutine sum_vars_test(passed)
+  logical, intent(inout) :: passed
+  real(real64), parameter :: a(2, 3) = reshape([ &
+    & 1.0_real64, 2.0_real64, 3.0_real64, 4.0_real64, 5.0_real64, 6.0_real64], [2, 3])
+  real(real64), parameter :: b(2, 3) = reshape([ &
+    & 10.0_real64, 20.0_real64, 30.0_real64, 40.0_real64, 50.0_real64, 60.0_real64], [2, 3])
+  real(real64), parameter :: c(2, 3) = -a
+  real(real64), pointer :: actual(:, :)
+  type(variable_type) :: result, vars(3)
+
+  vars(1) = data_array("a", a, ["x".dim.2, "y".dim.3])
+  vars(2) = data_array("b", b, ["x".dim.2, "y".dim.3])
+  vars(3) = data_array("c", c, ["x".dim.2, "y".dim.3])
+  result = sum(vars)
+  call extract(result, actual)
+
+  passed = all(abs(actual - b) <= epsilon(b)) .and. &
+    & all(result%dims == vars(1)%dims)
+end subroutine sum_vars_test
 
 !> Example: simple_wr
 subroutine simple_wr(passed)
@@ -149,6 +171,7 @@ subroutine sfc_pres_temp_rd(passed)
   type(netcdf_type) :: nc
   type(variable_type) :: var
   logical :: exist
+  character(len=:), pointer :: units
   type(dimension_type) :: default_dims(2)
   integer, parameter :: nlat = 181, nlon = 361
 
@@ -160,10 +183,11 @@ subroutine sfc_pres_temp_rd(passed)
          & all(var%atts == ["units".att."hPa"])
   if (.not. passed) return
 
-  var = get_variable(nc, "temperature", exist) - 273.15
+  var = get_variable(nc, "temperature", exist)
+  call extract(var%atts(1), units)
   passed = all(var%dims == default_dims) .and. &
          & var%name == "temperature" .and. &
-         & all(var%atts == ["units".att."celsius"])
+         & var%atts(1)%name == "units" .and. units == "celsius"
   if (.not. passed) return
 
   var = inquire_variable(nc, "relative_humidity", exist)
