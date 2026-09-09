@@ -30,4 +30,27 @@ module function new_var_${K}$_${R}$d(name, values, dims, atts) result(var)
 end function new_var_${K}$_${R}$d${NEWLINE()}$
 #: endfor
 #: endfor
+#: for R in range(1, MAX_RANK+1)
+!> Construct a `variable_type` of rank ${R}$ from a character array.
+module function new_var_char_${R}$d(name, values, dims, atts) result(var)
+  !> Name of the variable to create (will be trimmed).
+  character(len=*), intent(in) :: name
+  !> Single-character values to populate the variable's data buffer.
+  character, intent(in) :: values(${COLONS(R)}$)
+  !> Dimensions describing the variable's shape, ordered in Fortran order.
+  type(dimension_type), intent(in) :: dims(:)
+  !> Optional list of attributes to attach to the variable.
+  type(attribute_type), intent(in), optional :: atts(:)
+  !> Resulting `variable_type` initialized with metadata and buffer.
+  type(variable_type) :: var
+  !> Pointer view into the variable's internal buffer used to copy values.
+  character, pointer :: var_ptr(${COLONS(R)}$)
+
+  call allocate_memory(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts)
+  if (size(values) > 0) then
+    call extract(var, var_ptr)
+    var_ptr = values
+  end if
+end function new_var_char_${R}$d${NEWLINE(not (R == MAX_RANK))}$
+#: endfor
 end submodule nc4f_data_struct_var_ctor

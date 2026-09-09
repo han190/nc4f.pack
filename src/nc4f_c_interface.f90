@@ -417,6 +417,21 @@ interface
     integer(c_int) :: nc_inq_unlimdim
   end function nc_inq_unlimdim
 
+  !> Return the identifiers of all unlimited dimensions in a dataset or group.
+  function nc_inq_unlimdims(ncid, nunlimdimsp, unlimdimidsp) &
+    & bind(c, name="nc_inq_unlimdims")
+    import :: c_int, c_ptr
+    !> NetCDF or group ID.
+    integer(c_int), value :: ncid
+    !> Number of unlimited dimensions.
+    integer(c_int), intent(out) :: nunlimdimsp
+    !> Pointer to an array of unlimited dimension IDs, or NULL when querying
+    !> only the count.
+    type(c_ptr), value :: unlimdimidsp
+    !> NetCDF status code.
+    integer(c_int) :: nc_inq_unlimdims
+  end function nc_inq_unlimdims
+
   !> Define a new dimension.
   function nc_def_dim(ncid, name, len, idp) bind(c, name="nc_def_dim")
     import :: c_int, c_char, c_size_t

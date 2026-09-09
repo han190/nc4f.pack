@@ -155,7 +155,7 @@ end program main
 ## Currently supported types
 | Data type       | Attribute | Variable  |
 |:----------------|:---------:|:---------:|
-| CHAR            | &#x2611;  |           |
+| CHAR            | &#x2611;  | &#x2611;  |
 | BYTE            | &#x2611;  | &#x2611;  |
 | SHORT           | &#x2611;  | &#x2611;  |
 | INT             | &#x2611;  | &#x2611;  |
@@ -163,12 +163,11 @@ end program main
 | FLOAT           | &#x2611;  | &#x2611;  |
 | DOUBLE          | &#x2611;  | &#x2611;  |
 | UNSIGNED BYTE   |           |           |
-| UNSINGED SHORT  |           |           |
+| UNSIGNED SHORT  |           |           |
 | UNSIGNED INT    |           |           |
 | UNSIGNED INT64  |           |           |
 | STRING          |           |           |
 
 ## TODOs
 - [ ] `group_type` and `data_set`.
-- [ ] Support `CHAR` type variable.
 - [ ] Support trig functions.

@@ -5,6 +5,7 @@ implicit none (type, external)
 contains
 
 module function sum_vars(vars) result(s)
+  !> Input argument(s): `vars(:)`.
   type(variable_type), intent(in) :: vars(:)
   type(variable_type) :: s
   integer :: i

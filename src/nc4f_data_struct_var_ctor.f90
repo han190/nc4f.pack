@@ -2162,4 +2162,333 @@ module function new_var_real64_15d(name, values, dims, atts) result(var)
   end if
 end function new_var_real64_15d
 
+!> Construct a `variable_type` of rank 1 from a character array.
+module function new_var_char_1d(name, values, dims, atts) result(var)
+  !> Name of the variable to create (will be trimmed).
+  character(len=*), intent(in) :: name
+  !> Single-character values to populate the variable's data buffer.
+  character, intent(in) :: values(:)
+  !> Dimensions describing the variable's shape, ordered in Fortran order.
+  type(dimension_type), intent(in) :: dims(:)
+  !> Optional list of attributes to attach to the variable.
+  type(attribute_type), intent(in), optional :: atts(:)
+  !> Resulting `variable_type` initialized with metadata and buffer.
+  type(variable_type) :: var
+  !> Pointer view into the variable's internal buffer used to copy values.
+  character, pointer :: var_ptr(:)
+
+  call allocate_memory(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts)
+  if (size(values) > 0) then
+    call extract(var, var_ptr)
+    var_ptr = values
+  end if
+end function new_var_char_1d
+
+!> Construct a `variable_type` of rank 2 from a character array.
+module function new_var_char_2d(name, values, dims, atts) result(var)
+  !> Name of the variable to create (will be trimmed).
+  character(len=*), intent(in) :: name
+  !> Single-character values to populate the variable's data buffer.
+  character, intent(in) :: values(:, :)
+  !> Dimensions describing the variable's shape, ordered in Fortran order.
+  type(dimension_type), intent(in) :: dims(:)
+  !> Optional list of attributes to attach to the variable.
+  type(attribute_type), intent(in), optional :: atts(:)
+  !> Resulting `variable_type` initialized with metadata and buffer.
+  type(variable_type) :: var
+  !> Pointer view into the variable's internal buffer used to copy values.
+  character, pointer :: var_ptr(:, :)
+
+  call allocate_memory(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts)
+  if (size(values) > 0) then
+    call extract(var, var_ptr)
+    var_ptr = values
+  end if
+end function new_var_char_2d
+
+!> Construct a `variable_type` of rank 3 from a character array.
+module function new_var_char_3d(name, values, dims, atts) result(var)
+  !> Name of the variable to create (will be trimmed).
+  character(len=*), intent(in) :: name
+  !> Single-character values to populate the variable's data buffer.
+  character, intent(in) :: values(:, :, :)
+  !> Dimensions describing the variable's shape, ordered in Fortran order.
+  type(dimension_type), intent(in) :: dims(:)
+  !> Optional list of attributes to attach to the variable.
+  type(attribute_type), intent(in), optional :: atts(:)
+  !> Resulting `variable_type` initialized with metadata and buffer.
+  type(variable_type) :: var
+  !> Pointer view into the variable's internal buffer used to copy values.
+  character, pointer :: var_ptr(:, :, :)
+
+  call allocate_memory(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts)
+  if (size(values) > 0) then
+    call extract(var, var_ptr)
+    var_ptr = values
+  end if
+end function new_var_char_3d
+
+!> Construct a `variable_type` of rank 4 from a character array.
+module function new_var_char_4d(name, values, dims, atts) result(var)
+  !> Name of the variable to create (will be trimmed).
+  character(len=*), intent(in) :: name
+  !> Single-character values to populate the variable's data buffer.
+  character, intent(in) :: values(:, :, :, :)
+  !> Dimensions describing the variable's shape, ordered in Fortran order.
+  type(dimension_type), intent(in) :: dims(:)
+  !> Optional list of attributes to attach to the variable.
+  type(attribute_type), intent(in), optional :: atts(:)
+  !> Resulting `variable_type` initialized with metadata and buffer.
+  type(variable_type) :: var
+  !> Pointer view into the variable's internal buffer used to copy values.
+  character, pointer :: var_ptr(:, :, :, :)
+
+  call allocate_memory(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts)
+  if (size(values) > 0) then
+    call extract(var, var_ptr)
+    var_ptr = values
+  end if
+end function new_var_char_4d
+
+!> Construct a `variable_type` of rank 5 from a character array.
+module function new_var_char_5d(name, values, dims, atts) result(var)
+  !> Name of the variable to create (will be trimmed).
+  character(len=*), intent(in) :: name
+  !> Single-character values to populate the variable's data buffer.
+  character, intent(in) :: values(:, :, :, :, :)
+  !> Dimensions describing the variable's shape, ordered in Fortran order.
+  type(dimension_type), intent(in) :: dims(:)
+  !> Optional list of attributes to attach to the variable.
+  type(attribute_type), intent(in), optional :: atts(:)
+  !> Resulting `variable_type` initialized with metadata and buffer.
+  type(variable_type) :: var
+  !> Pointer view into the variable's internal buffer used to copy values.
+  character, pointer :: var_ptr(:, :, :, :, :)
+
+  call allocate_memory(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts)
+  if (size(values) > 0) then
+    call extract(var, var_ptr)
+    var_ptr = values
+  end if
+end function new_var_char_5d
+
+!> Construct a `variable_type` of rank 6 from a character array.
+module function new_var_char_6d(name, values, dims, atts) result(var)
+  !> Name of the variable to create (will be trimmed).
+  character(len=*), intent(in) :: name
+  !> Single-character values to populate the variable's data buffer.
+  character, intent(in) :: values(:, :, :, :, :, :)
+  !> Dimensions describing the variable's shape, ordered in Fortran order.
+  type(dimension_type), intent(in) :: dims(:)
+  !> Optional list of attributes to attach to the variable.
+  type(attribute_type), intent(in), optional :: atts(:)
+  !> Resulting `variable_type` initialized with metadata and buffer.
+  type(variable_type) :: var
+  !> Pointer view into the variable's internal buffer used to copy values.
+  character, pointer :: var_ptr(:, :, :, :, :, :)
+
+  call allocate_memory(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts)
+  if (size(values) > 0) then
+    call extract(var, var_ptr)
+    var_ptr = values
+  end if
+end function new_var_char_6d
+
+!> Construct a `variable_type` of rank 7 from a character array.
+module function new_var_char_7d(name, values, dims, atts) result(var)
+  !> Name of the variable to create (will be trimmed).
+  character(len=*), intent(in) :: name
+  !> Single-character values to populate the variable's data buffer.
+  character, intent(in) :: values(:, :, :, :, :, :, :)
+  !> Dimensions describing the variable's shape, ordered in Fortran order.
+  type(dimension_type), intent(in) :: dims(:)
+  !> Optional list of attributes to attach to the variable.
+  type(attribute_type), intent(in), optional :: atts(:)
+  !> Resulting `variable_type` initialized with metadata and buffer.
+  type(variable_type) :: var
+  !> Pointer view into the variable's internal buffer used to copy values.
+  character, pointer :: var_ptr(:, :, :, :, :, :, :)
+
+  call allocate_memory(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts)
+  if (size(values) > 0) then
+    call extract(var, var_ptr)
+    var_ptr = values
+  end if
+end function new_var_char_7d
+
+!> Construct a `variable_type` of rank 8 from a character array.
+module function new_var_char_8d(name, values, dims, atts) result(var)
+  !> Name of the variable to create (will be trimmed).
+  character(len=*), intent(in) :: name
+  !> Single-character values to populate the variable's data buffer.
+  character, intent(in) :: values(:, :, :, :, :, :, :, :)
+  !> Dimensions describing the variable's shape, ordered in Fortran order.
+  type(dimension_type), intent(in) :: dims(:)
+  !> Optional list of attributes to attach to the variable.
+  type(attribute_type), intent(in), optional :: atts(:)
+  !> Resulting `variable_type` initialized with metadata and buffer.
+  type(variable_type) :: var
+  !> Pointer view into the variable's internal buffer used to copy values.
+  character, pointer :: var_ptr(:, :, :, :, :, :, :, :)
+
+  call allocate_memory(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts)
+  if (size(values) > 0) then
+    call extract(var, var_ptr)
+    var_ptr = values
+  end if
+end function new_var_char_8d
+
+!> Construct a `variable_type` of rank 9 from a character array.
+module function new_var_char_9d(name, values, dims, atts) result(var)
+  !> Name of the variable to create (will be trimmed).
+  character(len=*), intent(in) :: name
+  !> Single-character values to populate the variable's data buffer.
+  character, intent(in) :: values(:, :, :, :, :, :, :, :, :)
+  !> Dimensions describing the variable's shape, ordered in Fortran order.
+  type(dimension_type), intent(in) :: dims(:)
+  !> Optional list of attributes to attach to the variable.
+  type(attribute_type), intent(in), optional :: atts(:)
+  !> Resulting `variable_type` initialized with metadata and buffer.
+  type(variable_type) :: var
+  !> Pointer view into the variable's internal buffer used to copy values.
+  character, pointer :: var_ptr(:, :, :, :, :, :, :, :, :)
+
+  call allocate_memory(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts)
+  if (size(values) > 0) then
+    call extract(var, var_ptr)
+    var_ptr = values
+  end if
+end function new_var_char_9d
+
+!> Construct a `variable_type` of rank 10 from a character array.
+module function new_var_char_10d(name, values, dims, atts) result(var)
+  !> Name of the variable to create (will be trimmed).
+  character(len=*), intent(in) :: name
+  !> Single-character values to populate the variable's data buffer.
+  character, intent(in) :: values(:, :, :, :, :, :, :, :, :, :)
+  !> Dimensions describing the variable's shape, ordered in Fortran order.
+  type(dimension_type), intent(in) :: dims(:)
+  !> Optional list of attributes to attach to the variable.
+  type(attribute_type), intent(in), optional :: atts(:)
+  !> Resulting `variable_type` initialized with metadata and buffer.
+  type(variable_type) :: var
+  !> Pointer view into the variable's internal buffer used to copy values.
+  character, pointer :: var_ptr(:, :, :, :, :, :, :, :, :, :)
+
+  call allocate_memory(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts)
+  if (size(values) > 0) then
+    call extract(var, var_ptr)
+    var_ptr = values
+  end if
+end function new_var_char_10d
+
+!> Construct a `variable_type` of rank 11 from a character array.
+module function new_var_char_11d(name, values, dims, atts) result(var)
+  !> Name of the variable to create (will be trimmed).
+  character(len=*), intent(in) :: name
+  !> Single-character values to populate the variable's data buffer.
+  character, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :)
+  !> Dimensions describing the variable's shape, ordered in Fortran order.
+  type(dimension_type), intent(in) :: dims(:)
+  !> Optional list of attributes to attach to the variable.
+  type(attribute_type), intent(in), optional :: atts(:)
+  !> Resulting `variable_type` initialized with metadata and buffer.
+  type(variable_type) :: var
+  !> Pointer view into the variable's internal buffer used to copy values.
+  character, pointer :: var_ptr(:, :, :, :, :, :, :, :, :, :, :)
+
+  call allocate_memory(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts)
+  if (size(values) > 0) then
+    call extract(var, var_ptr)
+    var_ptr = values
+  end if
+end function new_var_char_11d
+
+!> Construct a `variable_type` of rank 12 from a character array.
+module function new_var_char_12d(name, values, dims, atts) result(var)
+  !> Name of the variable to create (will be trimmed).
+  character(len=*), intent(in) :: name
+  !> Single-character values to populate the variable's data buffer.
+  character, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :)
+  !> Dimensions describing the variable's shape, ordered in Fortran order.
+  type(dimension_type), intent(in) :: dims(:)
+  !> Optional list of attributes to attach to the variable.
+  type(attribute_type), intent(in), optional :: atts(:)
+  !> Resulting `variable_type` initialized with metadata and buffer.
+  type(variable_type) :: var
+  !> Pointer view into the variable's internal buffer used to copy values.
+  character, pointer :: var_ptr(:, :, :, :, :, :, :, :, :, :, :, :)
+
+  call allocate_memory(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts)
+  if (size(values) > 0) then
+    call extract(var, var_ptr)
+    var_ptr = values
+  end if
+end function new_var_char_12d
+
+!> Construct a `variable_type` of rank 13 from a character array.
+module function new_var_char_13d(name, values, dims, atts) result(var)
+  !> Name of the variable to create (will be trimmed).
+  character(len=*), intent(in) :: name
+  !> Single-character values to populate the variable's data buffer.
+  character, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :)
+  !> Dimensions describing the variable's shape, ordered in Fortran order.
+  type(dimension_type), intent(in) :: dims(:)
+  !> Optional list of attributes to attach to the variable.
+  type(attribute_type), intent(in), optional :: atts(:)
+  !> Resulting `variable_type` initialized with metadata and buffer.
+  type(variable_type) :: var
+  !> Pointer view into the variable's internal buffer used to copy values.
+  character, pointer :: var_ptr(:, :, :, :, :, :, :, :, :, :, :, :, :)
+
+  call allocate_memory(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts)
+  if (size(values) > 0) then
+    call extract(var, var_ptr)
+    var_ptr = values
+  end if
+end function new_var_char_13d
+
+!> Construct a `variable_type` of rank 14 from a character array.
+module function new_var_char_14d(name, values, dims, atts) result(var)
+  !> Name of the variable to create (will be trimmed).
+  character(len=*), intent(in) :: name
+  !> Single-character values to populate the variable's data buffer.
+  character, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  !> Dimensions describing the variable's shape, ordered in Fortran order.
+  type(dimension_type), intent(in) :: dims(:)
+  !> Optional list of attributes to attach to the variable.
+  type(attribute_type), intent(in), optional :: atts(:)
+  !> Resulting `variable_type` initialized with metadata and buffer.
+  type(variable_type) :: var
+  !> Pointer view into the variable's internal buffer used to copy values.
+  character, pointer :: var_ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
+
+  call allocate_memory(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts)
+  if (size(values) > 0) then
+    call extract(var, var_ptr)
+    var_ptr = values
+  end if
+end function new_var_char_14d
+
+!> Construct a `variable_type` of rank 15 from a character array.
+module function new_var_char_15d(name, values, dims, atts) result(var)
+  !> Name of the variable to create (will be trimmed).
+  character(len=*), intent(in) :: name
+  !> Single-character values to populate the variable's data buffer.
+  character, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  !> Dimensions describing the variable's shape, ordered in Fortran order.
+  type(dimension_type), intent(in) :: dims(:)
+  !> Optional list of attributes to attach to the variable.
+  type(attribute_type), intent(in), optional :: atts(:)
+  !> Resulting `variable_type` initialized with metadata and buffer.
+  type(variable_type) :: var
+  !> Pointer view into the variable's internal buffer used to copy values.
+  character, pointer :: var_ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
+
+  call allocate_memory(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts)
+  if (size(values) > 0) then
+    call extract(var, var_ptr)
+    var_ptr = values
+  end if
+end function new_var_char_15d
 end submodule nc4f_data_struct_var_ctor

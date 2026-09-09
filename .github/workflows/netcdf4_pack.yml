@@ -1,12 +1,26 @@
-name: netcdf4pack
-run-name: Building netcdf4.pack by ${{ github.actor }}
-on: [push]
+name: nc4f
+run-name: Testing nc4f by ${{ github.actor }}
+
+on:
+  push:
+  pull_request:
 
 jobs:
-  Test-NetCDF4-PACK:
+  test:
     runs-on: ubuntu-latest
-    env:
-      FC: gfortran-14
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - compiler: gfortran-14
+            packages: gfortran-14
+            profile: debug
+          - compiler: gfortran-14
+            packages: gfortran-14
+            profile: release
+          - compiler: flang-new-18
+            packages: flang-18
+            profile: release
 
     steps:
       - name: Use Checkout
@@ -15,13 +29,29 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install --yes gfortran-14 libnetcdf-dev pkg-config fypp
+          sudo apt-get install --yes ${{ matrix.packages }} libnetcdf-bin libnetcdf-dev pkg-config fypp
 
       - name: Report compiler
-        run: $FC --version
+        run: ${{ matrix.compiler }} --version
 
       - name: Build
-        run: PROFILE=release make
+        run: FC=${{ matrix.compiler }} PROFILE=${{ matrix.profile }} make
 
       - name: Test
-        run: PROFILE=release make test
+        run: FC=${{ matrix.compiler }} PROFILE=${{ matrix.profile }} make test
+
+      - name: Inspect generated NetCDF file
+        run: ncdump -h build/test-results/characters.nc
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Use Checkout
+        uses: actions/checkout@v6
+
+      - name: Install Fortitude
+        run: python3 -m pip install fortitude-lint
+
+      - name: Report lint findings
+        run: fortitude check --output-format github --exit-zero

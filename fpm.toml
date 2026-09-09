@@ -1,5 +1,5 @@
 name = "nc4f"
-version = "0.0.1"
+version = "0.1.0"
 license = "MIT"
 maintainer = "limpid.mazarine@gmail.com"
 author = "Han Tang"
@@ -25,3 +25,7 @@ main = "nc4f_test.f90"
 [extra.fortitude.check]
 ignore = ['C002', 'C071', 'C072', 'C121']
 line-length = 120
+
+[extra.release]
+channel = "beta"
+tag = "0.1.0-beta.1"

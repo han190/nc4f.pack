@@ -67,7 +67,7 @@ SRC = \
 	$(SRC_DIR)/nc4f_nc_dim.f90 \
 	$(SRC_DIR)/nc4f_nc_util.f90 \
 	$(SRC_DIR)/nc4f_nc_var.f90 \
-	$(SRC_DIR)/nc4f.90
+	$(SRC_DIR)/nc4f.f90
 
 OBJ = \
 	$(BUILD_DIR)/nc4f_c_interface.o \
@@ -90,7 +90,11 @@ OBJ = \
 	$(BUILD_DIR)/nc4f.o
 
 TEST_FILES = \
-	nc4f_examples.f90 \
+	nc4f_test_cases.f90 \
+	nc4f_test_cases_basic.f90 \
+	nc4f_test_cases_errors.f90 \
+	nc4f_test_cases_io.f90 \
+	nc4f_test_cases_data.f90 \
 	nc4f_test_module.f90 \
 	nc4f_test.f90
 TEST := $(addprefix $(TEST_DIR)/, $(TEST_FILES))

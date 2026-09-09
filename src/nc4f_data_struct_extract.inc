@@ -103,6 +103,21 @@ interface extract
   module procedure :: extract_var_real64_13d
   module procedure :: extract_var_real64_14d
   module procedure :: extract_var_real64_15d
+  module procedure :: extract_var_char_1d
+  module procedure :: extract_var_char_2d
+  module procedure :: extract_var_char_3d
+  module procedure :: extract_var_char_4d
+  module procedure :: extract_var_char_5d
+  module procedure :: extract_var_char_6d
+  module procedure :: extract_var_char_7d
+  module procedure :: extract_var_char_8d
+  module procedure :: extract_var_char_9d
+  module procedure :: extract_var_char_10d
+  module procedure :: extract_var_char_11d
+  module procedure :: extract_var_char_12d
+  module procedure :: extract_var_char_13d
+  module procedure :: extract_var_char_14d
+  module procedure :: extract_var_char_15d
 end interface extract
 
 interface
@@ -937,4 +952,123 @@ interface
     !> Output pointer with matching element kind and rank.
     real(real64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
   end subroutine extract_var_real64_15d
+  !> Extract character variable data of rank 1 into `ptr`.
+  module subroutine extract_var_char_1d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching rank.
+    character, pointer, intent(out) :: ptr(:)
+  end subroutine extract_var_char_1d
+
+  !> Extract character variable data of rank 2 into `ptr`.
+  module subroutine extract_var_char_2d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching rank.
+    character, pointer, intent(out) :: ptr(:, :)
+  end subroutine extract_var_char_2d
+
+  !> Extract character variable data of rank 3 into `ptr`.
+  module subroutine extract_var_char_3d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching rank.
+    character, pointer, intent(out) :: ptr(:, :, :)
+  end subroutine extract_var_char_3d
+
+  !> Extract character variable data of rank 4 into `ptr`.
+  module subroutine extract_var_char_4d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching rank.
+    character, pointer, intent(out) :: ptr(:, :, :, :)
+  end subroutine extract_var_char_4d
+
+  !> Extract character variable data of rank 5 into `ptr`.
+  module subroutine extract_var_char_5d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching rank.
+    character, pointer, intent(out) :: ptr(:, :, :, :, :)
+  end subroutine extract_var_char_5d
+
+  !> Extract character variable data of rank 6 into `ptr`.
+  module subroutine extract_var_char_6d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching rank.
+    character, pointer, intent(out) :: ptr(:, :, :, :, :, :)
+  end subroutine extract_var_char_6d
+
+  !> Extract character variable data of rank 7 into `ptr`.
+  module subroutine extract_var_char_7d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching rank.
+    character, pointer, intent(out) :: ptr(:, :, :, :, :, :, :)
+  end subroutine extract_var_char_7d
+
+  !> Extract character variable data of rank 8 into `ptr`.
+  module subroutine extract_var_char_8d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching rank.
+    character, pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :)
+  end subroutine extract_var_char_8d
+
+  !> Extract character variable data of rank 9 into `ptr`.
+  module subroutine extract_var_char_9d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching rank.
+    character, pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_char_9d
+
+  !> Extract character variable data of rank 10 into `ptr`.
+  module subroutine extract_var_char_10d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching rank.
+    character, pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_char_10d
+
+  !> Extract character variable data of rank 11 into `ptr`.
+  module subroutine extract_var_char_11d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching rank.
+    character, pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_char_11d
+
+  !> Extract character variable data of rank 12 into `ptr`.
+  module subroutine extract_var_char_12d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching rank.
+    character, pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_char_12d
+
+  !> Extract character variable data of rank 13 into `ptr`.
+  module subroutine extract_var_char_13d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching rank.
+    character, pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_char_13d
+
+  !> Extract character variable data of rank 14 into `ptr`.
+  module subroutine extract_var_char_14d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching rank.
+    character, pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_char_14d
+
+  !> Extract character variable data of rank 15 into `ptr`.
+  module subroutine extract_var_char_15d(var, ptr)
+    !> Source variable whose buffer will be mapped.
+    type(variable_type), target, intent(in) :: var
+    !> Output pointer with matching rank.
+    character, pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  end subroutine extract_var_char_15d
 end interface

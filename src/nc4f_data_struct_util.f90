@@ -4,6 +4,7 @@ contains
 
 !> Return true when an operation reported a non-success status.
 module pure elemental logical function failed_error(error) result(has_failed)
+  !> Input argument(s): `error`.
   type(error_type), intent(in) :: error
 
   has_failed = error%code /= NC_NOERR
@@ -11,6 +12,7 @@ end function failed_error
 
 !> Return false when an operation failed because a NetCDF object was absent.
 module pure elemental logical function found_error(error) result(is_present)
+  !> Input argument(s): `error`.
   type(error_type), intent(in) :: error
   !> `nc_open` may return the C system `ENOENT` value directly rather than
   !> the NetCDF-specific `NC_ENOTFOUND` status.  `ENOENT` is 2 on the
@@ -82,7 +84,9 @@ end function get_buffer_size
 
 !> Compute a dimension product while checking invalid lengths and overflow.
 module pure function checked_dim_product(dims, context) result(element_count)
+  !> Input argument(s): `dims(:)`.
   type(dimension_type), intent(in) :: dims(:)
+  !> Input argument(s): `context`.
   character(len=*), intent(in) :: context
   integer(int64) :: element_count
   integer :: i
@@ -103,8 +107,11 @@ end function checked_dim_product
 
 !> Validate an attribute's metadata and backing byte buffer.
 module pure subroutine validate_att_data(att, expected_dtype, context)
+  !> Input argument(s): `att`.
   type(attribute_type), intent(in) :: att
+  !> Input argument(s): `expected_dtype`.
   integer(data_type), intent(in) :: expected_dtype
+  !> Input argument(s): `context`.
   character(len=*), intent(in) :: context
   integer(int64) :: required_bytes
 
@@ -120,9 +127,13 @@ end subroutine validate_att_data
 
 !> Validate a variable's metadata and backing byte buffer.
 module pure subroutine validate_var_data(var, expected_dtype, expected_rank, context)
+  !> Input argument(s): `var`.
   type(variable_type), intent(in) :: var
+  !> Input argument(s): `expected_dtype`.
   integer(data_type), intent(in) :: expected_dtype
+  !> Input argument(s): `expected_rank`.
   integer, intent(in) :: expected_rank
+  !> Input argument(s): `context`.
   character(len=*), intent(in) :: context
   integer(int64) :: element_count, required_bytes
 

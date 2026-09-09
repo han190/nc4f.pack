@@ -162,11 +162,17 @@ end subroutine write_frmt_dim
 
 !> Write an `error_type` in list-directed (Fortran `DT`) format.
 module subroutine write_frmt_error(error, unit, iotype, v_list, iostat, iomsg)
+  !> Input argument(s): `error`.
   class(error_type), intent(in) :: error
+  !> Input argument(s): `unit`.
   integer, intent(in) :: unit
+  !> Input argument(s): `iotype`.
   character(len=*), intent(in) :: iotype
+  !> Input argument(s): `v_list(:)`.
   integer, intent(in) :: v_list(:)
+  !> Output argument(s): `iostat`.
   integer, intent(out) :: iostat
+  !> Input/output argument(s): `iomsg`.
   character(len=*), intent(inout) :: iomsg
 
   associate (v_list_ => v_list, iomsg_ => iomsg)

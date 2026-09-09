@@ -53,9 +53,9 @@ function inq_dims_(ncid, varid, error) result(dims)
   !> Allocatable array of `dimension_type` in Fortran ordering
   !> (reversed relative to the C API ordering).
   type(dimension_type), allocatable :: dims(:)
-  integer(c_int), allocatable, target :: dimids(:)
+  integer(c_int), allocatable, target :: dimids(:), unlimdimids(:)
   character(len=NC_MAX_NAME + 1, kind=c_char) :: dim_name
-  integer(c_int) :: i, j, unlimdimidp, nunlim, ndims, stat
+  integer(c_int) :: i, j, nunlim, ndims, stat
   integer(c_int), parameter :: include_parents = 0_c_int
 
   error = error_type()
@@ -80,15 +80,20 @@ function inq_dims_(ncid, varid, error) result(dims)
       if (failed(error)) return
     end if
   end if
-  stat = nc_inq_unlimdim(ncid, unlimdimidp)
-  error = make_netcdf_error(stat, "[inq_dims] Unlimited dimension.")
+  stat = nc_inq_unlimdims(ncid, nunlim, c_null_ptr)
+  error = make_netcdf_error(stat, "[inq_dims] Unlimited dimension count.")
   if (failed(error)) return
+  allocate (unlimdimids(nunlim))
+  if (nunlim > 0) then
+    stat = nc_inq_unlimdims(ncid, nunlim, c_loc(unlimdimids(1)))
+    error = make_netcdf_error(stat, "[inq_dims] Unlimited dimension identifiers.")
+    if (failed(error)) return
+  end if
 
   allocate (dims(ndims))
 
   !> Since this module uses the C API, the dimension order is reversed
   !> when read into a Fortran program.
-  nunlim = 0
   do i = 1, ndims
     j = ndims - i + 1
     dims(j)%id = dimids(i)
@@ -99,13 +104,8 @@ function inq_dims_(ncid, varid, error) result(dims)
     error = make_netcdf_error(stat, "[inq_dims] Dimension length.")
     if (failed(error)) return
     dims(j)%name = clip(c2fstr(dim_name))
-    dims(j)%is_unlim = dimids(i) == unlimdimidp
-    if (dims(j)%is_unlim) nunlim = nunlim + 1
+    dims(j)%is_unlim = any(dimids(i) == unlimdimids)
   end do
-  if (nunlim > 1) then
-    error = error_type(NC_EINVAL, "[inq_dims] Too many unlimited dimensions.")
-    return
-  end if
 end function inq_dims_
 
 !> Define a dimension in the netCDF file if it does not already exist.
@@ -127,8 +127,11 @@ end function def_dim
 
 !> Define a dimension without stopping on a NetCDF failure.
 module function def_dim_error(nc, dim, error) result(new_dim)
+  !> Input argument(s): `nc`.
   type(netcdf_type), intent(in) :: nc
+  !> Input argument(s): `dim`.
   type(dimension_type), intent(in) :: dim
+  !> Output argument(s): `error`.
   type(error_type), intent(out) :: error
   type(dimension_type) :: new_dim
 
@@ -137,8 +140,11 @@ end function def_dim_error
 
 !> Define a dimension, preserving `NC_EBADDIM` as the expected create path.
 function def_dim_(nc, dim, error) result(new_dim)
+  !> Input argument(s): `nc`.
   type(netcdf_type), intent(in) :: nc
+  !> Input argument(s): `dim`.
   type(dimension_type), intent(in) :: dim
+  !> Output argument(s): `error`.
   type(error_type), intent(out) :: error
   type(dimension_type) :: new_dim
   integer(c_int) :: stat, dimid

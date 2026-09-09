@@ -23,6 +23,7 @@ end interface get_variable
 interface put_variable
   module procedure :: put_var !> Impure Elemental
   module procedure :: put_var_error
+  module procedure :: put_vara
 end interface put_variable
 
 interface inquire_variable
@@ -74,8 +75,11 @@ interface
 
   !> Read a global attribute by name without stopping on a NetCDF failure.
   module function get_att_nc_error(nc, name, error) result(att)
+    !> Input argument(s): `nc`.
     type(netcdf_type), intent(in) :: nc
+    !> Input argument(s): `name`.
     character(len=*), intent(in) :: name
+    !> Output argument(s): `error`.
     type(error_type), intent(out) :: error
     type(attribute_type) :: att
   end function get_att_nc_error
@@ -104,9 +108,13 @@ interface
 
   !> Read a variable attribute by name without stopping on a NetCDF failure.
   module function get_att_var_error(nc, var, name, error) result(att)
+    !> Input argument(s): `nc`.
     type(netcdf_type), intent(in) :: nc
+    !> Input argument(s): `var`.
     type(variable_type), intent(in) :: var
+    !> Input argument(s): `name`.
     character(len=*), intent(in) :: name
+    !> Output argument(s): `error`.
     type(error_type), intent(out) :: error
     type(attribute_type) :: att
   end function get_att_var_error
@@ -133,8 +141,11 @@ interface
 
   !> Write all attributes of a variable without stopping on a NetCDF failure.
   module subroutine put_att_var_error(nc, var, error)
+    !> Input argument(s): `nc`.
     type(netcdf_type), intent(in) :: nc
+    !> Input argument(s): `var`.
     type(variable_type), target, intent(in) :: var
+    !> Output argument(s): `error`.
     type(error_type), intent(out) :: error
   end subroutine put_att_var_error
 
@@ -146,7 +157,9 @@ interface
 
   !> Write all global attributes without stopping on a NetCDF failure.
   module subroutine put_att_nc_error(nc, error)
+    !> Input argument(s): `nc`.
     type(netcdf_type), target, intent(in) :: nc
+    !> Output argument(s): `error`.
     type(error_type), intent(out) :: error
   end subroutine put_att_nc_error
 
@@ -190,7 +203,8 @@ interface
   module function open_dataset(filename, mode, inq_dims, inq_atts, error) result(nc)
     !> Path to the dataset file.
     character(len=*), intent(in) :: filename
-    !> Mode to open the file in: 'r' for read, 'w' for write.
+    !> Mode to open the file: 'r' for read, 'w' to recreate, or 'a' for
+    !> read/write access to an existing dataset.
     character(len=*), intent(in), optional :: mode
     !> When true, inquire dimensions after opening the file.
     logical, intent(in), optional :: inq_dims
@@ -271,8 +285,11 @@ interface
 
   !> Define a dimension without stopping on a NetCDF failure.
   module function def_dim_error(nc, dim, error) result(new_dim)
+    !> Input argument(s): `nc`.
     type(netcdf_type), intent(in) :: nc
+    !> Input argument(s): `dim`.
     type(dimension_type), intent(in) :: dim
+    !> Output argument(s): `error`.
     type(error_type), intent(out) :: error
     type(dimension_type) :: new_dim
   end function def_dim_error
@@ -289,7 +306,9 @@ interface
 
   !> Construct an `error_type` from a NetCDF C status and optional context.
   module function make_netcdf_error(status, context) result(error)
+    !> Input argument(s): `status`.
     integer(c_int), intent(in) :: status
+    !> Input argument(s): `context`.
     character(*), intent(in), optional :: context
     type(error_type) :: error
   end function make_netcdf_error
@@ -320,19 +339,25 @@ interface
 
   !> Validate a variable before exposing its byte buffer to the C API.
   module subroutine validate_var_buffer(var, context)
+    !> Input argument(s): `var`.
     type(variable_type), intent(in) :: var
+    !> Input argument(s): `context`.
     character(len=*), intent(in) :: context
   end subroutine validate_var_buffer
 
   !> Validate an attribute before exposing its byte buffer to the C API.
   module subroutine validate_att_buffer(att, context)
+    !> Input argument(s): `att`.
     type(attribute_type), intent(in) :: att
+    !> Input argument(s): `context`.
     character(len=*), intent(in) :: context
   end subroutine validate_att_buffer
 
   !> Compute a checked element count from a list of dimensions.
   module function checked_dim_count(dims, context) result(element_count)
+    !> Input argument(s): `dims(:)`.
     type(dimension_type), intent(in) :: dims(:)
+    !> Input argument(s): `context`.
     character(len=*), intent(in) :: context
     integer(int64) :: element_count
   end function checked_dim_count
@@ -353,8 +378,11 @@ interface
 
   !> Read a scalar-named variable without stopping on a NetCDF failure.
   module function get_var_error(nc, name, error) result(var)
+    !> Input argument(s): `nc`.
     type(netcdf_type), intent(in) :: nc
+    !> Input argument(s): `name`.
     character(len=*), intent(in) :: name
+    !> Output argument(s): `error`.
     type(error_type), intent(out) :: error
     type(variable_type), target :: var
   end function get_var_error
@@ -387,8 +415,11 @@ interface
 
   !> Inquire a scalar-named variable without stopping on a NetCDF failure.
   module function inq_var_error(nc, name, error) result(var)
+    !> Input argument(s): `nc`.
     type(netcdf_type), intent(in) :: nc
+    !> Input argument(s): `name`.
     character(len=*), intent(in) :: name
+    !> Output argument(s): `error`.
     type(error_type), intent(out) :: error
     type(variable_type) :: var
   end function inq_var_error
@@ -403,10 +434,27 @@ interface
 
   !> Write a scalar variable without stopping on a NetCDF failure.
   module subroutine put_var_error(nc, var, error)
+    !> Input argument(s): `nc`.
     type(netcdf_type), intent(in) :: nc
+    !> Input argument(s): `var`.
     type(variable_type), target, intent(in) :: var
+    !> Output argument(s): `error`.
     type(error_type), intent(out) :: error
   end subroutine put_var_error
+
+  !> Write `var` into an existing variable at a Fortran-order hyperslab.
+  module subroutine put_vara(nc, var, start, count, error)
+    !> Open dataset in append (`"a"`) or read/write mode.
+    type(netcdf_type), intent(in) :: nc
+    !> Data buffer whose dimensions must equal `count`.
+    type(variable_type), target, intent(in) :: var
+    !> One-based Fortran-order start indices.
+    integer, intent(in) :: start(:)
+    !> Fortran-order edge lengths to write.
+    integer, intent(in) :: count(:)
+    !> Optional error result. When absent, failures stop the program.
+    type(error_type), intent(out), optional :: error
+  end subroutine put_vara
 end interface
 
 end module nc4f_nc

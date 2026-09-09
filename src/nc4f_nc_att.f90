@@ -4,7 +4,9 @@ contains
 
 !> Read a global attribute by name and return it.
 module impure elemental function get_att_nc(nc, name) result(att)
+  !> Input argument(s): `nc`.
   type(netcdf_type), intent(in) :: nc
+  !> Input argument(s): `name`.
   character(len=*), intent(in) :: name
   type(attribute_type) :: att
   type(error_type) :: error
@@ -15,8 +17,11 @@ end function get_att_nc
 
 !> Read a global attribute without stopping on a NetCDF failure.
 module function get_att_nc_error(nc, name, error) result(att)
+  !> Input argument(s): `nc`.
   type(netcdf_type), intent(in) :: nc
+  !> Input argument(s): `name`.
   character(len=*), intent(in) :: name
+  !> Output argument(s): `error`.
   type(error_type), intent(out) :: error
   type(attribute_type) :: att
 
@@ -25,7 +30,9 @@ end function get_att_nc_error
 
 !> Return all global attributes for a dataset.
 module function get_atts_nc(nc, error) result(atts)
+  !> Input argument(s): `nc`.
   type(netcdf_type), intent(in) :: nc
+  !> Output argument(s): `error`.
   type(error_type), optional, intent(out) :: error
   type(attribute_type), allocatable :: atts(:)
   type(error_type) :: operation_error
@@ -40,8 +47,11 @@ end function get_atts_nc
 
 !> Read a named attribute attached to a variable and return it.
 module function get_att_var(nc, var, name) result(att)
+  !> Input argument(s): `nc`.
   type(netcdf_type), intent(in) :: nc
+  !> Input argument(s): `var`.
   type(variable_type), intent(in) :: var
+  !> Input argument(s): `name`.
   character(len=*), intent(in) :: name
   type(attribute_type) :: att
   type(error_type) :: error
@@ -52,9 +62,13 @@ end function get_att_var
 
 !> Read a variable attribute without stopping on a NetCDF failure.
 module function get_att_var_error(nc, var, name, error) result(att)
+  !> Input argument(s): `nc`.
   type(netcdf_type), intent(in) :: nc
+  !> Input argument(s): `var`.
   type(variable_type), intent(in) :: var
+  !> Input argument(s): `name`.
   character(len=*), intent(in) :: name
+  !> Output argument(s): `error`.
   type(error_type), intent(out) :: error
   type(attribute_type) :: att
 
@@ -63,8 +77,11 @@ end function get_att_var_error
 
 !> Return all attributes attached to a variable.
 module function get_atts_var(nc, var, error) result(atts)
+  !> Input argument(s): `nc`.
   type(netcdf_type), intent(in) :: nc
+  !> Input argument(s): `var`.
   type(variable_type), intent(in) :: var
+  !> Output argument(s): `error`.
   type(error_type), optional, intent(out) :: error
   type(attribute_type), allocatable :: atts(:)
   type(error_type) :: operation_error
@@ -79,8 +96,11 @@ end function get_atts_var
 
 !> Helper that returns attributes for a C `ncid` and `varid`.
 function get_atts_(ncid, varid, error) result(atts)
+  !> Input argument(s): `ncid`.
   integer(c_int), intent(in) :: ncid
+  !> Input argument(s): `varid`.
   integer(c_int), intent(in) :: varid
+  !> Output argument(s): `error`.
   type(error_type), intent(out) :: error
   type(attribute_type), allocatable :: atts(:)
   integer(c_int) :: natts, i, stat
@@ -108,9 +128,13 @@ end function get_atts_
 
 !> Helper that reads a single attribute given C `ncid`, `varid`, and name.
 function get_att_(ncid, varid, name, error) result(att)
+  !> Input argument(s): `ncid`.
   integer(c_int), intent(in) :: ncid
+  !> Input argument(s): `varid`.
   integer(c_int), intent(in) :: varid
+  !> Input argument(s): `name`.
   character(len=*), intent(in) :: name
+  !> Output argument(s): `error`.
   type(error_type), intent(out) :: error
   type(attribute_type), target :: att
   integer(c_int) :: dtype, stat
@@ -141,7 +165,9 @@ end function get_att_
 !> Write all attributes of a variable to the dataset.
 !> This elemental overload preserves the existing array-variable API.
 module impure elemental subroutine put_att_var(nc, var)
+  !> Input argument(s): `nc`.
   type(netcdf_type), intent(in) :: nc
+  !> Input argument(s): `var`.
   type(variable_type), target, intent(in) :: var
   type(error_type) :: error
 
@@ -151,8 +177,11 @@ end subroutine put_att_var
 
 !> Write variable attributes without stopping on a NetCDF failure.
 module subroutine put_att_var_error(nc, var, error)
+  !> Input argument(s): `nc`.
   type(netcdf_type), intent(in) :: nc
+  !> Input argument(s): `var`.
   type(variable_type), target, intent(in) :: var
+  !> Output argument(s): `error`.
   type(error_type), intent(out) :: error
 
   call put_att_var_(nc, var, error)
@@ -160,8 +189,11 @@ end subroutine put_att_var_error
 
 !> Scalar implementation shared by the fail-fast and error-aware overloads.
 subroutine put_att_var_(nc, var, error)
+  !> Input argument(s): `nc`.
   type(netcdf_type), intent(in) :: nc
+  !> Input argument(s): `var`.
   type(variable_type), target, intent(in) :: var
+  !> Output argument(s): `error`.
   type(error_type), intent(out) :: error
   integer :: i
   integer(c_int) :: stat
@@ -190,6 +222,7 @@ end subroutine put_att_var_
 !> Write all global attributes of the dataset to the file.
 !> This elemental overload preserves the existing scalar API.
 module impure elemental subroutine put_att_nc(nc)
+  !> Input argument(s): `nc`.
   type(netcdf_type), target, intent(in) :: nc
   type(error_type) :: error
 
@@ -199,7 +232,9 @@ end subroutine put_att_nc
 
 !> Write global attributes without stopping on a NetCDF failure.
 module subroutine put_att_nc_error(nc, error)
+  !> Input argument(s): `nc`.
   type(netcdf_type), target, intent(in) :: nc
+  !> Output argument(s): `error`.
   type(error_type), intent(out) :: error
 
   call put_att_nc_(nc, error)
@@ -207,7 +242,9 @@ end subroutine put_att_nc_error
 
 !> Scalar implementation shared by the fail-fast and error-aware overloads.
 subroutine put_att_nc_(nc, error)
+  !> Input argument(s): `nc`.
   type(netcdf_type), target, intent(in) :: nc
+  !> Output argument(s): `error`.
   type(error_type), intent(out) :: error
   integer(int64) :: i
   integer(c_int) :: stat

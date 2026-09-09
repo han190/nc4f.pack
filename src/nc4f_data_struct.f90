@@ -138,6 +138,10 @@ interface found
   module procedure :: found_error
 end interface found
 
+interface sum
+  module procedure :: sum_vars
+end interface sum
+
 interface allocate_memory
   module procedure :: alloc_att_buf
   module procedure :: alloc_att_meta
@@ -285,11 +289,13 @@ interface
 
   !> Return true when `error` represents a failed operation.
   module pure elemental logical function failed_error(error) result(has_failed)
+    !> Input argument(s): `error`.
     type(error_type), intent(in) :: error
   end function failed_error
 
   !> Return false when `error` represents an absent NetCDF object.
   module pure elemental logical function found_error(error) result(is_present)
+    !> Input argument(s): `error`.
     type(error_type), intent(in) :: error
   end function found_error
 
@@ -363,22 +369,31 @@ interface
 
   !> Validate an attribute's metadata and backing byte buffer.
   module pure subroutine validate_att_data(att, expected_dtype, context)
+    !> Input argument(s): `att`.
     type(attribute_type), intent(in) :: att
+    !> Input argument(s): `expected_dtype`.
     integer(data_type), intent(in) :: expected_dtype
+    !> Input argument(s): `context`.
     character(len=*), intent(in) :: context
   end subroutine validate_att_data
 
   !> Validate a variable's metadata and backing byte buffer.
   module pure subroutine validate_var_data(var, expected_dtype, expected_rank, context)
+    !> Input argument(s): `var`.
     type(variable_type), intent(in) :: var
+    !> Input argument(s): `expected_dtype`.
     integer(data_type), intent(in) :: expected_dtype
+    !> Input argument(s): `expected_rank`.
     integer, intent(in) :: expected_rank
+    !> Input argument(s): `context`.
     character(len=*), intent(in) :: context
   end subroutine validate_var_data
 
   !> Compute a dimension product while checking invalid lengths and overflow.
   module pure function checked_dim_product(dims, context) result(element_count)
+    !> Input argument(s): `dims(:)`.
     type(dimension_type), intent(in) :: dims(:)
+    !> Input argument(s): `context`.
     character(len=*), intent(in) :: context
     integer(int64) :: element_count
   end function checked_dim_product
@@ -433,22 +448,23 @@ interface
 
   !> Write an `error_type` in list-directed (Fortran `DT`) format.
   module subroutine write_frmt_error(error, unit, iotype, v_list, iostat, iomsg)
+    !> Input argument(s): `error`.
     class(error_type), intent(in) :: error
+    !> Input argument(s): `unit`.
     integer, intent(in) :: unit
+    !> Input argument(s): `iotype`.
     character(len=*), intent(in) :: iotype
+    !> Input argument(s): `v_list(:)`.
     integer, intent(in) :: v_list(:)
+    !> Output argument(s): `iostat`.
     integer, intent(out) :: iostat
+    !> Input/output argument(s): `iomsg`.
     character(len=*), intent(inout) :: iomsg
   end subroutine write_frmt_error
-end interface
 
-interface sum
-  module procedure :: sum_vars
-end interface sum
-
-interface
   !> Return the element-wise sum of variables with matching dimensions and type.
   module function sum_vars(vars) result(s)
+    !> Input argument(s): `vars(:)`.
     type(variable_type), intent(in) :: vars(:)
     type(variable_type) :: s
   end function sum_vars

@@ -14,6 +14,7 @@ end type test_type
 
 interface
   subroutine test_proc(passed)
+    !> Input/output argument(s): `passed`.
     logical, intent(inout) :: passed
   end subroutine test_proc
 end interface
@@ -29,6 +30,7 @@ subroutine setup_test_results()
 end subroutine setup_test_results
 
 subroutine run_tests(tests)
+  !> Input/output argument(s): `tests(:)`.
   type(test_type), intent(inout) :: tests(:)
   integer :: i
   logical :: all_passed

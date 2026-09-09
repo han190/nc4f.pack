@@ -119,7 +119,9 @@ end function f2cstr
 
 !> Validate a variable before exposing its byte buffer to the C API.
 module subroutine validate_var_buffer(var, context)
+  !> Input argument(s): `var`.
   type(variable_type), intent(in) :: var
+  !> Input argument(s): `context`.
   character(len=*), intent(in) :: context
   integer(int64) :: element_count, required_bytes
 
@@ -134,7 +136,9 @@ end subroutine validate_var_buffer
 
 !> Validate an attribute before exposing its byte buffer to the C API.
 module subroutine validate_att_buffer(att, context)
+  !> Input argument(s): `att`.
   type(attribute_type), intent(in) :: att
+  !> Input argument(s): `context`.
   character(len=*), intent(in) :: context
   integer(int64) :: required_bytes
 
@@ -144,7 +148,9 @@ end subroutine validate_att_buffer
 
 !> Compute a checked element count from a list of dimensions.
 module function checked_dim_count(dims, context) result(element_count)
+  !> Input argument(s): `dims(:)`.
   type(dimension_type), intent(in) :: dims(:)
+  !> Input argument(s): `context`.
   character(len=*), intent(in) :: context
   integer(int64) :: element_count
   integer :: i
@@ -157,8 +163,11 @@ end function checked_dim_count
 
 !> Multiply a running element count by one dimension safely.
 subroutine checked_multiply(product_value, factor, context)
+  !> Input/output argument(s): `product_value`.
   integer(int64), intent(inout) :: product_value
+  !> Input argument(s): `factor`.
   integer(int64), intent(in) :: factor
+  !> Input argument(s): `context`.
   character(len=*), intent(in) :: context
 
   if (factor < 0) error stop trim(context)//" Negative dimension length."
@@ -173,8 +182,11 @@ end subroutine checked_multiply
 
 !> Return the required byte count for one supported netCDF type.
 function checked_buffer_size(dtype, element_count, context) result(required_bytes)
+  !> Input argument(s): `dtype`.
   integer(c_int), intent(in) :: dtype
+  !> Input argument(s): `element_count`.
   integer(int64), intent(in) :: element_count
+  !> Input argument(s): `context`.
   character(len=*), intent(in) :: context
   integer(int64) :: bytes_per_element, required_bytes
 
@@ -200,9 +212,14 @@ end function checked_buffer_size
 
 !> Check allocation and capacity of a raw byte buffer.
 subroutine validate_raw_buffer(buffer, required_bytes, object_name, context)
+  !> Input argument(s): `buffer(:)`.
   integer(int8), allocatable, intent(in) :: buffer(:)
+  !> Input argument(s): `required_bytes`.
   integer(int64), intent(in) :: required_bytes
-  character(len=*), intent(in) :: object_name, context
+  !> Name of the buffer-owning object.
+  character(len=*), intent(in) :: object_name
+  !> Calling-context text for the diagnostic.
+  character(len=*), intent(in) :: context
 
   if (required_bytes == 0) return
   if (.not. allocated(buffer)) &

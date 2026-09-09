@@ -139,7 +139,9 @@ interface
   !> Fortran string.
   module function new_att_character(name, value) result(att)
     !> Attribute name to assign (will be trimmed).
-    character(len=*), intent(in) :: name, value
+    character(len=*), intent(in) :: name
+    !> Character value to store in the attribute.
+    character(len=*), intent(in) :: value
     !> Resulting attribute containing character buffer (NC_CHAR type).
     type(attribute_type), target :: att
   end function new_att_character
