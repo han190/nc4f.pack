@@ -13,7 +13,7 @@ module function new_att_int8(name, values) result(att)
   !> Pointer view into the attribute buffer for efficient copy.
   integer(int8), pointer :: ptr(:)
 
-  call allocate_memory(att, name, BYTE_TYPE, size(values, kind=int64))
+  call initialize(att, name, BYTE_TYPE, size(values, kind=int64))
   if (size(values) > 0) then
     call extract(att, ptr)
     ptr = values
@@ -46,7 +46,7 @@ module function new_att_int16(name, values) result(att)
   !> Pointer view into the attribute buffer for efficient copy.
   integer(int16), pointer :: ptr(:)
 
-  call allocate_memory(att, name, SHORT_TYPE, size(values, kind=int64))
+  call initialize(att, name, SHORT_TYPE, size(values, kind=int64))
   if (size(values) > 0) then
     call extract(att, ptr)
     ptr = values
@@ -79,7 +79,7 @@ module function new_att_int32(name, values) result(att)
   !> Pointer view into the attribute buffer for efficient copy.
   integer(int32), pointer :: ptr(:)
 
-  call allocate_memory(att, name, INT_TYPE, size(values, kind=int64))
+  call initialize(att, name, INT_TYPE, size(values, kind=int64))
   if (size(values) > 0) then
     call extract(att, ptr)
     ptr = values
@@ -112,7 +112,7 @@ module function new_att_int64(name, values) result(att)
   !> Pointer view into the attribute buffer for efficient copy.
   integer(int64), pointer :: ptr(:)
 
-  call allocate_memory(att, name, INT64_TYPE, size(values, kind=int64))
+  call initialize(att, name, INT64_TYPE, size(values, kind=int64))
   if (size(values) > 0) then
     call extract(att, ptr)
     ptr = values
@@ -145,7 +145,7 @@ module function new_att_real32(name, values) result(att)
   !> Pointer view into the attribute buffer for efficient copy.
   real(real32), pointer :: ptr(:)
 
-  call allocate_memory(att, name, FLOAT_TYPE, size(values, kind=int64))
+  call initialize(att, name, FLOAT_TYPE, size(values, kind=int64))
   if (size(values) > 0) then
     call extract(att, ptr)
     ptr = values
@@ -178,7 +178,7 @@ module function new_att_real64(name, values) result(att)
   !> Pointer view into the attribute buffer for efficient copy.
   real(real64), pointer :: ptr(:)
 
-  call allocate_memory(att, name, DOUBLE_TYPE, size(values, kind=int64))
+  call initialize(att, name, DOUBLE_TYPE, size(values, kind=int64))
   if (size(values) > 0) then
     call extract(att, ptr)
     ptr = values
@@ -216,7 +216,7 @@ module function new_att_character(name, value) result(att)
   !> Loop index used when copying characters.
   integer(int64) :: i
 
-  call allocate_memory(att, name, CHAR_TYPE, len(value, kind=int64))
+  call initialize(att, name, CHAR_TYPE, len(value, kind=int64))
   call validate_att_data(att, CHAR_TYPE, "[new_att_character]")
   if (att%len == 0) return
   cptr = c_loc(att%buffer(1))

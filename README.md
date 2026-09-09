@@ -142,7 +142,7 @@ program main
   call extract(vars(2), THETA)
 
   !> Allocate output variable.
-  call allocate_memory(output, mold=vars(1))
+  call initialize(output, mold=vars(1))
   call extract(output, T)
 
   !> Computation.

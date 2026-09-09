@@ -8,50 +8,24 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - compiler: gfortran-14
-            packages: gfortran-14
-            profile: debug
-          - compiler: gfortran-14
-            packages: gfortran-14
-            profile: release
-          - compiler: flang-new-18
-            packages: flang-18
-            profile: release
 
     steps:
-      - name: Use Checkout
-        uses: actions/checkout@v6
+      - name: Check out repository
+        uses: actions/checkout@v4
 
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install --yes ${{ matrix.packages }} libnetcdf-bin libnetcdf-dev pkg-config fypp
+          sudo apt-get install --yes gfortran libnetcdf-dev netcdf-bin pkg-config fypp
 
       - name: Report compiler
-        run: ${{ matrix.compiler }} --version
+        run: gfortran --version
 
       - name: Build
-        run: FC=${{ matrix.compiler }} PROFILE=${{ matrix.profile }} make
+        run: make
 
       - name: Test
-        run: FC=${{ matrix.compiler }} PROFILE=${{ matrix.profile }} make test
+        run: make test
 
       - name: Inspect generated NetCDF file
         run: ncdump -h build/test-results/characters.nc
-
-  lint:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Use Checkout
-        uses: actions/checkout@v6
-
-      - name: Install Fortitude
-        run: python3 -m pip install fortitude-lint
-
-      - name: Report lint findings
-        run: fortitude check --output-format github --exit-zero

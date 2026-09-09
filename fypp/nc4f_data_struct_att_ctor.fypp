@@ -15,7 +15,7 @@ module function new_att_${K}$(name, values) result(att)
   !> Pointer view into the attribute buffer for efficient copy.
   ${T}$(${K}$), pointer :: ptr(:)
 
-  call allocate_memory(att, name, ${D}$, size(values, kind=int64))
+  call initialize(att, name, ${D}$, size(values, kind=int64))
   if (size(values) > 0) then
     call extract(att, ptr)
     ptr = values
@@ -53,7 +53,7 @@ module function new_att_character(name, value) result(att)
   !> Loop index used when copying characters.
   integer(int64) :: i
 
-  call allocate_memory(att, name, CHAR_TYPE, len(value, kind=int64))
+  call initialize(att, name, CHAR_TYPE, len(value, kind=int64))
   call validate_att_data(att, CHAR_TYPE, "[new_att_character]")
   if (att%len == 0) return
   cptr = c_loc(att%buffer(1))

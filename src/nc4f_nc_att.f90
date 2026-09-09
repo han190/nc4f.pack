@@ -156,7 +156,7 @@ function get_att_(ncid, varid, name, error) result(att)
     return
   end if zero_size_attr
 
-  call allocate_memory(att)
+  call initialize(att)
   call validate_buffer(att, "[get_att]")
   stat = nc_get_att(ncid, varid, f2cstr(att%name), c_loc(att%buffer(1)))
   error = make_netcdf_error(stat, context)

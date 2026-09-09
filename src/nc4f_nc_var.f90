@@ -52,7 +52,7 @@ function get_var_(nc, name, error) result(var)
     return
   end if zero_size_var
 
-  call allocate_memory(var)
+  call initialize(var)
   call validate_buffer(var, "[get_var]")
   cptr = c_loc(var%buffer(1))
   write (msg, "('[get_var] Invalid variable:', 1x, a)") name
@@ -141,7 +141,7 @@ function get_vara_(nc, name, start, count, error) result(var)
     var%dims(i)%is_unlim = .false.
   end do
   var%len = checked_dim_count(var%dims, "[get_vara]")
-  call allocate_memory(var)
+  call initialize(var)
   call validate_buffer(var, "[get_vara]")
 
   if (ndims > 0) then

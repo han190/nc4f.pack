@@ -21,7 +21,7 @@ module function sum_vars(vars) result(s)
       & error stop "[sum_vars] Invalid type."
   end do
 
-  call allocate_memory(s, mold=vars(1))
+  call initialize(s, mold=vars(1))
   if (s%len == 0) return
 
   select case (s%dtype)
