@@ -160,6 +160,139 @@ module subroutine extensive_rd(passed)
   call close_dataset(nc)
 end subroutine extensive_rd
 
+!> Read root-level data and metadata from NASA's externally produced
+!> CLDPROP COSP NetCDF-4 sample file.  The file also contains nested groups;
+!> this test intentionally exercises the currently supported root group only.
+module subroutine nasa_cosp_read(passed)
+  !> Input/output argument(s): `passed`.
+  logical, intent(inout) :: passed
+  character(*), parameter :: SAMPLE_FILE = &
+    & "data/CLDPROPCOSP_M3_MODIS_Aqua.A2014032.011.2020112203433.nc"
+  character(len=:), pointer :: yaml
+  real(real64), pointer :: latitude(:), longitude(:)
+  type(attribute_type) :: units, yaml_config
+  type(error_type) :: error
+  type(netcdf_type) :: nc
+  type(variable_type) :: latitude_var, longitude_var
+  logical :: is_open
+
+  passed = .false.
+  is_open = .false.
+  nullify (yaml)
+  nc = open_dataset(SAMPLE_FILE, "r", inq_dims=.true., error=error)
+  if (failed(error)) return
+  is_open = .true.
+
+  nasa_read: block
+    latitude_var = get_variable(nc, "latitude", error)
+    if (failed(error)) exit nasa_read
+    longitude_var = get_variable(nc, "longitude", error)
+    if (failed(error)) exit nasa_read
+    units = get_attribute(nc, latitude_var, "units", error)
+    if (failed(error)) exit nasa_read
+    yaml_config = get_attribute(nc, "YAML_config", error)
+    if (failed(error)) exit nasa_read
+
+    call extract(latitude_var, latitude)
+    call extract(longitude_var, longitude)
+    call extract(units, yaml)
+    if (associated(yaml)) then
+      deallocate (yaml)
+      nullify (yaml)
+    end if
+    call extract(yaml_config, yaml)
+    if (.not. associated(yaml)) exit nasa_read
+    if (len(yaml) <= 1024) exit nasa_read
+
+    passed = size(nc%dims) == 9 .and. &
+      & size(latitude) == 180 .and. size(longitude) == 360 .and. &
+      & latitude_var%dims(1)%name == "latitude" .and. &
+      & longitude_var%dims(1)%name == "longitude" .and. &
+      & abs(latitude(1) + 89.5_real64) <= epsilon(latitude(1)) .and. &
+      & abs(latitude(180) - 89.5_real64) <= epsilon(latitude(180)) .and. &
+      & abs(longitude(1) + 179.5_real64) <= epsilon(longitude(1)) .and. &
+      & abs(longitude(360) - 179.5_real64) <= epsilon(longitude(360)) .and. &
+      & yaml(:14) == "grid_settings:"
+  end block nasa_read
+
+  if (associated(yaml)) deallocate (yaml)
+  if (is_open) then
+    call close_dataset(nc, error)
+    if (failed(error)) passed = .false.
+  end if
+end subroutine nasa_cosp_read
+
+!> Read coordinates, CF metadata, and packed data from Unidata's externally
+!> produced ECMWF ERA-40 sample file.
+module subroutine ecmwf_era40_read(passed)
+  !> Input/output argument(s): `passed`.
+  logical, intent(inout) :: passed
+  character(*), parameter :: SAMPLE_FILE = "data/ECMWF_ERA-40_subset.nc"
+  character(len=:), pointer :: conventions, longitude_units, temperature_units
+  integer(int16), pointer :: temperature(:, :, :)
+  real(real32), pointer :: latitude(:), longitude(:)
+  type(attribute_type) :: conventions_att, longitude_units_att, temperature_units_att
+  type(error_type) :: error
+  type(netcdf_type) :: nc
+  type(variable_type) :: latitude_var, longitude_var, temperature_var
+  logical :: is_open
+
+  passed = .false.
+  is_open = .false.
+  nullify (conventions, longitude_units, temperature_units, temperature, latitude, longitude)
+  nc = open_dataset(SAMPLE_FILE, "r", inq_dims=.true., error=error)
+  if (failed(error)) return
+  is_open = .true.
+
+  era40_read: block
+    latitude_var = get_variable(nc, "latitude", error)
+    if (failed(error)) exit era40_read
+    longitude_var = get_variable(nc, "longitude", error)
+    if (failed(error)) exit era40_read
+    temperature_var = get_variable(nc, "p2t", [1, 1, 1], [4, 3, 2], error)
+    if (failed(error)) exit era40_read
+    conventions_att = get_attribute(nc, "Conventions", error)
+    if (failed(error)) exit era40_read
+    longitude_units_att = get_attribute(nc, longitude_var, "units", error)
+    if (failed(error)) exit era40_read
+    temperature_units_att = get_attribute(nc, temperature_var, "units", error)
+    if (failed(error)) exit era40_read
+
+    call extract(latitude_var, latitude)
+    call extract(longitude_var, longitude)
+    call extract(temperature_var, temperature)
+    call extract(conventions_att, conventions)
+    call extract(longitude_units_att, longitude_units)
+    call extract(temperature_units_att, temperature_units)
+    if (.not. associated(conventions) .or. .not. associated(longitude_units) .or. &
+      & .not. associated(temperature_units) .or. .not. associated(temperature) .or. &
+      & .not. associated(latitude) .or. .not. associated(longitude)) exit era40_read
+
+    passed = size(nc%dims) == 3 .and. &
+      & size(latitude) == 73 .and. size(longitude) == 144 .and. &
+      & all(shape(temperature) == [4, 3, 2]) .and. &
+      & latitude_var%dims(1)%name == "latitude" .and. &
+      & longitude_var%dims(1)%name == "longitude" .and. &
+      & temperature_var%dims(1)%name == "longitude" .and. &
+      & temperature_var%dims(2)%name == "latitude" .and. &
+      & temperature_var%dims(3)%name == "time" .and. &
+      & abs(latitude(1) - 90.0_real32) <= epsilon(latitude(1)) .and. &
+      & abs(latitude(73) + 90.0_real32) <= epsilon(latitude(73)) .and. &
+      & abs(longitude(1)) <= epsilon(longitude(1)) .and. &
+      & abs(longitude(144) - 357.5_real32) <= epsilon(longitude(144)) .and. &
+      & conventions == "CF-1.0" .and. longitude_units == "degrees_east" .and. &
+      & temperature_units == "K" .and. any(temperature /= -32767_int16)
+  end block era40_read
+
+  if (associated(conventions)) deallocate (conventions)
+  if (associated(longitude_units)) deallocate (longitude_units)
+  if (associated(temperature_units)) deallocate (temperature_units)
+  if (is_open) then
+    call close_dataset(nc, error)
+    if (failed(error)) passed = .false.
+  end if
+end subroutine ecmwf_era40_read
+
 function extensive_variables() result(vars)
   type(variable_type), allocatable :: vars(:)
   type(dimension_type) :: dims(7)

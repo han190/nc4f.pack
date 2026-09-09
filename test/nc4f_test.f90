@@ -20,7 +20,9 @@ tests = [&
   & test_type("sfc_pres_temp_rd", sfc_pres_temp_rd), &
   & test_type("buffer_edges", buffer_edges), &
   & test_type("extensive_wr", extensive_wr), &
-  & test_type("extensive_rd", extensive_rd)]
+  & test_type("extensive_rd", extensive_rd), &
+  & test_type("nasa_cosp_read", nasa_cosp_read), &
+  & test_type("ecmwf_era40_read", ecmwf_era40_read)]
 call setup_test_results()
 call run_tests(tests)
 

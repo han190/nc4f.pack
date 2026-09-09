@@ -1,5 +1,6 @@
 build/
 *.nc
+data/
 *.log
 *.txt
 .DS_store

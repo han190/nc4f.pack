@@ -24,6 +24,9 @@ jobs:
       - name: Build
         run: FC=gfortran-14 make
 
+      - name: Download integration fixtures
+        run: make download-test-data
+
       - name: Test
         run: FC=gfortran-14 make test
 

@@ -100,8 +100,10 @@ TEST_FILES = \
 TEST := $(addprefix $(TEST_DIR)/, $(TEST_FILES))
 TEST_OBJS := $(patsubst $(TEST_DIR)/%.f90,$(BUILD_DIR)/%.o,$(TEST))
 
-.PHONY: all prepare preprocess build library test clean 
+.PHONY: all prepare preprocess build library download-test-data test clean
 all: prepare preprocess build library
+download-test-data:
+	@./scripts/download_test_data.sh
 test: library $(TEST_OBJS) $(TEST_TARGET)
 	@printf "\r\033[2K[test] run test: $(TEST_TARGET)\n"
 	@$(TEST_TARGET)
