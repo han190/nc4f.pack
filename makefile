@@ -102,7 +102,7 @@ TEST_OBJS := $(patsubst $(TEST_DIR)/%.f90,$(BUILD_DIR)/%.o,$(TEST))
 
 .PHONY: all prepare preprocess build library test clean 
 all: prepare preprocess build library
-test: $(TEST_OBJS) $(TEST_TARGET)
+test: library $(TEST_OBJS) $(TEST_TARGET)
 	@printf "\r\033[2K[test] run test: $(TEST_TARGET)\n"
 	@$(TEST_TARGET)
 library: build create_static_link
