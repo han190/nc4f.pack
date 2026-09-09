@@ -7,12 +7,12 @@ contains
 !> Construction is deliberately separate: `make_netcdf_error` forms values
 !> from C statuses, and locally detected failures use the native
 !> `error_type(status, message)` constructor directly.
-module impure logical function handle_error(error) result(failed)
+module impure logical function handle_error(error) result(has_failed)
   !> Completed result of an nc4f operation.
   type(error_type), intent(in) :: error
 
-  failed = is_failed(error)
-  if (.not. failed) return
+  has_failed = failed(error)
+  if (.not. has_failed) return
 
   if (allocated(error%message)) then
     error stop trim(error%message)

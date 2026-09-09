@@ -282,7 +282,7 @@ interface
   !> ---------------------
 
   !> Apply the library's fail-fast policy to a completed error result.
-  module impure logical function handle_error(error) result(failed)
+  module impure logical function handle_error(error) result(has_failed)
     !> Completed result of an nc4f operation.
     type(error_type), intent(in) :: error
   end function handle_error

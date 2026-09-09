@@ -68,12 +68,12 @@ subroutine simple_rd(passed)
 
   !> Check a missing file without terminating the caller.
   nc = open_dataset(TEST_RESULTS_DIR//"file_that_does_not_exist.nc", error=error)
-  passed = is_failed(error) .and. not_found(error)
+  passed = failed(error) .and. .not. found(error)
   if (.not. passed) return
 
   nc = open_dataset(TEST_RESULTS_DIR//"simple_wr.nc", "r")
   var = inquire_variable(nc, "data", error)
-  if (is_failed(error)) then
+  if (failed(error)) then
     call close_dataset(nc)
     passed = .false.
     return
@@ -98,66 +98,66 @@ subroutine error_handling(passed)
 
   passed = .false.
   error = error_type(NC_ENOTVAR, "constructed error")
-  if (.not. (is_failed(error) .and. not_found(error) .and. &
+  if (.not. (failed(error) .and. .not. found(error) .and. &
     & allocated(error%message))) return
   error = error_type()
-  if (is_failed(error)) return
+  if (failed(error)) return
 
   nc = open_dataset(TEST_RESULTS_DIR//"unused.nc", "invalid", error=error)
-  if (.not. (is_failed(error) .and. error%code == NC_EINVAL)) return
+  if (.not. (failed(error) .and. error%code == NC_EINVAL)) return
 
   nc = open_dataset(TEST_RESULTS_DIR//"missing-error-fixture/no-file.nc", error=error)
-  if (.not. (is_failed(error) .and. not_found(error) .and. &
+  if (.not. (failed(error) .and. .not. found(error) .and. &
     & error%code /= NC_NOERR .and. allocated(error%message))) return
   write (stdout, "(dt)", iostat=io_stat) error
   if (io_stat /= 0 .or. len_trim(stdout) == 0) return
 
   present = data_array("present", values, ["x".dim.1], ["units".att."1"])
   call to_netcdf(TEST_RESULTS_DIR//"error-handling.nc", present, error=error)
-  if (is_failed(error)) return
+  if (failed(error)) return
   nc = open_dataset(TEST_RESULTS_DIR//"error-handling.nc", "r", error=error)
-  if (is_failed(error)) return
+  if (failed(error)) return
 
   var = inquire_variable(nc, "missing", error)
-  if (.not. (not_found(error) .and. error%code == NC_ENOTVAR)) then
+  if (found(error) .or. error%code /= NC_ENOTVAR) then
     call close_dataset(nc)
     return
   end if
   var = get_variable(nc, "missing", error)
-  if (.not. (not_found(error) .and. error%code == NC_ENOTVAR)) then
+  if (found(error) .or. error%code /= NC_ENOTVAR) then
     call close_dataset(nc)
     return
   end if
   var = get_variable(nc, "present", error)
-  if (is_failed(error)) then
+  if (failed(error)) then
     call close_dataset(nc)
     return
   end if
 
   att = get_attribute(nc, "missing_global", error)
-  if (.not. (not_found(error) .and. error%code == NC_ENOTATT)) then
+  if (found(error) .or. error%code /= NC_ENOTATT) then
     call close_dataset(nc)
     return
   end if
   att = get_attribute(nc, var, "missing", error)
-  if (.not. (not_found(error) .and. error%code == NC_ENOTATT)) then
+  if (found(error) .or. error%code /= NC_ENOTATT) then
     call close_dataset(nc)
     return
   end if
 
   var = get_variable(nc, "present", [2], [1], error)
-  if (.not. (is_failed(error) .and. .not. not_found(error) .and. &
+  if (.not. (failed(error) .and. found(error) .and. &
     & error%code == NC_EEDGE)) then
     call close_dataset(nc)
     return
   end if
   var = get_variable(nc, "present", [0], [1], error)
-  if (.not. (is_failed(error) .and. error%code == NC_EINVALCOORDS)) then
+  if (.not. (failed(error) .and. error%code == NC_EINVALCOORDS)) then
     call close_dataset(nc)
     return
   end if
   call close_dataset(nc, error)
-  passed = .not. is_failed(error)
+  passed = .not. failed(error)
 end subroutine error_handling
 
 !> Read and persist a selected Fortran-order hyperslab.
@@ -259,7 +259,7 @@ subroutine sfc_pres_temp_rd(passed)
   default_dims = ["longitude".dim.nlon, "latitude".dim.nlat]
   nc = open_dataset(TEST_RESULTS_DIR//"sfc_pres_temp_wr.nc", "r")
   var = get_variable(nc, "pressure", error)
-  if (is_failed(error)) then
+  if (failed(error)) then
     call close_dataset(nc)
     passed = .false.
     return
@@ -273,7 +273,7 @@ subroutine sfc_pres_temp_rd(passed)
   end if
 
   var = get_variable(nc, "temperature", error)
-  if (is_failed(error)) then
+  if (failed(error)) then
     call close_dataset(nc)
     passed = .false.
     return
@@ -288,7 +288,7 @@ subroutine sfc_pres_temp_rd(passed)
   end if
 
   var = inquire_variable(nc, "relative_humidity", error)
-  passed = not_found(error) .and. error%code == NC_ENOTVAR
+  passed = .not. found(error) .and. error%code == NC_ENOTVAR
   call close_dataset(nc)
 end subroutine sfc_pres_temp_rd
 

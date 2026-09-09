@@ -93,16 +93,16 @@ function get_atts_(ncid, varid, error) result(atts)
     stat = nc_inq_varnatts(ncid, varid, natts)
   end if
   error = make_netcdf_error(stat, "[get_atts] Attribute count.")
-  if (is_failed(error)) return
+  if (failed(error)) return
 
   allocate (atts(natts))
   !> For the NetCDF C library, attribute IDs start from 0.
   do i = 0, natts - 1
     stat = nc_inq_attname(ncid, varid, i, name)
     error = make_netcdf_error(stat, "[get_atts] Attribute name.")
-    if (is_failed(error)) return
+    if (failed(error)) return
     atts(i + 1) = get_att_(ncid, varid, c2fstr(name), error)
-    if (is_failed(error)) return
+    if (failed(error)) return
   end do
 end function get_atts_
 
@@ -122,7 +122,7 @@ function get_att_(ncid, varid, name, error) result(att)
   context = "[get_att] Invalid attribute: "//att%name//"."
   stat = nc_inq_att(ncid, varid, f2cstr(att%name), xtypep=dtype, lenp=len)
   error = make_netcdf_error(stat, context)
-  if (is_failed(error)) return
+  if (failed(error)) return
   att%len = len
   att%dtype = dtype
 
@@ -182,7 +182,7 @@ subroutine put_att_var_(nc, var, error)
       stat = nc_put_att(nc%id, var%id, f2cstr(att%name), &
         & att%dtype, att%len, cptr)
       error = make_netcdf_error(stat, context)
-      if (is_failed(error)) return
+      if (failed(error)) return
     end associate
   end do
 end subroutine put_att_var_
@@ -228,7 +228,7 @@ subroutine put_att_nc_(nc, error)
       stat = nc_put_att(nc%id, NC_GLOBAL, f2cstr(att%name), &
         & att%dtype, att%len, cptr)
       error = make_netcdf_error(stat, context)
-      if (is_failed(error)) return
+      if (failed(error)) return
     end associate
   end do
 end subroutine put_att_nc_

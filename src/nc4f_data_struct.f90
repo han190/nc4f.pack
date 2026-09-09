@@ -14,7 +14,7 @@ public :: &
 public :: &
   operator(.att.), operator(.dim.), operator(.and.), &
   operator(==), operator(/=), write(formatted), size, shape, sum, &
-  error_type, is_failed, not_found, &
+  error_type, failed, found, &
   NC_NOERR, NC_EBADID, NC_EINVAL, NC_EINVALCOORDS, NC_ENOTFOUND, &
   NC_ENOTVAR, NC_ENOTATT, NC_EBADDIM, NC_EEDGE
 private
@@ -128,15 +128,15 @@ interface shape
 end interface shape
 
 !> Return true when an operation reported a non-success status.
-interface is_failed
-  module procedure :: is_failed_error
-end interface is_failed
+interface failed
+  module procedure :: failed_error
+end interface failed
 
-!> Return true when an operation failed because a file, variable, attribute,
+!> Return false when an operation failed because a file, variable, attribute,
 !> or dimension was absent.
-interface not_found
-  module procedure :: not_found_error
-end interface not_found
+interface found
+  module procedure :: found_error
+end interface found
 
 interface allocate_memory
   module procedure :: alloc_att_buf
@@ -284,14 +284,14 @@ interface
   end function get_shape
 
   !> Return true when `error` represents a failed operation.
-  module pure elemental logical function is_failed_error(error) result(failed)
+  module pure elemental logical function failed_error(error) result(has_failed)
     type(error_type), intent(in) :: error
-  end function is_failed_error
+  end function failed_error
 
-  !> Return true when `error` represents an absent NetCDF object.
-  module pure elemental logical function not_found_error(error) result(absent)
+  !> Return false when `error` represents an absent NetCDF object.
+  module pure elemental logical function found_error(error) result(is_present)
     type(error_type), intent(in) :: error
-  end function not_found_error
+  end function found_error
 
   !> Allocate a variable `var` using metadata from `mold`.
   module pure subroutine alloc_var_mold(var, mold)

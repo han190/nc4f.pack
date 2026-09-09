@@ -3,14 +3,14 @@ implicit none (type, external)
 contains
 
 !> Return true when an operation reported a non-success status.
-module pure elemental logical function is_failed_error(error) result(failed)
+module pure elemental logical function failed_error(error) result(has_failed)
   type(error_type), intent(in) :: error
 
-  failed = error%code /= NC_NOERR
-end function is_failed_error
+  has_failed = error%code /= NC_NOERR
+end function failed_error
 
-!> Return true when an operation failed because a NetCDF object was absent.
-module pure elemental logical function not_found_error(error) result(absent)
+!> Return false when an operation failed because a NetCDF object was absent.
+module pure elemental logical function found_error(error) result(is_present)
   type(error_type), intent(in) :: error
   !> `nc_open` may return the C system `ENOENT` value directly rather than
   !> the NetCDF-specific `NC_ENOTFOUND` status.  `ENOENT` is 2 on the
@@ -19,11 +19,11 @@ module pure elemental logical function not_found_error(error) result(absent)
 
   select case (error%code)
   case (ENOENT, NC_ENOTFOUND, NC_ENOTVAR, NC_ENOTATT, NC_EBADDIM)
-    absent = .true.
+    is_present = .false.
   case default
-    absent = .false.
+    is_present = .true.
   end select
-end function not_found_error
+end function found_error
 
 !> Check whether re-allocation of a buffer is required.
 !> This compares the current buffer size with the requested target size.

@@ -174,7 +174,7 @@ module subroutine write_frmt_error(error, unit, iotype, v_list, iostat, iomsg)
 
   iostat = 999
   if (iotype == 'LISTDIRECTED' .or. iotype == 'DT') then
-    if (.not. is_failed(error)) then
+    if (.not. failed(error)) then
       write (unit, "('NetCDF status (', i0, ')')") error%code
     else if (allocated(error%message)) then
       write (unit, "('NetCDF error (', i0, '): ', a)") &

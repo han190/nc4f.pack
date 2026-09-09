@@ -70,9 +70,8 @@ its dimensions describe the selected data rather than the source variable.
 
 Calls without `error=` retain their fail-fast behavior. Pass an `error_type`
 to handle a NetCDF failure in the calling program instead. A successful call
-resets its error to `NC_NOERR`; `not_found` recognizes absent files,
-variables, attributes, and dimensions, while `is_failed` recognizes every
-failure.
+resets its error to `NC_NOERR`. `found` is false for absent files, variables,
+attributes, and dimensions, while `failed` recognizes every failure.
 
 ```fortran
 type(error_type) :: error
@@ -80,15 +79,15 @@ type(netcdf_type) :: nc
 type(variable_type) :: var
 
 nc = open_dataset("input.nc", "r", error=error)
-if (is_failed(error)) then
+if (failed(error)) then
   print *, error
   return
 end if
 
 var = get_variable(nc, "optional_name", error=error)
-if (not_found(error)) then
+if (.not. found(error)) then
   ! Optional variable is absent.
-else if (is_failed(error)) then
+else if (failed(error)) then
   print *, error
   return
 end if
