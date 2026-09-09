@@ -8,6 +8,7 @@ type(test_type), allocatable :: tests(:)
 tests = [&
   & test_type("simple_wr", simple_wr), &
   & test_type("simple_rd", simple_rd), &
+  & test_type("error_handling", error_handling), &
   & test_type("hyperslab_rd", hyperslab_rd), &
   & test_type("unlimited_wr", unlimited_wr), &
   & test_type("sum_vars", sum_vars_test), &

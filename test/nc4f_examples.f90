@@ -7,6 +7,7 @@ implicit none (type, external)
 public :: simple_wr, simple_rd
 public :: hyperslab_rd, unlimited_wr
 public :: sum_vars_test
+public :: error_handling
 public :: sfc_pres_temp_wr
 public :: sfc_pres_temp_rd
 public :: buffer_edges
@@ -62,22 +63,102 @@ subroutine simple_rd(passed)
   type(netcdf_type) :: nc
   type(variable_type) :: var
   integer, parameter :: nx = 47, ny = 83
-  logical :: exist
+  type(error_type) :: error
   character(len=1024) :: stdout
 
-  !> Check existence of a file.
-  nc = open_dataset(TEST_RESULTS_DIR//"file_that_does_not_exist.nc", exist=exist)
-  passed = .not. exist
+  !> Check a missing file without terminating the caller.
+  nc = open_dataset(TEST_RESULTS_DIR//"file_that_does_not_exist.nc", error=error)
+  passed = is_failed(error) .and. not_found(error)
   if (.not. passed) return
 
   nc = open_dataset(TEST_RESULTS_DIR//"simple_wr.nc", "r")
-  var = inquire_variable(nc, "data", exist)
+  var = inquire_variable(nc, "data", error)
+  if (is_failed(error)) then
+    call close_dataset(nc)
+    passed = .false.
+    return
+  end if
   write (stdout, "(dt)") var
   passed = var%name == "data" .and. &
          & all(var%dims == ["x".dim.nx, "y".dim.ny]) .and. &
          & trim(stdout) == "real(real32)::data (x:47, y:83)"
   call close_dataset(nc)
 end subroutine simple_rd
+
+!> Exercise recoverable NetCDF errors and their functional predicates.
+subroutine error_handling(passed)
+  logical, intent(inout) :: passed
+  real, parameter :: values(1) = [42.0]
+  character(len=1024) :: stdout
+  integer :: io_stat
+  type(attribute_type) :: att
+  type(error_type) :: error
+  type(netcdf_type) :: nc
+  type(variable_type) :: present, var
+
+  passed = .false.
+  error = error_type(NC_ENOTVAR, "constructed error")
+  if (.not. (is_failed(error) .and. not_found(error) .and. &
+    & allocated(error%message))) return
+  error = error_type()
+  if (is_failed(error)) return
+
+  nc = open_dataset(TEST_RESULTS_DIR//"unused.nc", "invalid", error=error)
+  if (.not. (is_failed(error) .and. error%code == NC_EINVAL)) return
+
+  nc = open_dataset(TEST_RESULTS_DIR//"missing-error-fixture/no-file.nc", error=error)
+  if (.not. (is_failed(error) .and. not_found(error) .and. &
+    & error%code /= NC_NOERR .and. allocated(error%message))) return
+  write (stdout, "(dt)", iostat=io_stat) error
+  if (io_stat /= 0 .or. len_trim(stdout) == 0) return
+
+  present = data_array("present", values, ["x".dim.1], ["units".att."1"])
+  call to_netcdf(TEST_RESULTS_DIR//"error-handling.nc", present, error=error)
+  if (is_failed(error)) return
+  nc = open_dataset(TEST_RESULTS_DIR//"error-handling.nc", "r", error=error)
+  if (is_failed(error)) return
+
+  var = inquire_variable(nc, "missing", error)
+  if (.not. (not_found(error) .and. error%code == NC_ENOTVAR)) then
+    call close_dataset(nc)
+    return
+  end if
+  var = get_variable(nc, "missing", error)
+  if (.not. (not_found(error) .and. error%code == NC_ENOTVAR)) then
+    call close_dataset(nc)
+    return
+  end if
+  var = get_variable(nc, "present", error)
+  if (is_failed(error)) then
+    call close_dataset(nc)
+    return
+  end if
+
+  att = get_attribute(nc, "missing_global", error)
+  if (.not. (not_found(error) .and. error%code == NC_ENOTATT)) then
+    call close_dataset(nc)
+    return
+  end if
+  att = get_attribute(nc, var, "missing", error)
+  if (.not. (not_found(error) .and. error%code == NC_ENOTATT)) then
+    call close_dataset(nc)
+    return
+  end if
+
+  var = get_variable(nc, "present", [2], [1], error)
+  if (.not. (is_failed(error) .and. .not. not_found(error) .and. &
+    & error%code == NC_EEDGE)) then
+    call close_dataset(nc)
+    return
+  end if
+  var = get_variable(nc, "present", [0], [1], error)
+  if (.not. (is_failed(error) .and. error%code == NC_EINVALCOORDS)) then
+    call close_dataset(nc)
+    return
+  end if
+  call close_dataset(nc, error)
+  passed = .not. is_failed(error)
+end subroutine error_handling
 
 !> Read and persist a selected Fortran-order hyperslab.
 subroutine hyperslab_rd(passed)
@@ -170,28 +251,45 @@ subroutine sfc_pres_temp_rd(passed)
   logical, intent(inout) :: passed
   type(netcdf_type) :: nc
   type(variable_type) :: var
-  logical :: exist
+  type(error_type) :: error
   character(len=:), pointer :: units
   type(dimension_type) :: default_dims(2)
   integer, parameter :: nlat = 181, nlon = 361
 
   default_dims = ["longitude".dim.nlon, "latitude".dim.nlat]
   nc = open_dataset(TEST_RESULTS_DIR//"sfc_pres_temp_wr.nc", "r")
-  var = get_variable(nc, "pressure", exist)
+  var = get_variable(nc, "pressure", error)
+  if (is_failed(error)) then
+    call close_dataset(nc)
+    passed = .false.
+    return
+  end if
   passed = all(var%dims == default_dims) .and. &
          & var%name == "pressure" .and. &
          & all(var%atts == ["units".att."hPa"])
-  if (.not. passed) return
+  if (.not. passed) then
+    call close_dataset(nc)
+    return
+  end if
 
-  var = get_variable(nc, "temperature", exist)
+  var = get_variable(nc, "temperature", error)
+  if (is_failed(error)) then
+    call close_dataset(nc)
+    passed = .false.
+    return
+  end if
   call extract(var%atts(1), units)
   passed = all(var%dims == default_dims) .and. &
          & var%name == "temperature" .and. &
          & var%atts(1)%name == "units" .and. units == "celsius"
-  if (.not. passed) return
+  if (.not. passed) then
+    call close_dataset(nc)
+    return
+  end if
 
-  var = inquire_variable(nc, "relative_humidity", exist)
-  passed = .not. exist
+  var = inquire_variable(nc, "relative_humidity", error)
+  passed = not_found(error) .and. error%code == NC_ENOTVAR
+  call close_dataset(nc)
 end subroutine sfc_pres_temp_rd
 
 !> Exercise character extraction and boundary-length netCDF names.

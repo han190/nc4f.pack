@@ -160,6 +160,32 @@ module subroutine write_frmt_dim(dim, unit, iotype, v_list, iostat, iomsg)
   end if
 end subroutine write_frmt_dim
 
+!> Write an `error_type` in list-directed (Fortran `DT`) format.
+module subroutine write_frmt_error(error, unit, iotype, v_list, iostat, iomsg)
+  class(error_type), intent(in) :: error
+  integer, intent(in) :: unit
+  character(len=*), intent(in) :: iotype
+  integer, intent(in) :: v_list(:)
+  integer, intent(out) :: iostat
+  character(len=*), intent(inout) :: iomsg
+
+  associate (v_list_ => v_list, iomsg_ => iomsg)
+  end associate
+
+  iostat = 999
+  if (iotype == 'LISTDIRECTED' .or. iotype == 'DT') then
+    if (.not. is_failed(error)) then
+      write (unit, "('NetCDF status (', i0, ')')") error%code
+    else if (allocated(error%message)) then
+      write (unit, "('NetCDF error (', i0, '): ', a)") &
+        & error%code, trim(error%message)
+    else
+      write (unit, "('NetCDF status (', i0, ')')") error%code
+    end if
+    iostat = 0
+  end if
+end subroutine write_frmt_error
+
 !> Map a netCDF type code (NC_*) to a human-readable Fortran type-kind string.
 pure subroutine type_kind_str(dtype, str)
   !> NetCDF type code to map.

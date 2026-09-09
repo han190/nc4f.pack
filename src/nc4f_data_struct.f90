@@ -2,7 +2,10 @@ module nc4f_data_struct
 
 use, intrinsic :: iso_fortran_env, only: &
   & int8, int16, int32, int64, real32, real64
-use, intrinsic :: iso_c_binding, only: c_char, c_ptr, c_loc, c_f_pointer
+use, intrinsic :: iso_c_binding, only: c_char, c_int, c_ptr, c_loc, c_f_pointer
+use, non_intrinsic :: nc4f_c_interface, only: &
+  NC_NOERR, NC_EBADID, NC_EINVAL, NC_EINVALCOORDS, NC_ENOTFOUND, &
+  NC_ENOTVAR, NC_ENOTATT, NC_EBADDIM, NC_EEDGE
 implicit none (type, external)
 
 public :: &
@@ -10,7 +13,10 @@ public :: &
   allocate_memory, extract, data_array, MAX_CHAR_LEN
 public :: &
   operator(.att.), operator(.dim.), operator(.and.), &
-  operator(==), operator(/=), write(formatted), size, shape, sum
+  operator(==), operator(/=), write(formatted), size, shape, sum, &
+  error_type, is_failed, not_found, &
+  NC_NOERR, NC_EBADID, NC_EINVAL, NC_EINVALCOORDS, NC_ENOTFOUND, &
+  NC_ENOTVAR, NC_ENOTATT, NC_EBADDIM, NC_EEDGE
 private
 
 integer(int32), parameter :: MAX_CHAR_LEN = 1024
@@ -78,6 +84,14 @@ type :: dimension_argument_type
   logical :: is_unlim = .false.
 end type dimension_argument_type
 
+!> Result of an nc4f operation that was allowed to return normally on error.
+!> A zero `code` denotes success; on failure, `message` contains an nc4f
+!> diagnostic and `code` preserves the originating status.
+type :: error_type
+  integer(c_int) :: code = NC_NOERR
+  character(len=:), allocatable :: message
+end type error_type
+
 !> Dimension type constructor.
 interface operator(.dim.)
   module procedure :: new_dim_len_int32
@@ -113,6 +127,17 @@ interface shape
   module procedure :: get_shape
 end interface shape
 
+!> Return true when an operation reported a non-success status.
+interface is_failed
+  module procedure :: is_failed_error
+end interface is_failed
+
+!> Return true when an operation failed because a file, variable, attribute,
+!> or dimension was absent.
+interface not_found
+  module procedure :: not_found_error
+end interface not_found
+
 interface allocate_memory
   module procedure :: alloc_att_buf
   module procedure :: alloc_att_meta
@@ -126,6 +151,7 @@ interface write(formatted)
   module procedure :: write_frmt_var
   module procedure :: write_frmt_att
   module procedure :: write_frmt_dim
+  module procedure :: write_frmt_error
 end interface write(formatted)
 
 interface
@@ -256,6 +282,16 @@ interface
     !> Allocatable array of dimension lengths returned (int64 each).
     integer(int64), allocatable :: n(:)
   end function get_shape
+
+  !> Return true when `error` represents a failed operation.
+  module pure elemental logical function is_failed_error(error) result(failed)
+    type(error_type), intent(in) :: error
+  end function is_failed_error
+
+  !> Return true when `error` represents an absent NetCDF object.
+  module pure elemental logical function not_found_error(error) result(absent)
+    type(error_type), intent(in) :: error
+  end function not_found_error
 
   !> Allocate a variable `var` using metadata from `mold`.
   module pure subroutine alloc_var_mold(var, mold)
@@ -394,6 +430,16 @@ interface
     !> I/O message buffer (in/out).
     character(len=*), intent(inout) :: iomsg
   end subroutine write_frmt_dim
+
+  !> Write an `error_type` in list-directed (Fortran `DT`) format.
+  module subroutine write_frmt_error(error, unit, iotype, v_list, iostat, iomsg)
+    class(error_type), intent(in) :: error
+    integer, intent(in) :: unit
+    character(len=*), intent(in) :: iotype
+    integer, intent(in) :: v_list(:)
+    integer, intent(out) :: iostat
+    character(len=*), intent(inout) :: iomsg
+  end subroutine write_frmt_error
 end interface
 
 interface sum

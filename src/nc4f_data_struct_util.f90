@@ -2,6 +2,29 @@ submodule(nc4f_data_struct) nc4f_data_struct_util
 implicit none (type, external)
 contains
 
+!> Return true when an operation reported a non-success status.
+module pure elemental logical function is_failed_error(error) result(failed)
+  type(error_type), intent(in) :: error
+
+  failed = error%code /= NC_NOERR
+end function is_failed_error
+
+!> Return true when an operation failed because a NetCDF object was absent.
+module pure elemental logical function not_found_error(error) result(absent)
+  type(error_type), intent(in) :: error
+  !> `nc_open` may return the C system `ENOENT` value directly rather than
+  !> the NetCDF-specific `NC_ENOTFOUND` status.  `ENOENT` is 2 on the
+  !> supported POSIX and Windows C runtimes.
+  integer(c_int), parameter :: ENOENT = 2_c_int
+
+  select case (error%code)
+  case (ENOENT, NC_ENOTFOUND, NC_ENOTVAR, NC_ENOTATT, NC_EBADDIM)
+    absent = .true.
+  case default
+    absent = .false.
+  end select
+end function not_found_error
+
 !> Check whether re-allocation of a buffer is required.
 !> This compares the current buffer size with the requested target size.
 module pure logical function allocation_required(buffer, bsize)

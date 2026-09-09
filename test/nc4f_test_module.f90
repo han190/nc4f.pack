@@ -31,15 +31,20 @@ end subroutine setup_test_results
 subroutine run_tests(tests)
   type(test_type), intent(inout) :: tests(:)
   integer :: i
+  logical :: all_passed
 
+  all_passed = .true.
   do i = 1, size(tests)
+    tests(i)%passed = .false.
     call tests(i)%test(tests(i)%passed)
     if (tests(i)%passed) then
       print "(a)", "[test] "//tests(i)%name//": Passed."
     else
       print "(a)", "[test] "//tests(i)%name//": Failed."
+      all_passed = .false.
     end if
   end do
+  if (.not. all_passed) error stop "[test] One or more tests failed."
 end subroutine run_tests
 
 end module nc4f_test_module

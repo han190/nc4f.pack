@@ -18,22 +18,22 @@ Write to a NetCDF-4 file:
 ```simple_wr.f90
 program main
 
-use, non_intrinsic :: nc4f
-implicit none (type, external)
+  use, non_intrinsic :: nc4f
+  implicit none (type, external)
 
-type(variable_type) :: var
-integer, parameter :: nx = 47, ny = 83
-real :: values(nx, ny)
-integer :: x, y
+  type(variable_type) :: var
+  integer, parameter :: nx = 47, ny = 83
+  real :: values(nx, ny)
+  integer :: x, y
 
-!> Dummy data.
-do concurrent(y=1:ny, x=1:nx)
-  values(x, y) = sqrt((x - 0.5*nx)**2 + (y - 0.5*ny)**2)
-end do
+  !> Dummy data.
+  do concurrent(y=1:ny, x=1:nx)
+    values(x, y) = sqrt((x - 0.5*nx)**2 + (y - 0.5*ny)**2)
+  end do
 
-!> Create a data array and write it to netcdf.
-var = data_array("data", values, ["x".dim.nx, "y".dim.ny])
-call to_netcdf("simple_wr.nc", var)
+  !> Create a data array and write it to netcdf.
+  var = data_array("data", values, ["x".dim.nx, "y".dim.ny])
+  call to_netcdf("simple_wr.nc", var)
   
 end program main
 ```
@@ -42,16 +42,16 @@ Read from a NetCDF-4 file:
 ```simple_rd.f90
 program main
 
-use, non_intrinsic :: nc4f
-implicit none (type, external)
+  use, non_intrinsic :: nc4f
+  implicit none (type, external)
 
-type(netcdf_type) :: nc
-type(variable_type) :: var
-real, pointer :: vals(:, :)
+  type(netcdf_type) :: nc
+  type(variable_type) :: var
+  real, pointer :: vals(:, :)
 
-nc = open_dataset("simple_wr.nc", "r")
-var = get_variable(nc, "data")
-call extract(var, vals)
+  nc = open_dataset("simple_wr.nc", "r")
+  var = get_variable(nc, "data")
+  call extract(var, vals)
 
 end program main
 ```
@@ -65,6 +65,40 @@ var = get_variable(nc, "data", start=[4, 6], count=[3, 2])
 
 The resulting `variable_type` is a materialized array with shape `[3, 2]`;
 its dimensions describe the selected data rather than the source variable.
+
+## Error handling
+
+Calls without `error=` retain their fail-fast behavior. Pass an `error_type`
+to handle a NetCDF failure in the calling program instead. A successful call
+resets its error to `NC_NOERR`; `not_found` recognizes absent files,
+variables, attributes, and dimensions, while `is_failed` recognizes every
+failure.
+
+```fortran
+type(error_type) :: error
+type(netcdf_type) :: nc
+type(variable_type) :: var
+
+nc = open_dataset("input.nc", "r", error=error)
+if (is_failed(error)) then
+  print *, error
+  return
+end if
+
+var = get_variable(nc, "optional_name", error=error)
+if (not_found(error)) then
+  ! Optional variable is absent.
+else if (is_failed(error)) then
+  print *, error
+  return
+end if
+```
+
+`print *, error` uses defined formatted I/O. `error%code` preserves the
+underlying NetCDF status, and `error%message` carries the diagnostic. The
+whole-variable `error=` overload is scalar; the existing elemental
+`get_variable(nc, names)` form remains fail-fast. Iterate when individual
+array elements need recoverable errors.
 
 ### A slightly more advanced example
 Let’s walk through a classic workflow: computing temperature (K) from a [WRF](https://github.com/wrf-model/WRF) output file.
@@ -83,37 +117,39 @@ plus `start` and `count` vectors.
 ```advanced.f90
 program main
 
-use, non_intrinsic :: nc4f
-implicit none (type, external)
+  use, non_intrinsic :: nc4f
+  implicit none (type, external)
 
-!> Constants.
-real, parameter :: R = 287.0, CP = 1004.0
-real, parameter :: THETA0 = 300.0, P0 = 1000.0 * 100
-!> nc4f derived types.
-type(netcdf_type) :: nc
-type(variable_type) :: vars(2), output
-!> Pointers that points to the actual values.
-real, dimension(:), pointer :: P, THETA, T
+  !> Constants.
+  real, parameter :: R = 287.0, CP = 1004.0
+  real, parameter :: THETA0 = 300.0, P0 = 1000.0 * 100
 
-!> Open a NetCDF4 file.
-nc = open_dataset("wrfout_d01_2000-01-01_00_00_00", "r")
-!> Use impure elemental function `get_variable` to load all
-!> you want with a one-liner.
-vars(1) = sum(get_variable(nc, [character(len=2) :: "P", "PB"]))
-vars(2) = get_variable(nc, "T")
+  !> nc4f derived types.
+  type(netcdf_type) :: nc
+  type(variable_type) :: vars(2), output
 
-!> Extract values from variables.
-call extract(vars(1), P)
-call extract(vars(2), THETA)
+  !> Pointers that points to the actual values.
+  real, dimension(:), pointer :: P, THETA, T
 
-!> Allocate output variable.
-call allocate_memory(output, mold=vars(1))
-call extract(output, T)
+  !> Open a NetCDF4 file.
+  nc = open_dataset("wrfout_d01_2000-01-01_00_00_00", "r")
+  !> Use impure elemental function `get_variable` to load all
+  !> you want with a one-liner.
+  vars(1) = sum(get_variable(nc, [character(len=2) :: "P", "PB"]))
+  vars(2) = get_variable(nc, "T")
 
-!> Computation.
-T = (THETA + THETA0)*(P/P0)**(R/CP)
-!> Save the variable output to a new NetCDF4 file.
-call to_netcdf("output.nc", output)
+  !> Extract values from variables.
+  call extract(vars(1), P)
+  call extract(vars(2), THETA)
+
+  !> Allocate output variable.
+  call allocate_memory(output, mold=vars(1))
+  call extract(output, T)
+
+  !> Computation.
+  T = (THETA + THETA0)*(P/P0)**(R/CP)
+  !> Save the variable output to a new NetCDF4 file.
+  call to_netcdf("output.nc", output)
 
 end program main
 ```

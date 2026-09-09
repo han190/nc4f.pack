@@ -14,30 +14,36 @@ public :: &
   put_attribute, put_variable
 private
 
-!> Public APIs (IE: Impure Elemental)
 interface get_variable
-  module procedure :: get_var !> IE
+  module procedure :: get_var !> Impure Elemental
+  module procedure :: get_var_error
   module procedure :: get_vara
 end interface get_variable
 
 interface put_variable
-  module procedure :: put_var !> IE
+  module procedure :: put_var !> Impure Elemental
+  module procedure :: put_var_error
 end interface put_variable
 
 interface inquire_variable
-  module procedure :: inq_var !> IE
+  module procedure :: inq_var !> Impure Elemental
+  module procedure :: inq_var_error
 end interface inquire_variable
 
 interface get_attribute
   module procedure :: get_atts_nc
-  module procedure :: get_att_nc !> IE
+  module procedure :: get_att_nc !> Impure Elemental
+  module procedure :: get_att_nc_error
   module procedure :: get_atts_var
-  module procedure :: get_att_var !> IE
+  module procedure :: get_att_var !> Impure Elemental
+  module procedure :: get_att_var_error
 end interface get_attribute
 
 interface put_attribute
-  module procedure :: put_att_nc !> IE
-  module procedure :: put_att_var !> IE
+  module procedure :: put_att_nc !> Impure Elemental
+  module procedure :: put_att_nc_error
+  module procedure :: put_att_var !> Impure Elemental
+  module procedure :: put_att_var_error
 end interface put_attribute
 
 interface inquire_dimensions
@@ -66,12 +72,20 @@ interface
     type(attribute_type) :: att
   end function get_att_nc
 
+  !> Read a global attribute by name without stopping on a NetCDF failure.
+  module function get_att_nc_error(nc, name, error) result(att)
+    type(netcdf_type), intent(in) :: nc
+    character(len=*), intent(in) :: name
+    type(error_type), intent(out) :: error
+    type(attribute_type) :: att
+  end function get_att_nc_error
+
   !> Return all global attributes for a dataset.
-  module function get_atts_nc(nc, exist) result(atts)
+  module function get_atts_nc(nc, error) result(atts)
     !> High-level `netcdf_type` representing the open file.
     type(netcdf_type), intent(in) :: nc
-    !> Optional output flag set to true when attributes exist.
-    logical, optional, intent(out) :: exist
+    !> Optional error result. When absent, failures stop the program.
+    type(error_type), optional, intent(out) :: error
     !> Allocatable array of attributes for the dataset.
     type(attribute_type), allocatable :: atts(:)
   end function get_atts_nc
@@ -88,14 +102,23 @@ interface
     type(attribute_type) :: att
   end function get_att_var
 
+  !> Read a variable attribute by name without stopping on a NetCDF failure.
+  module function get_att_var_error(nc, var, name, error) result(att)
+    type(netcdf_type), intent(in) :: nc
+    type(variable_type), intent(in) :: var
+    character(len=*), intent(in) :: name
+    type(error_type), intent(out) :: error
+    type(attribute_type) :: att
+  end function get_att_var_error
+
   !> Return all attributes attached to a variable.
-  module function get_atts_var(nc, var, exist) result(atts)
+  module function get_atts_var(nc, var, error) result(atts)
     !> High-level `netcdf_type` representing the open file.
     type(netcdf_type), intent(in) :: nc
     !> Variable whose attributes will be returned.
     type(variable_type), intent(in) :: var
-    !> Optional output flag set to true when attributes exist.
-    logical, optional, intent(out) :: exist
+    !> Optional error result. When absent, failures stop the program.
+    type(error_type), optional, intent(out) :: error
     !> Allocatable array of attributes for the variable.
     type(attribute_type), allocatable :: atts(:)
   end function get_atts_var
@@ -108,11 +131,24 @@ interface
     type(variable_type), target, intent(in) :: var
   end subroutine put_att_var
 
+  !> Write all attributes of a variable without stopping on a NetCDF failure.
+  module subroutine put_att_var_error(nc, var, error)
+    type(netcdf_type), intent(in) :: nc
+    type(variable_type), target, intent(in) :: var
+    type(error_type), intent(out) :: error
+  end subroutine put_att_var_error
+
   !> Write all global attributes of the dataset to the file.
   module impure elemental subroutine put_att_nc(nc)
     !> High-level `netcdf_type` representing the open file.
     type(netcdf_type), target, intent(in) :: nc
   end subroutine put_att_nc
+
+  !> Write all global attributes without stopping on a NetCDF failure.
+  module subroutine put_att_nc_error(nc, error)
+    type(netcdf_type), target, intent(in) :: nc
+    type(error_type), intent(out) :: error
+  end subroutine put_att_nc_error
 
   !> Initialize `att` from an attribute mold, allocating its buffer.
   module pure subroutine allocate_att_mold(att, mold)
@@ -151,7 +187,7 @@ interface
   end function neq_att
 
   !> Open or create a dataset and return a `netcdf_type` handle.
-  module function open_dataset(filename, mode, inq_dims, inq_atts, exist) result(nc)
+  module function open_dataset(filename, mode, inq_dims, inq_atts, error) result(nc)
     !> Path to the dataset file.
     character(len=*), intent(in) :: filename
     !> Mode to open the file in: 'r' for read, 'w' for write.
@@ -160,52 +196,62 @@ interface
     logical, intent(in), optional :: inq_dims
     !> When true, inquire global attributes after opening the file.
     logical, intent(in), optional :: inq_atts
-    !> Check if file exists (only valid when mode is 'r').
-    logical, intent(out), optional :: exist
+    !> Optional error result. When absent, failures stop the program.
+    type(error_type), intent(out), optional :: error
     !> Returned `netcdf_type` describing the opened dataset.
     type(netcdf_type) :: nc
   end function open_dataset
 
   !> Close a dataset and free associated allocatables.
-  module subroutine close_dataset(nc)
+  module subroutine close_dataset(nc, error)
     !> `netcdf_type` representing the open dataset to close.
     type(netcdf_type), intent(inout) :: nc
+    !> Optional error result. When absent, failures stop the program.
+    type(error_type), intent(out), optional :: error
   end subroutine close_dataset
 
   !> Create a netCDF file from an array of `variable_type` objects.
-  module subroutine to_netcdf_vars(filename, vars, atts)
+  module subroutine to_netcdf_vars(filename, vars, atts, error)
     !> Output filename to create.
     character(len=*), intent(in) :: filename
     !> Array of variables to write into the file.
     type(variable_type), intent(in) :: vars(:)
     !> Optional array of global attributes to attach to the dataset.
     type(attribute_type), intent(in), optional :: atts(:)
+    !> Optional error result. When absent, failures stop the program.
+    type(error_type), intent(out), optional :: error
   end subroutine to_netcdf_vars
 
   !> Create a netCDF file and write a single `variable_type` object.
-  module subroutine to_netcdf_var(filename, var, atts)
+  module subroutine to_netcdf_var(filename, var, atts, error)
     !> Output filename to create.
     character(len=*), intent(in) :: filename
     !> Variable to write into the file.
     type(variable_type), intent(in) :: var
     !> Optional array of global attributes to attach to the dataset.
     type(attribute_type), intent(in), optional :: atts(:)
+    !> Optional error result. When absent, failures stop the program.
+    type(error_type), intent(out), optional :: error
   end subroutine to_netcdf_var
 
   !> Inquire all dimensions for the top-level group of a netCDF file.
-  module function inq_dims_nc(nc) result(dims)
+  module function inq_dims_nc(nc, error) result(dims)
     !> High-level `netcdf_type` representing the open file.
     type(netcdf_type), intent(in) :: nc
+    !> Optional error result. When absent, failures stop the program.
+    type(error_type), intent(out), optional :: error
     !> Allocatable array of `dimension_type` in Fortran order.
     type(dimension_type), allocatable :: dims(:)
   end function inq_dims_nc
 
   !> Inquire the dimensions attached to a variable.
-  module function inq_dims_var(nc, var) result(dims)
+  module function inq_dims_var(nc, var, error) result(dims)
     !> High-level `netcdf_type` for the file.
     type(netcdf_type), intent(in) :: nc
     !> `variable_type` describing the variable.
     type(variable_type), intent(in) :: var
+    !> Optional error result. When absent, failures stop the program.
+    type(error_type), intent(out), optional :: error
     !> Allocatable array of `dimension_type` for that variable.
     type(dimension_type), allocatable :: dims(:)
   end function inq_dims_var
@@ -223,17 +269,30 @@ interface
     type(dimension_type) :: new_dim
   end function def_dim
 
+  !> Define a dimension without stopping on a NetCDF failure.
+  module function def_dim_error(nc, dim, error) result(new_dim)
+    type(netcdf_type), intent(in) :: nc
+    type(dimension_type), intent(in) :: dim
+    type(error_type), intent(out) :: error
+    type(dimension_type) :: new_dim
+  end function def_dim_error
+
   !> ---------------------
   !> submodule_utility.f90
   !> ---------------------
 
-  !> Handle errors from netCDF C API calls and raise Fortran errors.
-  module impure elemental subroutine handle_error(status, error_message)
-    !> Status code returned by a netCDF C API call.
+  !> Apply the library's fail-fast policy to a completed error result.
+  module impure logical function handle_error(error) result(failed)
+    !> Completed result of an nc4f operation.
+    type(error_type), intent(in) :: error
+  end function handle_error
+
+  !> Construct an `error_type` from a NetCDF C status and optional context.
+  module function make_netcdf_error(status, context) result(error)
     integer(c_int), intent(in) :: status
-    !> Optional user message to include in the error text.
-    character(*), intent(in), optional :: error_message
-  end subroutine handle_error
+    character(*), intent(in), optional :: context
+    type(error_type) :: error
+  end function make_netcdf_error
 
   !> Trim left and right space of a character variable.
   module pure function clip(string) result(clipped)
@@ -283,19 +342,25 @@ interface
   !> ----------------------
 
   !> Read a variable's data from a netCDF dataset into a `variable_type`.
-  module impure elemental function get_var(nc, name, exist) result(var)
+  module impure elemental function get_var(nc, name) result(var)
     !> High-level `netcdf_type` representing the open file.
     type(netcdf_type), intent(in) :: nc
     !> Name of the variable to read.
     character(len=*), intent(in) :: name
-    !> Optional output flag set to true if the variable exists.
-    logical, optional, intent(out) :: exist
     !> Variable object that will contain metadata and the data buffer.
     type(variable_type), target :: var
   end function get_var
 
+  !> Read a scalar-named variable without stopping on a NetCDF failure.
+  module function get_var_error(nc, name, error) result(var)
+    type(netcdf_type), intent(in) :: nc
+    character(len=*), intent(in) :: name
+    type(error_type), intent(out) :: error
+    type(variable_type), target :: var
+  end function get_var_error
+
   !> Read a contiguous Fortran-order hyperslab into a `variable_type`.
-  module function get_vara(nc, name, start, count, exist) result(var)
+  module function get_vara(nc, name, start, count, error) result(var)
     !> High-level `netcdf_type` representing the open file.
     type(netcdf_type), intent(in) :: nc
     !> Name of the variable to read.
@@ -304,23 +369,29 @@ interface
     integer, intent(in) :: start(:)
     !> Number of elements to read along each Fortran-order dimension.
     integer, intent(in) :: count(:)
-    !> Optional output flag set to true if the variable exists.
-    logical, optional, intent(out) :: exist
+    !> Optional error result. When absent, failures stop the program.
+    type(error_type), intent(out), optional :: error
     !> Materialized variable containing the selected data.
     type(variable_type), target :: var
   end function get_vara
 
   !> Inquire a variable's metadata without reading its data buffer.
-  module impure elemental function inq_var(nc, name, exist) result(var)
+  module impure elemental function inq_var(nc, name) result(var)
     !> High-level `netcdf_type` representing the open file.
     type(netcdf_type), intent(in) :: nc
     !> Name of the variable to inquire.
     character(len=*), intent(in) :: name
-    !> Optional output flag set to true if the variable exists.
-    logical, optional, intent(out) :: exist
     !> Variable object containing metadata (name, type, dims, atts, len).
     type(variable_type) :: var
   end function inq_var
+
+  !> Inquire a scalar-named variable without stopping on a NetCDF failure.
+  module function inq_var_error(nc, name, error) result(var)
+    type(netcdf_type), intent(in) :: nc
+    character(len=*), intent(in) :: name
+    type(error_type), intent(out) :: error
+    type(variable_type) :: var
+  end function inq_var_error
 
   !> Write a variable's data and metadata to a netCDF dataset.
   module impure elemental subroutine put_var(nc, var)
@@ -329,6 +400,13 @@ interface
     !> Variable object containing metadata and a data buffer to write.
     type(variable_type), target, intent(in) :: var
   end subroutine put_var
+
+  !> Write a scalar variable without stopping on a NetCDF failure.
+  module subroutine put_var_error(nc, var, error)
+    type(netcdf_type), intent(in) :: nc
+    type(variable_type), target, intent(in) :: var
+    type(error_type), intent(out) :: error
+  end subroutine put_var_error
 end interface
 
 end module nc4f_nc

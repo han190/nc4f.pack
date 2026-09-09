@@ -4,147 +4,172 @@ contains
 
 !> Read a global attribute by name and return it.
 module impure elemental function get_att_nc(nc, name) result(att)
-  !> High-level `netcdf_type` representing the open file.
   type(netcdf_type), intent(in) :: nc
-  !> Name of the global attribute to read.
   character(len=*), intent(in) :: name
-  !> Returned attribute object.
   type(attribute_type) :: att
+  type(error_type) :: error
 
-  att = get_att_(nc%id, NC_GLOBAL, clip(name))
+  att = get_att_(nc%id, NC_GLOBAL, clip(name), error)
+  if (handle_error(error)) return
 end function get_att_nc
 
-!> Return all global attributes for a dataset.
-module function get_atts_nc(nc, exist) result(atts)
-  !> High-level `netcdf_type` representing the open file.
+!> Read a global attribute without stopping on a NetCDF failure.
+module function get_att_nc_error(nc, name, error) result(att)
   type(netcdf_type), intent(in) :: nc
-  !> Optional output flag set to true when attributes exist.
-  logical, optional, intent(out) :: exist
-  !> Allocatable array of attributes for the dataset.
-  type(attribute_type), allocatable :: atts(:)
+  character(len=*), intent(in) :: name
+  type(error_type), intent(out) :: error
+  type(attribute_type) :: att
 
-  atts = get_atts_(nc%id, NC_GLOBAL, exist)
+  att = get_att_(nc%id, NC_GLOBAL, clip(name), error)
+end function get_att_nc_error
+
+!> Return all global attributes for a dataset.
+module function get_atts_nc(nc, error) result(atts)
+  type(netcdf_type), intent(in) :: nc
+  type(error_type), optional, intent(out) :: error
+  type(attribute_type), allocatable :: atts(:)
+  type(error_type) :: operation_error
+
+  atts = get_atts_(nc%id, NC_GLOBAL, operation_error)
+  if (present(error)) then
+    error = operation_error
+  else if (handle_error(operation_error)) then
+    return
+  end if
 end function get_atts_nc
 
 !> Read a named attribute attached to a variable and return it.
 module function get_att_var(nc, var, name) result(att)
-  !> High-level `netcdf_type` representing the open file.
   type(netcdf_type), intent(in) :: nc
-  !> Variable whose attribute will be read.
   type(variable_type), intent(in) :: var
-  !> Name of the attribute to read.
   character(len=*), intent(in) :: name
-  !> Returned attribute object.
   type(attribute_type) :: att
+  type(error_type) :: error
 
-  att = get_att_(nc%id, var%id, name)
+  att = get_att_(nc%id, var%id, name, error)
+  if (handle_error(error)) return
 end function get_att_var
 
-!> Return all attributes attached to a variable.
-module function get_atts_var(nc, var, exist) result(atts)
-  !> High-level `netcdf_type` representing the open file.
+!> Read a variable attribute without stopping on a NetCDF failure.
+module function get_att_var_error(nc, var, name, error) result(att)
   type(netcdf_type), intent(in) :: nc
-  !> Variable whose attributes will be returned.
   type(variable_type), intent(in) :: var
-  !> Optional output flag set to true when attributes exist.
-  logical, optional, intent(out) :: exist
-  !> Allocatable array of attributes for the variable.
-  type(attribute_type), allocatable :: atts(:)
+  character(len=*), intent(in) :: name
+  type(error_type), intent(out) :: error
+  type(attribute_type) :: att
 
-  atts = get_atts_(nc%id, var%id, exist)
+  att = get_att_(nc%id, var%id, name, error)
+end function get_att_var_error
+
+!> Return all attributes attached to a variable.
+module function get_atts_var(nc, var, error) result(atts)
+  type(netcdf_type), intent(in) :: nc
+  type(variable_type), intent(in) :: var
+  type(error_type), optional, intent(out) :: error
+  type(attribute_type), allocatable :: atts(:)
+  type(error_type) :: operation_error
+
+  atts = get_atts_(nc%id, var%id, operation_error)
+  if (present(error)) then
+    error = operation_error
+  else if (handle_error(operation_error)) then
+    return
+  end if
 end function get_atts_var
 
 !> Helper that returns attributes for a C `ncid` and `varid`.
-function get_atts_(ncid, varid, exist) result(atts)
-  !> C `ncid` for the dataset or group.
+function get_atts_(ncid, varid, error) result(atts)
   integer(c_int), intent(in) :: ncid
-  !> C `varid` for the variable or `NC_GLOBAL` for dataset attributes.
   integer(c_int), intent(in) :: varid
-  !> Optional output flag set to true when attributes exist.
-  logical, optional, intent(out) :: exist
-  !> Allocatable array of attributes returned by this helper.
+  type(error_type), intent(out) :: error
   type(attribute_type), allocatable :: atts(:)
-  !> Number of attributes returned by the C API.
-  integer(c_int) :: natts
-  !> Loop index for attribute enumeration.
-  integer(c_int) :: i
-  !> Temporary C-style name buffer for attribute names.
+  integer(c_int) :: natts, i, stat
   character(kind=c_char, len=NC_MAX_NAME + 1) :: name
-  !> Status code returned by C inquiries.
-  integer(c_int) :: stat
 
+  error = error_type()
   if (varid == NC_GLOBAL) then
     stat = nc_inq_natts(ncid, natts)
   else
     stat = nc_inq_varnatts(ncid, varid, natts)
   end if
+  error = make_netcdf_error(stat, "[get_atts] Attribute count.")
+  if (is_failed(error)) return
 
-  if (present(exist)) then
-    exist = stat == NC_NOERR
-    if (.not. exist) return
-  end if
-  call handle_error(stat)
-
-  if (.not. allocated(atts)) then
-    allocate (atts(natts))
-  else if (size(atts) < natts) then
-    deallocate (atts)
-    allocate (atts(natts))
-  end if
-
+  allocate (atts(natts))
   !> For the NetCDF C library, attribute IDs start from 0.
   do i = 0, natts - 1
-    call handle_error(nc_inq_attname(ncid, varid, i, name))
-    atts(i + 1) = get_att_(ncid, varid, c2fstr(name))
+    stat = nc_inq_attname(ncid, varid, i, name)
+    error = make_netcdf_error(stat, "[get_atts] Attribute name.")
+    if (is_failed(error)) return
+    atts(i + 1) = get_att_(ncid, varid, c2fstr(name), error)
+    if (is_failed(error)) return
   end do
 end function get_atts_
 
-!> Helper that reads a single attribute given C `ncid`, `varid` and name.
-impure elemental function get_att_(ncid, varid, name) result(att)
-  !> C `ncid` for the dataset or group.
+!> Helper that reads a single attribute given C `ncid`, `varid`, and name.
+function get_att_(ncid, varid, name, error) result(att)
   integer(c_int), intent(in) :: ncid
-  !> C `varid` for the variable or `NC_GLOBAL` for dataset attributes.
   integer(c_int), intent(in) :: varid
-  !> Attribute name to read.
   character(len=*), intent(in) :: name
-  !> Returned attribute object. This is `target` so its buffer can be
-  !> associated with C calls.
+  type(error_type), intent(out) :: error
   type(attribute_type), target :: att
-  !> Attribute data type returned by the C inquiry.
-  integer(c_int) :: dtype
-  !> Length (number of elements) of the attribute returned by the C API.
+  integer(c_int) :: dtype, stat
   integer(c_size_t) :: len
+  character(len=:), allocatable :: context
 
+  error = error_type()
   att%name = clip(name)
-  call handle_error(nc_inq_att(ncid, varid, &
-    & f2cstr(att%name), xtypep=dtype, lenp=len), &
-    & "[get_att_] Invalid attribute: "//att%name//".")
+  context = "[get_att] Invalid attribute: "//att%name//"."
+  stat = nc_inq_att(ncid, varid, f2cstr(att%name), xtypep=dtype, lenp=len)
+  error = make_netcdf_error(stat, context)
+  if (is_failed(error)) return
   att%len = len
   att%dtype = dtype
 
   zero_size_attr: if (att%len == 0) then
-    call validate_buffer(att, "[get_att_]")
+    call validate_buffer(att, "[get_att]")
     if (allocated(att%buffer)) deallocate (att%buffer)
     return
   end if zero_size_attr
 
   call allocate_memory(att)
-  call validate_buffer(att, "[get_att_]")
-  call handle_error(nc_get_att(ncid, varid, &
-    & f2cstr(att%name), c_loc(att%buffer(1))), &
-    & "[get_att_] Invalid attribute.")
+  call validate_buffer(att, "[get_att]")
+  stat = nc_get_att(ncid, varid, f2cstr(att%name), c_loc(att%buffer(1)))
+  error = make_netcdf_error(stat, context)
 end function get_att_
 
 !> Write all attributes of a variable to the dataset.
+!> This elemental overload preserves the existing array-variable API.
 module impure elemental subroutine put_att_var(nc, var)
-  !> High-level `netcdf_type` representing the open file.
   type(netcdf_type), intent(in) :: nc
-  !> Variable whose attributes will be written to the file.
   type(variable_type), target, intent(in) :: var
-  !> Loop index for iterating attributes.
-  integer :: i
-  type(c_ptr) :: cptr
+  type(error_type) :: error
 
+  call put_att_var_(nc, var, error)
+  if (handle_error(error)) return
+end subroutine put_att_var
+
+!> Write variable attributes without stopping on a NetCDF failure.
+module subroutine put_att_var_error(nc, var, error)
+  type(netcdf_type), intent(in) :: nc
+  type(variable_type), target, intent(in) :: var
+  type(error_type), intent(out) :: error
+
+  call put_att_var_(nc, var, error)
+end subroutine put_att_var_error
+
+!> Scalar implementation shared by the fail-fast and error-aware overloads.
+subroutine put_att_var_(nc, var, error)
+  type(netcdf_type), intent(in) :: nc
+  type(variable_type), target, intent(in) :: var
+  type(error_type), intent(out) :: error
+  integer :: i
+  integer(c_int) :: stat
+  type(c_ptr) :: cptr
+  character(len=:), allocatable :: context
+
+  error = error_type()
+  if (.not. allocated(var%atts)) return
   do i = 1, size(var%atts)
     associate (att => var%atts(i))
       call validate_buffer(att, "[put_att_var]")
@@ -153,21 +178,43 @@ module impure elemental subroutine put_att_var(nc, var)
       else
         cptr = c_loc(att%buffer(1))
       end if
-      call handle_error(nc_put_att(nc%id, var%id, f2cstr(att%name), &
-        & att%dtype, att%len, cptr), &
-        & "[put_att_] Invalid attribute.")
+      context = "[put_att] Invalid attribute: "//att%name//"."
+      stat = nc_put_att(nc%id, var%id, f2cstr(att%name), &
+        & att%dtype, att%len, cptr)
+      error = make_netcdf_error(stat, context)
+      if (is_failed(error)) return
     end associate
   end do
-end subroutine put_att_var
+end subroutine put_att_var_
 
 !> Write all global attributes of the dataset to the file.
+!> This elemental overload preserves the existing scalar API.
 module impure elemental subroutine put_att_nc(nc)
-  !> High-level `netcdf_type` representing the open file.
   type(netcdf_type), target, intent(in) :: nc
-  !> Loop index for iterating dataset attributes.
-  integer(int64) :: i
-  type(c_ptr) :: cptr
+  type(error_type) :: error
 
+  call put_att_nc_(nc, error)
+  if (handle_error(error)) return
+end subroutine put_att_nc
+
+!> Write global attributes without stopping on a NetCDF failure.
+module subroutine put_att_nc_error(nc, error)
+  type(netcdf_type), target, intent(in) :: nc
+  type(error_type), intent(out) :: error
+
+  call put_att_nc_(nc, error)
+end subroutine put_att_nc_error
+
+!> Scalar implementation shared by the fail-fast and error-aware overloads.
+subroutine put_att_nc_(nc, error)
+  type(netcdf_type), target, intent(in) :: nc
+  type(error_type), intent(out) :: error
+  integer(int64) :: i
+  integer(c_int) :: stat
+  type(c_ptr) :: cptr
+  character(len=:), allocatable :: context
+
+  error = error_type()
   if (.not. allocated(nc%atts)) return
   do i = 1, size(nc%atts, kind=int64)
     associate (att => nc%atts(i))
@@ -177,11 +224,13 @@ module impure elemental subroutine put_att_nc(nc)
       else
         cptr = c_loc(att%buffer(1))
       end if
-      call handle_error(nc_put_att(nc%id, NC_GLOBAL, f2cstr(att%name), &
-        & att%dtype, att%len, cptr), &
-        & "[put_att_] Invalid attribute.")
+      context = "[put_att] Invalid attribute: "//att%name//"."
+      stat = nc_put_att(nc%id, NC_GLOBAL, f2cstr(att%name), &
+        & att%dtype, att%len, cptr)
+      error = make_netcdf_error(stat, context)
+      if (is_failed(error)) return
     end associate
   end do
-end subroutine put_att_nc
+end subroutine put_att_nc_
 
 end submodule nc4f_nc_att

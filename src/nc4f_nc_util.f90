@@ -2,45 +2,85 @@ submodule(nc4f_nc) nc4f_nc_util
 implicit none (type, external)
 contains
 
-!> Handle errors from netCDF C API calls and raise Fortran errors.
-module impure elemental subroutine handle_error(status, error_message)
-  !> Status code returned by a netCDF C API call.
+!> Apply the legacy fail-fast policy to a completed `error_type`.
+!>
+!> Construction is deliberately separate: `make_netcdf_error` forms values
+!> from C statuses, and locally detected failures use the native
+!> `error_type(status, message)` constructor directly.
+module impure logical function handle_error(error) result(failed)
+  !> Completed result of an nc4f operation.
+  type(error_type), intent(in) :: error
+
+  failed = is_failed(error)
+  if (.not. failed) return
+
+  if (allocated(error%message)) then
+    error stop trim(error%message)
+  else
+    error stop "nc4f operation failed without a diagnostic."
+  end if
+end function handle_error
+
+!> Construct an error result from a NetCDF C status and optional context.
+module function make_netcdf_error(status, context) result(error)
+  !> Status code returned by a NetCDF C API call.
   integer(c_int), intent(in) :: status
-  !> Optional user message to include in the error text.
-  character(*), intent(in), optional :: error_message
+  !> Optional nc4f operation context to append to the NetCDF diagnostic.
+  character(*), intent(in), optional :: context
+  !> Constructed result. A successful status returns `error_type()`.
+  type(error_type) :: error
+  character(len=:), allocatable :: message
+
+  if (status == NC_NOERR) then
+    error = error_type()
+  else
+    if (present(context)) then
+      message = netcdf_message(status, context)
+    else
+      message = netcdf_message(status)
+    end if
+    error = error_type(status, message)
+  end if
+end function make_netcdf_error
+
+!> Convert a failed NetCDF C status and optional context into a diagnostic.
+function netcdf_message(status, context) result(message)
+  !> Status code returned by a NetCDF C API call.
+  integer(c_int), intent(in) :: status
+  !> Optional nc4f operation context to append to the NetCDF diagnostic.
+  character(*), intent(in), optional :: context
+  !> Allocatable Fortran diagnostic text.
+  character(len=:), allocatable :: message
   !> Pointer to the bytes of the C string returned by `nc_strerror`.
   character(kind=c_char), pointer :: fptr(:)
   type(c_ptr) :: cptr
   integer :: i, message_len
   !> Message buffer used to assemble the Fortran error string.
-  character(len=MAX_CHAR_LEN) :: msg, netcdf_message
+  character(len=MAX_CHAR_LEN) :: status_message
 
-  if (status /= NC_NOERR) then
-    netcdf_message = ""
-    cptr = nc_strerror(status)
-    if (.not. c_associated(cptr)) then
-      netcdf_message = "Unknown netCDF error"
+  status_message = ""
+  cptr = nc_strerror(status)
+  if (.not. c_associated(cptr)) then
+    status_message = "Unknown netCDF error"
+  else
+    message_len = int(min(c_strlen(cptr), int(MAX_CHAR_LEN, c_size_t)))
+    if (message_len == 0) then
+      status_message = "Unknown netCDF error"
     else
-      message_len = int(min(c_strlen(cptr), int(MAX_CHAR_LEN, c_size_t)))
-      if (message_len == 0) then
-        netcdf_message = "Unknown netCDF error"
-      else
-        call c_f_pointer(cptr, fptr, [message_len])
-        do i = 1, message_len
-          netcdf_message(i:i) = fptr(i)
-        end do
-      end if
-    end if
-    if (present(error_message)) then
-      write (msg, "(a, a, '(', a, ')')") &
-        & trim(netcdf_message), new_line('a'), clip(error_message)
-      error stop trim(msg)
-    else
-      error stop trim(netcdf_message)
+      call c_f_pointer(cptr, fptr, [message_len])
+      do i = 1, message_len
+        status_message(i:i) = fptr(i)
+      end do
     end if
   end if
+
+  if (present(context)) then
+    message = trim(status_message)//new_line('a')//clip(context)
+  else
+    message = trim(status_message)
+  end if
   nullify (fptr)
-end subroutine handle_error
+end function netcdf_message
 
 !> Trim left and right space of a character variable.
 module pure function clip(string) result(clipped)

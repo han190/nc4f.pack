@@ -16,6 +16,22 @@ integer(c_int), parameter :: NC_NETCDF4 = int(z'1000', kind=c_int)
 
 !> No Error
 integer(c_int), parameter :: NC_NOERR = 0_c_int
+!> Invalid netCDF identifier.
+integer(c_int), parameter :: NC_EBADID = -33_c_int
+!> Invalid argument.
+integer(c_int), parameter :: NC_EINVAL = -36_c_int
+!> Hyperslab coordinates are outside a dimension.
+integer(c_int), parameter :: NC_EINVALCOORDS = -40_c_int
+!> Attribute not found.
+integer(c_int), parameter :: NC_ENOTATT = -43_c_int
+!> Dimension not found.
+integer(c_int), parameter :: NC_EBADDIM = -46_c_int
+!> Variable not found.
+integer(c_int), parameter :: NC_ENOTVAR = -49_c_int
+!> Hyperslab edge lengths exceed a dimension bound.
+integer(c_int), parameter :: NC_EEDGE = -57_c_int
+!> File not found.
+integer(c_int), parameter :: NC_ENOTFOUND = -90_c_int
 integer(c_int), parameter :: NC_MAX_NAME = 256_c_int
 
 !> not enforced after 4.5.0
