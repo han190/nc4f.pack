@@ -20,7 +20,7 @@ module pure elemental logical function found_error(error) result(is_present)
   integer(c_int), parameter :: ENOENT = 2_c_int
 
   select case (error%code)
-  case (ENOENT, NC_ENOTFOUND, NC_ENOTVAR, NC_ENOTATT, NC_EBADDIM)
+  case (ENOENT, NC_ENOTFOUND, NC_ENOTVAR, NC_ENOTATT, NC_EBADDIM, NC_ENOGRP)
     is_present = .false.
   case default
     is_present = .true.

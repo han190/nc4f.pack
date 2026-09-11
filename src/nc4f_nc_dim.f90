@@ -3,9 +3,9 @@ implicit none (type, external)
 contains
 
 !> Inquire all dimensions for the top-level group of a netCDF file.
-module function inq_dims_nc(nc, error) result(dims)
+module function inq_dims_grp(nc, error) result(dims)
   !> High-level `netcdf_type` representing the open file.
-  type(netcdf_type), intent(in) :: nc
+  class(group_type), intent(in) :: nc
   !> Optional error result. When absent, failures stop the program.
   type(error_type), intent(out), optional :: error
   !> Allocatable array of `dimension_type` in Fortran order.
@@ -18,12 +18,12 @@ module function inq_dims_nc(nc, error) result(dims)
   else if (handle_error(operation_error)) then
     return
   end if
-end function inq_dims_nc
+end function inq_dims_grp
 
 !> Inquire the dimensions attached to a variable.
 module function inq_dims_var(nc, var, error) result(dims)
   !> High-level `netcdf_type` for the file.
-  type(netcdf_type), intent(in) :: nc
+  class(group_type), intent(in) :: nc
   !> `variable_type` describing the variable.
   type(variable_type), intent(in) :: var
   !> Optional error result. When absent, failures stop the program.
@@ -111,7 +111,7 @@ end function inq_dims_
 !> Define a dimension in the netCDF file if it does not already exist.
 module impure elemental function def_dim(nc, dim) result(new_dim)
   !> High-level `netcdf_type` for the file.
-  type(netcdf_type), intent(in) :: nc
+  class(group_type), intent(in) :: nc
   !> `dimension_type` describing the desired dimension (name, len,
   !> is_unlim).
   type(dimension_type), intent(in) :: dim
@@ -128,7 +128,7 @@ end function def_dim
 !> Define a dimension without stopping on a NetCDF failure.
 module function def_dim_error(nc, dim, error) result(new_dim)
   !> Input argument(s): `nc`.
-  type(netcdf_type), intent(in) :: nc
+  class(group_type), intent(in) :: nc
   !> Input argument(s): `dim`.
   type(dimension_type), intent(in) :: dim
   !> Output argument(s): `error`.
@@ -141,7 +141,7 @@ end function def_dim_error
 !> Define a dimension, preserving `NC_EBADDIM` as the expected create path.
 function def_dim_(nc, dim, error) result(new_dim)
   !> Input argument(s): `nc`.
-  type(netcdf_type), intent(in) :: nc
+  class(group_type), intent(in) :: nc
   !> Input argument(s): `dim`.
   type(dimension_type), intent(in) :: dim
   !> Output argument(s): `error`.

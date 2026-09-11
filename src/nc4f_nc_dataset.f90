@@ -59,16 +59,17 @@ function open_dataset_(filename, mode, inq_dims, inq_atts, error) result(nc)
     write (msg, "('[open_dataset]', 1x, a)") nc%filename
     error = make_netcdf_error(stat, msg)
     if (failed(error)) return
+    nc%name = "/"
     nc%mode = NC_NOWRITE
     if (optval(.false., inq_dims)) then
-      nc%dims = inq_dims_nc(nc, error=error)
+      nc%dims = inq_dims_grp(nc, error=error)
       if (failed(error)) then
         call close_dataset_(nc, cleanup_error)
         return
       end if
     end if
     if (optval(.false., inq_atts)) then
-      nc%atts = get_atts_nc(nc, error=error)
+      nc%atts = get_atts_grp(nc, error=error)
       if (failed(error)) then
         call close_dataset_(nc, cleanup_error)
         return
@@ -82,6 +83,7 @@ function open_dataset_(filename, mode, inq_dims, inq_atts, error) result(nc)
     stat = nc_create(f2cstr(nc%filename), ior(NC_NETCDF4, NC_CLOBBER), nc%id)
     error = make_netcdf_error(stat, msg)
     if (failed(error)) return
+    nc%name = "/"
     nc%mode = NC_NETCDF4
     if (allocated(nc%atts)) deallocate (nc%atts)
     if (allocated(nc%dims)) deallocate (nc%dims)
@@ -93,16 +95,17 @@ function open_dataset_(filename, mode, inq_dims, inq_atts, error) result(nc)
     write (msg, "('[open_dataset]', 1x, a)") nc%filename
     error = make_netcdf_error(stat, msg)
     if (failed(error)) return
+    nc%name = "/"
     nc%mode = NC_WRITE
     if (optval(.false., inq_dims)) then
-      nc%dims = inq_dims_nc(nc, error=error)
+      nc%dims = inq_dims_grp(nc, error=error)
       if (failed(error)) then
         call close_dataset_(nc, cleanup_error)
         return
       end if
     end if
     if (optval(.false., inq_atts)) then
-      nc%atts = get_atts_nc(nc, error=error)
+      nc%atts = get_atts_grp(nc, error=error)
       if (failed(error)) then
         call close_dataset_(nc, cleanup_error)
         return
@@ -159,6 +162,8 @@ subroutine close_dataset_(nc, error)
   if (failed(error)) return
   if (allocated(nc%atts)) deallocate (nc%atts)
   if (allocated(nc%dims)) deallocate (nc%dims)
+  if (allocated(nc%vars)) deallocate (nc%vars)
+  if (allocated(nc%grps)) deallocate (nc%grps)
 end subroutine close_dataset_
 
 !> Create a netCDF file from an array of `variable_type` objects.
@@ -207,7 +212,7 @@ subroutine to_netcdf_vars_(filename, vars, atts, error)
   end do
   if (present(atts)) then
     nc%atts = atts
-    call put_att_nc_error(nc, error)
+    call put_att_grp_error(nc, error)
     if (failed(error)) then
       call close_dataset_(nc, cleanup_error)
       return
@@ -259,7 +264,7 @@ subroutine to_netcdf_var_(filename, var, atts, error)
   end if
   if (present(atts)) then
     nc%atts = atts
-    call put_att_nc_error(nc, error)
+    call put_att_grp_error(nc, error)
     if (failed(error)) then
       call close_dataset_(nc, cleanup_error)
       return
@@ -267,5 +272,93 @@ subroutine to_netcdf_var_(filename, var, atts, error)
   end if
   call close_dataset_(nc, error)
 end subroutine to_netcdf_var_
+
+!> Create a NetCDF file whose root group has the supplied group's contents.
+module subroutine to_netcdf_grp(filename, grp, atts, error)
+  !> Output filename to create.
+  character(len=*), intent(in) :: filename
+  !> In-memory group to serialize as the file root.
+  type(group_type), intent(in) :: grp
+  !> Optional additional global attributes for the file root.
+  type(attribute_type), intent(in), optional :: atts(:)
+  !> Optional error result. When absent, failures stop the program.
+  type(error_type), intent(out), optional :: error
+  type(error_type) :: operation_error
+
+  call to_netcdf_grp_(filename, grp, atts, operation_error)
+  if (present(error)) then
+    error = operation_error
+  else if (handle_error(operation_error)) then
+    return
+  end if
+end subroutine to_netcdf_grp
+
+!> Create a NetCDF file with the supplied groups below a new root group.
+module subroutine to_netcdf_grps(filename, grps, atts, error)
+  !> Output filename to create.
+  character(len=*), intent(in) :: filename
+  !> In-memory groups to serialize as the root's direct children.
+  type(group_type), intent(in) :: grps(:)
+  !> Optional global attributes for the otherwise empty file root.
+  type(attribute_type), intent(in), optional :: atts(:)
+  !> Optional error result. When absent, failures stop the program.
+  type(error_type), intent(out), optional :: error
+  type(error_type) :: operation_error
+
+  call to_netcdf_grps_(filename, grps, atts, operation_error)
+  if (present(error)) then
+    error = operation_error
+  else if (handle_error(operation_error)) then
+    return
+  end if
+end subroutine to_netcdf_grps
+
+!> Error-returning implementation for a group treated as the file root.
+subroutine to_netcdf_grp_(filename, grp, atts, error)
+  character(len=*), intent(in) :: filename
+  type(group_type), intent(in) :: grp
+  type(attribute_type), intent(in), optional :: atts(:)
+  type(error_type), intent(out) :: error
+  type(error_type) :: cleanup_error
+  type(group_type) :: file_root
+  type(netcdf_type) :: nc
+
+  error = error_type()
+  nc = open_dataset_(filename, mode="w", error=error)
+  if (failed(error)) return
+
+  file_root%id = nc%id
+  file_root%name = "/"
+  call serialize_grp_(file_root, grp, atts, error)
+  if (failed(error)) then
+    call close_dataset_(nc, cleanup_error)
+    return
+  end if
+  call close_dataset_(nc, error)
+end subroutine to_netcdf_grp_
+
+!> Error-returning implementation for direct child groups of a new root.
+subroutine to_netcdf_grps_(filename, grps, atts, error)
+  character(len=*), intent(in) :: filename
+  type(group_type), intent(in) :: grps(:)
+  type(attribute_type), intent(in), optional :: atts(:)
+  type(error_type), intent(out) :: error
+  type(error_type) :: cleanup_error
+  type(group_type) :: file_root
+  type(netcdf_type) :: nc
+
+  error = error_type()
+  nc = open_dataset_(filename, mode="w", error=error)
+  if (failed(error)) return
+
+  file_root%id = nc%id
+  file_root%name = "/"
+  call serialize_grps_(file_root, grps, atts, error)
+  if (failed(error)) then
+    call close_dataset_(nc, cleanup_error)
+    return
+  end if
+  call close_dataset_(nc, error)
+end subroutine to_netcdf_grps_
 
 end submodule nc4f_nc_dataset

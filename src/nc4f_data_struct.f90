@@ -4,19 +4,19 @@ use, intrinsic :: iso_fortran_env, only: &
   & int8, int16, int32, int64, real32, real64
 use, intrinsic :: iso_c_binding, only: c_char, c_int, c_ptr, c_loc, c_f_pointer
 use, non_intrinsic :: nc4f_c_interface, only: &
-  NC_NOERR, NC_EBADID, NC_EINVAL, NC_EINVALCOORDS, NC_ENOTFOUND, &
-  NC_ENOTVAR, NC_ENOTATT, NC_EBADDIM, NC_EEDGE
+  NC_NOWRITE, NC_NOERR, NC_EBADID, NC_EINVAL, NC_EINVALCOORDS, NC_ENOTFOUND, &
+  NC_ENOTVAR, NC_ENOTATT, NC_EBADDIM, NC_EEDGE, NC_EBADGRPID, NC_ENOGRP
 implicit none (type, external)
 
 public :: &
-  netcdf_type, variable_type, attribute_type, dimension_type, &
-  initialize, extract, data_array, MAX_CHAR_LEN
+  netcdf_type, group_type, variable_type, attribute_type, dimension_type, &
+  initialize, extract, data_array, data_set, MAX_CHAR_LEN
 public :: &
   operator(.att.), operator(.dim.), operator(.and.), &
   operator(==), operator(/=), write(formatted), size, shape, sum, &
   error_type, failed, found, &
   NC_NOERR, NC_EBADID, NC_EINVAL, NC_EINVALCOORDS, NC_ENOTFOUND, &
-  NC_ENOTVAR, NC_ENOTATT, NC_EBADDIM, NC_EEDGE
+  NC_ENOTVAR, NC_ENOTATT, NC_EBADDIM, NC_EEDGE, NC_EBADGRPID, NC_ENOGRP
 private
 
 integer(int32), parameter :: MAX_CHAR_LEN = 1024
@@ -40,15 +40,6 @@ enum, bind(c)
   enumerator :: STRING_TYPE = 12 ! N/A
 end enum
 integer, parameter :: data_type = kind(NAT_TYPE)
-
-!> NetCDF root group.
-type :: netcdf_type
-  integer :: id = INVALID_INT32
-  character(len=:), allocatable :: filename
-  integer :: mode
-  type(attribute_type), allocatable :: atts(:)
-  type(dimension_type), allocatable :: dims(:)
-end type netcdf_type
 
 !> NetCDF variable type.
 type :: variable_type
@@ -77,6 +68,22 @@ type :: dimension_type
   integer(int64) :: len = INVALID_INT64
   logical :: is_unlim = .false.
 end type dimension_type
+
+!> A NetCDF group, including data declared locally and direct child groups.
+type :: group_type
+  integer(c_int) :: id = INVALID_INT32
+  character(len=:), allocatable :: name
+  type(dimension_type), allocatable :: dims(:)
+  type(attribute_type), allocatable :: atts(:)
+  type(variable_type), allocatable :: vars(:)
+  type(group_type), allocatable :: grps(:)
+end type group_type
+
+!> An open NetCDF file is its root group plus file-specific state.
+type, extends(group_type) :: netcdf_type
+  character(len=:), allocatable :: filename
+  integer(c_int) :: mode = NC_NOWRITE
+end type netcdf_type
 
 !> NetCDF dimension argument type.
 type :: dimension_argument_type
@@ -142,6 +149,15 @@ interface sum
   module procedure :: sum_vars
 end interface sum
 
+!> Construct an in-memory `group_type` from local arrays and/or child groups.
+!>
+!> `data_set(name, arrays=..., atts=..., grps=...)` infers the group's local
+!> dimensions from `arrays`; dimensions with the same name must agree.  The
+!> result is an in-memory group description, not an open `netcdf_type` handle.
+interface data_set
+  module procedure :: new_data_set
+end interface data_set
+
 interface initialize
   module procedure :: alloc_att_buf
   module procedure :: alloc_att_meta
@@ -155,10 +171,20 @@ interface write(formatted)
   module procedure :: write_frmt_var
   module procedure :: write_frmt_att
   module procedure :: write_frmt_dim
+  module procedure :: write_frmt_grp
   module procedure :: write_frmt_error
 end interface write(formatted)
 
 interface
+  !> Construct a group specification from local arrays, attributes, and children.
+  module function new_data_set(name, arrays, grps, atts) result(group)
+    character(len=*), intent(in) :: name
+    type(variable_type), intent(in), optional :: arrays(:)
+    type(group_type), intent(in), optional :: grps(:)
+    type(attribute_type), intent(in), optional :: atts(:)
+    type(group_type) :: group
+  end function new_data_set
+
   !> Initialize `att` from an attribute mold, allocating its buffer.
   module pure subroutine alloc_att_mold(att, mold)
     !> Attribute to allocate and initialize.
@@ -397,6 +423,22 @@ interface
     character(len=*), intent(in) :: context
     integer(int64) :: element_count
   end function checked_dim_product
+
+  !> Write a group hierarchy in formatted list-directed or DT form.
+  module subroutine write_frmt_grp(grp, unit, iotype, v_list, iostat, iomsg)
+    !> Variable object to format and write.
+    class(group_type), intent(in) :: grp
+    !> Output unit number.
+    integer, intent(in) :: unit
+    !> I/O type string (e.g. 'LISTDIRECTED' or 'DT').
+    character(len=*), intent(in) :: iotype
+    !> Optional list descriptor (passed by the formatted write interface).
+    integer, intent(in) :: v_list(:)
+    !> I/O status returned (0 for success).
+    integer, intent(out) :: iostat
+    !> I/O message buffer (in/out).
+    character(len=*), intent(inout) :: iomsg
+  end subroutine write_frmt_grp
 
   !> Write a `variable_type` in list-directed (Fortran `DT`) format.
   module subroutine write_frmt_var(var, unit, iotype, v_list, iostat, iomsg)

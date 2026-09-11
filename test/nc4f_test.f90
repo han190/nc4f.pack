@@ -21,6 +21,8 @@ tests = [&
   & test_type("buffer_edges", buffer_edges), &
   & test_type("extensive_wr", extensive_wr), &
   & test_type("extensive_rd", extensive_rd), &
+  & test_type("group_model", group_model), &
+  & test_type("group_write", group_write), &
   & test_type("nasa_cosp_read", nasa_cosp_read), &
   & test_type("ecmwf_era40_read", ecmwf_era40_read)]
 call setup_test_results()

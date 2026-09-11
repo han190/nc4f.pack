@@ -32,6 +32,10 @@ integer(c_int), parameter :: NC_ENOTVAR = -49_c_int
 integer(c_int), parameter :: NC_EEDGE = -57_c_int
 !> File not found.
 integer(c_int), parameter :: NC_ENOTFOUND = -90_c_int
+!> Invalid group identifier.
+integer(c_int), parameter :: NC_EBADGRPID = -116_c_int
+!> Group not found.
+integer(c_int), parameter :: NC_ENOGRP = -125_c_int
 integer(c_int), parameter :: NC_MAX_NAME = 256_c_int
 
 !> not enforced after 4.5.0
@@ -100,12 +104,12 @@ interface
     !> Options:
     !> - NC_NOERR No error.
     !> - NC_EPERM Attempting to create a netCDF file in a
-    !>  directory where you do not have permission to open files.
+    !>   directory where you do not have permission to open files.
     !> - NC_ENFILE Too many files open.
     !> - NC_ENOMEM Out of memory.
     !> - NC_EHDFERR HDF5 error. (NetCDF-4 files only.)
     !> - NC_EDIMMETA Error in netCDF-4 dimension metadata. (NetCDF-4 files
-    !>  only.)
+    !>   only.)
     integer(c_int) :: nc_open
   end function nc_open
 
@@ -129,14 +133,14 @@ interface
     !> Options:
     !> - NC_NOERR No error.
     !> - NC_EEXIST Specifying a file name of a file that exists and also
-    !>  specifying NC_NOCLOBBER.
+    !>   specifying NC_NOCLOBBER.
     !> - NC_EPERM Attempting to create a netCDF file in a directory where you
-    !>  do not have permission to create files.
+    !>   do not have permission to create files.
     !> - NC_ENOMEM System out of memory.
     !> - NC_ENFILE Too many files open.
     !> - NC_EHDFERR HDF5 error (netCDF-4 files only).
     !> - NC_EFILEMETA Error writing netCDF-4 file-level metadata in HDF5 file.
-    !>  (netCDF-4 files only).
+    !>   (netCDF-4 files only).
     !> - NC_EDISKLESS if there was an error in creating the in-memory file.
     integer(c_int) :: nc_create
   end function nc_create
@@ -150,9 +154,158 @@ interface
     !> - NC_NOERR No error.
     !> - NC_EBADID Invalid id passed.
     !> - NC_EBADGRPID ncid did not contain the root group id of this file.
-    !>  (NetCDF-4 only).
+    !>   (NetCDF-4 only).
     integer(c_int) :: nc_close
   end function nc_close
+
+  !> Define a child group below `parent_ncid`.
+  function nc_def_grp(parent_ncid, name, new_ncid) bind(c, name="nc_def_grp")
+    import :: c_int, c_char
+    !> Parent file or group identifier.
+    integer(c_int), value :: parent_ncid
+    !> Name for the newly defined direct child group.
+    character(kind=c_char), intent(in) :: name(*)
+    !> Returned identifier for the newly created group.
+    integer(c_int), intent(out) :: new_ncid
+    !> Options:
+    !> - NC_NOERR No error.
+    !> - NC_ENOTNC4 Not a netCDF-4 file.
+    !> - NC_ENOTINDEFINE Not in define mode.
+    !> - NC_ESTRICTNC3 Not permitted in netCDF-4 classic mode.
+    !> - NC_EPERM File is read-only.
+    !> - NC_ENOMEM Memory allocation failure.
+    !> - NC_ENAMEINUSE Group name is already in use.
+    integer(c_int) :: nc_def_grp
+  end function nc_def_grp
+
+  !> Look up a direct child group by name.
+  function nc_inq_ncid(ncid, name, grp_ncid) bind(c, name="nc_inq_ncid")
+    import :: c_int, c_char
+    !> Parent file or group identifier.
+    integer(c_int), value :: ncid
+    !> Name of the direct child group to look up.
+    character(kind=c_char), intent(in) :: name(*)
+    !> Returned identifier for the matching child group.
+    integer(c_int), intent(out) :: grp_ncid
+    !> Options:
+    !> - NC_NOERR No error.
+    !> - NC_EBADID Bad ncid.
+    !> - NC_ENOTNC4 Not a netCDF-4 file.
+    !> - NC_ENOGRP Group not found.
+    integer(c_int) :: nc_inq_ncid
+  end function nc_inq_ncid
+
+  !> Return direct child group identifiers, or only their count when NULL.
+  function nc_inq_grps(ncid, numgrps, ncids) bind(c, name="nc_inq_grps")
+    import :: c_int, c_ptr
+    !> File or group identifier whose direct children are queried.
+    integer(c_int), value :: ncid
+    !> Returned number of direct child groups.
+    integer(c_int), intent(out) :: numgrps
+    !> Caller-allocated array of `numgrps` group IDs, or C NULL to query only
+    !> the number of groups.
+    type(c_ptr), value :: ncids
+    !> Options:
+    !> - NC_NOERR No error.
+    !> - NC_EBADID Bad ncid.
+    integer(c_int) :: nc_inq_grps
+  end function nc_inq_grps
+
+  !> Return a group's local name.
+  function nc_inq_grpname(ncid, name) bind(c, name="nc_inq_grpname")
+    import :: c_int, c_char
+    !> Identifier of the group to name.
+    integer(c_int), value :: ncid
+    !> Caller-allocated name buffer of at least `NC_MAX_NAME + 1` characters.
+    character(kind=c_char), intent(out) :: name(*)
+    !> Options:
+    !> - NC_NOERR No error.
+    !> - NC_EBADID Bad ncid.
+    integer(c_int) :: nc_inq_grpname
+  end function nc_inq_grpname
+
+  !> Return a group's full path and required path length.
+  function nc_inq_grpname_full(ncid, lenp, full_name) &
+    & bind(c, name="nc_inq_grpname_full")
+    import :: c_int, c_char, c_size_t
+    !> Identifier of the group whose full path is queried.
+    integer(c_int), value :: ncid
+    !> Returned length of the full path, excluding the trailing NUL byte.
+    integer(c_size_t), intent(out) :: lenp
+    !> Caller-allocated buffer for the NUL-terminated full path. The root
+    !> group path is `/` and has length one.
+    character(kind=c_char), intent(out) :: full_name(*)
+    !> Options:
+    !> - NC_NOERR No error.
+    !> - NC_EBADID Bad ncid.
+    !> - NC_ENOMEM Memory allocation failure.
+    integer(c_int) :: nc_inq_grpname_full
+  end function nc_inq_grpname_full
+
+  !> Return the parent group identifier.
+  function nc_inq_grp_parent(ncid, parent_ncid) bind(c, name="nc_inq_grp_parent")
+    import :: c_int
+    !> Identifier of the group whose parent is queried.
+    integer(c_int), value :: ncid
+    !> Returned identifier for the direct parent group.
+    integer(c_int), intent(out) :: parent_ncid
+    !> Options:
+    !> - NC_NOERR No error.
+    !> - NC_EBADID Bad ncid.
+    !> - NC_ENOGRP No parent group: `ncid` identifies the root group.
+    integer(c_int) :: nc_inq_grp_parent
+  end function nc_inq_grp_parent
+
+  !> Resolve a full group path relative to `ncid`.
+  function nc_inq_grp_full_ncid(ncid, full_name, grp_ncid) &
+    & bind(c, name="nc_inq_grp_full_ncid")
+    import :: c_int, c_char
+    !> File or group identifier relative to which the full path is resolved.
+    integer(c_int), value :: ncid
+    !> Absolute or relative NUL-terminated group path to resolve.
+    character(kind=c_char), intent(in) :: full_name(*)
+    !> Returned identifier for the resolved group.
+    integer(c_int), intent(out) :: grp_ncid
+    !> Options:
+    !> - NC_NOERR No error.
+    !> - NC_EBADID Bad ncid.
+    !> - NC_ENOGRP Group not found.
+    !> - NC_ENOMEM Memory allocation failure.
+    !> - NC_EINVAL A group path is required.
+    integer(c_int) :: nc_inq_grp_full_ncid
+  end function nc_inq_grp_full_ncid
+
+  !> Return local variable identifiers, or only their count when NULL.
+  function nc_inq_varids(ncid, nvars, varids) bind(c, name="nc_inq_varids")
+    import :: c_int, c_ptr
+    !> Group identifier whose locally declared variables are queried.
+    integer(c_int), value :: ncid
+    !> Returned number of locally declared variables.
+    integer(c_int), intent(out) :: nvars
+    !> Caller-allocated array of `nvars` variable IDs, or C NULL to query only
+    !> the number of variables.
+    type(c_ptr), value :: varids
+    !> Options:
+    !> - NC_NOERR No error.
+    !> - NC_EBADID Bad ncid.
+    integer(c_int) :: nc_inq_varids
+  end function nc_inq_varids
+
+  !> Return a variable's local name.
+  function nc_inq_varname(ncid, varid, name) bind(c, name="nc_inq_varname")
+    import :: c_int, c_char
+    !> File or group identifier that scopes `varid`.
+    integer(c_int), value :: ncid
+    !> Identifier of the variable to name.
+    integer(c_int), value :: varid
+    !> Caller-allocated name buffer of at least `NC_MAX_NAME + 1` characters.
+    character(kind=c_char), intent(out) :: name(*)
+    !> Options:
+    !> - NC_NOERR No error.
+    !> - NC_EBADID Bad ncid.
+    !> - NC_ENOTVAR Invalid variable ID.
+    integer(c_int) :: nc_inq_varname
+  end function nc_inq_varname
 
   !> Return information about a netCDF attribute.
   function nc_inq_att(ncid, varid, name, xtypep, lenp) &

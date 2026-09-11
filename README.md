@@ -66,39 +66,6 @@ var = get_variable(nc, "data", start=[4, 6], count=[3, 2])
 The resulting `variable_type` is a materialized array with shape `[3, 2]`;
 its dimensions describe the selected data rather than the source variable.
 
-## Error handling
-
-Calls without `error=` retain their fail-fast behavior. Pass an `error_type`
-to handle a NetCDF failure in the calling program instead. A successful call
-resets its error to `NC_NOERR`. `found` is false for absent files, variables,
-attributes, and dimensions, while `failed` recognizes every failure.
-
-```fortran
-type(error_type) :: error
-type(netcdf_type) :: nc
-type(variable_type) :: var
-
-nc = open_dataset("input.nc", "r", error=error)
-if (failed(error)) then
-  print *, error
-  return
-end if
-
-var = get_variable(nc, "optional_name", error=error)
-if (.not. found(error)) then
-  ! Optional variable is absent.
-else if (failed(error)) then
-  print *, error
-  return
-end if
-```
-
-`print *, error` uses defined formatted I/O. `error%code` preserves the
-underlying NetCDF status, and `error%message` carries the diagnostic. The
-whole-variable `error=` overload is scalar; the existing elemental
-`get_variable(nc, names)` form remains fail-fast. Iterate when individual
-array elements need recoverable errors.
-
 ### A slightly more advanced example
 Let’s walk through a classic workflow: computing temperature (K) from a [WRF](https://github.com/wrf-model/WRF) output file.
 1. Load data from a WRF output file, which is a netcdf file.
@@ -169,5 +136,4 @@ end program main
 | STRING          |           |           |
 
 ## TODOs
-- [ ] `group_type` and `data_set`.
 - [ ] Support trig functions.

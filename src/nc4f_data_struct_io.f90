@@ -160,6 +160,113 @@ module subroutine write_frmt_dim(dim, unit, iotype, v_list, iostat, iomsg)
   end if
 end subroutine write_frmt_dim
 
+!> Write a group hierarchy in a compact ncdump-like layout.
+module subroutine write_frmt_grp(grp, unit, iotype, v_list, iostat, iomsg)
+  class(group_type), intent(in) :: grp
+  integer, intent(in) :: unit
+  character(len=*), intent(in) :: iotype
+  integer, intent(in) :: v_list(:)
+  integer, intent(out) :: iostat
+  character(len=*), intent(inout) :: iomsg
+
+  associate (v_list_ => v_list, iomsg_ => iomsg)
+  end associate
+
+  iostat = 999
+  if (iotype == "LISTDIRECTED" .or. iotype == "DT") then
+    call write_grp_(grp, unit, 0)
+    iostat = 0
+  end if
+end subroutine write_frmt_grp
+
+!> Recursively write one group and its direct children with indentation.
+recursive subroutine write_grp_(grp, unit, depth)
+  class(group_type), intent(in) :: grp
+  integer, intent(in) :: unit, depth
+  character(len=:), allocatable :: indent, name
+  integer :: i
+
+  indent = repeat(" ", 2*depth)
+  name = "/"
+  if (allocated(grp%name)) name = grp%name
+  if (depth == 0) then
+    write (unit, "(a, a, ' {')") indent//"group: ", trim(name)
+  else
+    write (unit, "(/, a, a, ' {')") indent//"group: ", trim(name)
+  end if
+
+  if (allocated(grp%dims)) then
+    if (size(grp%dims) > 0) then
+      write (unit, "(/, a)") indent//"  dimensions:"
+      do i = 1, size(grp%dims)
+        call write_dim_(grp%dims(i), unit, indent//"    ")
+      end do
+    end if
+  end if
+  if (allocated(grp%vars)) then
+    if (size(grp%vars) > 0) then
+      write (unit, "(/, a)") indent//"  variables:"
+      do i = 1, size(grp%vars)
+        call write_var_(grp%vars(i), unit, indent//"    ")
+      end do
+    end if
+  end if
+  if (allocated(grp%atts)) then
+    if (size(grp%atts) > 0) then
+      write (unit, "(/, a)") indent//"  // global attributes:"
+      do i = 1, size(grp%atts)
+        write (unit, "(/, a, dt)") indent//"    ", grp%atts(i)
+      end do
+    end if
+  end if
+  if (allocated(grp%grps)) then
+    if (size(grp%grps) > 0) then
+      write (unit, "(/, a)") indent//"  groups:"
+      do i = 1, size(grp%grps)
+        call write_grp_(grp%grps(i), unit, depth + 1)
+      end do
+    end if
+  end if
+  write (unit, "(/, a, '}')") indent
+end subroutine write_grp_
+
+!> Write a dimension in a NetCDF declaration style.
+subroutine write_dim_(dim, unit, indent)
+  type(dimension_type), intent(in) :: dim
+  integer, intent(in) :: unit
+  character(len=*), intent(in) :: indent
+
+  if (dim%is_unlim) then
+    write (unit, "(/, a, a, ' = UNLIMITED ; // (', i0, ' currently)')") &
+      & indent, dim%name, dim%len
+  else
+    write (unit, "(/, a, a, ' = ', i0, ' ;')") indent, dim%name, dim%len
+  end if
+end subroutine write_dim_
+
+!> Write a variable declaration using local Fortran-order dimension names.
+subroutine write_var_(var, unit, indent)
+  type(variable_type), intent(in) :: var
+  integer, intent(in) :: unit
+  character(len=*), intent(in) :: indent
+  character(len=MAX_CHAR_LEN) :: dims, dtype
+  integer :: i
+
+  call type_kind_str(var%dtype, dtype, ncdump=.true.)
+  dims = ""
+  if (allocated(var%dims)) then
+    if (size(var%dims) > 0) then
+      dims = "("
+      do i = 1, size(var%dims)
+        if (i > 1) dims = trim(dims)//", "
+        dims = trim(dims)//var%dims(i)%name
+      end do
+      dims = trim(dims)//")"
+    end if
+  end if
+  write (unit, "(/, a, a, 1x, a, a, ' ;')") indent, trim(dtype), var%name, trim(dims)
+end subroutine write_var_
+
 !> Write an `error_type` in list-directed (Fortran `DT`) format.
 module subroutine write_frmt_error(error, unit, iotype, v_list, iostat, iomsg)
   !> Input argument(s): `error`.
@@ -192,28 +299,62 @@ module subroutine write_frmt_error(error, unit, iotype, v_list, iostat, iomsg)
   end if
 end subroutine write_frmt_error
 
-!> Map a netCDF type code (NC_*) to a human-readable Fortran type-kind string.
-pure subroutine type_kind_str(dtype, str)
+!> Map a NetCDF type code to a Fortran type-kind or ncdump declaration name.
+pure subroutine type_kind_str(dtype, str, ncdump)
   !> NetCDF type code to map.
   integer(data_type), intent(in) :: dtype
-  !> Output string describing the Fortran type-kind.
+  !> Output string describing the requested type name.
   character(len=*), intent(out) :: str
+  !> Select the NetCDF/ncdump declaration spelling instead of Fortran syntax.
+  logical, intent(in), optional :: ncdump
+  logical :: use_ncdump
+
+  use_ncdump = .false.
+  if (present(ncdump)) use_ncdump = ncdump
 
   select case (dtype)
   case (FLOAT_TYPE)
-    str = 'real(real32)'
+    if (use_ncdump) then
+      str = 'float'
+    else
+      str = 'real(real32)'
+    end if
   case (DOUBLE_TYPE)
-    str = 'real(real64)'
+    if (use_ncdump) then
+      str = 'double'
+    else
+      str = 'real(real64)'
+    end if
   case (BYTE_TYPE)
-    str = 'integer(int8)'
+    if (use_ncdump) then
+      str = 'byte'
+    else
+      str = 'integer(int8)'
+    end if
   case (SHORT_TYPE)
-    str = 'integer(int16)'
+    if (use_ncdump) then
+      str = 'short'
+    else
+      str = 'integer(int16)'
+    end if
   case (INT_TYPE)
-    str = 'integer(int32)'
+    if (use_ncdump) then
+      str = 'int'
+    else
+      str = 'integer(int32)'
+    end if
   case (INT64_TYPE)
-    str = 'integer(int64)'
+    if (use_ncdump) then
+      str = 'int64'
+    else
+      str = 'integer(int64)'
+    end if
   case (CHAR_TYPE)
-    str = 'character(len=*)'
+    if (use_ncdump) then
+      str = 'char'
+    else
+      str = 'character(len=*)'
+    end if
   case default
     error stop "[type_kind_str] Unsupported type."
   end select

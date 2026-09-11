@@ -57,6 +57,7 @@ SRC = \
 	$(SRC_DIR)/nc4f_data_struct_att.f90 \
 	$(SRC_DIR)/nc4f_data_struct_dim.f90 \
 	$(SRC_DIR)/nc4f_data_struct_extract.f90 \
+	$(SRC_DIR)/nc4f_data_struct_grp.f90 \
 	$(SRC_DIR)/nc4f_data_struct_io.f90 \
 	$(SRC_DIR)/nc4f_data_struct_util.f90 \
 	$(SRC_DIR)/nc4f_data_struct_var_ctor.f90 \
@@ -65,6 +66,7 @@ SRC = \
 	$(SRC_DIR)/nc4f_nc_att.f90 \
 	$(SRC_DIR)/nc4f_nc_dataset.f90 \
 	$(SRC_DIR)/nc4f_nc_dim.f90 \
+	$(SRC_DIR)/nc4f_nc_grp.f90 \
 	$(SRC_DIR)/nc4f_nc_util.f90 \
 	$(SRC_DIR)/nc4f_nc_var.f90 \
 	$(SRC_DIR)/nc4f.f90
@@ -77,6 +79,7 @@ OBJ = \
 	$(BUILD_DIR)/nc4f_data_struct_att.o \
 	$(BUILD_DIR)/nc4f_data_struct_dim.o \
 	$(BUILD_DIR)/nc4f_data_struct_extract.o \
+	$(BUILD_DIR)/nc4f_data_struct_grp.o \
 	$(BUILD_DIR)/nc4f_data_struct_io.o \
 	$(BUILD_DIR)/nc4f_data_struct_util.o \
 	$(BUILD_DIR)/nc4f_data_struct_var_ctor.o \
@@ -85,6 +88,7 @@ OBJ = \
 	$(BUILD_DIR)/nc4f_nc_att.o \
 	$(BUILD_DIR)/nc4f_nc_dataset.o \
 	$(BUILD_DIR)/nc4f_nc_dim.o \
+	$(BUILD_DIR)/nc4f_nc_grp.o \
 	$(BUILD_DIR)/nc4f_nc_util.o \
 	$(BUILD_DIR)/nc4f_nc_var.o \
 	$(BUILD_DIR)/nc4f.o
@@ -93,6 +97,7 @@ TEST_FILES = \
 	nc4f_test_cases.f90 \
 	nc4f_test_cases_basic.f90 \
 	nc4f_test_cases_errors.f90 \
+	nc4f_test_cases_group.f90 \
 	nc4f_test_cases_io.f90 \
 	nc4f_test_cases_data.f90 \
 	nc4f_test_module.f90 \

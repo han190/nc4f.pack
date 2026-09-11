@@ -6,7 +6,7 @@ contains
 !> This elemental overload preserves the concise array-name API.
 module impure elemental function get_var(nc, name) result(var)
   !> Input argument(s): `nc`.
-  type(netcdf_type), intent(in) :: nc
+  class(group_type), intent(in) :: nc
   !> Input argument(s): `name`.
   character(len=*), intent(in) :: name
   type(variable_type), target :: var
@@ -19,7 +19,7 @@ end function get_var
 !> Read a scalar-named variable without stopping on a NetCDF failure.
 module function get_var_error(nc, name, error) result(var)
   !> Input argument(s): `nc`.
-  type(netcdf_type), intent(in) :: nc
+  class(group_type), intent(in) :: nc
   !> Input argument(s): `name`.
   character(len=*), intent(in) :: name
   !> Output argument(s): `error`.
@@ -32,7 +32,7 @@ end function get_var_error
 !> Scalar implementation shared by the fail-fast and error-aware overloads.
 function get_var_(nc, name, error) result(var)
   !> Input argument(s): `nc`.
-  type(netcdf_type), intent(in) :: nc
+  class(group_type), intent(in) :: nc
   !> Input argument(s): `name`.
   character(len=*), intent(in) :: name
   !> Output argument(s): `error`.
@@ -63,7 +63,7 @@ end function get_var_
 !> Read a contiguous Fortran-order hyperslab into a `variable_type`.
 module function get_vara(nc, name, start, count, error) result(var)
   !> Input argument(s): `nc`.
-  type(netcdf_type), intent(in) :: nc
+  class(group_type), intent(in) :: nc
   !> Input argument(s): `name`.
   character(len=*), intent(in) :: name
   !> Input argument(s): `start(:)`.
@@ -86,7 +86,7 @@ end function get_vara
 !> Error-returning implementation of a Fortran-order hyperslab read.
 function get_vara_(nc, name, start, count, error) result(var)
   !> Input argument(s): `nc`.
-  type(netcdf_type), intent(in) :: nc
+  class(group_type), intent(in) :: nc
   !> Input argument(s): `name`.
   character(len=*), intent(in) :: name
   !> Input argument(s): `start(:)`.
@@ -161,7 +161,7 @@ end function get_vara_
 !> This elemental overload preserves the concise array-name API.
 module impure elemental function inq_var(nc, name) result(var)
   !> Input argument(s): `nc`.
-  type(netcdf_type), intent(in) :: nc
+  class(group_type), intent(in) :: nc
   !> Input argument(s): `name`.
   character(len=*), intent(in) :: name
   type(variable_type) :: var
@@ -174,7 +174,7 @@ end function inq_var
 !> Inquire a scalar-named variable without stopping on a NetCDF failure.
 module function inq_var_error(nc, name, error) result(var)
   !> Input argument(s): `nc`.
-  type(netcdf_type), intent(in) :: nc
+  class(group_type), intent(in) :: nc
   !> Input argument(s): `name`.
   character(len=*), intent(in) :: name
   !> Output argument(s): `error`.
@@ -187,7 +187,7 @@ end function inq_var_error
 !> Scalar implementation shared by the fail-fast and error-aware overloads.
 function inq_var_(nc, name, error) result(var)
   !> Input argument(s): `nc`.
-  type(netcdf_type), intent(in) :: nc
+  class(group_type), intent(in) :: nc
   !> Input argument(s): `name`.
   character(len=*), intent(in) :: name
   !> Output argument(s): `error`.
@@ -235,7 +235,7 @@ end function inq_vartype_
 !> This elemental overload preserves the existing array-variable API.
 module impure elemental subroutine put_var(nc, var)
   !> Input argument(s): `nc`.
-  type(netcdf_type), intent(in) :: nc
+  class(group_type), intent(in) :: nc
   !> Input argument(s): `var`.
   type(variable_type), target, intent(in) :: var
   type(error_type) :: error
@@ -247,7 +247,7 @@ end subroutine put_var
 !> Write a scalar variable without stopping on a NetCDF failure.
 module subroutine put_var_error(nc, var, error)
   !> Input argument(s): `nc`.
-  type(netcdf_type), intent(in) :: nc
+  class(group_type), intent(in) :: nc
   !> Input argument(s): `var`.
   type(variable_type), target, intent(in) :: var
   !> Output argument(s): `error`.
@@ -259,7 +259,7 @@ end subroutine put_var_error
 !> Write a contiguous Fortran-order hyperslab to an existing variable.
 module subroutine put_vara(nc, var, start, count, error)
   !> Input argument(s): `nc`.
-  type(netcdf_type), intent(in) :: nc
+  class(group_type), intent(in) :: nc
   !> Input argument(s): `var`.
   type(variable_type), target, intent(in) :: var
   !> Input argument(s): `start(:)`.
@@ -281,7 +281,7 @@ end subroutine put_vara
 !> Error-returning implementation of a Fortran-order hyperslab write.
 subroutine put_vara_(nc, var, start, count, error)
   !> Input argument(s): `nc`.
-  type(netcdf_type), intent(in) :: nc
+  class(group_type), intent(in) :: nc
   !> Input argument(s): `var`.
   type(variable_type), target, intent(in) :: var
   !> Input argument(s): `start(:)`.
@@ -370,7 +370,7 @@ end subroutine put_vara_
 !> Scalar implementation shared by the fail-fast and error-aware overloads.
 subroutine put_var_(nc, var, error)
   !> Input argument(s): `nc`.
-  type(netcdf_type), intent(in) :: nc
+  class(group_type), intent(in) :: nc
   !> Input argument(s): `var`.
   type(variable_type), target, intent(in) :: var
   !> Output argument(s): `error`.
@@ -410,11 +410,11 @@ subroutine put_var_(nc, var, error)
 end subroutine put_var_
 
 !> Define a variable in the netCDF file and return its `variable_type`.
-function def_var_(nc, var, error) result(new_var)
+module function def_var_(nc, var, error) result(new_var)
   !> Input argument(s): `nc`.
-  type(netcdf_type), intent(in) :: nc
+  class(group_type), intent(in) :: nc
   !> Input argument(s): `var`.
-  type(variable_type), target, intent(in) :: var
+  type(variable_type), intent(in) :: var
   !> Output argument(s): `error`.
   type(error_type), intent(out) :: error
   type(variable_type) :: new_var
@@ -423,6 +423,7 @@ function def_var_(nc, var, error) result(new_var)
   type(dimension_type), allocatable :: new_dims(:)
   integer :: n, i, j
 
+  new_var = variable_type()
   error = error_type()
   n = size(var%dims)
   allocate (new_dims(n), new_dimids(n))

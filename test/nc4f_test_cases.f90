@@ -8,11 +8,14 @@ public :: simple_wr, simple_rd, character_variables, buffer_edges
 public :: creation_policy, error_handling
  public :: hyperslab_rd, hyperslab_wr, unlimited_wr, unlimited_dims
 public :: sum_vars_test, sfc_pres_temp_wr, sfc_pres_temp_rd, extensive_wr, extensive_rd
+public :: group_model, group_write
 public :: nasa_cosp_read
 public :: ecmwf_era40_read
 private
 
 character(*), parameter :: TEST_RESULTS_DIR = "build/test-results/"
+character(*), parameter :: NETCDF_TYPE_RESULT_FILE = &
+  & "build/test-results/nasa_cosp_netcdf_type.txt"
 
 interface
   module subroutine simple_wr(passed)
@@ -89,6 +92,14 @@ interface
     !> Input/output argument(s): `passed`.
     logical, intent(inout) :: passed
   end subroutine extensive_rd
+
+  module subroutine group_model(passed)
+    logical, intent(inout) :: passed
+  end subroutine group_model
+
+  module subroutine group_write(passed)
+    logical, intent(inout) :: passed
+  end subroutine group_write
 
   module subroutine nasa_cosp_read(passed)
     !> Input/output argument(s): `passed`.

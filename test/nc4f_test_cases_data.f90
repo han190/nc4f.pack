@@ -172,18 +172,49 @@ module subroutine nasa_cosp_read(passed)
   real(real64), pointer :: latitude(:), longitude(:)
   type(attribute_type) :: units, yaml_config
   type(error_type) :: error
-  type(netcdf_type) :: nc
+  type(group_type), allocatable :: grps(:)
+  type(group_type) :: root, solar_zenith
+  type(netcdf_type), target :: nc
   type(variable_type) :: latitude_var, longitude_var
-  logical :: is_open
+  class(group_type), pointer :: nc_group
+  integer :: file_unit, io_stat
+  logical :: is_open, output_open
 
   passed = .false.
   is_open = .false.
+  output_open = .false.
   nullify (yaml)
-  nc = open_dataset(SAMPLE_FILE, "r", inq_dims=.true., error=error)
+  nc = open_dataset(SAMPLE_FILE, "r", error=error)
   if (failed(error)) return
   is_open = .true.
 
   nasa_read: block
+    grps = inquire_groups(nc, error)
+    if (failed(error)) exit nasa_read
+    root = inquire_group(nc, inq_dims=.true., inq_atts=.true., inq_vars=.true., &
+      & inq_grps=.true., recursive=.true., error=error)
+    if (failed(error)) exit nasa_read
+    nc%dims = root%dims
+    nc%atts = root%atts
+    nc%vars = root%vars
+    nc%grps = root%grps
+    nc_group => nc
+
+    open (newunit=file_unit, file=NETCDF_TYPE_RESULT_FILE, status="replace", &
+      & action="write", iostat=io_stat)
+    if (io_stat /= 0) exit nasa_read
+    output_open = .true.
+    write (file_unit, "(dt)", iostat=io_stat) nc_group
+    close (file_unit, iostat=io_stat)
+    output_open = .false.
+    if (io_stat /= 0) exit nasa_read
+
+    solar_zenith = get_group(nc, "Solar_Zenith", error)
+    if (failed(error)) exit nasa_read
+    solar_zenith = inquire_group(solar_zenith, inq_dims=.true., inq_atts=.true., &
+      & inq_vars=.true., inq_grps=.true., error=error)
+    if (failed(error)) exit nasa_read
+
     latitude_var = get_variable(nc, "latitude", error)
     if (failed(error)) exit nasa_read
     longitude_var = get_variable(nc, "longitude", error)
@@ -204,7 +235,10 @@ module subroutine nasa_cosp_read(passed)
     if (.not. associated(yaml)) exit nasa_read
     if (len(yaml) <= 1024) exit nasa_read
 
-    passed = size(nc%dims) == 9 .and. &
+    passed = size(nc%dims) == 9 .and. size(grps) == 23 .and. &
+      & grps(1)%name == "Solar_Zenith" .and. solar_zenith%name == "Solar_Zenith" .and. &
+      & size(solar_zenith%dims) == 0 .and. size(solar_zenith%atts) == 7 .and. &
+      & size(solar_zenith%vars) == 5 .and. size(solar_zenith%grps) == 0 .and. &
       & size(latitude) == 180 .and. size(longitude) == 360 .and. &
       & latitude_var%dims(1)%name == "latitude" .and. &
       & longitude_var%dims(1)%name == "longitude" .and. &
@@ -215,6 +249,7 @@ module subroutine nasa_cosp_read(passed)
       & yaml(:14) == "grid_settings:"
   end block nasa_read
 
+  if (output_open) close (file_unit)
   if (associated(yaml)) deallocate (yaml)
   if (is_open) then
     call close_dataset(nc, error)

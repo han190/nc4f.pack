@@ -3,9 +3,9 @@ implicit none (type, external)
 contains
 
 !> Read a global attribute by name and return it.
-module impure elemental function get_att_nc(nc, name) result(att)
+module impure elemental function get_att_grp(nc, name) result(att)
   !> Input argument(s): `nc`.
-  type(netcdf_type), intent(in) :: nc
+  class(group_type), intent(in) :: nc
   !> Input argument(s): `name`.
   character(len=*), intent(in) :: name
   type(attribute_type) :: att
@@ -13,12 +13,12 @@ module impure elemental function get_att_nc(nc, name) result(att)
 
   att = get_att_(nc%id, NC_GLOBAL, clip(name), error)
   if (handle_error(error)) return
-end function get_att_nc
+end function get_att_grp
 
 !> Read a global attribute without stopping on a NetCDF failure.
-module function get_att_nc_error(nc, name, error) result(att)
+module function get_att_grp_error(nc, name, error) result(att)
   !> Input argument(s): `nc`.
-  type(netcdf_type), intent(in) :: nc
+  class(group_type), intent(in) :: nc
   !> Input argument(s): `name`.
   character(len=*), intent(in) :: name
   !> Output argument(s): `error`.
@@ -26,12 +26,12 @@ module function get_att_nc_error(nc, name, error) result(att)
   type(attribute_type) :: att
 
   att = get_att_(nc%id, NC_GLOBAL, clip(name), error)
-end function get_att_nc_error
+end function get_att_grp_error
 
 !> Return all global attributes for a dataset.
-module function get_atts_nc(nc, error) result(atts)
+module function get_atts_grp(nc, error) result(atts)
   !> Input argument(s): `nc`.
-  type(netcdf_type), intent(in) :: nc
+  class(group_type), intent(in) :: nc
   !> Output argument(s): `error`.
   type(error_type), optional, intent(out) :: error
   type(attribute_type), allocatable :: atts(:)
@@ -43,12 +43,12 @@ module function get_atts_nc(nc, error) result(atts)
   else if (handle_error(operation_error)) then
     return
   end if
-end function get_atts_nc
+end function get_atts_grp
 
 !> Read a named attribute attached to a variable and return it.
 module function get_att_var(nc, var, name) result(att)
   !> Input argument(s): `nc`.
-  type(netcdf_type), intent(in) :: nc
+  class(group_type), intent(in) :: nc
   !> Input argument(s): `var`.
   type(variable_type), intent(in) :: var
   !> Input argument(s): `name`.
@@ -63,7 +63,7 @@ end function get_att_var
 !> Read a variable attribute without stopping on a NetCDF failure.
 module function get_att_var_error(nc, var, name, error) result(att)
   !> Input argument(s): `nc`.
-  type(netcdf_type), intent(in) :: nc
+  class(group_type), intent(in) :: nc
   !> Input argument(s): `var`.
   type(variable_type), intent(in) :: var
   !> Input argument(s): `name`.
@@ -78,7 +78,7 @@ end function get_att_var_error
 !> Return all attributes attached to a variable.
 module function get_atts_var(nc, var, error) result(atts)
   !> Input argument(s): `nc`.
-  type(netcdf_type), intent(in) :: nc
+  class(group_type), intent(in) :: nc
   !> Input argument(s): `var`.
   type(variable_type), intent(in) :: var
   !> Output argument(s): `error`.
@@ -166,7 +166,7 @@ end function get_att_
 !> This elemental overload preserves the existing array-variable API.
 module impure elemental subroutine put_att_var(nc, var)
   !> Input argument(s): `nc`.
-  type(netcdf_type), intent(in) :: nc
+  class(group_type), intent(in) :: nc
   !> Input argument(s): `var`.
   type(variable_type), target, intent(in) :: var
   type(error_type) :: error
@@ -178,7 +178,7 @@ end subroutine put_att_var
 !> Write variable attributes without stopping on a NetCDF failure.
 module subroutine put_att_var_error(nc, var, error)
   !> Input argument(s): `nc`.
-  type(netcdf_type), intent(in) :: nc
+  class(group_type), intent(in) :: nc
   !> Input argument(s): `var`.
   type(variable_type), target, intent(in) :: var
   !> Output argument(s): `error`.
@@ -190,7 +190,7 @@ end subroutine put_att_var_error
 !> Scalar implementation shared by the fail-fast and error-aware overloads.
 subroutine put_att_var_(nc, var, error)
   !> Input argument(s): `nc`.
-  type(netcdf_type), intent(in) :: nc
+  class(group_type), intent(in) :: nc
   !> Input argument(s): `var`.
   type(variable_type), target, intent(in) :: var
   !> Output argument(s): `error`.
@@ -221,29 +221,29 @@ end subroutine put_att_var_
 
 !> Write all global attributes of the dataset to the file.
 !> This elemental overload preserves the existing scalar API.
-module impure elemental subroutine put_att_nc(nc)
+module impure elemental subroutine put_att_grp(nc)
   !> Input argument(s): `nc`.
-  type(netcdf_type), target, intent(in) :: nc
+  class(group_type), target, intent(in) :: nc
   type(error_type) :: error
 
-  call put_att_nc_(nc, error)
+  call put_att_grp_(nc, error)
   if (handle_error(error)) return
-end subroutine put_att_nc
+end subroutine put_att_grp
 
 !> Write global attributes without stopping on a NetCDF failure.
-module subroutine put_att_nc_error(nc, error)
+module subroutine put_att_grp_error(nc, error)
   !> Input argument(s): `nc`.
-  type(netcdf_type), target, intent(in) :: nc
+  class(group_type), target, intent(in) :: nc
   !> Output argument(s): `error`.
   type(error_type), intent(out) :: error
 
-  call put_att_nc_(nc, error)
-end subroutine put_att_nc_error
+  call put_att_grp_(nc, error)
+end subroutine put_att_grp_error
 
 !> Scalar implementation shared by the fail-fast and error-aware overloads.
-subroutine put_att_nc_(nc, error)
+subroutine put_att_grp_(nc, error)
   !> Input argument(s): `nc`.
-  type(netcdf_type), target, intent(in) :: nc
+  class(group_type), target, intent(in) :: nc
   !> Output argument(s): `error`.
   type(error_type), intent(out) :: error
   integer(int64) :: i
@@ -255,7 +255,7 @@ subroutine put_att_nc_(nc, error)
   if (.not. allocated(nc%atts)) return
   do i = 1, size(nc%atts, kind=int64)
     associate (att => nc%atts(i))
-      call validate_buffer(att, "[put_att_nc]")
+      call validate_buffer(att, "[put_att_grp]")
       if (att%len == 0) then
         cptr = c_null_ptr
       else
@@ -268,6 +268,6 @@ subroutine put_att_nc_(nc, error)
       if (failed(error)) return
     end associate
   end do
-end subroutine put_att_nc_
+end subroutine put_att_grp_
 
 end submodule nc4f_nc_att
