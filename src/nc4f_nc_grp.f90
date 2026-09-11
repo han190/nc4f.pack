@@ -100,6 +100,7 @@ module subroutine serialize_grps_(root, grps, atts, error)
   type(attribute_type), intent(in), optional :: atts(:)
   type(error_type), intent(out) :: error
   type(group_type) :: child
+  character(len=NC_MAX_NAME) :: child_name
   integer :: i
 
   error = error_type()
@@ -120,13 +121,15 @@ module subroutine serialize_grps_(root, grps, atts, error)
     if (failed(error)) return
   end if
   do i = 1, size(grps)
-    child = def_grp_(root, grps(i)%name, error)
+    child_name = grps(i)%name
+    child = def_grp_(root, child_name, error)
     if (failed(error)) return
     call define_grp_tree_(child, grps(i), error)
     if (failed(error)) return
   end do
   do i = 1, size(grps)
-    child = get_grp_(root, grps(i)%name, error)
+    child_name = grps(i)%name
+    child = get_grp_(root, child_name, error)
     if (failed(error)) return
     call write_grp_tree_data_(child, grps(i), error)
     if (failed(error)) return
@@ -141,6 +144,7 @@ recursive subroutine define_grp_tree_(target, source, error)
   type(dimension_type) :: defined_dim
   type(group_type) :: child
   type(variable_type) :: defined_var
+  character(len=NC_MAX_NAME) :: child_name
   integer :: i
 
   error = error_type()
@@ -172,7 +176,8 @@ recursive subroutine define_grp_tree_(target, source, error)
         error = error_type(NC_EINVAL, "[to_netcdf] Each child group must have a name.")
         return
       end if
-      child = def_grp_(target, source%grps(i)%name, error)
+      child_name = source%grps(i)%name
+      child = def_grp_(target, child_name, error)
       if (failed(error)) return
       call define_grp_tree_(child, source%grps(i), error)
       if (failed(error)) return
@@ -199,6 +204,7 @@ recursive subroutine write_grp_tree_data_(target, source, error)
   type(error_type), intent(out) :: error
   type(group_type) :: child
   integer, allocatable :: start(:), count(:)
+  character(len=NC_MAX_NAME) :: child_name
   integer :: i, j, ndims
 
   error = error_type()
@@ -219,7 +225,8 @@ recursive subroutine write_grp_tree_data_(target, source, error)
   end if
   if (allocated(source%grps)) then
     do i = 1, size(source%grps)
-      child = get_grp_(target, source%grps(i)%name, error)
+      child_name = source%grps(i)%name
+      child = get_grp_(target, child_name, error)
       if (failed(error)) return
       call write_grp_tree_data_(child, source%grps(i), error)
       if (failed(error)) return
