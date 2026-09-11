@@ -529,7 +529,7 @@ interface
   !> Serialize in-memory groups as direct children of an existing file root.
   module subroutine serialize_grps_(root, grps, atts, error)
     class(group_type), intent(in) :: root
-    type(group_type), intent(in) :: grps(:)
+    type(group_type), target, intent(in) :: grps(:)
     type(attribute_type), intent(in), optional :: atts(:)
     type(error_type), intent(out) :: error
   end subroutine serialize_grps_

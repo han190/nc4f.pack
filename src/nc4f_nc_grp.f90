@@ -96,20 +96,22 @@ end subroutine serialize_grp_
 !> Serialize groups as direct children of an existing file root.
 module subroutine serialize_grps_(root, grps, atts, error)
   class(group_type), intent(in) :: root
-  type(group_type), intent(in) :: grps(:)
+  type(group_type), target, intent(in) :: grps(:)
   type(attribute_type), intent(in), optional :: atts(:)
   type(error_type), intent(out) :: error
   type(group_type) :: child
+  type(group_type), pointer :: source_child
   character(len=NC_MAX_NAME) :: child_name
   integer :: i
 
   error = error_type()
   do i = 1, size(grps)
-    if (.not. allocated(grps(i)%name)) then
+    source_child => grps(i)
+    if (.not. allocated(source_child%name)) then
       error = error_type(NC_EINVAL, "[to_netcdf_grps] Each group must have a name.")
       return
     end if
-    if (trim(grps(i)%name) == "/") then
+    if (trim(source_child%name) == "/") then
       error = error_type(NC_EINVAL, &
         & "[to_netcdf_grps] A first-level group cannot be named '/'.")
       return
@@ -121,17 +123,19 @@ module subroutine serialize_grps_(root, grps, atts, error)
     if (failed(error)) return
   end if
   do i = 1, size(grps)
-    child_name = grps(i)%name
+    source_child => grps(i)
+    child_name = source_child%name
     child = def_grp_(root, child_name, error)
     if (failed(error)) return
-    call define_grp_tree_(child, grps(i), error)
+    call define_grp_tree_(child, source_child, error)
     if (failed(error)) return
   end do
   do i = 1, size(grps)
-    child_name = grps(i)%name
+    source_child => grps(i)
+    child_name = source_child%name
     child = get_grp_(root, child_name, error)
     if (failed(error)) return
-    call write_grp_tree_data_(child, grps(i), error)
+    call write_grp_tree_data_(child, source_child, error)
     if (failed(error)) return
   end do
 end subroutine serialize_grps_
@@ -139,10 +143,11 @@ end subroutine serialize_grps_
 !> Define all metadata in a group tree before any data are transferred.
 recursive subroutine define_grp_tree_(target, source, error)
   class(group_type), intent(in) :: target
-  type(group_type), intent(in) :: source
+  type(group_type), target, intent(in) :: source
   type(error_type), intent(out) :: error
   type(dimension_type) :: defined_dim
   type(group_type) :: child
+  type(group_type), pointer :: source_child
   type(variable_type) :: defined_var
   character(len=NC_MAX_NAME) :: child_name
   integer :: i
@@ -172,14 +177,15 @@ recursive subroutine define_grp_tree_(target, source, error)
   end if
   if (allocated(source%grps)) then
     do i = 1, size(source%grps)
-      if (.not. allocated(source%grps(i)%name)) then
+      source_child => source%grps(i)
+      if (.not. allocated(source_child%name)) then
         error = error_type(NC_EINVAL, "[to_netcdf] Each child group must have a name.")
         return
       end if
-      child_name = source%grps(i)%name
+      child_name = source_child%name
       child = def_grp_(target, child_name, error)
       if (failed(error)) return
-      call define_grp_tree_(child, source%grps(i), error)
+      call define_grp_tree_(child, source_child, error)
       if (failed(error)) return
     end do
   end if
@@ -200,9 +206,10 @@ end subroutine write_grp_atts_
 !> Write all data buffers after the complete group tree has been defined.
 recursive subroutine write_grp_tree_data_(target, source, error)
   class(group_type), intent(in) :: target
-  type(group_type), intent(in) :: source
+  type(group_type), target, intent(in) :: source
   type(error_type), intent(out) :: error
   type(group_type) :: child
+  type(group_type), pointer :: source_child
   integer, allocatable :: start(:), count(:)
   character(len=NC_MAX_NAME) :: child_name
   integer :: i, j, ndims
@@ -225,10 +232,11 @@ recursive subroutine write_grp_tree_data_(target, source, error)
   end if
   if (allocated(source%grps)) then
     do i = 1, size(source%grps)
-      child_name = source%grps(i)%name
+      source_child => source%grps(i)
+      child_name = source_child%name
       child = get_grp_(target, child_name, error)
       if (failed(error)) return
-      call write_grp_tree_data_(child, source%grps(i), error)
+      call write_grp_tree_data_(child, source_child, error)
       if (failed(error)) return
     end do
   end if
