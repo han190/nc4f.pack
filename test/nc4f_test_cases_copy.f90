@@ -10,6 +10,7 @@ contains
 module subroutine copy_semantics(passed)
   logical, intent(inout) :: passed
   type(group_type) :: child, deep_group, grandchild, shallow_group
+  type(group_type) :: child_grps(1), grandchild_grps(1)
   type(variable_type) :: deep_var, shallow_var, source_var
   real(real32), target :: raw_values(2)
   real(real32), pointer :: deep_values(:), shallow_values(:), source_values(:)
@@ -27,9 +28,11 @@ module subroutine copy_semantics(passed)
 
   source_var = datarray("source", raw_values, ["x" .dim. 2])
   grandchild = dataset("grandchild", [source_var])
-  child = dataset("child", grps=[grandchild])
-  shallow_group = dataset("root", [source_var], [child])
-  deep_group = dataset("root", [source_var], [child], deep=.true.)
+  grandchild_grps(1) = grandchild
+  child = dataset("child", grps=grandchild_grps)
+  child_grps(1) = child
+  shallow_group = dataset("root", [source_var], child_grps)
+  deep_group = dataset("root", [source_var], child_grps, deep=.true.)
   call extract(source_var, source_values)
   source_values(2) = 17.0_real32
   call extract(shallow_group%vars(1), shallow_values)

@@ -9,6 +9,7 @@ module subroutine group_model(passed)
   integer :: child_at, dims_at, file_unit, groups_at, iostat, line_number, &
     & root_at, vars_at, atts_at
   type(group_type) :: child, container, root
+  type(group_type) :: child_grps(1)
   type(variable_type) :: child_var, root_var
   real :: child_values(3), root_values(2)
 
@@ -17,8 +18,9 @@ module subroutine group_model(passed)
   root_var = datarray("root_data", root_values, ["root_x".dim.2])
   child_var = datarray("child_data", child_values, ["child_x".dim.3])
   child = dataset("child", vars=[child_var], atts=["title".att."child group"])
-  container = dataset("container", grps=[child])
-  root = dataset("/", vars=[root_var], atts=["title".att."root group"], grps=[child])
+  child_grps(1) = child
+  container = dataset("container", grps=child_grps)
+  root = dataset("/", vars=[root_var], atts=["title".att."root group"], grps=child_grps)
 
   root_at = 0
   dims_at = 0
@@ -73,6 +75,7 @@ module subroutine group_write(passed)
   type(group_type) :: child, child_on_disk, invalid, parent, parent_on_disk, &
     & root, root_on_disk, sibling
   type(group_type), allocatable :: top_level(:)
+  type(group_type) :: parent_grps(1), root_grps(1), top_level_input(2)
   type(netcdf_type) :: nc
   type(variable_type) :: child_data, child_var, root_data, root_var, sibling_var
 
@@ -81,10 +84,12 @@ module subroutine group_write(passed)
   child_var = datarray("child_data", [3.0, 4.0, 5.0], ["child_x".dim.3])
   sibling_var = datarray("sibling_data", [6.0], ["sibling_x".dim.1])
   child = dataset("child", vars=[child_var], atts=["title".att."child"])
-  parent = dataset("parent", grps=[child])
+  parent_grps(1) = child
+  parent = dataset("parent", grps=parent_grps)
   sibling = dataset("sibling", vars=[sibling_var])
+  root_grps(1) = parent
   root = dataset("input-root-name-is-ignored", vars=[root_var], &
-    & atts=["title".att."root"], grps=[parent])
+    & atts=["title".att."root"], grps=root_grps)
 
   call to_netcdf_grp(TEST_RESULTS_DIR//"group-root.nc", root, &
     & atts=["writer".att."group_write"], error=error)
@@ -133,7 +138,9 @@ module subroutine group_write(passed)
     return
   end if
 
-  call to_netcdf_grps(TEST_RESULTS_DIR//"group-children.nc", [parent, sibling], &
+  top_level_input(1) = parent
+  top_level_input(2) = sibling
+  call to_netcdf_grps(TEST_RESULTS_DIR//"group-children.nc", top_level_input, &
     & atts=["title".att."group collection"], error=error)
   if ((error%code /= NC_NOERR)) return
   nc = open_dataset(TEST_RESULTS_DIR//"group-children.nc", "r", error=error)
@@ -162,7 +169,8 @@ module subroutine group_write(passed)
     & parent_on_disk%grps(1)%name == "child")) return
 
   invalid = dataset("/")
-  call to_netcdf_grps(TEST_RESULTS_DIR//"invalid-root-child.nc", [invalid], error=error)
+  top_level_input(1) = invalid
+  call to_netcdf_grps(TEST_RESULTS_DIR//"invalid-root-child.nc", top_level_input(:1), error=error)
   passed = (error%code /= NC_NOERR) .and. error%code == NC_EINVAL
 end subroutine group_write
 

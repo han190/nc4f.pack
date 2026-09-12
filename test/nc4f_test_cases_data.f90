@@ -197,10 +197,7 @@ module subroutine nasa_cosp_read(passed)
     nc%dims = root%dims
     nc%atts = root%atts
     nc%vars = root%vars
-    if (associated(root%grps)) then
-      allocate (nc%grps(size(root%grps)))
-      nc%grps = root%grps
-    end if
+    if (associated(root%grps)) nc%grps => root%grps
     nc_group => nc
 
     open (newunit=file_unit, file=NETCDF_TYPE_RESULT_FILE, status="replace", &

@@ -12,6 +12,7 @@ module subroutine data_model(passed)
   type(attribute_type) :: atts(1), cloned_att
   type(dimension_type) :: dim
   type(group_type) :: attrs_only, child, deep_grp, empty, group_only, grp, leaf, restored, restored_child
+  type(group_type) :: child_grps(1), leaf_grps(1)
   type(netcdf_type) :: nc, nc_copy
   type(variable_type) :: borrowed_var, owned_var, restored_var, sum_var, vars(1)
   type(error_type) :: error
@@ -42,10 +43,12 @@ module subroutine data_model(passed)
   empty = dataset("empty")
   attrs_only = dataset("attrs", atts=[atts(1)])
   leaf = dataset("leaf", [vars(1)])
-  child = dataset("child", [vars(1)], [leaf], [atts(1)])
-  group_only = dataset("groups", [child], [atts(1)])
-  grp = dataset("root", [vars(1)], [child], [atts(1)])
-  deep_grp = dataset("deep", [borrowed_var], [child], [atts(1)], deep=.true.)
+  leaf_grps(1) = leaf
+  child = dataset("child", [vars(1)], leaf_grps, [atts(1)])
+  child_grps(1) = child
+  group_only = dataset("groups", child_grps, [atts(1)])
+  grp = dataset("root", [vars(1)], child_grps, [atts(1)])
+  deep_grp = dataset("deep", [borrowed_var], child_grps, [atts(1)], deep=.true.)
   if (c_associated(c_loc(deep_grp%vars(1)%buffer(1)), c_loc(values(1, 1)))) return
   if (.not. associated(grp%grps(1)%grps, child%grps)) return
   if (.not. c_associated(c_loc(grp%vars(1)%buffer(1)), c_loc(vars(1)%buffer(1)))) return
