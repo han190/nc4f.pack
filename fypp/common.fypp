@@ -19,4 +19,9 @@ $: "\n"
 :#{for _ in range(R - 1)}#, :#{endfor}#
 #: enddef
 
+#! Generate one-based first-element indices for an array.
+#: def ONES(R)
+${', '.join(['1'] * R)}$
+#: enddef
+
 #: endmute

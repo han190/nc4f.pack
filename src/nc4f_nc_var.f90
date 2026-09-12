@@ -44,11 +44,11 @@ function get_var_(nc, name, error) result(var)
 
   error = error_type()
   var = inq_var_(nc, name, error)
-  if (failed(error)) return
+  if (has_error(error)) return
 
   zero_size_var: if (var%len == 0) then
     call validate_buffer(var, "[get_var]")
-    if (allocated(var%buffer)) deallocate (var%buffer)
+    if (associated(var%buffer)) nullify (var%buffer)
     return
   end if zero_size_var
 
@@ -105,7 +105,7 @@ function get_vara_(nc, name, start, count, error) result(var)
 
   error = error_type()
   var = inq_var_(nc, name, error)
-  if (failed(error)) return
+  if (has_error(error)) return
 
   ndims = size(var%dims)
   if (size(start) /= ndims .or. size(count) /= ndims) then
@@ -201,13 +201,13 @@ function inq_var_(nc, name, error) result(var)
   write (msg, "('[inq_varid]', 1x, a)") var%name
   stat = nc_inq_varid(nc%id, f2cstr(var%name), var%id)
   error = make_netcdf_error(stat, msg)
-  if (failed(error)) return
+  if (has_error(error)) return
   var%dtype = inq_vartype_(nc%id, var%id, error)
-  if (failed(error)) return
+  if (has_error(error)) return
   var%atts = get_atts_var(nc, var, error=error)
-  if (failed(error)) return
+  if (has_error(error)) return
   var%dims = inq_dims_var(nc, var, error=error)
-  if (failed(error)) return
+  if (has_error(error)) return
   var%len = checked_dim_count(var%dims, "[inq_var]")
 end function inq_var_
 
@@ -300,7 +300,7 @@ subroutine put_vara_(nc, var, start, count, error)
 
   error = error_type()
   target = inq_var_(nc, var%name, error)
-  if (failed(error)) return
+  if (has_error(error)) return
 
   ndims = size(target%dims)
   if (size(start) /= ndims .or. size(count) /= ndims) then
@@ -384,10 +384,10 @@ subroutine put_var_(nc, var, error)
   error = error_type()
   call validate_buffer(var, "[put_var]")
   tmp = def_var_(nc, var, error)
-  if (failed(error)) return
+  if (has_error(error)) return
   if (allocated(var%atts)) then
     call put_att_var_error(nc, tmp, error)
-    if (failed(error)) return
+    if (has_error(error)) return
   end if
   if (var%len <= 0) return
 
@@ -429,7 +429,7 @@ module function def_var_(nc, var, error) result(new_var)
   allocate (new_dims(n), new_dimids(n))
   do i = 1, n
     new_dims(i) = def_dim_error(nc, var%dims(i), error)
-    if (failed(error)) return
+    if (has_error(error)) return
   end do
   !> Reverse dimensions because this module calls the C API.
   do i = 1, n
@@ -440,7 +440,7 @@ module function def_var_(nc, var, error) result(new_var)
   stat = nc_def_var(nc%id, f2cstr(var%name), var%dtype, size(new_dims), &
     & new_dimids, varid)
   error = make_netcdf_error(stat, "[def_var] Define variable.")
-  if (failed(error)) return
+  if (has_error(error)) return
   new_var%id = varid
   if (allocated(var%atts)) new_var%atts = var%atts
 end function def_var_

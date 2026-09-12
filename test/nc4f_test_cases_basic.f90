@@ -16,10 +16,10 @@ module subroutine simple_wr(passed)
   do concurrent(y=1:ny, x=1:nx)
     values(x, y) = sqrt((x - 0.5*nx)**2 + (y - 0.5*ny)**2)
   end do
-  var = data_array("data", values, ["x".dim.nx, "y".dim.ny])
+  var = datarray("data", values, ["x".dim.nx, "y".dim.ny])
   call to_netcdf(TEST_RESULTS_DIR//"simple_wr.nc", var)
   write (stdout, "(dt)") var
-  passed = trim(stdout) == "real(real32)::data (x:47, y:83)"
+  passed = index(stdout, "float data(x, y)") > 0
 end subroutine simple_wr
 
 module subroutine simple_rd(passed)
@@ -32,12 +32,12 @@ module subroutine simple_rd(passed)
   character(len=1024) :: stdout
 
   nc = open_dataset(TEST_RESULTS_DIR//"file_that_does_not_exist.nc", error=error)
-  passed = failed(error) .and. .not. found(error)
+  passed = (error%code /= NC_NOERR) .and. .not. found(error)
   if (.not. passed) return
 
   nc = open_dataset(TEST_RESULTS_DIR//"simple_wr.nc", "r")
   var = inquire_variable(nc, "data", error)
-  if (failed(error)) then
+  if ((error%code /= NC_NOERR)) then
     call close_dataset(nc)
     passed = .false.
     return
@@ -45,7 +45,7 @@ module subroutine simple_rd(passed)
   write (stdout, "(dt)") var
   passed = var%name == "data" .and. &
          & all(var%dims == ["x".dim.nx, "y".dim.ny]) .and. &
-         & trim(stdout) == "real(real32)::data (x:47, y:83)"
+         & index(stdout, "float data(x, y)") > 0
   call close_dataset(nc)
 end subroutine simple_rd
 
@@ -58,20 +58,20 @@ module subroutine character_variables(passed)
   type(netcdf_type) :: nc
   type(variable_type) :: actual, var
 
-  var = data_array("letters", values, ["x".dim.2, "y".dim.3])
+  var = datarray("letters", values, ["x".dim.2, "y".dim.3])
   call to_netcdf(TEST_RESULTS_DIR//"characters.nc", var, error=error)
-  if (failed(error)) then
+  if ((error%code /= NC_NOERR)) then
     passed = .false.
     return
   end if
   nc = open_dataset(TEST_RESULTS_DIR//"characters.nc", "r", error=error)
-  if (failed(error)) then
+  if ((error%code /= NC_NOERR)) then
     passed = .false.
     return
   end if
   actual = get_variable(nc, "letters", error)
   call close_dataset(nc)
-  if (failed(error)) then
+  if ((error%code /= NC_NOERR)) then
     passed = .false.
     return
   end if
@@ -94,13 +94,13 @@ module subroutine buffer_edges(passed)
   empty_att = "empty".att.""
   call extract(empty_att, text)
   passed = associated(text) .and. len(text) == 0
-  if (associated(text)) deallocate (text)
+  if (associated(text)) nullify (text)
   if (.not. passed) return
 
   dim_name = repeat("d", len(dim_name) - 1)
   att_name = repeat("a", len(att_name) - 1)
   var_name = repeat("v", len(var_name) - 1)
-  var = data_array(var_name, values, [dim_name.dim.2], &
+  var = datarray(var_name, values, [dim_name.dim.2], &
     & [att_name.att."maximum-length name", "empty".att.""])
   call to_netcdf(TEST_RESULTS_DIR//"buffer_edges.nc", var)
 

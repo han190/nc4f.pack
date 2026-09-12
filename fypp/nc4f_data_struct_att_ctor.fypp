@@ -6,61 +6,34 @@ contains
 #: for D, T, K in zip(dtypes, types, kinds)
 !> Create an `attribute_type` from an array of `${T}$` of kind `${K}$`.
 module function new_att_${K}$(name, values) result(att)
-  !> Attribute name to assign (will be trimmed).
   character(len=*), intent(in) :: name
-  !> Values to store in the attribute (1D array of `${T}$` of kind `${K}$`).
   ${T}$(${K}$), intent(in) :: values(:)
-  !> Resulting attribute object containing metadata and buffer.
   type(attribute_type) :: att
-  !> Pointer view into the attribute buffer for efficient copy.
-  ${T}$(${K}$), pointer :: ptr(:)
 
-  call initialize(att, name, ${D}$, size(values, kind=int64))
-  if (size(values) > 0) then
-    call extract(att, ptr)
-    ptr = values
-  end if
+  call init_att(att, name, ${D}$, size(values, kind=int64))
+  if (size(values) > 0) att%buffer = transfer(values, 0_int8, size(att%buffer))
 end function new_att_${K}$
 
-!> Create a scalar `attribute_type` from a single `${T}$` value.
+!> Create a scalar `attribute_type` from a `${T}$` value.
 module function new_att_${K}$_scalar(name, value) result(att)
-  !> Attribute name to assign (will be trimmed).
   character(len=*), intent(in) :: name
-  !> Scalar value to store in the attribute.
   ${T}$(${K}$), intent(in) :: value
-  !> Resulting attribute object containing metadata and buffer.
   type(attribute_type) :: att
-  !> Temporary 1-element array used to forward to the array constructor.
   ${T}$(${K}$) :: tmp(1)
 
   tmp(1) = value
   att = new_att_${K}$(name, tmp)
 end function new_att_${K}$_scalar${NEWLINE()}$
 #: endfor
-!> Create an `attribute_type` containing character data from a
-!> Fortran string.
-module function new_att_character(name, value) result(att)
-  !> Attribute name to assign (will be trimmed).
-  character(len=*), intent(in) :: name
-  !> Character value to store in the attribute.
-  character(len=*), intent(in) :: value
-  !> Resulting attribute containing character buffer (NC_CHAR type).
-  type(attribute_type), target :: att
-  !> Temporary C-character pointer used to populate the attribute buffer.
-  character(kind=c_char), pointer :: fptr(:)
-  !> C pointer for interop with the attribute buffer.
-  type(c_ptr) :: cptr
-  !> Loop index used when copying characters.
-  integer(int64) :: i
 
-  call initialize(att, name, CHAR_TYPE, len(value, kind=int64))
-  call validate_att_data(att, CHAR_TYPE, "[new_att_character]")
-  if (att%len == 0) return
-  cptr = c_loc(att%buffer(1))
-  call c_f_pointer(cptr, fptr, [att%len])
-  do i = 1, att%len
-    fptr(i) = value(i:i)
-  end do
+!> Create an `attribute_type` containing character data.
+module function new_att_character(name, value) result(att)
+  character(len=*), intent(in) :: name
+  character(len=*), intent(in) :: value
+  type(attribute_type) :: att
+
+  call init_att(att, name, CHAR_TYPE, len(value, kind=int64))
+  if (len(value) > 0) att%buffer = transfer(value, 0_int8, size(att%buffer))
 end function new_att_character
 
 end submodule nc4f_data_struct_att_ctor

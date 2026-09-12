@@ -7,30 +7,39 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [gfortran-16, flang-new-23]
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+
+      - name: Add LLVM 23 repository
+        run: |
+          curl -fsSL https://apt.llvm.org/llvm-snapshot.gpg.key | \
+            sudo tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc > /dev/null
+          echo "deb http://apt.llvm.org/resolute/ llvm-toolchain-resolute-23 main" | \
+            sudo tee /etc/apt/sources.list.d/llvm-23.list
 
       - name: Install dependencies
         run: |
           sudo rm -f /etc/apt/sources.list.d/google-chrome.list \
             /etc/apt/sources.list.d/google-chrome.sources
           sudo apt-get update
-          sudo apt-get install --yes libnetcdf-dev netcdf-bin pkg-config fypp
+          sudo apt-get install --yes \
+            fortran-fpm gfortran-16 flang-23 libnetcdf-dev netcdf-bin pkg-config fypp
 
       - name: Report compiler
-        run: gfortran-14 --version
-
-      - name: Build
-        run: FC=gfortran-14 make
+        run: ${{ matrix.compiler }} --version
 
       - name: Download integration fixtures
         run: make download-test-data
 
-      - name: Test
-        run: FC=gfortran-14 make test
+      - name: Test with FPM
+        run: fpm test --compiler ${{ matrix.compiler }} --profile debug --flag "$(pkg-config --cflags --libs netcdf)"
 
       - name: Inspect generated NetCDF file
         run: ncdump -h build/test-results/characters.nc

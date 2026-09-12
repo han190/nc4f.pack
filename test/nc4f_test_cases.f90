@@ -11,6 +11,8 @@ public :: sum_vars_test, sfc_pres_temp_wr, sfc_pres_temp_rd, extensive_wr, exten
 public :: group_model, group_write
 public :: nasa_cosp_read
 public :: ecmwf_era40_read
+public :: copy_semantics
+public :: data_model
 private
 
 character(*), parameter :: TEST_RESULTS_DIR = "build/test-results/"
@@ -110,6 +112,14 @@ interface
     !> Input/output argument(s): `passed`.
     logical, intent(inout) :: passed
   end subroutine ecmwf_era40_read
+
+  module subroutine copy_semantics(passed)
+    logical, intent(inout) :: passed
+  end subroutine copy_semantics
+
+  module subroutine data_model(passed)
+    logical, intent(inout) :: passed
+  end subroutine data_model
 end interface
 
 end module nc4f_test_cases

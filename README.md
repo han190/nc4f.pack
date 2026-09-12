@@ -32,7 +32,7 @@ program main
   end do
 
   !> Create a data array and write it to netcdf.
-  var = data_array("data", values, ["x".dim.nx, "y".dim.ny])
+  var = datarray("data", values, ["x".dim.nx, "y".dim.ny])
   call to_netcdf("simple_wr.nc", var)
   
 end program main
@@ -137,3 +137,10 @@ end program main
 
 ## TODOs
 - [ ] Support trig functions.
+
+## v2 data model
+
+The current model uses pointer-backed value buffers and child-group trees.
+See [ownership and copy semantics](docs/ownership.md) and the
+[migration review](docs/v2-migration.md), particularly before using
+`deep=.false.` or migrating from `data_array` / `data_set`.

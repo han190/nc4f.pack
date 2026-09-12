@@ -52,9 +52,11 @@ SRC_F90 = \
 SRC = \
   $(SRC_DIR)/nc4f_c_interface.f90 \
 	$(SRC_DIR)/nc4f_data_struct.f90 \
+	$(SRC_DIR)/nc4f_data_struct_access.f90 \
 	$(SRC_DIR)/nc4f_data_struct_arith.f90 \
-	$(SRC_DIR)/nc4f_data_struct_att_ctor.f90 \
 	$(SRC_DIR)/nc4f_data_struct_att.f90 \
+	$(SRC_DIR)/nc4f_data_struct_att_ctor.f90 \
+	$(SRC_DIR)/nc4f_data_struct_clone.f90 \
 	$(SRC_DIR)/nc4f_data_struct_dim.f90 \
 	$(SRC_DIR)/nc4f_data_struct_extract.f90 \
 	$(SRC_DIR)/nc4f_data_struct_grp.f90 \
@@ -66,6 +68,7 @@ SRC = \
 	$(SRC_DIR)/nc4f_nc_att.f90 \
 	$(SRC_DIR)/nc4f_nc_dataset.f90 \
 	$(SRC_DIR)/nc4f_nc_dim.f90 \
+	$(SRC_DIR)/nc4f_nc_err.f90 \
 	$(SRC_DIR)/nc4f_nc_grp.f90 \
 	$(SRC_DIR)/nc4f_nc_util.f90 \
 	$(SRC_DIR)/nc4f_nc_var.f90 \
@@ -74,9 +77,11 @@ SRC = \
 OBJ = \
 	$(BUILD_DIR)/nc4f_c_interface.o \
 	$(BUILD_DIR)/nc4f_data_struct.o \
+	$(BUILD_DIR)/nc4f_data_struct_access.o \
 	$(BUILD_DIR)/nc4f_data_struct_arith.o \
-	$(BUILD_DIR)/nc4f_data_struct_att_ctor.o \
 	$(BUILD_DIR)/nc4f_data_struct_att.o \
+	$(BUILD_DIR)/nc4f_data_struct_att_ctor.o \
+	$(BUILD_DIR)/nc4f_data_struct_clone.o \
 	$(BUILD_DIR)/nc4f_data_struct_dim.o \
 	$(BUILD_DIR)/nc4f_data_struct_extract.o \
 	$(BUILD_DIR)/nc4f_data_struct_grp.o \
@@ -88,6 +93,7 @@ OBJ = \
 	$(BUILD_DIR)/nc4f_nc_att.o \
 	$(BUILD_DIR)/nc4f_nc_dataset.o \
 	$(BUILD_DIR)/nc4f_nc_dim.o \
+	$(BUILD_DIR)/nc4f_nc_err.o \
 	$(BUILD_DIR)/nc4f_nc_grp.o \
 	$(BUILD_DIR)/nc4f_nc_util.o \
 	$(BUILD_DIR)/nc4f_nc_var.o \
@@ -100,6 +106,8 @@ TEST_FILES = \
 	nc4f_test_cases_group.f90 \
 	nc4f_test_cases_io.f90 \
 	nc4f_test_cases_data.f90 \
+	nc4f_test_cases_copy.f90 \
+	nc4f_test_cases_model.f90 \
 	nc4f_test_module.f90 \
 	nc4f_test.f90
 TEST := $(addprefix $(TEST_DIR)/, $(TEST_FILES))

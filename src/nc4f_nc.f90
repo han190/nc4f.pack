@@ -15,6 +15,9 @@ public :: &
   get_group, inquire_groups, inquire_group
 private
 
+!> Fixed scratch length for operation-context diagnostics.
+integer, parameter :: MAX_CHAR_LEN = 1024
+
 interface get_variable
   module procedure :: get_var !> Impure Elemental
   module procedure :: get_var_error
@@ -76,6 +79,12 @@ interface validate_buffer
   module procedure :: validate_var_buffer
   module procedure :: validate_att_buffer
 end interface validate_buffer
+
+!> Allocate a fresh byte buffer for metadata read from the C API.
+interface initialize
+  module procedure :: initialize_att
+  module procedure :: initialize_var
+end interface initialize
 
 interface
   !> Return a direct child group by name.
@@ -381,6 +390,22 @@ interface
     type(error_type) :: error
   end function make_netcdf_error
 
+  !> Return true when `error` represents a failed operation.
+  module pure elemental logical function has_error(error) result(is_error)
+    !> Completed result of an nc4f operation.
+    type(error_type), intent(in) :: error
+  end function has_error
+
+  !> Convert a NetCDF C status and optional context into a diagnostic.
+  module function netcdf_message(status, context) result(message)
+    !> Status code returned by a NetCDF C API call.
+    integer(c_int), intent(in) :: status
+    !> Optional nc4f operation context for the diagnostic.
+    character(len=*), intent(in), optional :: context
+    !> Allocatable diagnostic string.
+    character(len=:), allocatable :: message
+  end function netcdf_message
+
   !> Trim left and right space of a character variable.
   module pure function clip(string) result(clipped)
     !> The input string.
@@ -429,6 +454,39 @@ interface
     character(len=*), intent(in) :: context
     integer(int64) :: element_count
   end function checked_dim_count
+
+  !> Safely multiply one dimension length into an element count.
+  module subroutine checked_multiply(product_value, factor, context)
+    integer(int64), intent(inout) :: product_value
+    integer(int64), intent(in) :: factor
+    character(len=*), intent(in) :: context
+  end subroutine checked_multiply
+
+  !> Return the checked byte count for a supported NetCDF data type.
+  module function checked_buffer_size(dtype, element_count, context) result(required_bytes)
+    integer(c_int), intent(in) :: dtype
+    integer(int64), intent(in) :: element_count
+    character(len=*), intent(in) :: context
+    integer(int64) :: required_bytes
+  end function checked_buffer_size
+
+  !> Validate capacity of a pointer-backed raw byte buffer.
+  module subroutine validate_raw_buffer(buffer, required_bytes, object_name, context)
+    integer(int8), pointer, intent(in) :: buffer(:)
+    integer(int64), intent(in) :: required_bytes
+    character(len=*), intent(in) :: object_name
+    character(len=*), intent(in) :: context
+  end subroutine validate_raw_buffer
+
+  !> Allocate a fresh byte buffer for an attribute read from a NetCDF file.
+  module subroutine initialize_att(att)
+    type(attribute_type), intent(inout) :: att
+  end subroutine initialize_att
+
+  !> Allocate a fresh byte buffer for a variable read from a NetCDF file.
+  module subroutine initialize_var(var)
+    type(variable_type), intent(inout) :: var
+  end subroutine initialize_var
 
   !> ----------------------
   !> submodule_variable.f90

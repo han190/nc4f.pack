@@ -62,32 +62,32 @@ function inq_dims_(ncid, varid, error) result(dims)
   if (present(varid)) then
     stat = nc_inq_varndims(ncid, varid, ndims)
     error = make_netcdf_error(stat, "[inq_dims] Variable rank.")
-    if (failed(error)) return
+    if (has_error(error)) return
     allocate (dimids(ndims))
     if (ndims > 0) then
       stat = nc_inq_vardimid(ncid, varid, dimids)
       error = make_netcdf_error(stat, "[inq_dims] Variable dimensions.")
-      if (failed(error)) return
+      if (has_error(error)) return
     end if
   else
     stat = nc_inq_dimids(ncid, ndims, c_null_ptr, include_parents)
     error = make_netcdf_error(stat, "[inq_dims] Dimension count.")
-    if (failed(error)) return
+    if (has_error(error)) return
     allocate (dimids(ndims))
     if (ndims > 0) then
       stat = nc_inq_dimids(ncid, ndims, c_loc(dimids(1)), include_parents)
       error = make_netcdf_error(stat, "[inq_dims] Dimension identifiers.")
-      if (failed(error)) return
+      if (has_error(error)) return
     end if
   end if
   stat = nc_inq_unlimdims(ncid, nunlim, c_null_ptr)
   error = make_netcdf_error(stat, "[inq_dims] Unlimited dimension count.")
-  if (failed(error)) return
+  if (has_error(error)) return
   allocate (unlimdimids(nunlim))
   if (nunlim > 0) then
     stat = nc_inq_unlimdims(ncid, nunlim, c_loc(unlimdimids(1)))
     error = make_netcdf_error(stat, "[inq_dims] Unlimited dimension identifiers.")
-    if (failed(error)) return
+    if (has_error(error)) return
   end if
 
   allocate (dims(ndims))
@@ -99,10 +99,10 @@ function inq_dims_(ncid, varid, error) result(dims)
     dims(j)%id = dimids(i)
     stat = nc_inq_dimname(ncid, dimids(i), dim_name)
     error = make_netcdf_error(stat, "[inq_dims] Dimension name.")
-    if (failed(error)) return
+    if (has_error(error)) return
     stat = nc_inq_dimlen(ncid, dimids(i), dims(j)%len)
     error = make_netcdf_error(stat, "[inq_dims] Dimension length.")
-    if (failed(error)) return
+    if (has_error(error)) return
     dims(j)%name = clip(c2fstr(dim_name))
     dims(j)%is_unlim = any(dimids(i) == unlimdimids)
   end do
@@ -166,7 +166,7 @@ function def_dim_(nc, dim, error) result(new_dim)
   len = merge(NC_UNLIMITED, dim%len, dim%is_unlim)
   stat = nc_def_dim(nc%id, f2cstr(dim%name), len, dimid)
   error = make_netcdf_error(stat, context)
-  if (failed(error)) return
+  if (has_error(error)) return
   new_dim = dimension_type(dimid, dim%name, dim%len, dim%is_unlim)
 end function def_dim_
 

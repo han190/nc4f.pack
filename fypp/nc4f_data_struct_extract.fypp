@@ -80,7 +80,7 @@ module subroutine extract_var_${K}$_${R}$d(var, ptr)
   #: if R == 1
   call c_f_pointer(cptr, ptr, [var%len])
   #: else
-  call c_f_pointer(cptr, ptr, shape(var))
+  call c_f_pointer(cptr, ptr, get_shape_(var))
   #: endif
 end subroutine extract_var_${K}$_${R}$d${NEWLINE(not (K == 'real64' and R == MAX_RANK))}$
 #: endfor
@@ -106,7 +106,7 @@ module subroutine extract_var_char_${R}$d(var, ptr)
   #: if R == 1
   call c_f_pointer(cptr, ptr, [var%len])
   #: else
-  call c_f_pointer(cptr, ptr, shape(var))
+  call c_f_pointer(cptr, ptr, get_shape_(var))
   #: endif
 end subroutine extract_var_char_${R}$d${NEWLINE(not (R == MAX_RANK))}$
 #: endfor

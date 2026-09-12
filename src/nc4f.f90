@@ -1,18 +1,19 @@
+!> Public facade for the v2 package while its operational APIs are ported.
 module nc4f
 
-use :: nc4f_data_struct, only: &
-  netcdf_type, group_type, variable_type, attribute_type, dimension_type, error_type, &
-  initialize, extract, data_array, data_set, size, shape, sum, failed, found, &
-  NC_NOERR, NC_EBADID, NC_EINVAL, NC_EINVALCOORDS, NC_ENOTFOUND, &
-  NC_ENOTVAR, NC_ENOTATT, NC_EBADDIM, NC_EEDGE, NC_EBADGRPID, NC_ENOGRP, &
-  operator(.att.), operator(.dim.), operator(.and.), &
-  operator(==), operator(/=), write(formatted)
+use, non_intrinsic :: nc4f_data_struct, only: &
+  attribute_type, dimension_type, error_type, group_type, netcdf_type, variable_type, &
+  NC_EBADID, NC_EBADDIM, NC_EBADGRPID, NC_EEDGE, NC_EINVAL, NC_EINVALCOORDS, NC_ENOGRP, &
+  NC_ENOTATT, NC_ENOTFOUND, NC_ENOTVAR, NC_NOERR, &
+  datarray, dataset, extract, found, initialize, operator(.att.), operator(.and.), operator(.dim.), &
+  operator(==), operator(/=), shape, size, sum, write(formatted)
+use, non_intrinsic :: nc4f_nc
+implicit none (type, external)
 
-use :: nc4f_nc, only: &
-  open_dataset, close_dataset, to_netcdf, to_netcdf_grp, to_netcdf_grps, &
-  inquire_dimensions, inquire_variable, &
-  get_attribute, get_variable, &
-  put_attribute, put_variable, &
-  get_group, inquire_groups, inquire_group
+public :: attribute_type, dimension_type, error_type, group_type, netcdf_type, variable_type
+public :: NC_EBADID, NC_EBADDIM, NC_EBADGRPID, NC_EEDGE, NC_EINVAL, NC_EINVALCOORDS, NC_ENOGRP, &
+  & NC_ENOTATT, NC_ENOTFOUND, NC_ENOTVAR, NC_NOERR
+public :: datarray, dataset, extract, found, initialize, operator(.att.), operator(.and.), operator(.dim.), &
+  operator(==), operator(/=), shape, size, sum, write(formatted)
 
-end module
+end module nc4f

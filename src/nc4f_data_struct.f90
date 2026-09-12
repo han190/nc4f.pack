@@ -1,29 +1,37 @@
+!> The v2 public data model.
+!>
+!> Attributes, variables, and groups use ordinary Fortran value components.
+!> Their data buffers and child-group collections are pointers: this keeps
+!> large values and recursive group trees shallow under intrinsic assignment.
 module nc4f_data_struct
 
-use, intrinsic :: iso_fortran_env, only: &
-  & int8, int16, int32, int64, real32, real64
-use, intrinsic :: iso_c_binding, only: c_char, c_int, c_ptr, c_loc, c_f_pointer
+use, intrinsic :: iso_fortran_env, only: int8, int16, int32, int64, real32, real64
+use, intrinsic :: iso_c_binding, only: c_f_pointer, c_int, c_loc, c_ptr
 use, non_intrinsic :: nc4f_c_interface, only: &
-  NC_NOWRITE, NC_NOERR, NC_EBADID, NC_EINVAL, NC_EINVALCOORDS, NC_ENOTFOUND, &
-  NC_ENOTVAR, NC_ENOTATT, NC_EBADDIM, NC_EEDGE, NC_EBADGRPID, NC_ENOGRP
+  NC_EBADID, NC_EBADDIM, NC_EBADGRPID, NC_EEDGE, NC_EINVAL, NC_EINVALCOORDS, NC_ENOGRP, &
+  NC_ENOTATT, NC_ENOTFOUND, NC_ENOTVAR, NC_NOERR, NC_NOWRITE
 implicit none (type, external)
 
-public :: &
-  netcdf_type, group_type, variable_type, attribute_type, dimension_type, &
-  initialize, extract, data_array, data_set, MAX_CHAR_LEN
-public :: &
-  operator(.att.), operator(.dim.), operator(.and.), &
-  operator(==), operator(/=), write(formatted), size, shape, sum, &
-  error_type, failed, found, &
-  NC_NOERR, NC_EBADID, NC_EINVAL, NC_EINVALCOORDS, NC_ENOTFOUND, &
-  NC_ENOTVAR, NC_ENOTATT, NC_EBADDIM, NC_EEDGE, NC_EBADGRPID, NC_ENOGRP
+public :: attribute_type, dimension_type, error_type, group_type, netcdf_type, variable_type
+public :: NC_EBADID, NC_EBADDIM, NC_EBADGRPID, NC_EEDGE, NC_EINVAL, NC_EINVALCOORDS, NC_ENOGRP, &
+  & NC_ENOTATT, NC_ENOTFOUND, NC_ENOTVAR, NC_NOERR
+public :: datarray, dataset, extract, found, initialize, operator(.att.), operator(.and.), operator(.dim.), &
+  & operator(==), operator(/=), shape, size, sum, write(formatted)
 private
 
-integer(int32), parameter :: MAX_CHAR_LEN = 1024
 integer(int32), parameter :: INVALID_INT32 = -2147483647_int32
 integer(int64), parameter :: INVALID_INT64 = -9223372036854775807_int64
 
-!> Type constant.
+!> Result of an nc4f operation that was allowed to return normally on error.
+!>
+!> A zero `code` denotes success. On failure, `message` contains an nc4f
+!> diagnostic and `code` preserves the originating NetCDF status.
+type :: error_type
+  integer(c_int) :: code = NC_NOERR
+  character(len=:), allocatable :: message
+end type error_type
+
+!> Type constant used for NetCDF external data types.
 enum, bind(c)
   enumerator :: NAT_TYPE = 0
   enumerator :: BYTE_TYPE = 1
@@ -32,97 +40,94 @@ enum, bind(c)
   enumerator :: INT_TYPE = 4
   enumerator :: FLOAT_TYPE = 5
   enumerator :: DOUBLE_TYPE = 6
-  enumerator :: UBYTE_TYPE = 7 ! N/A
-  enumerator :: USHORT_TYPE = 8 ! N/A
-  enumerator :: UINT_TYPE = 9 ! N/A
+  enumerator :: UBYTE_TYPE = 7
+  enumerator :: USHORT_TYPE = 8
+  enumerator :: UINT_TYPE = 9
   enumerator :: INT64_TYPE = 10
-  enumerator :: UINT64_TYPE = 11 ! N/A
-  enumerator :: STRING_TYPE = 12 ! N/A
+  enumerator :: UINT64_TYPE = 11
+  enumerator :: STRING_TYPE = 12
 end enum
 integer, parameter :: data_type = kind(NAT_TYPE)
 
-!> NetCDF variable type.
-type :: variable_type
-  integer :: id = INVALID_INT32
-  character(len=:), allocatable :: name
-  integer(data_type) :: dtype = NAT_TYPE
-  integer(int64) :: len = INVALID_INT64
-  type(dimension_type), allocatable :: dims(:)
-  type(attribute_type), allocatable :: atts(:)
-  integer(int8), allocatable :: buffer(:)
-end type variable_type
-
-!> NetCDF attribute type.
-type :: attribute_type
-  integer :: id = INVALID_INT32
-  character(len=:), allocatable :: name
-  integer(data_type) :: dtype = NAT_TYPE
-  integer(int64) :: len = INVALID_INT64
-  integer(int8), allocatable :: buffer(:)
-end type attribute_type
-
-!> NetCDF dimension type.
+!> NetCDF dimension metadata remains a small value object.
 type :: dimension_type
-  integer :: id = INVALID_INT32
+  integer(c_int) :: id = INVALID_INT32
   character(len=:), allocatable :: name
   integer(int64) :: len = INVALID_INT64
   logical :: is_unlim = .false.
 end type dimension_type
 
-!> A NetCDF group, including data declared locally and direct child groups.
+!> Arguments used to construct an unlimited dimension with `.and.`.
+type :: dimension_argument_type
+  integer(int64) :: len = INVALID_INT64
+  logical :: is_unlim = .false.
+end type dimension_argument_type
+
+!> NetCDF attribute metadata and values.
+!>
+!> `buffer` either owns an allocation or borrows contiguous caller storage.
+type :: attribute_type
+  integer(c_int) :: id = INVALID_INT32
+  character(len=:), allocatable :: name
+  integer(data_type) :: dtype = NAT_TYPE
+  integer(int64) :: len = INVALID_INT64
+  integer(int8), pointer :: buffer(:) => null()
+end type attribute_type
+
+!> NetCDF variable metadata, dimensions, attributes, and values.
+type :: variable_type
+  integer(c_int) :: id = INVALID_INT32
+  character(len=:), allocatable :: name
+  integer(data_type) :: dtype = NAT_TYPE
+  integer(int64) :: len = INVALID_INT64
+  type(dimension_type), allocatable :: dims(:)
+  type(attribute_type), allocatable :: atts(:)
+  integer(int8), pointer :: buffer(:) => null()
+end type variable_type
+
+!> NetCDF group metadata.
+!>
+!> Child groups are pointer-backed so intrinsic assignment shares the child
+!> tree instead of recursively copying it.
 type :: group_type
   integer(c_int) :: id = INVALID_INT32
   character(len=:), allocatable :: name
   type(dimension_type), allocatable :: dims(:)
   type(attribute_type), allocatable :: atts(:)
   type(variable_type), allocatable :: vars(:)
-  type(group_type), allocatable :: grps(:)
+  type(group_type), pointer :: grps(:) => null()
 end type group_type
 
-!> An open NetCDF file is its root group plus file-specific state.
+!> An open NetCDF file: a root-group value plus file-specific state.
 type, extends(group_type) :: netcdf_type
   character(len=:), allocatable :: filename
   integer(c_int) :: mode = NC_NOWRITE
 end type netcdf_type
 
-!> NetCDF dimension argument type.
-type :: dimension_argument_type
-  integer(int64) :: len = INVALID_INT64
-  logical :: is_unlim = .false.
-end type dimension_argument_type
+include "nc4f_data_struct_att_ctor.inc"
+include "nc4f_data_struct_var_ctor.inc"
+include "nc4f_data_struct_extract.inc"
 
-!> Result of an nc4f operation that was allowed to return normally on error.
-!> A zero `code` denotes success; on failure, `message` contains an nc4f
-!> diagnostic and `code` preserves the originating status.
-type :: error_type
-  integer(c_int) :: code = NC_NOERR
-  character(len=:), allocatable :: message
-end type error_type
-
-!> Dimension type constructor.
 interface operator(.dim.)
   module procedure :: new_dim_len_int32
   module procedure :: new_dim_len_int64
   module procedure :: new_dim_args
 end interface operator(.dim.)
 
-!> Dimension argument constructor.
 interface operator(.and.)
   module procedure :: new_dim_arg_int32
   module procedure :: new_dim_arg_int64
 end interface operator(.and.)
 
-!> Overloading equal.
 interface operator(==)
-  module procedure :: eq_dim
   module procedure :: eq_att
+  module procedure :: eq_dim
   module procedure :: eq_var
 end interface operator(==)
 
-!> Overloading not equal.
 interface operator(/=)
-  module procedure :: neq_dim
   module procedure :: neq_att
+  module procedure :: neq_dim
   module procedure :: neq_var
 end interface operator(/=)
 
@@ -134,386 +139,267 @@ interface shape
   module procedure :: get_shape
 end interface shape
 
-!> Return true when an operation reported a non-success status.
-interface failed
-  module procedure :: failed_error
-end interface failed
-
-!> Return false when an operation failed because a file, variable, attribute,
-!> or dimension was absent.
-interface found
-  module procedure :: found_error
-end interface found
-
 interface sum
   module procedure :: sum_vars
 end interface sum
 
-!> Construct an in-memory `group_type` from local arrays and/or child groups.
-!>
-!> `data_set(name, arrays=..., atts=..., grps=...)` infers the group's local
-!> dimensions from `arrays`; dimensions with the same name must agree.  The
-!> result is an in-memory group description, not an open `netcdf_type` handle.
-interface data_set
-  module procedure :: new_data_set
-end interface data_set
+interface found
+  module procedure :: found_error
+end interface found
 
 interface initialize
-  module procedure :: alloc_att_buf
-  module procedure :: alloc_att_meta
-  module procedure :: alloc_att_mold
-  module procedure :: alloc_var_buf
-  module procedure :: alloc_var_meta
-  module procedure :: alloc_var_mold
+  module procedure :: init_att
+  module procedure :: init_att_mold
+  module procedure :: init_var
+  module procedure :: init_var_mold
 end interface initialize
 
+!> Formatted derived-type I/O in a compact ncdump-like layout.
 interface write(formatted)
-  module procedure :: write_frmt_var
   module procedure :: write_frmt_att
   module procedure :: write_frmt_dim
+  module procedure :: write_frmt_var
   module procedure :: write_frmt_grp
   module procedure :: write_frmt_error
 end interface write(formatted)
 
+!> Assemble a group from existing handles and metadata.
+!>
+!> The default `deep=.false.` preserves data-buffer and descendant-group
+!> pointers.  With `deep=.true.`, all data buffers and descendants are cloned.
+interface dataset
+  module procedure :: new_dataset_empty
+  module procedure :: new_dataset_vars
+  module procedure :: new_dataset_grps
+  module procedure :: new_dataset_all
+end interface dataset
+
 interface
-  !> Construct a group specification from local arrays, attributes, and children.
-  module function new_data_set(name, arrays, grps, atts) result(group)
+  module subroutine init_att(att, name, dtype, len)
+    type(attribute_type), intent(inout) :: att
     character(len=*), intent(in) :: name
-    type(variable_type), intent(in), optional :: arrays(:)
+    integer(data_type), intent(in) :: dtype
+    integer(int64), intent(in) :: len
+  end subroutine init_att
+
+  module subroutine init_var(var, name, dtype, len, dims, atts, deep)
+    type(variable_type), intent(inout) :: var
+    character(len=*), intent(in) :: name
+    integer(data_type), intent(in) :: dtype
+    integer(int64), intent(in) :: len
+    type(dimension_type), intent(in) :: dims(:)
+    type(attribute_type), intent(in), optional :: atts(:)
+    logical, intent(in), optional :: deep
+  end subroutine init_var
+
+  module subroutine init_att_mold(att, mold)
+    type(attribute_type), intent(inout) :: att
+    type(attribute_type), intent(in) :: mold
+  end subroutine init_att_mold
+
+  module subroutine init_var_mold(var, mold)
+    type(variable_type), intent(inout) :: var
+    type(variable_type), intent(in) :: mold
+  end subroutine init_var_mold
+
+  module function new_dataset_empty(name, atts, deep) result(grp)
+    character(len=*), intent(in) :: name
+    type(attribute_type), intent(in), optional :: atts(:)
+    logical, intent(in), optional :: deep
+    type(group_type) :: grp
+  end function new_dataset_empty
+
+  module function new_dataset_vars(name, vars, atts, deep) result(grp)
+    character(len=*), intent(in) :: name
+    type(variable_type), intent(in) :: vars(:)
+    type(attribute_type), intent(in), optional :: atts(:)
+    logical, intent(in), optional :: deep
+    type(group_type) :: grp
+  end function new_dataset_vars
+
+  module function new_dataset_grps(name, grps, atts, deep) result(grp)
+    character(len=*), intent(in) :: name
+    type(group_type), intent(in) :: grps(:)
+    type(attribute_type), intent(in), optional :: atts(:)
+    logical, intent(in), optional :: deep
+    type(group_type) :: grp
+  end function new_dataset_grps
+
+  module function new_dataset_all(name, vars, grps, atts, deep) result(grp)
+    character(len=*), intent(in) :: name
+    type(variable_type), intent(in) :: vars(:)
+    type(group_type), intent(in) :: grps(:)
+    type(attribute_type), intent(in), optional :: atts(:)
+    logical, intent(in), optional :: deep
+    type(group_type) :: grp
+  end function new_dataset_all
+
+  module subroutine new_dataset_(grp, name, vars, grps, atts, deep)
+    type(group_type), intent(out) :: grp
+    character(len=*), intent(in) :: name
+    type(variable_type), intent(in), optional :: vars(:)
     type(group_type), intent(in), optional :: grps(:)
     type(attribute_type), intent(in), optional :: atts(:)
-    type(group_type) :: group
-  end function new_data_set
+    logical, intent(in), optional :: deep
+  end subroutine new_dataset_
 
-  !> Initialize `att` from an attribute mold, allocating its buffer.
-  module pure subroutine alloc_att_mold(att, mold)
-    !> Attribute to allocate and initialize.
-    type(attribute_type), intent(inout) :: att
-    !> Mold attribute providing metadata to copy.
-    type(attribute_type), intent(in) :: mold
-  end subroutine alloc_att_mold
+  module subroutine clone_att_(src, dest)
+    type(attribute_type), intent(in) :: src
+    type(attribute_type), intent(out) :: dest
+  end subroutine clone_att_
 
-  !> Initialize attribute metadata and allocate its buffer.
-  module pure subroutine alloc_att_meta(att, name, dtype, len)
-    !> Attribute to initialize.
-    type(attribute_type), intent(inout) :: att
-    !> Name to assign to the attribute.
-    character(len=*), intent(in) :: name
-    !> NetCDF data type code (NC_* constant) for the attribute.
+  module subroutine clone_var_(src, dest)
+    type(variable_type), intent(in) :: src
+    type(variable_type), intent(out) :: dest
+  end subroutine clone_var_
+
+  recursive module subroutine clone_grp_(src, dest)
+    type(group_type), intent(in) :: src
+    type(group_type), intent(out) :: dest
+  end subroutine clone_grp_
+
+  module subroutine validate_att_data(att, dtype, context)
+    type(attribute_type), intent(in) :: att
     integer(data_type), intent(in) :: dtype
-    !> Number of elements for the attribute.
-    integer(int64), intent(in) :: len
-  end subroutine alloc_att_meta
+    character(len=*), intent(in) :: context
+  end subroutine validate_att_data
 
-  !> Allocate or resize the attribute's data buffer based on its type.
-  module pure subroutine alloc_att_buf(att)
-    !> Attribute whose buffer will be allocated or resized.
-    type(attribute_type), intent(inout) :: att
-  end subroutine alloc_att_buf
+  module subroutine validate_var_data(var, dtype, rank, context)
+    type(variable_type), intent(in) :: var
+    integer(data_type), intent(in) :: dtype
+    integer, intent(in) :: rank
+    character(len=*), intent(in) :: context
+  end subroutine validate_var_data
 
-  !> Return true when two `attribute_type` values are identical.
-  module elemental logical function eq_att(x, y) result(res)
-    !> Left-hand attribute to compare.
-    type(attribute_type), intent(in) :: x
-    !> Right-hand attribute to compare.
-    type(attribute_type), intent(in) :: y
-  end function eq_att
+  module function get_shape_(var) result(shape_)
+    type(variable_type), intent(in) :: var
+    integer, allocatable :: shape_(:)
+  end function get_shape_
 
-  !> Return true when two `attribute_type` values differ.
-  module elemental logical function neq_att(x, y) result(res)
-    !> Left-hand attribute to compare.
-    type(attribute_type), intent(in) :: x
-    !> Right-hand attribute to compare.
-    type(attribute_type), intent(in) :: y
-  end function neq_att
+  module subroutine write_frmt_att(att, unit, iotype, v_list, iostat, iomsg)
+    class(attribute_type), intent(in) :: att
+    integer, intent(in) :: unit
+    character(len=*), intent(in) :: iotype
+    integer, intent(in) :: v_list(:)
+    integer, intent(out) :: iostat
+    character(len=*), intent(inout) :: iomsg
+  end subroutine write_frmt_att
 
-  !> Construct a `dimension_argument_type` from a 64-bit length and a
-  !> logical indicating whether the dimension is unlimited.
-  module elemental function new_dim_arg_int64(len, is_unlim) result(arg)
-    !> Length of the dimension (int64).
-    integer(int64), intent(in) :: len
-    !> True if the dimension is unlimited.
-    logical, intent(in) :: is_unlim
-    !> A dimension argument.
-    type(dimension_argument_type) :: arg
-  end function new_dim_arg_int64
+  module subroutine write_frmt_dim(dim, unit, iotype, v_list, iostat, iomsg)
+    class(dimension_type), intent(in) :: dim
+    integer, intent(in) :: unit
+    character(len=*), intent(in) :: iotype
+    integer, intent(in) :: v_list(:)
+    integer, intent(out) :: iostat
+    character(len=*), intent(inout) :: iomsg
+  end subroutine write_frmt_dim
 
-  !> Construct a `dimension_argument_type` from a 32-bit length and a
-  !> logical indicating whether the dimension is unlimited.
-  module elemental function new_dim_arg_int32(len, is_unlim) result(arg)
-    !> Length of the dimension (int32).
-    integer(int32), intent(in) :: len
-    !> True if the dimension is unlimited.
-    logical, intent(in) :: is_unlim
-    !> A dimension argument.
-    type(dimension_argument_type) :: arg
-  end function new_dim_arg_int32
+  module subroutine write_frmt_var(var, unit, iotype, v_list, iostat, iomsg)
+    class(variable_type), intent(in) :: var
+    integer, intent(in) :: unit
+    character(len=*), intent(in) :: iotype
+    integer, intent(in) :: v_list(:)
+    integer, intent(out) :: iostat
+    character(len=*), intent(inout) :: iomsg
+  end subroutine write_frmt_var
 
-  !> Create a `dimension_type` given a name and a 64-bit length.
-  module elemental function new_dim_len_int64(name, len) result(dim)
-    !> Dimension name (will be trimmed).
-    character(len=*), intent(in) :: name
-    !> Length of the dimension (int64).
-    integer(int64), intent(in) :: len
-    !> Result dimension.
-    type(dimension_type) :: dim
-  end function new_dim_len_int64
+  module subroutine write_frmt_grp(grp, unit, iotype, v_list, iostat, iomsg)
+    class(group_type), intent(in) :: grp
+    integer, intent(in) :: unit
+    character(len=*), intent(in) :: iotype
+    integer, intent(in) :: v_list(:)
+    integer, intent(out) :: iostat
+    character(len=*), intent(inout) :: iomsg
+  end subroutine write_frmt_grp
 
-  !> Create a `dimension_type` given a name and a 32-bit length.
+  module subroutine write_frmt_error(error, unit, iotype, v_list, iostat, iomsg)
+    class(error_type), intent(in) :: error
+    integer, intent(in) :: unit
+    character(len=*), intent(in) :: iotype
+    integer, intent(in) :: v_list(:)
+    integer, intent(out) :: iostat
+    character(len=*), intent(inout) :: iomsg
+  end subroutine write_frmt_error
+
   module elemental function new_dim_len_int32(name, len) result(dim)
-    !> Dimension name (will be trimmed).
     character(len=*), intent(in) :: name
-    !> Length of the dimension (int32).
     integer(int32), intent(in) :: len
-    !> Result dimension.
     type(dimension_type) :: dim
   end function new_dim_len_int32
 
-  !> Create a `dimension_type` from a name and a `dimension_argument_type`.
-  module elemental function new_dim_args(name, args) result(dim)
-    !> Dimension name.
+  module elemental function new_dim_len_int64(name, len) result(dim)
     character(len=*), intent(in) :: name
-    !> `dimension_argument_type` containing length and unlimited flag.
+    integer(int64), intent(in) :: len
+    type(dimension_type) :: dim
+  end function new_dim_len_int64
+
+  module elemental function new_dim_arg_int32(len, is_unlim) result(arg)
+    integer(int32), intent(in) :: len
+    logical, intent(in) :: is_unlim
+    type(dimension_argument_type) :: arg
+  end function new_dim_arg_int32
+
+  module elemental function new_dim_arg_int64(len, is_unlim) result(arg)
+    integer(int64), intent(in) :: len
+    logical, intent(in) :: is_unlim
+    type(dimension_argument_type) :: arg
+  end function new_dim_arg_int64
+
+  module elemental function new_dim_args(name, args) result(dim)
+    character(len=*), intent(in) :: name
     type(dimension_argument_type), intent(in) :: args
     type(dimension_type) :: dim
   end function new_dim_args
 
-  !> Compare two `dimension_type` values for equality (name, length, and
-  !> unlimited flag).
   module elemental logical function eq_dim(x, y)
-    !> Left-hand `dimension_type` to compare.
-    type(dimension_type), intent(in) :: x
-    !> Right-hand `dimension_type` to compare.
-    type(dimension_type), intent(in) :: y
+    type(dimension_type), intent(in) :: x, y
   end function eq_dim
 
-  !> Test whether two `dimension_type` values are different.
   module elemental logical function neq_dim(x, y)
-    !> Left-hand `dimension_type` to compare.
-    type(dimension_type), intent(in) :: x
-    !> Right-hand `dimension_type` to compare.
-    type(dimension_type), intent(in) :: y
+    type(dimension_type), intent(in) :: x, y
   end function neq_dim
 
-  !> Return the number of elements for the whole variable or a single dim.
+  module elemental logical function eq_att(x, y) result(is_equal)
+    type(attribute_type), intent(in) :: x, y
+  end function eq_att
+
+  module elemental logical function neq_att(x, y) result(is_equal)
+    type(attribute_type), intent(in) :: x, y
+  end function neq_att
+
+  module elemental logical function eq_var(x, y) result(is_equal)
+    type(variable_type), intent(in) :: x, y
+  end function eq_var
+
+  module elemental logical function neq_var(x, y) result(is_equal)
+    type(variable_type), intent(in) :: x, y
+  end function neq_var
+
   module pure function get_size(var, dim) result(n)
-    !> Variable object to inspect.
     type(variable_type), intent(in) :: var
-    !> Optional 1-based dimension index. If absent, return total size.
-    integer, optional, intent(in) :: dim
-    !> Number of elements returned (int64).
+    integer, intent(in), optional :: dim
     integer(int64) :: n
   end function get_size
 
-  !> Return the shape (lengths) of the variable's dimensions.
-  module pure function get_shape(var) result(n)
-    !> Variable object to inspect.
+  module pure function get_shape(var) result(extents)
     type(variable_type), intent(in) :: var
-    !> Allocatable array of dimension lengths returned (int64 each).
-    integer(int64), allocatable :: n(:)
+    integer(int64), allocatable :: extents(:)
   end function get_shape
 
-  !> Return true when `error` represents a failed operation.
-  module pure elemental logical function failed_error(error) result(has_failed)
-    !> Input argument(s): `error`.
-    type(error_type), intent(in) :: error
-  end function failed_error
+  module function sum_vars(vars) result(total)
+    type(variable_type), intent(in) :: vars(:)
+    type(variable_type) :: total
+  end function sum_vars
 
-  !> Return false when `error` represents an absent NetCDF object.
   module pure elemental logical function found_error(error) result(is_present)
-    !> Input argument(s): `error`.
     type(error_type), intent(in) :: error
   end function found_error
 
-  !> Allocate a variable `var` using metadata from `mold`.
-  module pure subroutine alloc_var_mold(var, mold)
-    !> Variable to allocate and initialize.
-    type(variable_type), intent(inout) :: var
-    !> Mold containing metadata to copy into `var`.
-    type(variable_type), intent(in) :: mold
-  end subroutine alloc_var_mold
-
-  !> Allocate variable metadata and prepare its data buffer.
-  module pure subroutine alloc_var_meta(var, name, dtype, len, dims, atts)
-    !> Variable to initialize and allocate.
-    type(variable_type), intent(inout) :: var
-    !> Name to assign to the variable.
-    character(len=*), intent(in) :: name
-    !> NetCDF data type code (NC_* constant) for the variable.
+  module function buffer_size(dtype, len) result(nbytes)
     integer(data_type), intent(in) :: dtype
-    !> Total number of elements for the variable.
     integer(int64), intent(in) :: len
-    !> Array of dimensions describing the variable's shape.
-    type(dimension_type), intent(in) :: dims(:)
-    !> Optional array of attributes to copy into the variable.
-    type(attribute_type), optional, intent(in) :: atts(:)
-  end subroutine alloc_var_meta
-
-  !> Allocate or resize the variable's data buffer according to its type.
-  module pure subroutine alloc_var_buf(var)
-    !> Variable whose data buffer will be allocated or resized.
-    type(variable_type), intent(inout) :: var
-  end subroutine alloc_var_buf
-
-  !> Compare two `variable_type` values for deep equality of metadata and
-  !> contents. Returns true when name, type, length, dims, attributes and
-  !> buffer contents are equal.
-  module elemental logical function eq_var(x, y) result(res)
-    !> Left-hand variable to compare.
-    type(variable_type), intent(in) :: x
-    !> Right-hand variable to compare.
-    type(variable_type), intent(in) :: y
-  end function eq_var
-
-  !> Return true when two `variable_type` values differ.
-  module elemental logical function neq_var(x, y) result(res)
-    !> Left-hand variable to compare.
-    type(variable_type), intent(in) :: x
-    !> Right-hand variable to compare.
-    type(variable_type), intent(in) :: y
-  end function neq_var
-
-  !> Check whether re-allocation of a buffer is required.
-  !> This compares the current buffer size with the requested target size.
-  module pure logical function allocation_required(buffer, bsize)
-    !> Buffer array to check.
-    integer(int8), allocatable, intent(in) :: buffer(:)
-    !> Target buffer size required.
-    integer(int64), intent(in) :: bsize
-  end function allocation_required
-
-  !> Compute the buffer size in bytes for a given netCDF data type and
-  !> number of elements.
-  module elemental function get_buffer_size(dtype, len) result(buffer_size)
-    !> NetCDF data type code (NC_* constants).
-    integer(data_type), intent(in) :: dtype
-    !> Number of elements of the given type.
-    integer(int64), intent(in) :: len
-    !> Result buffer size.
-    integer(int64) :: buffer_size
-  end function get_buffer_size
-
-  !> Validate an attribute's metadata and backing byte buffer.
-  module pure subroutine validate_att_data(att, expected_dtype, context)
-    !> Input argument(s): `att`.
-    type(attribute_type), intent(in) :: att
-    !> Input argument(s): `expected_dtype`.
-    integer(data_type), intent(in) :: expected_dtype
-    !> Input argument(s): `context`.
-    character(len=*), intent(in) :: context
-  end subroutine validate_att_data
-
-  !> Validate a variable's metadata and backing byte buffer.
-  module pure subroutine validate_var_data(var, expected_dtype, expected_rank, context)
-    !> Input argument(s): `var`.
-    type(variable_type), intent(in) :: var
-    !> Input argument(s): `expected_dtype`.
-    integer(data_type), intent(in) :: expected_dtype
-    !> Input argument(s): `expected_rank`.
-    integer, intent(in) :: expected_rank
-    !> Input argument(s): `context`.
-    character(len=*), intent(in) :: context
-  end subroutine validate_var_data
-
-  !> Compute a dimension product while checking invalid lengths and overflow.
-  module pure function checked_dim_product(dims, context) result(element_count)
-    !> Input argument(s): `dims(:)`.
-    type(dimension_type), intent(in) :: dims(:)
-    !> Input argument(s): `context`.
-    character(len=*), intent(in) :: context
-    integer(int64) :: element_count
-  end function checked_dim_product
-
-  !> Write a group hierarchy in formatted list-directed or DT form.
-  module subroutine write_frmt_grp(grp, unit, iotype, v_list, iostat, iomsg)
-    !> Variable object to format and write.
-    class(group_type), intent(in) :: grp
-    !> Output unit number.
-    integer, intent(in) :: unit
-    !> I/O type string (e.g. 'LISTDIRECTED' or 'DT').
-    character(len=*), intent(in) :: iotype
-    !> Optional list descriptor (passed by the formatted write interface).
-    integer, intent(in) :: v_list(:)
-    !> I/O status returned (0 for success).
-    integer, intent(out) :: iostat
-    !> I/O message buffer (in/out).
-    character(len=*), intent(inout) :: iomsg
-  end subroutine write_frmt_grp
-
-  !> Write a `variable_type` in list-directed (Fortran `DT`) format.
-  module subroutine write_frmt_var(var, unit, iotype, v_list, iostat, iomsg)
-    !> Variable object to format and write.
-    class(variable_type), intent(in) :: var
-    !> Output unit number.
-    integer, intent(in) :: unit
-    !> I/O type string (e.g. 'LISTDIRECTED' or 'DT').
-    character(len=*), intent(in) :: iotype
-    !> Optional list descriptor (passed by the formatted write interface).
-    integer, intent(in) :: v_list(:)
-    !> I/O status returned (0 for success).
-    integer, intent(out) :: iostat
-    !> I/O message buffer (in/out).
-    character(len=*), intent(inout) :: iomsg
-  end subroutine write_frmt_var
-
-  !> Write an `attribute_type` in list-directed (Fortran `DT`) format.
-  module subroutine write_frmt_att(att, unit, iotype, v_list, iostat, iomsg)
-    !> Attribute object to format and write.
-    class(attribute_type), intent(in) :: att
-    !> Output unit number.
-    integer, intent(in) :: unit
-    !> I/O type string (e.g. 'LISTDIRECTED' or 'DT').
-    character(len=*), intent(in) :: iotype
-    !> Optional list descriptor (passed by the formatted write interface).
-    integer, intent(in) :: v_list(:)
-    !> I/O status returned (0 for success).
-    integer, intent(out) :: iostat
-    !> I/O message buffer (in/out).
-    character(len=*), intent(inout) :: iomsg
-  end subroutine write_frmt_att
-
-  !> Write a `dimension_type` in list-directed (Fortran `DT`) format.
-  module subroutine write_frmt_dim(dim, unit, iotype, v_list, iostat, iomsg)
-    !> Dimension object to format and write.
-    class(dimension_type), intent(in) :: dim
-    !> Output unit number.
-    integer, intent(in) :: unit
-    !> I/O type string (e.g. 'LISTDIRECTED' or 'DT').
-    character(len=*), intent(in) :: iotype
-    !> Optional list descriptor (passed by the formatted write interface).
-    integer, intent(in) :: v_list(:)
-    !> I/O status returned (0 for success).
-    integer, intent(out) :: iostat
-    !> I/O message buffer (in/out).
-    character(len=*), intent(inout) :: iomsg
-  end subroutine write_frmt_dim
-
-  !> Write an `error_type` in list-directed (Fortran `DT`) format.
-  module subroutine write_frmt_error(error, unit, iotype, v_list, iostat, iomsg)
-    !> Input argument(s): `error`.
-    class(error_type), intent(in) :: error
-    !> Input argument(s): `unit`.
-    integer, intent(in) :: unit
-    !> Input argument(s): `iotype`.
-    character(len=*), intent(in) :: iotype
-    !> Input argument(s): `v_list(:)`.
-    integer, intent(in) :: v_list(:)
-    !> Output argument(s): `iostat`.
-    integer, intent(out) :: iostat
-    !> Input/output argument(s): `iomsg`.
-    character(len=*), intent(inout) :: iomsg
-  end subroutine write_frmt_error
-
-  !> Return the element-wise sum of variables with matching dimensions and type.
-  module function sum_vars(vars) result(s)
-    !> Input argument(s): `vars(:)`.
-    type(variable_type), intent(in) :: vars(:)
-    type(variable_type) :: s
-  end function sum_vars
+    integer :: nbytes
+  end function buffer_size
 end interface
-
-include "nc4f_data_struct_att_ctor.inc"
-include "nc4f_data_struct_extract.inc"
-include "nc4f_data_struct_var_ctor.inc"
 
 end module nc4f_data_struct

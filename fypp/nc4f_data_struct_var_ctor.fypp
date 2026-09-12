@@ -6,51 +6,62 @@ contains
 #: for D, T, K in zip(dtypes, types, kinds)
 #: for R in range(1, MAX_RANK+1)
 !> Construct a `variable_type` of rank ${R}$ and kind ${K}$ from an array.
-module function new_var_${K}$_${R}$d(name, values, dims, atts) result(var)
+module function new_var_${K}$_${R}$d(name, values, dims, atts, deep) result(var)
   !> Name of the variable to create (will be trimmed).
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank ${R}$ and element type `${T}$` of kind `${K}$`.
-  ${T}$(${K}$), intent(in) :: values(${COLONS(R)}$)
+  ${T}$(${K}$), contiguous, target, intent(in) :: values(${COLONS(R)}$)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
   type(attribute_type), intent(in), optional :: atts(:)
+  !> When true (default), copy values into owned storage.  When false,
+  !> retain a borrowed view of this contiguous target array.
+  logical, intent(in), optional :: deep
   !> Resulting `variable_type` initialized with metadata and buffer.
   type(variable_type) :: var
-  !> Pointer view into the variable's internal buffer with matching type
-  !> and rank. Used to copy the input `values` efficiently into `var`.
-  ${T}$(${K}$), pointer :: var_ptr(${COLONS(R)}$)
-
-  call initialize(var, name, ${D}$, size(values, kind=int64), dims, atts)
+  type(c_ptr) :: cptr
+  logical :: deep_copy
+  deep_copy = .true.
+  if (present(deep)) deep_copy = deep
+  call init_var(var, name, ${D}$, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
-    call extract(var, var_ptr)
-    var_ptr = values
+    if (deep_copy) then
+      var%buffer = transfer(values, 0_int8, size(var%buffer))
+    else
+      cptr = c_loc(values(${ONES(R)}$))
+      call c_f_pointer(cptr, var%buffer, &
+        & [buffer_size(${D}$, size(values, kind=int64))])
+    end if
+  else if (.not. deep_copy) then
+    allocate (var%buffer(0))
   end if
 end function new_var_${K}$_${R}$d${NEWLINE()}$
 #: endfor
 #: endfor
 #: for R in range(1, MAX_RANK+1)
 !> Construct a `variable_type` of rank ${R}$ from a character array.
-module function new_var_char_${R}$d(name, values, dims, atts) result(var)
+module function new_var_char_${R}$d(name, values, dims, atts, deep) result(var)
   !> Name of the variable to create (will be trimmed).
   character(len=*), intent(in) :: name
   !> Single-character values to populate the variable's data buffer.
-  character, intent(in) :: values(${COLONS(R)}$)
+  character, contiguous, target, intent(in) :: values(${COLONS(R)}$)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
   type(attribute_type), intent(in), optional :: atts(:)
+  !> When true (default), copy values into owned storage.  When false,
+  !> retain a borrowed view of this contiguous target array.
+  logical, intent(in), optional :: deep
   !> Resulting `variable_type` initialized with metadata and buffer.
   type(variable_type) :: var
-  !> Pointer view into the variable's internal buffer used to copy values.
-  character, pointer :: var_ptr(${COLONS(R)}$)
-
-  call initialize(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts)
-  if (size(values) > 0) then
-    call extract(var, var_ptr)
-    var_ptr = values
-  end if
+  logical :: deep_copy
+  deep_copy = .true.
+  if (present(deep)) deep_copy = deep
+  if (.not. deep_copy) error stop "[datarray] Shallow character buffers are unsupported."
+  call init_var(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts, deep=.true.)
+  if (size(values) > 0) var%buffer = transfer(values, 0_int8, size(var%buffer))
 end function new_var_char_${R}$d${NEWLINE(not (R == MAX_RANK))}$
 #: endfor
 end submodule nc4f_data_struct_var_ctor

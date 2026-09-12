@@ -41,6 +41,7 @@ module function inq_grp(group, inq_dims, inq_atts, inq_vars, &
   logical, intent(in), optional :: recursive
   type(error_type), intent(out), optional :: error
   type(group_type) :: description
+  type(group_type), allocatable :: children(:)
   type(error_type) :: operation_error
   logical :: want_dims, want_atts, want_vars, want_groups, descend
 
@@ -57,15 +58,19 @@ module function inq_grp(group, inq_dims, inq_atts, inq_vars, &
   if (want_dims) then
     description%dims = inq_dims_grp(group, error=operation_error)
   end if
-  if (.not. failed(operation_error) .and. want_atts) then
+  if (.not. has_error(operation_error) .and. want_atts) then
     description%atts = get_atts_grp(group, error=operation_error)
   end if
-  if (.not. failed(operation_error) .and. want_vars) then
+  if (.not. has_error(operation_error) .and. want_vars) then
     description%vars = inq_vars_(group, operation_error)
   end if
-  if (.not. failed(operation_error) .and. want_groups) then
-    description%grps = inq_grps_(group, operation_error)
-    if (.not. failed(operation_error) .and. descend) then
+  if (.not. has_error(operation_error) .and. want_groups) then
+    children = inq_grps_(group, operation_error)
+    if (.not. has_error(operation_error)) then
+      allocate (description%grps(size(children)))
+      description%grps = children
+    end if
+    if (.not. has_error(operation_error) .and. descend) then
       call materialize_children(description%grps, want_dims, want_atts, want_vars, operation_error)
     end if
   end if
@@ -85,10 +90,10 @@ module subroutine serialize_grp_(root, grp, atts, error)
   type(error_type), intent(out) :: error
 
   call define_grp_tree_(root, grp, error)
-  if (failed(error)) return
+  if (has_error(error)) return
   if (present(atts)) then
     call write_grp_atts_(root, atts, error)
-    if (failed(error)) return
+    if (has_error(error)) return
   end if
   call write_grp_tree_data_(root, grp, error)
 end subroutine serialize_grp_
@@ -120,23 +125,23 @@ module subroutine serialize_grps_(root, grps, atts, error)
 
   if (present(atts)) then
     call write_grp_atts_(root, atts, error)
-    if (failed(error)) return
+    if (has_error(error)) return
   end if
   do i = 1, size(grps)
     source_child => grps(i)
     child_name = source_child%name
     child = def_grp_(root, child_name, error)
-    if (failed(error)) return
+    if (has_error(error)) return
     call define_grp_tree_(child, source_child, error)
-    if (failed(error)) return
+    if (has_error(error)) return
   end do
   do i = 1, size(grps)
     source_child => grps(i)
     child_name = source_child%name
     child = get_grp_(root, child_name, error)
-    if (failed(error)) return
+    if (has_error(error)) return
     call write_grp_tree_data_(child, source_child, error)
-    if (failed(error)) return
+    if (has_error(error)) return
   end do
 end subroutine serialize_grps_
 
@@ -156,12 +161,12 @@ recursive subroutine define_grp_tree_(target, source, error)
   if (allocated(source%dims)) then
     do i = 1, size(source%dims)
       defined_dim = def_dim_error(target, source%dims(i), error)
-      if (failed(error)) return
+      if (has_error(error)) return
     end do
   end if
   if (allocated(source%atts)) then
     call write_grp_atts_(target, source%atts, error)
-    if (failed(error)) return
+    if (has_error(error)) return
   end if
   if (allocated(source%vars)) then
     do i = 1, size(source%vars)
@@ -170,12 +175,12 @@ recursive subroutine define_grp_tree_(target, source, error)
         return
       end if
       defined_var = def_var_(target, source%vars(i), error)
-      if (failed(error)) return
+      if (has_error(error)) return
       call put_att_var_error(target, defined_var, error)
-      if (failed(error)) return
+      if (has_error(error)) return
     end do
   end if
-  if (allocated(source%grps)) then
+  if (associated(source%grps)) then
     do i = 1, size(source%grps)
       source_child => source%grps(i)
       if (.not. allocated(source_child%name)) then
@@ -184,9 +189,9 @@ recursive subroutine define_grp_tree_(target, source, error)
       end if
       child_name = source_child%name
       child = def_grp_(target, child_name, error)
-      if (failed(error)) return
+      if (has_error(error)) return
       call define_grp_tree_(child, source_child, error)
-      if (failed(error)) return
+      if (has_error(error)) return
     end do
   end if
 end subroutine define_grp_tree_
@@ -226,18 +231,18 @@ recursive subroutine write_grp_tree_data_(target, source, error)
         count(j) = int(source%vars(i)%dims(j)%len)
       end do
       call put_variable(target, source%vars(i), start, count, error=error)
-      if (failed(error)) return
+      if (has_error(error)) return
       deallocate (start, count)
     end do
   end if
-  if (allocated(source%grps)) then
+  if (associated(source%grps)) then
     do i = 1, size(source%grps)
       source_child => source%grps(i)
       child_name = source_child%name
       child = get_grp_(target, child_name, error)
-      if (failed(error)) return
+      if (has_error(error)) return
       call write_grp_tree_data_(child, source_child, error)
-      if (failed(error)) return
+      if (has_error(error)) return
     end do
   end if
 end subroutine write_grp_tree_data_
@@ -280,18 +285,18 @@ function inq_grps_(parent, error) result(grps)
   error = error_type()
   stat = nc_inq_grps(parent%id, ngroups, c_null_ptr)
   error = make_netcdf_error(stat, "[inq_grps] Group count.")
-  if (failed(error)) return
+  if (has_error(error)) return
   allocate (grps(ngroups), ids(ngroups))
   if (ngroups == 0) return
 
   stat = nc_inq_grps(parent%id, ngroups, c_loc(ids(1)))
   error = make_netcdf_error(stat, "[inq_grps] Group identifiers.")
-  if (failed(error)) return
+  if (has_error(error)) return
   do i = 1, ngroups
     name = c_null_char
     stat = nc_inq_grpname(ids(i), name)
     error = make_netcdf_error(stat, "[inq_grps] Group name.")
-    if (failed(error)) return
+    if (has_error(error)) return
     grps(i)%id = ids(i)
     grps(i)%name = clip(c2fstr(name))
   end do
@@ -309,20 +314,20 @@ function inq_vars_(group, error) result(vars)
   error = error_type()
   stat = nc_inq_varids(group%id, nvars, c_null_ptr)
   error = make_netcdf_error(stat, "[inq_grp] Variable count.")
-  if (failed(error)) return
+  if (has_error(error)) return
   allocate (vars(nvars), ids(nvars))
   if (nvars == 0) return
 
   stat = nc_inq_varids(group%id, nvars, c_loc(ids(1)))
   error = make_netcdf_error(stat, "[inq_grp] Variable identifiers.")
-  if (failed(error)) return
+  if (has_error(error)) return
   do i = 1, nvars
     name = c_null_char
     stat = nc_inq_varname(group%id, ids(i), name)
     error = make_netcdf_error(stat, "[inq_grp] Variable name.")
-    if (failed(error)) return
+    if (has_error(error)) return
     vars(i) = inq_var_error(group, c2fstr(name), error)
-    if (failed(error)) return
+    if (has_error(error)) return
   end do
 end function inq_vars_
 
@@ -337,7 +342,7 @@ subroutine materialize_children(grps, want_dims, want_atts, want_vars, error)
   do i = 1, size(grps)
     grps(i) = inq_grp(grps(i), inq_dims=want_dims, inq_atts=want_atts, &
       & inq_vars=want_vars, inq_grps=.true., recursive=.true., error=error)
-    if (failed(error)) return
+    if (has_error(error)) return
   end do
 end subroutine materialize_children
 

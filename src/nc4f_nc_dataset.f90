@@ -45,6 +45,7 @@ function open_dataset_(filename, mode, inq_dims, inq_atts, error) result(nc)
   type(error_type) :: cleanup_error
 
   error = error_type()
+  nc%name = "/"
   if (present(mode)) then
     open_mode = trim(mode)
   else
@@ -58,19 +59,18 @@ function open_dataset_(filename, mode, inq_dims, inq_atts, error) result(nc)
     stat = nc_open(f2cstr(nc%filename), NC_NOWRITE, nc%id)
     write (msg, "('[open_dataset]', 1x, a)") nc%filename
     error = make_netcdf_error(stat, msg)
-    if (failed(error)) return
-    nc%name = "/"
+    if (has_error(error)) return
     nc%mode = NC_NOWRITE
     if (optval(.false., inq_dims)) then
       nc%dims = inq_dims_grp(nc, error=error)
-      if (failed(error)) then
+      if (has_error(error)) then
         call close_dataset_(nc, cleanup_error)
         return
       end if
     end if
     if (optval(.false., inq_atts)) then
       nc%atts = get_atts_grp(nc, error=error)
-      if (failed(error)) then
+      if (has_error(error)) then
         call close_dataset_(nc, cleanup_error)
         return
       end if
@@ -82,11 +82,8 @@ function open_dataset_(filename, mode, inq_dims, inq_atts, error) result(nc)
     write (msg, "('[open_dataset]', 1x, a)") nc%filename
     stat = nc_create(f2cstr(nc%filename), ior(NC_NETCDF4, NC_CLOBBER), nc%id)
     error = make_netcdf_error(stat, msg)
-    if (failed(error)) return
-    nc%name = "/"
+    if (has_error(error)) return
     nc%mode = NC_NETCDF4
-    if (allocated(nc%atts)) deallocate (nc%atts)
-    if (allocated(nc%dims)) deallocate (nc%dims)
 
   case ("a", "append", "rw", "readwrite")
 
@@ -94,19 +91,18 @@ function open_dataset_(filename, mode, inq_dims, inq_atts, error) result(nc)
     stat = nc_open(f2cstr(nc%filename), NC_WRITE, nc%id)
     write (msg, "('[open_dataset]', 1x, a)") nc%filename
     error = make_netcdf_error(stat, msg)
-    if (failed(error)) return
-    nc%name = "/"
+    if (has_error(error)) return
     nc%mode = NC_WRITE
     if (optval(.false., inq_dims)) then
       nc%dims = inq_dims_grp(nc, error=error)
-      if (failed(error)) then
+      if (has_error(error)) then
         call close_dataset_(nc, cleanup_error)
         return
       end if
     end if
     if (optval(.false., inq_atts)) then
       nc%atts = get_atts_grp(nc, error=error)
-      if (failed(error)) then
+      if (has_error(error)) then
         call close_dataset_(nc, cleanup_error)
         return
       end if
@@ -159,11 +155,11 @@ subroutine close_dataset_(nc, error)
   error = error_type()
   stat = nc_close(nc%id)
   error = make_netcdf_error(stat, "[close_dataset]")
-  if (failed(error)) return
+  if (has_error(error)) return
   if (allocated(nc%atts)) deallocate (nc%atts)
   if (allocated(nc%dims)) deallocate (nc%dims)
   if (allocated(nc%vars)) deallocate (nc%vars)
-  if (allocated(nc%grps)) deallocate (nc%grps)
+  if (associated(nc%grps)) nullify (nc%grps)
 end subroutine close_dataset_
 
 !> Create a netCDF file from an array of `variable_type` objects.
@@ -202,10 +198,10 @@ subroutine to_netcdf_vars_(filename, vars, atts, error)
 
   error = error_type()
   nc = open_dataset_(filename, mode="w", error=error)
-  if (failed(error)) return
+  if (has_error(error)) return
   do i = 1, size(vars)
     call put_var_error(nc, vars(i), error)
-    if (failed(error)) then
+    if (has_error(error)) then
       call close_dataset_(nc, cleanup_error)
       return
     end if
@@ -213,7 +209,7 @@ subroutine to_netcdf_vars_(filename, vars, atts, error)
   if (present(atts)) then
     nc%atts = atts
     call put_att_grp_error(nc, error)
-    if (failed(error)) then
+    if (has_error(error)) then
       call close_dataset_(nc, cleanup_error)
       return
     end if
@@ -256,16 +252,16 @@ subroutine to_netcdf_var_(filename, var, atts, error)
 
   error = error_type()
   nc = open_dataset_(filename, mode="w", error=error)
-  if (failed(error)) return
+  if (has_error(error)) return
   call put_var_error(nc, var, error)
-  if (failed(error)) then
+  if (has_error(error)) then
     call close_dataset_(nc, cleanup_error)
     return
   end if
   if (present(atts)) then
     nc%atts = atts
     call put_att_grp_error(nc, error)
-    if (failed(error)) then
+    if (has_error(error)) then
       call close_dataset_(nc, cleanup_error)
       return
     end if
@@ -325,12 +321,12 @@ subroutine to_netcdf_grp_(filename, grp, atts, error)
 
   error = error_type()
   nc = open_dataset_(filename, mode="w", error=error)
-  if (failed(error)) return
+  if (has_error(error)) return
 
   file_root%id = nc%id
   file_root%name = "/"
   call serialize_grp_(file_root, grp, atts, error)
-  if (failed(error)) then
+  if (has_error(error)) then
     call close_dataset_(nc, cleanup_error)
     return
   end if
@@ -349,12 +345,12 @@ subroutine to_netcdf_grps_(filename, grps, atts, error)
 
   error = error_type()
   nc = open_dataset_(filename, mode="w", error=error)
-  if (failed(error)) return
+  if (has_error(error)) return
 
   file_root%id = nc%id
   file_root%name = "/"
   call serialize_grps_(file_root, grps, atts, error)
-  if (failed(error)) then
+  if (has_error(error)) then
     call close_dataset_(nc, cleanup_error)
     return
   end if

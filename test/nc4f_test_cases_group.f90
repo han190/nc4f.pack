@@ -14,11 +14,11 @@ module subroutine group_model(passed)
 
   root_values = [1.0, 2.0]
   child_values = [3.0, 4.0, 5.0]
-  root_var = data_array("root_data", root_values, ["root_x".dim.2])
-  child_var = data_array("child_data", child_values, ["child_x".dim.3])
-  child = data_set("child", arrays=[child_var], atts=["title".att."child group"])
-  container = data_set("container", grps=[child])
-  root = data_set("/", arrays=[root_var], atts=["title".att."root group"], grps=[child])
+  root_var = datarray("root_data", root_values, ["root_x".dim.2])
+  child_var = datarray("child_data", child_values, ["child_x".dim.3])
+  child = dataset("child", vars=[child_var], atts=["title".att."child group"])
+  container = dataset("container", grps=[child])
+  root = dataset("/", vars=[root_var], atts=["title".att."root group"], grps=[child])
 
   root_at = 0
   dims_at = 0
@@ -55,11 +55,10 @@ module subroutine group_model(passed)
   passed = root%name == "/" .and. &
     & size(root%dims) == 1 .and. root%dims(1)%name == "root_x" .and. &
     & size(root%vars) == 1 .and. size(root%atts) == 1 .and. &
-    & size(root%grps) == 1 .and. root%grps(1)%name == "child" .and. &
-    & size(root%grps(1)%dims) == 1 .and. &
-    & root%grps(1)%dims(1)%name == "child_x" .and. &
+    & associated(root%grps) .and. size(root%grps) == 1 .and. root%grps(1)%name == "child" .and. &
+    & size(root%grps(1)%dims) == 1 .and. root%grps(1)%dims(1)%name == "child_x" .and. &
     & container%name == "container" .and. .not. allocated(container%dims) .and. &
-    & .not. allocated(container%vars) .and. size(container%grps) == 1 .and. &
+    & .not. allocated(container%vars) .and. associated(container%grps) .and. &
     & container%grps(1)%name == "child" .and. &
     & root_at > 0 .and. root_at < dims_at .and. dims_at < vars_at .and. &
     & vars_at < atts_at .and. atts_at < groups_at .and. groups_at < child_at
@@ -78,56 +77,56 @@ module subroutine group_write(passed)
   type(variable_type) :: child_data, child_var, root_data, root_var, sibling_var
 
   passed = .false.
-  root_var = data_array("root_data", [1.0, 2.0], ["root_x".dim.2])
-  child_var = data_array("child_data", [3.0, 4.0, 5.0], ["child_x".dim.3])
-  sibling_var = data_array("sibling_data", [6.0], ["sibling_x".dim.1])
-  child = data_set("child", arrays=[child_var], atts=["title".att."child"])
-  parent = data_set("parent", grps=[child])
-  sibling = data_set("sibling", arrays=[sibling_var])
-  root = data_set("input-root-name-is-ignored", arrays=[root_var], &
+  root_var = datarray("root_data", [1.0, 2.0], ["root_x".dim.2])
+  child_var = datarray("child_data", [3.0, 4.0, 5.0], ["child_x".dim.3])
+  sibling_var = datarray("sibling_data", [6.0], ["sibling_x".dim.1])
+  child = dataset("child", vars=[child_var], atts=["title".att."child"])
+  parent = dataset("parent", grps=[child])
+  sibling = dataset("sibling", vars=[sibling_var])
+  root = dataset("input-root-name-is-ignored", vars=[root_var], &
     & atts=["title".att."root"], grps=[parent])
 
   call to_netcdf_grp(TEST_RESULTS_DIR//"group-root.nc", root, &
     & atts=["writer".att."group_write"], error=error)
-  if (failed(error)) return
+  if ((error%code /= NC_NOERR)) return
   nc = open_dataset(TEST_RESULTS_DIR//"group-root.nc", "r", error=error)
-  if (failed(error)) return
+  if ((error%code /= NC_NOERR)) return
   root_on_disk = inquire_group(nc, inq_dims=.true., inq_atts=.true., &
     & inq_vars=.true., inq_grps=.true., recursive=.true., error=error)
-  if (failed(error)) then
+  if ((error%code /= NC_NOERR)) then
     call close_dataset(nc)
     return
   end if
   parent_on_disk = get_group(nc, "parent", error)
-  if (failed(error)) then
+  if ((error%code /= NC_NOERR)) then
     call close_dataset(nc)
     return
   end if
   child_on_disk = get_group(parent_on_disk, "child", error)
-  if (failed(error)) then
+  if ((error%code /= NC_NOERR)) then
     call close_dataset(nc)
     return
   end if
   root_data = get_variable(nc, "root_data", error)
-  if (failed(error)) then
+  if ((error%code /= NC_NOERR)) then
     call close_dataset(nc)
     return
   end if
   call extract(root_data, root_values)
   child_data = get_variable(child_on_disk, "child_data", error)
-  if (failed(error)) then
+  if ((error%code /= NC_NOERR)) then
     call close_dataset(nc)
     return
   end if
   call extract(child_data, child_values)
   call close_dataset(nc, error)
-  if (failed(error)) then
+  if ((error%code /= NC_NOERR)) then
     return
   end if
   if (.not. (root_on_disk%name == "/" .and. size(root_on_disk%vars) == 1 .and. &
-    & size(root_on_disk%atts) == 2 .and. size(root_on_disk%grps) == 1 .and. &
+    & size(root_on_disk%atts) == 2 .and. associated(root_on_disk%grps) .and. &
     & root_on_disk%grps(1)%name == "parent" .and. &
-    & size(root_on_disk%grps(1)%grps) == 1 .and. &
+    & associated(root_on_disk%grps(1)%grps) .and. &
     & root_on_disk%grps(1)%grps(1)%name == "child" .and. &
     & all(abs(root_values - [1.0, 2.0]) <= epsilon(1.0)) .and. &
     & all(abs(child_values - [3.0, 4.0, 5.0]) <= epsilon(1.0)))) then
@@ -136,13 +135,13 @@ module subroutine group_write(passed)
 
   call to_netcdf_grps(TEST_RESULTS_DIR//"group-children.nc", [parent, sibling], &
     & atts=["title".att."group collection"], error=error)
-  if (failed(error)) return
+  if ((error%code /= NC_NOERR)) return
   nc = open_dataset(TEST_RESULTS_DIR//"group-children.nc", "r", error=error)
-  if (failed(error)) return
+  if ((error%code /= NC_NOERR)) return
   top_level = inquire_groups(nc, error)
-  if (failed(error)) return
+  if ((error%code /= NC_NOERR)) return
   root_att = get_attribute(nc, "title", error)
-  if (failed(error)) then
+  if ((error%code /= NC_NOERR)) then
     call close_dataset(nc)
     return
   end if
@@ -153,18 +152,18 @@ module subroutine group_write(passed)
   end if
   parent_on_disk = inquire_group(top_level(1), inq_grps=.true., recursive=.true., &
     & error=error)
-  if (failed(error)) then
+  if ((error%code /= NC_NOERR)) then
     call close_dataset(nc)
     return
   end if
   call close_dataset(nc, error)
-  if (failed(error)) return
-  if (.not. (size(parent_on_disk%grps) == 1 .and. &
+  if ((error%code /= NC_NOERR)) return
+  if (.not. (associated(parent_on_disk%grps) .and. size(parent_on_disk%grps) == 1 .and. &
     & parent_on_disk%grps(1)%name == "child")) return
 
-  invalid = data_set("/")
+  invalid = dataset("/")
   call to_netcdf_grps(TEST_RESULTS_DIR//"invalid-root-child.nc", [invalid], error=error)
-  passed = failed(error) .and. error%code == NC_EINVAL
+  passed = (error%code /= NC_NOERR) .and. error%code == NC_EINVAL
 end subroutine group_write
 
 end submodule nc4f_test_cases_group
