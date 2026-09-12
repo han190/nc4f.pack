@@ -26,7 +26,7 @@ module subroutine clone_var_(src, dest)
   dest%name = src%name
   dest%dtype = src%dtype
   dest%len = src%len
-  dest%dims = src%dims
+  if (allocated(src%dims)) dest%dims = src%dims
   if (associated(src%buffer)) then
     allocate (dest%buffer(size(src%buffer)))
     dest%buffer = src%buffer
@@ -45,7 +45,7 @@ recursive module subroutine clone_grp_(src, dest)
   integer :: i
   dest%id = src%id
   dest%name = src%name
-  dest%dims = src%dims
+  if (allocated(src%dims)) dest%dims = src%dims
   if (allocated(src%atts)) then
     allocate (dest%atts(size(src%atts)))
     do i = 1, size(src%atts)
