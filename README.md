@@ -52,6 +52,7 @@ program main
   nc = open_dataset("simple_wr.nc", "r")
   var = get_variable(nc, "data")
   call extract(var, vals)
+  call close_dataset(nc)
 
 end program main
 ```
@@ -92,30 +93,32 @@ program main
 
   !> nc4f derived types.
   type(netcdf_type) :: nc
-  type(variable_type) :: vars(2), output
+  type(variable_type) :: inputs(2), output
 
-  !> Pointers that points to the actual values.
-  real, dimension(:), pointer :: P, THETA, T
+  !> Pointers to the four-dimensional WRF fields.  nc4f stores dimensions in
+  !> Fortran order: west-east, south-north, bottom-top, then time.
+  real, dimension(:,:,:,:), pointer :: P, THETA, T
 
   !> Open a NetCDF4 file.
   nc = open_dataset("wrfout_d01_2000-01-01_00_00_00", "r")
   !> Use impure elemental function `get_variable` to load all
   !> you want with a one-liner.
-  vars(1) = sum(get_variable(nc, [character(len=2) :: "P", "PB"]))
-  vars(2) = get_variable(nc, "T")
+  inputs(1) = sum(get_variable(nc, [character(len=2) :: "P", "PB"]))
+  inputs(2) = get_variable(nc, "T")
 
   !> Extract values from variables.
-  call extract(vars(1), P)
-  call extract(vars(2), THETA)
+  call extract(inputs(1), P)
+  call extract(inputs(2), THETA)
 
   !> Allocate output variable.
-  call initialize(output, mold=vars(1))
+  call initialize(output, mold=inputs(1))
   call extract(output, T)
 
   !> Computation.
   T = (THETA + THETA0)*(P/P0)**(R/CP)
   !> Save the variable output to a new NetCDF4 file.
   call to_netcdf("output.nc", output)
+  call close_dataset(nc)
 
 end program main
 ```

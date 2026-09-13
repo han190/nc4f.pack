@@ -49,3 +49,19 @@ download \
   'https://archive.unidata.ucar.edu/software/netcdf/examples/ECMWF_ERA-40_subset.nc' \
   'ECMWF_ERA-40_subset.nc' \
   'f5d5bb82811e74179894a87e439acbb952eb692181570b97bcfbc9f61aa18890'
+download \
+  'https://archive.unidata.ucar.edu/software/netcdf/examples/sresa1b_ncar_ccsm3-example.nc' \
+  'sresa1b_ncar_ccsm3-example.nc' \
+  '2c2047ee329654f3bebf0a4b0d99eada50f1183728a3c7c129b0bc50d404511b'
+download \
+  'https://archive.unidata.ucar.edu/software/netcdf/examples/cami_0000-09-01_64x128_L26_c030918.nc' \
+  'cami_0000-09-01_64x128_L26_c030918.nc' \
+  'd53aa1507d0656412d020945db35f8dff632b326a8fd920dd5a27c5870e9aab7'
+download \
+  'https://archive.unidata.ucar.edu/software/netcdf/examples/tos_O1_2001-2002.nc' \
+  'tos_O1_2001-2002.nc' \
+  'ecd54cdd054cb6a529d47bd0af1cc8d6a45cb6e22f4f209562084b6b5af01ba8'
+download \
+  'https://archive.unidata.ucar.edu/software/netcdf/examples/test_echam_spectral.nc' \
+  'test_echam_spectral.nc' \
+  'b0e6e5cf582eedbe2e4c831f5d522cc02bf1fdb077b42e0390326035c712dda0'

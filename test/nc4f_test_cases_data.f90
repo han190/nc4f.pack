@@ -328,6 +328,276 @@ module subroutine ecmwf_era40_read(passed)
   end if
 end subroutine ecmwf_era40_read
 
+!> Read a CF climate-model file through the root-group API.
+module subroutine sresa1b_ccsm3_read(passed)
+  logical, intent(inout) :: passed
+  character(*), parameter :: SAMPLE_FILE = "data/sresa1b_ncar_ccsm3-example.nc"
+  character(len=:), pointer :: conventions, units
+  real(real32), pointer :: values(:, :, :)
+  type(attribute_type) :: conventions_att, units_att
+  type(error_type) :: error
+  type(group_type), allocatable :: grps(:)
+  type(group_type) :: root
+  type(netcdf_type) :: nc
+  type(variable_type) :: tas
+  logical :: is_open
+
+  passed = .false.
+  is_open = .false.
+  nullify (conventions, units, values)
+  nc = open_dataset(SAMPLE_FILE, "r", error=error)
+  if (error%code /= NC_NOERR) return
+  is_open = .true.
+
+  ccsm3_read: block
+    grps = inquire_groups(nc, error)
+    if (error%code /= NC_NOERR) exit ccsm3_read
+    root = inquire_group(nc, inq_dims=.true., inq_atts=.true., inq_vars=.true., &
+      & inq_grps=.true., error=error)
+    if (error%code /= NC_NOERR) exit ccsm3_read
+    tas = get_variable(nc, "tas", [1, 1, 1], [4, 3, 1], error)
+    if (error%code /= NC_NOERR) exit ccsm3_read
+    conventions_att = get_attribute(nc, "Conventions", error)
+    if (error%code /= NC_NOERR) exit ccsm3_read
+    units_att = get_attribute(nc, tas, "units", error)
+    if (error%code /= NC_NOERR) exit ccsm3_read
+    call extract(tas, values)
+    call extract(conventions_att, conventions)
+    call extract(units_att, units)
+    if (.not. associated(values) .or. .not. associated(conventions) .or. &
+      & .not. associated(units)) exit ccsm3_read
+
+    passed = size(grps) == 0 .and. associated(root%grps) .and. &
+      & size(root%grps) == 0 .and. size(root%vars) == 12 .and. &
+      & has_dim(root%dims, "lat", 128_int64) .and. &
+      & has_dim(root%dims, "lon", 256_int64) .and. &
+      & has_dim(root%dims, "plev", 17_int64) .and. &
+      & has_dim(root%dims, "time", 1_int64, .true.) .and. &
+      & all(shape(values) == [4, 3, 1]) .and. &
+      & all(values > 100.0_real32 .and. values < 400.0_real32) .and. &
+      & tas%dims(1)%name == "lon" .and. tas%dims(2)%name == "lat" .and. &
+      & tas%dims(3)%name == "time" .and. starts_with(conventions, "CF-1.0") .and. &
+      & starts_with(units, "K")
+  end block ccsm3_read
+
+  if (associated(conventions)) deallocate (conventions)
+  if (associated(units)) deallocate (units)
+  if (is_open) then
+    call close_dataset(nc, error)
+    if (error%code /= NC_NOERR) passed = .false.
+  end if
+end subroutine sresa1b_ccsm3_read
+
+!> Read CAM initial-condition data with a four-dimensional hyperslab.
+module subroutine cami_initial_read(passed)
+  logical, intent(inout) :: passed
+  character(*), parameter :: SAMPLE_FILE = "data/cami_0000-09-01_64x128_L26_c030918.nc"
+  character(len=:), pointer :: conventions, units
+  real(real64), pointer :: values(:, :, :, :)
+  type(attribute_type) :: conventions_att, units_att
+  type(error_type) :: error
+  type(group_type), allocatable :: grps(:)
+  type(group_type) :: root
+  type(netcdf_type) :: nc
+  type(variable_type) :: temperature
+  logical :: is_open
+
+  passed = .false.
+  is_open = .false.
+  nullify (conventions, units, values)
+  nc = open_dataset(SAMPLE_FILE, "r", error=error)
+  if (error%code /= NC_NOERR) return
+  is_open = .true.
+
+  cami_read: block
+    grps = inquire_groups(nc, error)
+    if (error%code /= NC_NOERR) exit cami_read
+    root = inquire_group(nc, inq_dims=.true., inq_atts=.true., inq_vars=.true., &
+      & inq_grps=.true., error=error)
+    if (error%code /= NC_NOERR) exit cami_read
+    temperature = get_variable(nc, "T", [1, 1, 1, 1], [2, 3, 4, 1], error)
+    if (error%code /= NC_NOERR) exit cami_read
+    conventions_att = get_attribute(nc, "Conventions", error)
+    if (error%code /= NC_NOERR) exit cami_read
+    units_att = get_attribute(nc, temperature, "units", error)
+    if (error%code /= NC_NOERR) exit cami_read
+    call extract(temperature, values)
+    call extract(conventions_att, conventions)
+    call extract(units_att, units)
+    if (.not. associated(values) .or. .not. associated(conventions) .or. &
+      & .not. associated(units)) exit cami_read
+
+    passed = size(grps) == 0 .and. associated(root%grps) .and. &
+      & size(root%grps) == 0 .and. size(root%vars) == 57 .and. &
+      & has_dim(root%dims, "lat", 64_int64) .and. &
+      & has_dim(root%dims, "lon", 128_int64) .and. &
+      & has_dim(root%dims, "lev", 26_int64) .and. &
+      & has_dim(root%dims, "ilev", 27_int64) .and. &
+      & has_dim(root%dims, "time", 1_int64, .true.) .and. &
+      & all(shape(values) == [2, 3, 4, 1]) .and. &
+      & all(values > 100.0_real64 .and. values < 400.0_real64) .and. &
+      & temperature%dims(1)%name == "lon" .and. &
+      & temperature%dims(2)%name == "lev" .and. &
+      & temperature%dims(3)%name == "lat" .and. &
+      & temperature%dims(4)%name == "time" .and. &
+      & starts_with(conventions, "CF-1.0") .and. starts_with(units, "K")
+  end block cami_read
+
+  if (associated(conventions)) deallocate (conventions)
+  if (associated(units)) deallocate (units)
+  if (is_open) then
+    call close_dataset(nc, error)
+    if (error%code /= NC_NOERR) passed = .false.
+  end if
+end subroutine cami_initial_read
+
+!> Read an ocean file whose first latitude row contains missing values.
+module subroutine tos_o1_read(passed)
+  logical, intent(inout) :: passed
+  character(*), parameter :: SAMPLE_FILE = "data/tos_O1_2001-2002.nc"
+  character(len=:), pointer :: conventions, units
+  real(real32), pointer :: values(:, :, :)
+  type(attribute_type) :: conventions_att, units_att
+  type(error_type) :: error
+  type(group_type), allocatable :: grps(:)
+  type(group_type) :: root
+  type(netcdf_type) :: nc
+  type(variable_type) :: tos
+  logical :: is_open
+
+  passed = .false.
+  is_open = .false.
+  nullify (conventions, units, values)
+  nc = open_dataset(SAMPLE_FILE, "r", error=error)
+  if (error%code /= NC_NOERR) return
+  is_open = .true.
+
+  tos_read: block
+    grps = inquire_groups(nc, error)
+    if (error%code /= NC_NOERR) exit tos_read
+    root = inquire_group(nc, inq_dims=.true., inq_atts=.true., inq_vars=.true., &
+      & inq_grps=.true., error=error)
+    if (error%code /= NC_NOERR) exit tos_read
+    tos = get_variable(nc, "tos", [1, 85, 1], [4, 3, 2], error)
+    if (error%code /= NC_NOERR) exit tos_read
+    conventions_att = get_attribute(nc, "Conventions", error)
+    if (error%code /= NC_NOERR) exit tos_read
+    units_att = get_attribute(nc, tos, "units", error)
+    if (error%code /= NC_NOERR) exit tos_read
+    call extract(tos, values)
+    call extract(conventions_att, conventions)
+    call extract(units_att, units)
+    if (.not. associated(values) .or. .not. associated(conventions) .or. &
+      & .not. associated(units)) exit tos_read
+
+    passed = size(grps) == 0 .and. associated(root%grps) .and. &
+      & size(root%grps) == 0 .and. size(root%vars) == 7 .and. &
+      & has_dim(root%dims, "lat", 170_int64) .and. &
+      & has_dim(root%dims, "lon", 180_int64) .and. &
+      & has_dim(root%dims, "time", 24_int64, .true.) .and. &
+      & all(shape(values) == [4, 3, 2]) .and. &
+      & tos%dims(1)%name == "lon" .and. tos%dims(2)%name == "lat" .and. &
+      & tos%dims(3)%name == "time" .and. conventions == "CF-1.0" .and. units == "K"
+  end block tos_read
+
+  if (associated(conventions)) deallocate (conventions)
+  if (associated(units)) deallocate (units)
+  if (is_open) then
+    call close_dataset(nc, error)
+    if (error%code /= NC_NOERR) passed = .false.
+  end if
+end subroutine tos_o1_read
+
+!> Read a spectral-grid file with non-geographical dimensions.
+module subroutine echam_spectral_read(passed)
+  logical, intent(inout) :: passed
+  character(*), parameter :: SAMPLE_FILE = "data/test_echam_spectral.nc"
+  character(len=:), pointer :: conventions, grid_type
+  real(real32), pointer :: values(:, :, :)
+  type(attribute_type) :: conventions_att, grid_type_att
+  type(error_type) :: error
+  type(group_type), allocatable :: grps(:)
+  type(group_type) :: root
+  type(netcdf_type) :: nc
+  type(variable_type) :: lsp
+  logical :: is_open
+
+  passed = .false.
+  is_open = .false.
+  nullify (conventions, grid_type, values)
+  nc = open_dataset(SAMPLE_FILE, "r", error=error)
+  if (error%code /= NC_NOERR) return
+  is_open = .true.
+
+  echam_read: block
+    grps = inquire_groups(nc, error)
+    if (error%code /= NC_NOERR) exit echam_read
+    root = inquire_group(nc, inq_dims=.true., inq_atts=.true., inq_vars=.true., &
+      & inq_grps=.true., error=error)
+    if (error%code /= NC_NOERR) exit echam_read
+    lsp = get_variable(nc, "lsp", [1, 1, 1], [2, 4, 1], error)
+    if (error%code /= NC_NOERR) exit echam_read
+    conventions_att = get_attribute(nc, "Conventions", error)
+    if (error%code /= NC_NOERR) exit echam_read
+    grid_type_att = get_attribute(nc, lsp, "grid_type", error)
+    if (error%code /= NC_NOERR) exit echam_read
+    call extract(lsp, values)
+    call extract(conventions_att, conventions)
+    call extract(grid_type_att, grid_type)
+    if (.not. associated(values) .or. .not. associated(conventions) .or. &
+      & .not. associated(grid_type)) exit echam_read
+
+    passed = size(grps) == 0 .and. associated(root%grps) .and. &
+      & size(root%grps) == 0 .and. size(root%vars) == 136 .and. &
+      & has_dim(root%dims, "time", 8_int64, .true.) .and. &
+      & has_dim(root%dims, "lat", 96_int64) .and. &
+      & has_dim(root%dims, "lon", 192_int64) .and. &
+      & has_dim(root%dims, "spc", 2080_int64) .and. &
+      & has_dim(root%dims, "complex", 2_int64) .and. &
+      & all(shape(values) == [2, 4, 1]) .and. &
+      & all(abs(values) < 20.0_real32) .and. &
+      & lsp%dims(1)%name == "complex" .and. lsp%dims(2)%name == "spc" .and. &
+      & lsp%dims(3)%name == "time" .and. starts_with(conventions, "CF-1.0") .and. &
+      & starts_with(grid_type, "spectral")
+  end block echam_read
+
+  if (associated(conventions)) deallocate (conventions)
+  if (associated(grid_type)) deallocate (grid_type)
+  if (is_open) then
+    call close_dataset(nc, error)
+    if (error%code /= NC_NOERR) passed = .false.
+  end if
+end subroutine echam_spectral_read
+
+!> Return whether `dims` contains a dimension with the specified metadata.
+pure logical function has_dim(dims, name, len, is_unlim)
+  type(dimension_type), intent(in) :: dims(:)
+  character(len=*), intent(in) :: name
+  integer(int64), intent(in) :: len
+  logical, intent(in), optional :: is_unlim
+  integer :: i
+
+  has_dim = .false.
+  do i = 1, size(dims)
+    if (.not. allocated(dims(i)%name)) cycle
+    if (dims(i)%name /= name .or. dims(i)%len /= len) cycle
+    if (present(is_unlim)) then
+      if (dims(i)%is_unlim .neqv. is_unlim) cycle
+    end if
+    has_dim = .true.
+    return
+  end do
+end function has_dim
+
+!> Return whether `text` begins with `prefix`; trailing NULs are retained when
+!> an externally written `NC_CHAR` attribute includes them in its stored value.
+pure logical function starts_with(text, prefix)
+  character(len=*), intent(in) :: text, prefix
+
+  starts_with = len(text) >= len(prefix)
+  if (starts_with) starts_with = text(:len(prefix)) == prefix
+end function starts_with
+
 function extensive_variables() result(vars)
   type(variable_type), allocatable :: vars(:)
   type(dimension_type) :: dims(7)
