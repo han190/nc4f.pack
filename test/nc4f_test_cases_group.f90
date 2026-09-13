@@ -91,7 +91,7 @@ module subroutine group_write(passed)
   root = dataset("input-root-name-is-ignored", vars=[root_var], &
     & atts=["title".att."root"], grps=root_grps)
 
-  call to_netcdf_grp(TEST_RESULTS_DIR//"group-root.nc", root, &
+  call to_netcdf(TEST_RESULTS_DIR//"group-root.nc", root, &
     & atts=["writer".att."group_write"], error=error)
   if ((error%code /= NC_NOERR)) return
   nc = open_dataset(TEST_RESULTS_DIR//"group-root.nc", "r", error=error)
@@ -140,7 +140,7 @@ module subroutine group_write(passed)
 
   top_level_input(1) = parent
   top_level_input(2) = sibling
-  call to_netcdf_grps(TEST_RESULTS_DIR//"group-children.nc", top_level_input, &
+  call to_netcdf(TEST_RESULTS_DIR//"group-children.nc", top_level_input, &
     & atts=["title".att."group collection"], error=error)
   if ((error%code /= NC_NOERR)) return
   nc = open_dataset(TEST_RESULTS_DIR//"group-children.nc", "r", error=error)
@@ -170,7 +170,7 @@ module subroutine group_write(passed)
 
   invalid = dataset("/")
   top_level_input(1) = invalid
-  call to_netcdf_grps(TEST_RESULTS_DIR//"invalid-root-child.nc", top_level_input(:1), error=error)
+  call to_netcdf(TEST_RESULTS_DIR//"invalid-root-child.nc", top_level_input(:1), error=error)
   passed = (error%code /= NC_NOERR) .and. error%code == NC_EINVAL
 end subroutine group_write
 

@@ -6,7 +6,7 @@ implicit none (type, external)
 
 public :: simple_wr, simple_rd, character_variables, buffer_edges
 public :: creation_policy, error_handling
- public :: hyperslab_rd, hyperslab_wr, unlimited_wr, unlimited_dims
+public :: hyperslab_rd, hyperslab_wr, unlimited_wr, unlimited_dims
 public :: sum_vars_test, sfc_pres_temp_wr, sfc_pres_temp_rd, extensive_wr, extensive_rd
 public :: group_model, group_write
 public :: nasa_cosp_read

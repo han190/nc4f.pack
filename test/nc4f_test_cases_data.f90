@@ -99,7 +99,7 @@ module subroutine sfc_pres_temp_rd(passed)
   end if
 
   var = inquire_variable(nc, "relative_humidity", error)
-  passed = .exists. error .and. error%code == NC_ENOTVAR
+  passed = .exists.error .and. error%code == NC_ENOTVAR
   call close_dataset(nc)
 end subroutine sfc_pres_temp_rd
 
@@ -624,8 +624,8 @@ function extensive_variables() result(vars)
     & shape(real32_values_7d))
 
   vars = [ &
-    & datarray("int8_rank1", int8_values, dims(:1), ["marker".att.(-7_int8)]), &
-    & datarray("int16_rank2", int16_values, dims(:2), ["marker".att.(-15_int16)]), &
+    & datarray("int8_rank1", int8_values, dims(:1), ["marker".att. (-7_int8)]), &
+    & datarray("int16_rank2", int16_values, dims(:2), ["marker".att. (-15_int16)]), &
     & datarray("int32_rank3", int32_values, dims(:3), ["marker".att.350_int32]), &
     & datarray("int64_rank4", int64_values, dims(:4), ["marker".att.7500_int64]), &
     & datarray("real32_rank5", real32_values_5d, dims(:5), ["marker".att.1.25_real32]), &

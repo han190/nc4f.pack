@@ -16,8 +16,8 @@ module subroutine copy_semantics(passed)
   real(real32), pointer :: deep_values(:), shallow_values(:), source_values(:)
 
   raw_values = [1.0_real32, 2.0_real32]
-  deep_var = datarray("deep", raw_values, ["x" .dim. 2], deep=.true.)
-  shallow_var = datarray("shallow", raw_values, ["x" .dim. 2], deep=.false.)
+  deep_var = datarray("deep", raw_values, ["x".dim.2], deep=.true.)
+  shallow_var = datarray("shallow", raw_values, ["x".dim.2], deep=.false.)
   raw_values(1) = 9.0_real32
   call extract(deep_var, deep_values)
   call extract(shallow_var, shallow_values)
@@ -26,7 +26,7 @@ module subroutine copy_semantics(passed)
   if (abs(deep_values(1) - 1.0_real32) > epsilon(1.0_real32) .or. &
     & abs(shallow_values(1) - 9.0_real32) > epsilon(1.0_real32)) return
 
-  source_var = datarray("source", raw_values, ["x" .dim. 2])
+  source_var = datarray("source", raw_values, ["x".dim.2])
   grandchild = dataset("grandchild", [source_var])
   grandchild_grps(1) = grandchild
   child = dataset("child", grps=grandchild_grps)

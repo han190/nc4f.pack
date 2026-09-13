@@ -50,15 +50,15 @@ module subroutine error_handling(passed)
 
   passed = .false.
   error = error_type(NC_ENOTVAR, "constructed error")
-  if (.not. (.exists. error .and. allocated(error%message))) return
+  if (.not. (.exists.error .and. allocated(error%message))) return
   error = error_type()
-  if (.exists. error) return
+  if (.exists.error) return
 
   nc = open_dataset(TEST_RESULTS_DIR//"unused.nc", "invalid", error=error)
   if (.not. ((error%code /= NC_NOERR) .and. error%code == NC_EINVAL)) return
 
   nc = open_dataset(TEST_RESULTS_DIR//"missing-error-fixture/no-file.nc", error=error)
-  if (.not. (.exists. error .and. allocated(error%message))) return
+  if (.not. (.exists.error .and. allocated(error%message))) return
   write (stdout, "(dt)", iostat=io_stat) error
   if (io_stat /= 0 .or. len_trim(stdout) == 0) return
 
@@ -69,12 +69,12 @@ module subroutine error_handling(passed)
   if ((error%code /= NC_NOERR)) return
 
   var = inquire_variable(nc, "missing", error)
-  if (.not. .exists. error .or. error%code /= NC_ENOTVAR) then
+  if (.not. .exists.error .or. error%code /= NC_ENOTVAR) then
     call close_dataset(nc)
     return
   end if
   var = get_variable(nc, "missing", error)
-  if (.not. .exists. error .or. error%code /= NC_ENOTVAR) then
+  if (.not. .exists.error .or. error%code /= NC_ENOTVAR) then
     call close_dataset(nc)
     return
   end if
@@ -85,18 +85,18 @@ module subroutine error_handling(passed)
   end if
 
   att = get_attribute(nc, "missing_global", error)
-  if (.not. .exists. error .or. error%code /= NC_ENOTATT) then
+  if (.not. .exists.error .or. error%code /= NC_ENOTATT) then
     call close_dataset(nc)
     return
   end if
   att = get_attribute(nc, var, "missing", error)
-  if (.not. .exists. error .or. error%code /= NC_ENOTATT) then
+  if (.not. .exists.error .or. error%code /= NC_ENOTATT) then
     call close_dataset(nc)
     return
   end if
 
   var = get_variable(nc, "present", [2], [1], error)
-  if (.not. (.exists. error .and. error%code == NC_EEDGE)) then
+  if (.not. (.exists.error .and. error%code == NC_EEDGE)) then
     call close_dataset(nc)
     return
   end if

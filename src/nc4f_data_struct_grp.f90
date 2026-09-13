@@ -38,7 +38,8 @@ module subroutine init_var(var, name, dtype, len, dims, atts, deep)
   var%name = trim(name)
   var%dtype = dtype
   var%dims = dims
-  if (size(var) /= len) error stop "[init_var] Dimension product differs from variable length."
+  if (size(var) /= len) error stop &
+    & "[init_var] Dimension product differs from variable length."
   var%len = len
   if (present(atts)) var%atts = atts
   if (deep_copy) allocate (var%buffer(buffer_size(dtype, len)))
@@ -88,9 +89,8 @@ module subroutine new_dataset_(grp, name, vars, grps, atts, deep)
   type(group_type), intent(in), optional :: grps(:)
   type(attribute_type), intent(in), optional :: atts(:)
   logical, intent(in), optional :: deep
-  type(dimension_type), allocatable :: dims(:)
-  integer :: i, j, k, n, ndims
-  logical :: deep_copy, has_name
+  integer :: i
+  logical :: deep_copy
 
   deep_copy = .false.
   if (present(deep)) deep_copy = deep
@@ -114,32 +114,7 @@ module subroutine new_dataset_(grp, name, vars, grps, atts, deep)
     else
       grp%vars = vars
     end if
-    ndims = 0
-    do i = 1, size(vars)
-      if (allocated(vars(i)%dims)) ndims = ndims + size(vars(i)%dims)
-    end do
-    allocate (dims(ndims))
-    n = 0
-    do i = 1, size(vars)
-      do j = 1, size(vars(i)%dims)
-        has_name = .false.
-        do k = 1, n
-          if (dims(k)%name == vars(i)%dims(j)%name) then
-            has_name = .true.
-            if (dims(k)%len /= vars(i)%dims(j)%len .or. &
-              & dims(k)%is_unlim .neqv. vars(i)%dims(j)%is_unlim) then
-              error stop "[dataset] Conflicting definitions for one dimension name."
-            end if
-            exit
-          end if
-        end do
-        if (.not. has_name) then
-          n = n + 1
-          dims(n) = vars(i)%dims(j)
-        end if
-      end do
-    end do
-    grp%dims = dims(:n)
+    grp%dims = collect_dims_(vars)
   end if
   if (present(grps)) then
     allocate (grp%grps(size(grps)))
@@ -152,6 +127,46 @@ module subroutine new_dataset_(grp, name, vars, grps, atts, deep)
     end if
   end if
 end subroutine new_dataset_
+
+!> Collect unique variable dimensions in first-seen order.
+!>
+!> Dimensions sharing a name must have matching length and unlimited status.
+function collect_dims_(vars) result(dims)
+  type(variable_type), intent(in) :: vars(:)
+  type(dimension_type), allocatable :: dims(:)
+  type(dimension_type), allocatable :: collected(:)
+  integer :: i, j, k, n, ndims
+  logical :: has_name
+
+  ndims = 0
+  do i = 1, size(vars)
+    if (allocated(vars(i)%dims)) ndims = ndims + size(vars(i)%dims)
+  end do
+  allocate (collected(ndims))
+
+  n = 0
+  do i = 1, size(vars)
+    if (.not. allocated(vars(i)%dims)) cycle
+    do j = 1, size(vars(i)%dims)
+      has_name = .false.
+      do k = 1, n
+        if (collected(k)%name == vars(i)%dims(j)%name) then
+          has_name = .true.
+          if (collected(k)%len /= vars(i)%dims(j)%len .or. &
+            & collected(k)%is_unlim .neqv. vars(i)%dims(j)%is_unlim) then
+            error stop "[dataset] Conflicting definitions for one dimension name."
+          end if
+          exit
+        end if
+      end do
+      if (.not. has_name) then
+        n = n + 1
+        collected(n) = vars(i)%dims(j)
+      end if
+    end do
+  end do
+  dims = collected(:n)
+end function collect_dims_
 
 module function buffer_size(dtype, len, context) result(nbytes)
   integer(data_type), intent(in) :: dtype
@@ -171,11 +186,11 @@ module function buffer_size(dtype, len, context) result(nbytes)
   case (BYTE_TYPE, CHAR_TYPE)
     item_bytes = 1
   case (SHORT_TYPE)
-    item_bytes = storage_size(0_int16) / storage_size(0_int8)
+    item_bytes = storage_size(0_int16)/storage_size(0_int8)
   case (INT_TYPE, FLOAT_TYPE)
-    item_bytes = storage_size(0_int32) / storage_size(0_int8)
+    item_bytes = storage_size(0_int32)/storage_size(0_int8)
   case (INT64_TYPE, DOUBLE_TYPE)
-    item_bytes = storage_size(0_int64) / storage_size(0_int8)
+    item_bytes = storage_size(0_int64)/storage_size(0_int8)
   case default
     if (present(context)) then
       error stop trim(context)//" Unsupported NetCDF data type."
@@ -183,14 +198,14 @@ module function buffer_size(dtype, len, context) result(nbytes)
       error stop "[buffer_size] Unsupported NetCDF data type."
     end if
   end select
-  if (len > int(huge(nbytes), int64) / item_bytes) then
+  if (len > int(huge(nbytes), int64)/item_bytes) then
     if (present(context)) then
       error stop trim(context)//" Byte-size overflow."
     else
       error stop "[buffer_size] Byte-size overflow."
     end if
   end if
-  nbytes = int(len * item_bytes)
+  nbytes = int(len*item_bytes)
 end function buffer_size
 
 end submodule nc4f_data_struct_grp

@@ -119,7 +119,7 @@ recursive function render_grp_(grp, depth) result(text)
   character(len=:), allocatable :: indent, name
   integer :: i
 
-  indent = repeat(" ", 2 * depth)
+  indent = repeat(" ", 2*depth)
   name = "/"
   if (allocated(grp%name)) name = grp%name
   text = indent//"group: "//trim(name)//" {"//new_line('a')

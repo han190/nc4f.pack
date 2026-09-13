@@ -8,7 +8,7 @@ use, non_intrinsic :: nc4f_data_struct
 implicit none (type, external)
 
 public :: &
-  open_dataset, close_dataset, to_netcdf, to_netcdf_grp, to_netcdf_grps, &
+  open_dataset, close_dataset, to_netcdf, &
   inquire_dimensions, inquire_variable, &
   get_attribute, get_variable, &
   put_attribute, put_variable, &

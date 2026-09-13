@@ -30,11 +30,11 @@ module subroutine data_model(passed)
   nc_copy = nc
   if (dim%len /= 3 .or. nc%filename /= "model.nc" .or. nc_copy%filename /= "model.nc") return
 
-  atts(1) = "units" .att. "K"
-  vars(1) = datarray("temperature", [273.0, 274.0], ["x" .dim. 2], atts=atts)
+  atts(1) = "units".att."K"
+  vars(1) = datarray("temperature", [273.0, 274.0], ["x".dim.2], atts=atts)
   allocate (values(2, 2), source=reshape([1.0_real32, 2.0_real32, 3.0_real32, 4.0_real32], [2, 2]))
-  owned_var = datarray("owned", values, ["x" .dim. 2, "y" .dim. 2], deep=.true.)
-  borrowed_var = datarray("borrowed", values, ["x" .dim. 2, "y" .dim. 2], deep=.false.)
+  owned_var = datarray("owned", values, ["x".dim.2, "y".dim.2], deep=.true.)
+  borrowed_var = datarray("borrowed", values, ["x".dim.2, "y".dim.2], deep=.false.)
   if (c_associated(c_loc(owned_var%buffer(1)), c_loc(values(1, 1)))) return
   if (.not. c_associated(c_loc(borrowed_var%buffer(1)), c_loc(values(1, 1)))) return
   call extract(borrowed_var, extracted)
@@ -54,7 +54,7 @@ module subroutine data_model(passed)
   if (.not. c_associated(c_loc(grp%vars(1)%buffer(1)), c_loc(vars(1)%buffer(1)))) return
   if (associated(deep_grp%grps(1)%grps, child%grps)) return
 
-  dim = "time" .dim. (0 .and. .true.)
+  dim = "time".dim. (0 .and. .true.)
   if (.not. dim%is_unlim .or. dim%len /= 0) return
   call initialize(cloned_att, mold=atts(1))
   if (cloned_att%name /= atts(1)%name .or. cloned_att%dtype /= atts(1)%dtype) return
@@ -67,7 +67,7 @@ module subroutine data_model(passed)
   if (any(abs(sum_values - [546.0_real32, 548.0_real32]) > epsilon(1.0_real32))) return
 
   error%code = NC_ENOTFOUND
-  if (.not. .exists. error) return
+  if (.not. .exists.error) return
   error = error_type()
   open (newunit=unit, status="scratch", action="readwrite", form="formatted", iostat=iostat, iomsg=iomsg)
   if (iostat /= 0) return
