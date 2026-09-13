@@ -41,6 +41,7 @@ module pure function get_size(var, dim) result(n)
   case (1:)
     if (dim_ > size(var%dims)) error stop "[size] Invalid dimension index."
     n = var%dims(size(var%dims) - dim_ + 1)%len
+    if (n < 0) error stop "[size] Negative dimension length."
   case default
     error stop "[size] Invalid dimension index."
   end select
@@ -49,13 +50,16 @@ end function get_size
 !> Return variable dimension lengths in their stored Fortran order.
 module pure function get_shape(var) result(extents)
   type(variable_type), intent(in) :: var
-  integer(int64), allocatable :: extents(:)
+  integer, allocatable :: extents(:)
   integer :: i
 
   if (.not. allocated(var%dims)) error stop "[shape] Variable dimensions are not allocated."
   allocate (extents(size(var%dims)))
   do i = 1, size(var%dims)
-    extents(i) = var%dims(i)%len
+    if (var%dims(i)%len > int(huge(extents(i)), int64)) then
+      error stop "[shape] Dimension length exceeds default integer range."
+    end if
+    extents(i) = int(var%dims(i)%len)
   end do
 end function get_shape
 

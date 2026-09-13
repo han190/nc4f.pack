@@ -14,10 +14,8 @@ module subroutine validate_att_data(att, dtype, context)
 
   if (att%dtype /= dtype) error stop trim(context)//" Unexpected attribute type."
   if (att%len < 0) error stop trim(context)//" Negative attribute length."
-  nbytes = buffer_size(att%dtype, att%len)
-  if (nbytes == 0) return
-  if (.not. associated(att%buffer)) error stop trim(context)//" Attribute buffer is not associated."
-  if (size(att%buffer) < nbytes) error stop trim(context)//" Attribute buffer is too small."
+  nbytes = buffer_size(att%dtype, att%len, context)
+  call validate_buffer(att%buffer, int(nbytes, int64), "Attribute", context)
 end subroutine validate_att_data
 
 !> Validate a variable before mapping its byte buffer.
@@ -26,8 +24,7 @@ module subroutine validate_var_data(var, dtype, rank, context)
   integer(data_type), intent(in) :: dtype
   integer, intent(in) :: rank
   character(len=*), intent(in) :: context
-  integer :: i, nbytes
-  integer(int64) :: element_count
+  integer :: nbytes
 
   if (var%dtype /= dtype) error stop trim(context)//" Unexpected variable type."
   if (.not. allocated(var%dims)) error stop trim(context)//" Variable dimensions are not allocated."
@@ -35,31 +32,26 @@ module subroutine validate_var_data(var, dtype, rank, context)
     error stop trim(context)//" Unexpected variable rank."
   end if
 
-  element_count = 1_int64
-  do i = 1, size(var%dims)
-    if (var%dims(i)%len < 0) error stop trim(context)//" Negative dimension length."
-    element_count = element_count * var%dims(i)%len
-  end do
-  if (element_count /= var%len) error stop trim(context)//" Dimension product differs from length."
+  if (size(var) /= var%len) error stop trim(context)//" Dimension product differs from length."
 
-  nbytes = buffer_size(var%dtype, var%len)
-  if (nbytes == 0) return
-  if (.not. associated(var%buffer)) error stop trim(context)//" Variable buffer is not associated."
-  if (size(var%buffer) < nbytes) error stop trim(context)//" Variable buffer is too small."
+  nbytes = buffer_size(var%dtype, var%len, context)
+  call validate_buffer(var%buffer, int(nbytes, int64), "Variable", context)
 end subroutine validate_var_data
 
-!> Return variable extents in Fortran array order.
-module function get_shape_(var) result(shape_)
-  type(variable_type), intent(in) :: var
-  integer, allocatable :: shape_(:)
-  integer :: i, ndims
+!> Validate capacity of a pointer-backed raw byte buffer.
+module subroutine validate_buffer(buffer, bytes, name, context)
+  integer(int8), pointer, intent(in) :: buffer(:)
+  integer(int64), intent(in) :: bytes
+  character(len=*), intent(in) :: name
+  character(len=*), intent(in) :: context
 
-  if (.not. allocated(var%dims)) error stop "[get_shape_] Variable dimensions are not allocated."
-  ndims = size(var%dims)
-  allocate (shape_(ndims))
-  do i = 1, ndims
-    shape_(i) = int(var%dims(i)%len)
-  end do
-end function get_shape_
+  if (bytes == 0) return
+  if (.not. associated(buffer)) then
+    error stop trim(context)//" "//name//" buffer is not associated."
+  end if
+  if (size(buffer, kind=int64) < bytes) then
+    error stop trim(context)//" "//name//" buffer is too small."
+  end if
+end subroutine validate_buffer
 
 end submodule nc4f_data_struct_access

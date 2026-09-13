@@ -15,8 +15,11 @@ implicit none (type, external)
 public :: attribute_type, dimension_type, error_type, group_type, netcdf_type, variable_type
 public :: NC_EBADID, NC_EBADDIM, NC_EBADGRPID, NC_EEDGE, NC_EINVAL, NC_EINVALCOORDS, NC_ENOGRP, &
   & NC_ENOTATT, NC_ENOTFOUND, NC_ENOTVAR, NC_NOERR
-public :: datarray, dataset, extract, found, initialize, operator(.att.), operator(.and.), operator(.dim.), &
+public :: datarray, dataset, extract, initialize, operator(.att.), operator(.and.), operator(.dim.), &
   & operator(==), operator(/=), shape, size, sum, write(formatted)
+!> Internal shared utilities used by operational submodules.  They are not
+!> re-exported through the user-facing `nc4f` facade.
+public :: buffer_size, validate_buffer
 private
 
 integer(int32), parameter :: INVALID_INT32 = -2147483647_int32
@@ -143,10 +146,6 @@ interface sum
   module procedure :: sum_vars
 end interface sum
 
-interface found
-  module procedure :: found_error
-end interface found
-
 interface initialize
   module procedure :: init_att
   module procedure :: init_att_mold
@@ -271,10 +270,12 @@ interface
     character(len=*), intent(in) :: context
   end subroutine validate_var_data
 
-  module function get_shape_(var) result(shape_)
-    type(variable_type), intent(in) :: var
-    integer, allocatable :: shape_(:)
-  end function get_shape_
+  module subroutine validate_buffer(buffer, bytes, name, context)
+    integer(int8), pointer, intent(in) :: buffer(:)
+    integer(int64), intent(in) :: bytes
+    character(len=*), intent(in) :: name
+    character(len=*), intent(in) :: context
+  end subroutine validate_buffer
 
   module subroutine write_frmt_att(att, unit, iotype, v_list, iostat, iomsg)
     class(attribute_type), intent(in) :: att
@@ -383,7 +384,7 @@ interface
 
   module pure function get_shape(var) result(extents)
     type(variable_type), intent(in) :: var
-    integer(int64), allocatable :: extents(:)
+    integer, allocatable :: extents(:)
   end function get_shape
 
   module function sum_vars(vars) result(total)
@@ -391,13 +392,10 @@ interface
     type(variable_type) :: total
   end function sum_vars
 
-  module pure elemental logical function found_error(error) result(is_present)
-    type(error_type), intent(in) :: error
-  end function found_error
-
-  module function buffer_size(dtype, len) result(nbytes)
+  module function buffer_size(dtype, len, context) result(nbytes)
     integer(data_type), intent(in) :: dtype
     integer(int64), intent(in) :: len
+    character(len=*), intent(in), optional :: context
     integer :: nbytes
   end function buffer_size
 end interface

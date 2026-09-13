@@ -12,7 +12,7 @@ public :: &
   inquire_dimensions, inquire_variable, &
   get_attribute, get_variable, &
   put_attribute, put_variable, &
-  get_group, inquire_groups, inquire_group
+  get_group, inquire_groups, inquire_group, operator(.exists.)
 private
 
 !> Fixed scratch length for operation-context diagnostics.
@@ -75,10 +75,10 @@ interface to_netcdf
   module procedure :: to_netcdf_grps
 end interface to_netcdf
 
-interface validate_buffer
-  module procedure :: validate_var_buffer
-  module procedure :: validate_att_buffer
-end interface validate_buffer
+!> Return whether an error result represents a failed operation.
+interface operator(.exists.)
+  module procedure :: has_error
+end interface operator(.exists.)
 
 !> Allocate a fresh byte buffer for metadata read from the C API.
 interface initialize
@@ -211,26 +211,6 @@ interface
     !> Output argument(s): `error`.
     type(error_type), intent(out) :: error
   end subroutine put_att_grp_error
-
-  !> Initialize `att` from an attribute mold, allocating its buffer.
-  module pure subroutine allocate_att_mold(att, mold)
-    !> Attribute to allocate and initialize.
-    type(attribute_type), intent(inout) :: att
-    !> Mold attribute providing metadata to copy.
-    type(attribute_type), intent(in) :: mold
-  end subroutine allocate_att_mold
-
-  !> Initialize attribute metadata and allocate its buffer.
-  module pure subroutine allocate_att_meta(att, name, dtype, len)
-    !> Attribute to initialize.
-    type(attribute_type), intent(inout) :: att
-    !> Name to assign to the attribute.
-    character(len=*), intent(in) :: name
-    !> NetCDF data type code (NC_* constant) for the attribute.
-    integer(int32), intent(in) :: dtype
-    !> Number of elements for the attribute.
-    integer(int64), intent(in) :: len
-  end subroutine allocate_att_meta
 
   !> Return true when two `attribute_type` values are identical.
   module elemental logical function eq_att(x, y)
@@ -445,38 +425,6 @@ interface
     !> Input argument(s): `context`.
     character(len=*), intent(in) :: context
   end subroutine validate_att_buffer
-
-  !> Compute a checked element count from a list of dimensions.
-  module function checked_dim_count(dims, context) result(element_count)
-    !> Input argument(s): `dims(:)`.
-    type(dimension_type), intent(in) :: dims(:)
-    !> Input argument(s): `context`.
-    character(len=*), intent(in) :: context
-    integer(int64) :: element_count
-  end function checked_dim_count
-
-  !> Safely multiply one dimension length into an element count.
-  module subroutine checked_multiply(product_value, factor, context)
-    integer(int64), intent(inout) :: product_value
-    integer(int64), intent(in) :: factor
-    character(len=*), intent(in) :: context
-  end subroutine checked_multiply
-
-  !> Return the checked byte count for a supported NetCDF data type.
-  module function checked_buffer_size(dtype, element_count, context) result(required_bytes)
-    integer(c_int), intent(in) :: dtype
-    integer(int64), intent(in) :: element_count
-    character(len=*), intent(in) :: context
-    integer(int64) :: required_bytes
-  end function checked_buffer_size
-
-  !> Validate capacity of a pointer-backed raw byte buffer.
-  module subroutine validate_raw_buffer(buffer, required_bytes, object_name, context)
-    integer(int8), pointer, intent(in) :: buffer(:)
-    integer(int64), intent(in) :: required_bytes
-    character(len=*), intent(in) :: object_name
-    character(len=*), intent(in) :: context
-  end subroutine validate_raw_buffer
 
   !> Allocate a fresh byte buffer for an attribute read from a NetCDF file.
   module subroutine initialize_att(att)

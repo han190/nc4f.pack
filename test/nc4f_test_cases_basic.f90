@@ -32,7 +32,7 @@ module subroutine simple_rd(passed)
   character(len=1024) :: stdout
 
   nc = open_dataset(TEST_RESULTS_DIR//"file_that_does_not_exist.nc", error=error)
-  passed = (error%code /= NC_NOERR) .and. .not. found(error)
+  passed = .exists. error
   if (.not. passed) return
 
   nc = open_dataset(TEST_RESULTS_DIR//"simple_wr.nc", "r")

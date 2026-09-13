@@ -61,7 +61,6 @@ SRC = \
 	$(SRC_DIR)/nc4f_data_struct_extract.f90 \
 	$(SRC_DIR)/nc4f_data_struct_grp.f90 \
 	$(SRC_DIR)/nc4f_data_struct_io.f90 \
-	$(SRC_DIR)/nc4f_data_struct_util.f90 \
 	$(SRC_DIR)/nc4f_data_struct_var_ctor.f90 \
 	$(SRC_DIR)/nc4f_data_struct_var.f90 \
 	$(SRC_DIR)/nc4f_nc.f90 \
@@ -86,7 +85,6 @@ OBJ = \
 	$(BUILD_DIR)/nc4f_data_struct_extract.o \
 	$(BUILD_DIR)/nc4f_data_struct_grp.o \
 	$(BUILD_DIR)/nc4f_data_struct_io.o \
-	$(BUILD_DIR)/nc4f_data_struct_util.o \
 	$(BUILD_DIR)/nc4f_data_struct_var_ctor.o \
 	$(BUILD_DIR)/nc4f_data_struct_var.o \
 	$(BUILD_DIR)/nc4f_nc.o \

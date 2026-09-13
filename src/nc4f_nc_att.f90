@@ -151,13 +151,13 @@ function get_att_(ncid, varid, name, error) result(att)
   att%dtype = dtype
 
   zero_size_attr: if (att%len == 0) then
-    call validate_buffer(att, "[get_att]")
+    call validate_att_buffer(att, "[get_att]")
     if (associated(att%buffer)) nullify (att%buffer)
     return
   end if zero_size_attr
 
   call initialize(att)
-  call validate_buffer(att, "[get_att]")
+  call validate_att_buffer(att, "[get_att]")
   stat = nc_get_att(ncid, varid, f2cstr(att%name), c_loc(att%buffer(1)))
   error = make_netcdf_error(stat, context)
 end function get_att_
@@ -204,7 +204,7 @@ subroutine put_att_var_(nc, var, error)
   if (.not. allocated(var%atts)) return
   do i = 1, size(var%atts)
     associate (att => var%atts(i))
-      call validate_buffer(att, "[put_att_var]")
+      call validate_att_buffer(att, "[put_att_var]")
       if (att%len == 0) then
         cptr = c_null_ptr
       else
@@ -255,7 +255,7 @@ subroutine put_att_grp_(nc, error)
   if (.not. allocated(nc%atts)) return
   do i = 1, size(nc%atts, kind=int64)
     associate (att => nc%atts(i))
-      call validate_buffer(att, "[put_att_grp]")
+      call validate_att_buffer(att, "[put_att_grp]")
       if (att%len == 0) then
         cptr = c_null_ptr
       else

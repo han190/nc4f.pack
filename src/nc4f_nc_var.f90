@@ -47,13 +47,13 @@ function get_var_(nc, name, error) result(var)
   if (has_error(error)) return
 
   zero_size_var: if (var%len == 0) then
-    call validate_buffer(var, "[get_var]")
+    call validate_var_buffer(var, "[get_var]")
     if (associated(var%buffer)) nullify (var%buffer)
     return
   end if zero_size_var
 
   call initialize(var)
-  call validate_buffer(var, "[get_var]")
+  call validate_var_buffer(var, "[get_var]")
   cptr = c_loc(var%buffer(1))
   write (msg, "('[get_var] Invalid variable:', 1x, a)") name
   stat = nc_get_var(nc%id, var%id, cptr)
@@ -140,9 +140,9 @@ function get_vara_(nc, name, start, count, error) result(var)
     var%dims(i)%len = f_count
     var%dims(i)%is_unlim = .false.
   end do
-  var%len = checked_dim_count(var%dims, "[get_vara]")
+  var%len = size(var)
   call initialize(var)
-  call validate_buffer(var, "[get_vara]")
+  call validate_var_buffer(var, "[get_vara]")
 
   if (ndims > 0) then
     startp = c_loc(c_start(1))
@@ -208,7 +208,7 @@ function inq_var_(nc, name, error) result(var)
   if (has_error(error)) return
   var%dims = inq_dims_var(nc, var, error=error)
   if (has_error(error)) return
-  var%len = checked_dim_count(var%dims, "[inq_var]")
+  var%len = size(var)
 end function inq_var_
 
 !> Inquire a variable's NetCDF type while allowing a status to propagate.
@@ -319,7 +319,7 @@ subroutine put_vara_(nc, var, start, count, error)
     return
   end if
 
-  call validate_buffer(var, "[put_vara]")
+  call validate_var_buffer(var, "[put_vara]")
   allocate (c_start(ndims), c_count(ndims))
   do i = 1, ndims
     f_start = int(start(i), int64)
@@ -382,7 +382,7 @@ subroutine put_var_(nc, var, error)
   integer :: i, j, ndims
 
   error = error_type()
-  call validate_buffer(var, "[put_var]")
+  call validate_var_buffer(var, "[put_var]")
   tmp = def_var_(nc, var, error)
   if (has_error(error)) return
   if (allocated(var%atts)) then

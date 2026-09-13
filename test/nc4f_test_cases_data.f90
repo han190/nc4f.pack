@@ -99,7 +99,7 @@ module subroutine sfc_pres_temp_rd(passed)
   end if
 
   var = inquire_variable(nc, "relative_humidity", error)
-  passed = .not. found(error) .and. error%code == NC_ENOTVAR
+  passed = .exists. error .and. error%code == NC_ENOTVAR
   call close_dataset(nc)
 end subroutine sfc_pres_temp_rd
 

@@ -206,47 +206,6 @@ function render_var_(var, indent) result(line)
   line = indent//trim(dtype)//" "//var%name//dims//" ;"
 end function render_var_
 
-subroutine write_dim_(dim, unit, indent, iostat, iomsg)
-  type(dimension_type), intent(in) :: dim
-  integer, intent(in) :: unit
-  character(len=*), intent(in) :: indent
-  integer, intent(out) :: iostat
-  character(len=*), intent(inout) :: iomsg
-
-  if (dim%is_unlim) then
-    write (unit, "(a, a, ' = UNLIMITED ; // (', i0, ' currently)')", iostat=iostat, iomsg=iomsg) &
-      & indent, dim%name, dim%len
-  else
-    write (unit, "(a, a, ' = ', i0, ' ;')", iostat=iostat, iomsg=iomsg) indent, dim%name, dim%len
-  end if
-end subroutine write_dim_
-
-subroutine write_var_(var, unit, indent, iostat, iomsg)
-  type(variable_type), intent(in) :: var
-  integer, intent(in) :: unit
-  character(len=*), intent(in) :: indent
-  integer, intent(out) :: iostat
-  character(len=*), intent(inout) :: iomsg
-  character(len=16) :: dtype
-  character(len=:), allocatable :: dims
-  integer :: i
-
-  call type_name_(var%dtype, dtype)
-  dims = ""
-  if (allocated(var%dims)) then
-    if (size(var%dims) > 0) then
-      dims = "("
-      do i = 1, size(var%dims)
-        if (i > 1) dims = dims//", "
-        dims = dims//trim(var%dims(i)%name)
-      end do
-      dims = dims//")"
-    end if
-  end if
-  write (unit, "(a, a, 1x, a, a, ' ;')", iostat=iostat, iomsg=iomsg) &
-    & indent, trim(dtype), var%name, dims
-end subroutine write_var_
-
 subroutine type_name_(dtype, name)
   integer(data_type), intent(in) :: dtype
   character(len=*), intent(out) :: name

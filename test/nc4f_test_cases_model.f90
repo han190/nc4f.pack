@@ -67,7 +67,7 @@ module subroutine data_model(passed)
   if (any(abs(sum_values - [546.0_real32, 548.0_real32]) > epsilon(1.0_real32))) return
 
   error%code = NC_ENOTFOUND
-  if (found(error)) return
+  if (.not. .exists. error) return
   error = error_type()
   open (newunit=unit, status="scratch", action="readwrite", form="formatted", iostat=iostat, iomsg=iomsg)
   if (iostat /= 0) return

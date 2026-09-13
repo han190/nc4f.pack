@@ -29,25 +29,17 @@ module subroutine init_var(var, name, dtype, len, dims, atts, deep)
   type(dimension_type), intent(in) :: dims(:)
   type(attribute_type), intent(in), optional :: atts(:)
   logical, intent(in), optional :: deep
-  integer :: i
-  integer(int64) :: dim_len
   logical :: deep_copy
 
   if (len < 0) error stop "[init_var] Negative variable length."
-  dim_len = 1_int64
-  do i = 1, size(dims)
-    if (dims(i)%len < 0) error stop "[init_var] Negative dimension length."
-    dim_len = dim_len * dims(i)%len
-  end do
-  if (dim_len /= len) error stop "[init_var] Dimension product differs from variable length."
-
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
   nullify (var%buffer)
   var%name = trim(name)
   var%dtype = dtype
-  var%len = len
   var%dims = dims
+  if (size(var) /= len) error stop "[init_var] Dimension product differs from variable length."
+  var%len = len
   if (present(atts)) var%atts = atts
   if (deep_copy) allocate (var%buffer(buffer_size(dtype, len)))
 end subroutine init_var
@@ -161,11 +153,20 @@ module subroutine new_dataset_(grp, name, vars, grps, atts, deep)
   end if
 end subroutine new_dataset_
 
-module function buffer_size(dtype, len) result(nbytes)
+module function buffer_size(dtype, len, context) result(nbytes)
   integer(data_type), intent(in) :: dtype
   integer(int64), intent(in) :: len
+  character(len=*), intent(in), optional :: context
   integer :: nbytes
   integer(int64) :: item_bytes
+
+  if (len < 0) then
+    if (present(context)) then
+      error stop trim(context)//" Negative element count."
+    else
+      error stop "[buffer_size] Negative element count."
+    end if
+  end if
   select case (dtype)
   case (BYTE_TYPE, CHAR_TYPE)
     item_bytes = 1
@@ -176,9 +177,19 @@ module function buffer_size(dtype, len) result(nbytes)
   case (INT64_TYPE, DOUBLE_TYPE)
     item_bytes = storage_size(0_int64) / storage_size(0_int8)
   case default
-    error stop "[buffer_size] Unsupported NetCDF data type."
+    if (present(context)) then
+      error stop trim(context)//" Unsupported NetCDF data type."
+    else
+      error stop "[buffer_size] Unsupported NetCDF data type."
+    end if
   end select
-  if (len > int(huge(nbytes), int64) / item_bytes) error stop "[buffer_size] Buffer too large."
+  if (len > int(huge(nbytes), int64) / item_bytes) then
+    if (present(context)) then
+      error stop trim(context)//" Byte-size overflow."
+    else
+      error stop "[buffer_size] Byte-size overflow."
+    end if
+  end if
   nbytes = int(len * item_bytes)
 end function buffer_size
 
