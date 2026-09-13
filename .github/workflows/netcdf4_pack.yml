@@ -7,7 +7,8 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-24.04
+    container: fedora:45
 
     steps:
       - name: Check out repository
@@ -15,22 +16,27 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo rm -f /etc/apt/sources.list.d/google-chrome.list \
-            /etc/apt/sources.list.d/google-chrome.sources
-          sudo apt-get update
-          sudo apt-get install --yes gfortran-16 libnetcdf-dev netcdf-bin pkg-config fypp
+          dnf install --assumeyes \
+            curl \
+            gcc-gfortran \
+            make \
+            netcdf \
+            netcdf-devel \
+            perl-Digest-SHA \
+            pkgconf-pkg-config \
+            python3-fypp
 
       - name: Report compiler
-        run: gfortran-16 --version
+        run: gfortran --version
 
       - name: Build
-        run: FC=gfortran-16 make
+        run: FC=gfortran make
 
       - name: Download integration fixtures
         run: make download-test-data
 
       - name: Test
-        run: FC=gfortran-16 make test
+        run: FC=gfortran make test
 
       - name: Inspect generated NetCDF file
         run: ncdump -h build/test-results/characters.nc
