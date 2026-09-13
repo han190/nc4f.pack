@@ -7,7 +7,9 @@ implicit none (type, external)
 
 contains
 
+!> Execute `data_model`.
 module subroutine data_model(passed)
+  !> Input/output argument: `passed`.
   logical, intent(inout) :: passed
   type(attribute_type) :: atts(1), cloned_att
   type(dimension_type) :: dim

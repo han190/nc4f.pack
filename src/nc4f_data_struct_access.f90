@@ -7,8 +7,11 @@ contains
 
 !> Validate an attribute before mapping its byte buffer.
 module subroutine validate_att_data(att, dtype, context)
+  !> Input argument: `att`.
   type(attribute_type), intent(in) :: att
+  !> Input argument: `dtype`.
   integer(data_type), intent(in) :: dtype
+  !> Input argument: `context`.
   character(len=*), intent(in) :: context
   integer :: nbytes
 
@@ -20,9 +23,13 @@ end subroutine validate_att_data
 
 !> Validate a variable before mapping its byte buffer.
 module subroutine validate_var_data(var, dtype, rank, context)
+  !> Input argument: `var`.
   type(variable_type), intent(in) :: var
+  !> Input argument: `dtype`.
   integer(data_type), intent(in) :: dtype
+  !> Input argument: `rank`.
   integer, intent(in) :: rank
+  !> Input argument: `context`.
   character(len=*), intent(in) :: context
   integer :: nbytes
 
@@ -40,9 +47,13 @@ end subroutine validate_var_data
 
 !> Validate capacity of a pointer-backed raw byte buffer.
 module subroutine validate_buffer(buffer, bytes, name, context)
+  !> Input argument: `buffer`.
   integer(int8), pointer, intent(in) :: buffer(:)
+  !> Input argument: `bytes`.
   integer(int64), intent(in) :: bytes
+  !> Input argument: `name`.
   character(len=*), intent(in) :: name
+  !> Input argument: `context`.
   character(len=*), intent(in) :: context
 
   if (bytes == 0) return

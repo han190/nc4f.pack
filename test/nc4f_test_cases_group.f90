@@ -4,6 +4,7 @@ contains
 
 !> Exercise recursive group construction and ncdump-like formatted output.
 module subroutine group_model(passed)
+  !> Input/output argument: `passed`.
   logical, intent(inout) :: passed
   character(len=256) :: line
   integer :: child_at, dims_at, file_unit, groups_at, iostat, line_number, &
@@ -68,6 +69,7 @@ end subroutine group_model
 
 !> Write recursive group descriptions through both group serialization APIs.
 module subroutine group_write(passed)
+  !> Input/output argument: `passed`.
   logical, intent(inout) :: passed
   real, pointer :: child_values(:), root_values(:)
   type(attribute_type) :: root_att

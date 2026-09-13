@@ -4,6 +4,7 @@ implicit none (type, external)
 
 contains
 
+!> Execute `simple_wr`.
 module subroutine simple_wr(passed)
   !> Input/output argument(s): `passed`.
   logical, intent(inout) :: passed
@@ -22,6 +23,7 @@ module subroutine simple_wr(passed)
   passed = index(stdout, "float data(x, y)") > 0
 end subroutine simple_wr
 
+!> Execute `simple_rd`.
 module subroutine simple_rd(passed)
   !> Input/output argument(s): `passed`.
   logical, intent(inout) :: passed
@@ -49,6 +51,7 @@ module subroutine simple_rd(passed)
   call close_dataset(nc)
 end subroutine simple_rd
 
+!> Execute `character_variables`.
 module subroutine character_variables(passed)
   !> Input/output argument(s): `passed`.
   logical, intent(inout) :: passed
@@ -80,6 +83,7 @@ module subroutine character_variables(passed)
     & all(actual_values == values)
 end subroutine character_variables
 
+!> Execute `buffer_edges`.
 module subroutine buffer_edges(passed)
   !> Input/output argument(s): `passed`.
   logical, intent(inout) :: passed

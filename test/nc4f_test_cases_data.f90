@@ -4,6 +4,7 @@ implicit none (type, external)
 
 contains
 
+!> Execute `sum_vars_test`.
 module subroutine sum_vars_test(passed)
   !> Input/output argument(s): `passed`.
   logical, intent(inout) :: passed
@@ -24,6 +25,7 @@ module subroutine sum_vars_test(passed)
   passed = all(abs(actual - b) <= epsilon(b)) .and. all(result%dims == vars(1)%dims)
 end subroutine sum_vars_test
 
+!> Execute `sfc_pres_temp_wr`.
 module subroutine sfc_pres_temp_wr(passed)
   !> Input/output argument(s): `passed`.
   logical, intent(inout) :: passed
@@ -59,6 +61,7 @@ module subroutine sfc_pres_temp_wr(passed)
   passed = .true.
 end subroutine sfc_pres_temp_wr
 
+!> Execute `sfc_pres_temp_rd`.
 module subroutine sfc_pres_temp_rd(passed)
   !> Input/output argument(s): `passed`.
   logical, intent(inout) :: passed
@@ -103,6 +106,7 @@ module subroutine sfc_pres_temp_rd(passed)
   call close_dataset(nc)
 end subroutine sfc_pres_temp_rd
 
+!> Execute `extensive_wr`.
 module subroutine extensive_wr(passed)
   !> Input/output argument(s): `passed`.
   logical, intent(inout) :: passed
@@ -117,6 +121,7 @@ module subroutine extensive_wr(passed)
   if (passed) passed = file_size > 0
 end subroutine extensive_wr
 
+!> Execute `extensive_rd`.
 module subroutine extensive_rd(passed)
   !> Input/output argument(s): `passed`.
   logical, intent(inout) :: passed
@@ -330,6 +335,7 @@ end subroutine ecmwf_era40_read
 
 !> Read a CF climate-model file through the root-group API.
 module subroutine sresa1b_ccsm3_read(passed)
+  !> Input/output argument: `passed`.
   logical, intent(inout) :: passed
   character(*), parameter :: SAMPLE_FILE = "data/sresa1b_ncar_ccsm3-example.nc"
   character(len=:), pointer :: conventions, units
@@ -390,6 +396,7 @@ end subroutine sresa1b_ccsm3_read
 
 !> Read CAM initial-condition data with a four-dimensional hyperslab.
 module subroutine cami_initial_read(passed)
+  !> Input/output argument: `passed`.
   logical, intent(inout) :: passed
   character(*), parameter :: SAMPLE_FILE = "data/cami_0000-09-01_64x128_L26_c030918.nc"
   character(len=:), pointer :: conventions, units
@@ -453,6 +460,7 @@ end subroutine cami_initial_read
 
 !> Read an ocean file whose first latitude row contains missing values.
 module subroutine tos_o1_read(passed)
+  !> Input/output argument: `passed`.
   logical, intent(inout) :: passed
   character(*), parameter :: SAMPLE_FILE = "data/tos_O1_2001-2002.nc"
   character(len=:), pointer :: conventions, units
@@ -510,6 +518,7 @@ end subroutine tos_o1_read
 
 !> Read a spectral-grid file with non-geographical dimensions.
 module subroutine echam_spectral_read(passed)
+  !> Input/output argument: `passed`.
   logical, intent(inout) :: passed
   character(*), parameter :: SAMPLE_FILE = "data/test_echam_spectral.nc"
   character(len=:), pointer :: conventions, grid_type
@@ -571,9 +580,13 @@ end subroutine echam_spectral_read
 
 !> Return whether `dims` contains a dimension with the specified metadata.
 pure logical function has_dim(dims, name, len, is_unlim)
+  !> Input argument: `dims`.
   type(dimension_type), intent(in) :: dims(:)
+  !> Input argument: `name`.
   character(len=*), intent(in) :: name
+  !> Input argument: `len`.
   integer(int64), intent(in) :: len
+  !> Input argument: `is_unlim`.
   logical, intent(in), optional :: is_unlim
   integer :: i
 
@@ -592,13 +605,16 @@ end function has_dim
 !> Return whether `text` begins with `prefix`; trailing NULs are retained when
 !> an externally written `NC_CHAR` attribute includes them in its stored value.
 pure logical function starts_with(text, prefix)
+  !> Input arguments: `text` and `prefix`.
   character(len=*), intent(in) :: text, prefix
 
   starts_with = len(text) >= len(prefix)
   if (starts_with) starts_with = text(:len(prefix)) == prefix
 end function starts_with
 
+!> Compute `extensive_variables`.
 function extensive_variables() result(vars)
+  !> Return value: `vars`.
   type(variable_type), allocatable :: vars(:)
   type(dimension_type) :: dims(7)
   integer(int8) :: int8_values(2)
@@ -633,7 +649,9 @@ function extensive_variables() result(vars)
     & datarray("real32_rank7", real32_values_7d, dims, ["description".att."rank-seven variable"])]
 end function extensive_variables
 
+!> Compute `extensive_attributes`.
 function extensive_attributes() result(atts)
+  !> Return value: `atts`.
   type(attribute_type), allocatable :: atts(:)
 
   atts = [ &

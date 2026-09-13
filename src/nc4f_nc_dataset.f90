@@ -39,6 +39,7 @@ function open_dataset_(filename, mode, inq_dims, inq_atts, error) result(nc)
   logical, intent(in), optional :: inq_atts
   !> Output argument(s): `error`.
   type(error_type), intent(out) :: error
+  !> Return value: `nc`.
   type(netcdf_type) :: nc
   character(len=MAX_CHAR_LEN) :: msg, open_mode
   integer(c_int) :: stat
@@ -115,6 +116,7 @@ function open_dataset_(filename, mode, inq_dims, inq_atts, error) result(nc)
   end select
 end function open_dataset_
 
+!> Compute `optval`.
 elemental logical function optval(default, opt) result(val)
   !> Input argument(s): `default`.
   logical, intent(in) :: default
@@ -311,9 +313,13 @@ end subroutine to_netcdf_grps
 
 !> Error-returning implementation for a group treated as the file root.
 subroutine to_netcdf_grp_(filename, grp, atts, error)
+  !> Input argument: `filename`.
   character(len=*), intent(in) :: filename
+  !> Input argument: `grp`.
   type(group_type), intent(in) :: grp
+  !> Input argument: `atts`.
   type(attribute_type), intent(in), optional :: atts(:)
+  !> Output argument: `error`.
   type(error_type), intent(out) :: error
   type(error_type) :: cleanup_error
   type(group_type) :: file_root
@@ -335,9 +341,13 @@ end subroutine to_netcdf_grp_
 
 !> Error-returning implementation for direct child groups of a new root.
 subroutine to_netcdf_grps_(filename, grps, atts, error)
+  !> Input argument: `filename`.
   character(len=*), intent(in) :: filename
+  !> Input argument: `grps`.
   type(group_type), intent(in) :: grps(:)
+  !> Input argument: `atts`.
   type(attribute_type), intent(in), optional :: atts(:)
+  !> Output argument: `error`.
   type(error_type), intent(out) :: error
   type(error_type) :: cleanup_error
   type(group_type) :: file_root

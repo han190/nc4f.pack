@@ -7,7 +7,9 @@ contains
 
 !> Initialize an owning variable from existing variable metadata.
 module subroutine init_var_mold(var, mold)
+  !> Input/output argument: `var`.
   type(variable_type), intent(inout) :: var
+  !> Input argument: `mold`.
   type(variable_type), intent(in) :: mold
 
   if (allocated(mold%atts)) then
@@ -19,8 +21,11 @@ end subroutine init_var_mold
 
 !> Return the element count of a variable or one of its dimensions.
 module pure function get_size(var, dim) result(n)
+  !> Input argument: `var`.
   type(variable_type), intent(in) :: var
+  !> Input argument: `dim`.
   integer, intent(in), optional :: dim
+  !> Return value: `n`.
   integer(int64) :: n
   integer :: dim_, i
 
@@ -49,7 +54,9 @@ end function get_size
 
 !> Return variable dimension lengths in their stored Fortran order.
 module pure function get_shape(var) result(extents)
+  !> Input argument: `var`.
   type(variable_type), intent(in) :: var
+  !> Return value: `extents`.
   integer, allocatable :: extents(:)
   integer :: i
 
@@ -65,6 +72,7 @@ end function get_shape
 
 !> Return true when two variables have identical metadata and byte values.
 module elemental logical function eq_var(x, y) result(is_equal)
+  !> Input arguments: `x` and `y`.
   type(variable_type), intent(in) :: x, y
 
   is_equal = x%dtype == y%dtype .and. x%len == y%len
@@ -103,6 +111,7 @@ end function eq_var
 
 !> Return true when two variables differ.
 module elemental logical function neq_var(x, y) result(is_equal)
+  !> Input arguments: `x` and `y`.
   type(variable_type), intent(in) :: x, y
 
   is_equal = .not. eq_var(x, y)

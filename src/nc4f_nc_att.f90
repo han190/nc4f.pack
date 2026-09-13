@@ -8,6 +8,7 @@ module impure elemental function get_att_grp(nc, name) result(att)
   class(group_type), intent(in) :: nc
   !> Input argument(s): `name`.
   character(len=*), intent(in) :: name
+  !> Return value: `att`.
   type(attribute_type) :: att
   type(error_type) :: error
 
@@ -23,6 +24,7 @@ module function get_att_grp_error(nc, name, error) result(att)
   character(len=*), intent(in) :: name
   !> Output argument(s): `error`.
   type(error_type), intent(out) :: error
+  !> Return value: `att`.
   type(attribute_type) :: att
 
   att = get_att_(nc%id, NC_GLOBAL, clip(name), error)
@@ -34,6 +36,7 @@ module function get_atts_grp(nc, error) result(atts)
   class(group_type), intent(in) :: nc
   !> Output argument(s): `error`.
   type(error_type), optional, intent(out) :: error
+  !> Return value: `atts`.
   type(attribute_type), allocatable :: atts(:)
   type(error_type) :: operation_error
 
@@ -53,6 +56,7 @@ module function get_att_var(nc, var, name) result(att)
   type(variable_type), intent(in) :: var
   !> Input argument(s): `name`.
   character(len=*), intent(in) :: name
+  !> Return value: `att`.
   type(attribute_type) :: att
   type(error_type) :: error
 
@@ -70,6 +74,7 @@ module function get_att_var_error(nc, var, name, error) result(att)
   character(len=*), intent(in) :: name
   !> Output argument(s): `error`.
   type(error_type), intent(out) :: error
+  !> Return value: `att`.
   type(attribute_type) :: att
 
   att = get_att_(nc%id, var%id, name, error)
@@ -83,6 +88,7 @@ module function get_atts_var(nc, var, error) result(atts)
   type(variable_type), intent(in) :: var
   !> Output argument(s): `error`.
   type(error_type), optional, intent(out) :: error
+  !> Return value: `atts`.
   type(attribute_type), allocatable :: atts(:)
   type(error_type) :: operation_error
 
@@ -102,6 +108,7 @@ function get_atts_(ncid, varid, error) result(atts)
   integer(c_int), intent(in) :: varid
   !> Output argument(s): `error`.
   type(error_type), intent(out) :: error
+  !> Return value: `atts`.
   type(attribute_type), allocatable :: atts(:)
   integer(c_int) :: natts, i, stat
   character(kind=c_char, len=NC_MAX_NAME + 1) :: name
@@ -136,6 +143,7 @@ function get_att_(ncid, varid, name, error) result(att)
   character(len=*), intent(in) :: name
   !> Output argument(s): `error`.
   type(error_type), intent(out) :: error
+  !> Return value: `att`.
   type(attribute_type), target :: att
   integer(c_int) :: dtype, stat
   integer(c_size_t) :: len

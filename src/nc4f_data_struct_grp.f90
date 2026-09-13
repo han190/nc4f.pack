@@ -7,9 +7,13 @@ contains
 
 !> Initialize an owning attribute buffer.
 module subroutine init_att(att, name, dtype, len)
+  !> Input/output argument: `att`.
   type(attribute_type), intent(inout) :: att
+  !> Input argument: `name`.
   character(len=*), intent(in) :: name
+  !> Input argument: `dtype`.
   integer(data_type), intent(in) :: dtype
+  !> Input argument: `len`.
   integer(int64), intent(in) :: len
 
   if (len < 0) error stop "[init_att] Negative attribute length."
@@ -22,12 +26,19 @@ end subroutine init_att
 
 !> Initialize variable metadata and, for a deep value, an owning buffer.
 module subroutine init_var(var, name, dtype, len, dims, atts, deep)
+  !> Input/output argument: `var`.
   type(variable_type), intent(inout) :: var
+  !> Input argument: `name`.
   character(len=*), intent(in) :: name
+  !> Input argument: `dtype`.
   integer(data_type), intent(in) :: dtype
+  !> Input argument: `len`.
   integer(int64), intent(in) :: len
+  !> Input argument: `dims`.
   type(dimension_type), intent(in) :: dims(:)
+  !> Input argument: `atts`.
   type(attribute_type), intent(in), optional :: atts(:)
+  !> Input argument: `deep`.
   logical, intent(in), optional :: deep
   logical :: deep_copy
 
@@ -45,49 +56,79 @@ module subroutine init_var(var, name, dtype, len, dims, atts, deep)
   if (deep_copy) allocate (var%buffer(buffer_size(dtype, len)))
 end subroutine init_var
 
+!> Compute `new_dataset_empty`.
 module function new_dataset_empty(name, atts, deep) result(grp)
+  !> Input argument: `name`.
   character(len=*), intent(in) :: name
+  !> Input argument: `atts`.
   type(attribute_type), intent(in), optional :: atts(:)
+  !> Input argument: `deep`.
   logical, intent(in), optional :: deep
+  !> Return value: `grp`.
   type(group_type) :: grp
   call new_dataset_(grp, name, atts=atts, deep=deep)
 end function new_dataset_empty
 
+!> Compute `new_dataset_vars`.
 module function new_dataset_vars(name, vars, atts, deep) result(grp)
+  !> Input argument: `name`.
   character(len=*), intent(in) :: name
+  !> Input argument: `vars`.
   type(variable_type), intent(in) :: vars(:)
+  !> Input argument: `atts`.
   type(attribute_type), intent(in), optional :: atts(:)
+  !> Input argument: `deep`.
   logical, intent(in), optional :: deep
+  !> Return value: `grp`.
   type(group_type) :: grp
   call new_dataset_(grp, name, vars=vars, atts=atts, deep=deep)
 end function new_dataset_vars
 
+!> Compute `new_dataset_grps`.
 module function new_dataset_grps(name, grps, atts, deep) result(grp)
+  !> Input argument: `name`.
   character(len=*), intent(in) :: name
+  !> Input argument: `grps`.
   type(group_type), intent(in) :: grps(:)
+  !> Input argument: `atts`.
   type(attribute_type), intent(in), optional :: atts(:)
+  !> Input argument: `deep`.
   logical, intent(in), optional :: deep
+  !> Return value: `grp`.
   type(group_type) :: grp
   call new_dataset_(grp, name, grps=grps, atts=atts, deep=deep)
 end function new_dataset_grps
 
+!> Compute `new_dataset_all`.
 module function new_dataset_all(name, vars, grps, atts, deep) result(grp)
+  !> Input argument: `name`.
   character(len=*), intent(in) :: name
+  !> Input argument: `vars`.
   type(variable_type), intent(in) :: vars(:)
+  !> Input argument: `grps`.
   type(group_type), intent(in) :: grps(:)
+  !> Input argument: `atts`.
   type(attribute_type), intent(in), optional :: atts(:)
+  !> Input argument: `deep`.
   logical, intent(in), optional :: deep
+  !> Return value: `grp`.
   type(group_type) :: grp
   call new_dataset_(grp, name, vars, grps, atts, deep)
 end function new_dataset_all
 
 !> Populate a group with shallow or deep child values.
 module subroutine new_dataset_(grp, name, vars, grps, atts, deep)
+  !> Output argument: `grp`.
   type(group_type), intent(out) :: grp
+  !> Input argument: `name`.
   character(len=*), intent(in) :: name
+  !> Input argument: `vars`.
   type(variable_type), intent(in), optional :: vars(:)
+  !> Input argument: `grps`.
   type(group_type), intent(in), optional :: grps(:)
+  !> Input argument: `atts`.
   type(attribute_type), intent(in), optional :: atts(:)
+  !> Input argument: `deep`.
   logical, intent(in), optional :: deep
   integer :: i
   logical :: deep_copy
@@ -132,7 +173,9 @@ end subroutine new_dataset_
 !>
 !> Dimensions sharing a name must have matching length and unlimited status.
 function collect_dims_(vars) result(dims)
+  !> Input argument: `vars`.
   type(variable_type), intent(in) :: vars(:)
+  !> Return value: `dims`.
   type(dimension_type), allocatable :: dims(:)
   type(dimension_type), allocatable :: collected(:)
   integer :: i, j, k, n, ndims
@@ -168,10 +211,15 @@ function collect_dims_(vars) result(dims)
   dims = collected(:n)
 end function collect_dims_
 
+!> Compute `buffer_size`.
 module function buffer_size(dtype, len, context) result(nbytes)
+  !> Input argument: `dtype`.
   integer(data_type), intent(in) :: dtype
+  !> Input argument: `len`.
   integer(int64), intent(in) :: len
+  !> Input argument: `context`.
   character(len=*), intent(in), optional :: context
+  !> Return value: `nbytes`.
   integer :: nbytes
   integer(int64) :: item_bytes
 

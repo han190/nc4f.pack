@@ -7,7 +7,9 @@ contains
 
 !> Return the element-wise sum of compatible variables in `vars`.
 module function sum_vars(vars) result(total)
+  !> Input argument: `vars`.
   type(variable_type), intent(in) :: vars(:)
+  !> Return value: `total`.
   type(variable_type) :: total
   integer :: i
   integer(int64) :: j

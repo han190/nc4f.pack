@@ -7,6 +7,6 @@
 | flang-new 18 | Supported beta target | Ubuntu CI, release |
 | Fortran 2018 submodules | Required | Core implementation |
 | Linux | Supported | Ubuntu CI |
-| macOS and other POSIX systems | Expected where the requirements above are present | Not a release gate yet |
+| macOS and other POSIX systems | Expected where requirements are present | Not a release gate yet |
 
 `nc4f` calls the NetCDF C API and does not require the NetCDF Fortran library.

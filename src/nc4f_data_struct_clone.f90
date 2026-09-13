@@ -5,8 +5,11 @@ implicit none (type, external)
 
 contains
 
+!> Execute `clone_att_`.
 module subroutine clone_att_(src, dest)
+  !> Input argument: `src`.
   type(attribute_type), intent(in) :: src
+  !> Output argument: `dest`.
   type(attribute_type), intent(out) :: dest
   dest%id = src%id
   dest%name = src%name
@@ -18,8 +21,11 @@ module subroutine clone_att_(src, dest)
   end if
 end subroutine clone_att_
 
+!> Execute `clone_var_`.
 module subroutine clone_var_(src, dest)
+  !> Input argument: `src`.
   type(variable_type), intent(in) :: src
+  !> Output argument: `dest`.
   type(variable_type), intent(out) :: dest
   integer :: i
   dest%id = src%id
@@ -39,8 +45,11 @@ module subroutine clone_var_(src, dest)
   end if
 end subroutine clone_var_
 
+!> Execute `clone_grp_`.
 recursive module subroutine clone_grp_(src, dest)
+  !> Input argument: `src`.
   type(group_type), intent(in) :: src
+  !> Output argument: `dest`.
   type(group_type), intent(out) :: dest
   integer :: i
   dest%id = src%id

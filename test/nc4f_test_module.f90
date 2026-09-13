@@ -29,6 +29,7 @@ subroutine setup_test_results()
   if (exitstat /= 0) error stop "[setup_test_results] Cannot create build/test-results."
 end subroutine setup_test_results
 
+!> Execute `run_tests`.
 subroutine run_tests(tests)
   !> Input/output argument(s): `tests(:)`.
   type(test_type), intent(inout) :: tests(:)

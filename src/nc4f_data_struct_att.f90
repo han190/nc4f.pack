@@ -7,7 +7,9 @@ contains
 
 !> Initialize an owning attribute from existing attribute metadata.
 module subroutine init_att_mold(att, mold)
+  !> Input/output argument: `att`.
   type(attribute_type), intent(inout) :: att
+  !> Input argument: `mold`.
   type(attribute_type), intent(in) :: mold
 
   call init_att(att, mold%name, mold%dtype, mold%len)
@@ -15,6 +17,7 @@ end subroutine init_att_mold
 
 !> Return true when two attributes have identical metadata and byte values.
 module elemental logical function eq_att(x, y) result(is_equal)
+  !> Input arguments: `x` and `y`.
   type(attribute_type), intent(in) :: x, y
 
   is_equal = x%dtype == y%dtype .and. x%len == y%len
@@ -35,6 +38,7 @@ end function eq_att
 
 !> Return true when two attributes differ.
 module elemental logical function neq_att(x, y) result(is_equal)
+  !> Input arguments: `x` and `y`.
   type(attribute_type), intent(in) :: x, y
 
   is_equal = .not. eq_att(x, y)

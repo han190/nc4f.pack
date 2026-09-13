@@ -133,6 +133,7 @@ module function def_dim_error(nc, dim, error) result(new_dim)
   type(dimension_type), intent(in) :: dim
   !> Output argument(s): `error`.
   type(error_type), intent(out) :: error
+  !> Return value: `new_dim`.
   type(dimension_type) :: new_dim
 
   new_dim = def_dim_(nc, dim, error)
@@ -146,6 +147,7 @@ function def_dim_(nc, dim, error) result(new_dim)
   type(dimension_type), intent(in) :: dim
   !> Output argument(s): `error`.
   type(error_type), intent(out) :: error
+  !> Return value: `new_dim`.
   type(dimension_type) :: new_dim
   integer(c_int) :: stat, dimid
   integer(c_size_t) :: len

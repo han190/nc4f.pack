@@ -9,6 +9,7 @@ module impure elemental function get_var(nc, name) result(var)
   class(group_type), intent(in) :: nc
   !> Input argument(s): `name`.
   character(len=*), intent(in) :: name
+  !> Return value: `var`.
   type(variable_type), target :: var
   type(error_type) :: error
 
@@ -24,6 +25,7 @@ module function get_var_error(nc, name, error) result(var)
   character(len=*), intent(in) :: name
   !> Output argument(s): `error`.
   type(error_type), intent(out) :: error
+  !> Return value: `var`.
   type(variable_type), target :: var
 
   var = get_var_(nc, name, error)
@@ -37,6 +39,7 @@ function get_var_(nc, name, error) result(var)
   character(len=*), intent(in) :: name
   !> Output argument(s): `error`.
   type(error_type), intent(out) :: error
+  !> Return value: `var`.
   type(variable_type), target :: var
   type(c_ptr) :: cptr
   integer(c_int) :: stat
@@ -72,6 +75,7 @@ module function get_vara(nc, name, start, count, error) result(var)
   integer, intent(in) :: count(:)
   !> Output argument(s): `error`.
   type(error_type), intent(out), optional :: error
+  !> Return value: `var`.
   type(variable_type), target :: var
   type(error_type) :: operation_error
 
@@ -95,6 +99,7 @@ function get_vara_(nc, name, start, count, error) result(var)
   integer, intent(in) :: count(:)
   !> Output argument(s): `error`.
   type(error_type), intent(out) :: error
+  !> Return value: `var`.
   type(variable_type), target :: var
   integer(c_size_t), allocatable, target :: c_start(:), c_count(:)
   type(c_ptr) :: startp, countp, datap
@@ -164,6 +169,7 @@ module impure elemental function inq_var(nc, name) result(var)
   class(group_type), intent(in) :: nc
   !> Input argument(s): `name`.
   character(len=*), intent(in) :: name
+  !> Return value: `var`.
   type(variable_type) :: var
   type(error_type) :: error
 
@@ -179,6 +185,7 @@ module function inq_var_error(nc, name, error) result(var)
   character(len=*), intent(in) :: name
   !> Output argument(s): `error`.
   type(error_type), intent(out) :: error
+  !> Return value: `var`.
   type(variable_type) :: var
 
   var = inq_var_(nc, name, error)
@@ -192,6 +199,7 @@ function inq_var_(nc, name, error) result(var)
   character(len=*), intent(in) :: name
   !> Output argument(s): `error`.
   type(error_type), intent(out) :: error
+  !> Return value: `var`.
   type(variable_type) :: var
   integer(c_int) :: stat
   character(len=MAX_CHAR_LEN) :: msg
@@ -219,6 +227,7 @@ function inq_vartype_(ncid, varid, error) result(vartype)
   integer(c_int), intent(in) :: varid
   !> Output argument(s): `error`.
   type(error_type), intent(out) :: error
+  !> Return value: `vartype`.
   integer(c_int) :: vartype
   integer(c_int) :: stat
   character(len=MAX_CHAR_LEN) :: msg, fmt
@@ -417,6 +426,7 @@ module function def_var_(nc, var, error) result(new_var)
   type(variable_type), intent(in) :: var
   !> Output argument(s): `error`.
   type(error_type), intent(out) :: error
+  !> Return value: `new_var`.
   type(variable_type) :: new_var
   integer(c_int) :: varid, stat
   integer(c_int), allocatable :: new_dimids(:)

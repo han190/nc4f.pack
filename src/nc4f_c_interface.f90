@@ -101,7 +101,7 @@ interface
     integer(c_int), value :: mode
     !> Pointer to location where returned netCDF ID is to be stored.
     integer(c_int), intent(out) :: ncidp
-    !> Options:
+    !> **Options:**
     !> - NC_NOERR No error.
     !> - NC_EPERM Attempting to create a netCDF file in a
     !>   directory where you do not have permission to open files.
@@ -130,7 +130,7 @@ interface
     integer(c_int), value :: cmode
     !> Pointer to location where returned netCDF ID is to be stored.
     integer(c_int), intent(out) :: ncidp
-    !> Options:
+    !> **Options:**
     !> - NC_NOERR No error.
     !> - NC_EEXIST Specifying a file name of a file that exists and also
     !>   specifying NC_NOCLOBBER.
@@ -150,7 +150,7 @@ interface
     import :: c_int
     !> NetCDF ID, from a previous call to nc_open() or nc_create().
     integer(c_int), value :: ncid
-    !> Options:
+    !> **Options:**
     !> - NC_NOERR No error.
     !> - NC_EBADID Invalid id passed.
     !> - NC_EBADGRPID ncid did not contain the root group id of this file.
@@ -167,7 +167,7 @@ interface
     character(kind=c_char), intent(in) :: name(*)
     !> Returned identifier for the newly created group.
     integer(c_int), intent(out) :: new_ncid
-    !> Options:
+    !> **Options:**
     !> - NC_NOERR No error.
     !> - NC_ENOTNC4 Not a netCDF-4 file.
     !> - NC_ENOTINDEFINE Not in define mode.
@@ -187,7 +187,7 @@ interface
     character(kind=c_char), intent(in) :: name(*)
     !> Returned identifier for the matching child group.
     integer(c_int), intent(out) :: grp_ncid
-    !> Options:
+    !> **Options:**
     !> - NC_NOERR No error.
     !> - NC_EBADID Bad ncid.
     !> - NC_ENOTNC4 Not a netCDF-4 file.
@@ -205,7 +205,7 @@ interface
     !> Caller-allocated array of `numgrps` group IDs, or C NULL to query only
     !> the number of groups.
     type(c_ptr), value :: ncids
-    !> Options:
+    !> **Options:**
     !> - NC_NOERR No error.
     !> - NC_EBADID Bad ncid.
     integer(c_int) :: nc_inq_grps
@@ -218,7 +218,7 @@ interface
     integer(c_int), value :: ncid
     !> Caller-allocated name buffer of at least `NC_MAX_NAME + 1` characters.
     character(kind=c_char), intent(out) :: name(*)
-    !> Options:
+    !> **Options:**
     !> - NC_NOERR No error.
     !> - NC_EBADID Bad ncid.
     integer(c_int) :: nc_inq_grpname
@@ -235,7 +235,7 @@ interface
     !> Caller-allocated buffer for the NUL-terminated full path. The root
     !> group path is `/` and has length one.
     character(kind=c_char), intent(out) :: full_name(*)
-    !> Options:
+    !> **Options:**
     !> - NC_NOERR No error.
     !> - NC_EBADID Bad ncid.
     !> - NC_ENOMEM Memory allocation failure.
@@ -249,7 +249,7 @@ interface
     integer(c_int), value :: ncid
     !> Returned identifier for the direct parent group.
     integer(c_int), intent(out) :: parent_ncid
-    !> Options:
+    !> **Options:**
     !> - NC_NOERR No error.
     !> - NC_EBADID Bad ncid.
     !> - NC_ENOGRP No parent group: `ncid` identifies the root group.
@@ -266,7 +266,7 @@ interface
     character(kind=c_char), intent(in) :: full_name(*)
     !> Returned identifier for the resolved group.
     integer(c_int), intent(out) :: grp_ncid
-    !> Options:
+    !> **Options:**
     !> - NC_NOERR No error.
     !> - NC_EBADID Bad ncid.
     !> - NC_ENOGRP Group not found.
@@ -285,7 +285,7 @@ interface
     !> Caller-allocated array of `nvars` variable IDs, or C NULL to query only
     !> the number of variables.
     type(c_ptr), value :: varids
-    !> Options:
+    !> **Options:**
     !> - NC_NOERR No error.
     !> - NC_EBADID Bad ncid.
     integer(c_int) :: nc_inq_varids
@@ -300,7 +300,7 @@ interface
     integer(c_int), value :: varid
     !> Caller-allocated name buffer of at least `NC_MAX_NAME + 1` characters.
     character(kind=c_char), intent(out) :: name(*)
-    !> Options:
+    !> **Options:**
     !> - NC_NOERR No error.
     !> - NC_EBADID Bad ncid.
     !> - NC_ENOTVAR Invalid variable ID.
@@ -329,7 +329,7 @@ interface
     !> Before using the value as a C string, make sure it is null-terminated.
     !> Ignored if NULL.
     integer(c_size_t), intent(out) :: lenp
-    !> Options:
+    !> **Options:**
     !> - NC_NOERR no error.
     !> - NC_EBADID bad ncid.
     !> - NC_ENOTVAR bad varid.
@@ -354,7 +354,7 @@ interface
     !> Pointer that will get array of attribute value(s). Use nc_inq_attlen()
     !> to learn length.
     type(c_ptr), value :: value
-    !> Options:
+    !> **Options:**
     !> - NC_NOERR for success.
     !> - NC_EBADID Bad ncid.
     !> - NC_ENOTVAR Bad varid.
@@ -376,7 +376,7 @@ interface
     !> Pointer where number of global or group attributes will be written.
     !> Ignored if NULL.
     integer(c_int), intent(out) :: nattsp
-    !> Options:
+    !> **Options:**
     !> - NC_NOERR no error.
     !> - NC_EBADID bad ncid.
     !> - NC_EBADGRPID bad group ID.
@@ -402,7 +402,7 @@ interface
     integer(c_int), intent(out) :: dimidsp(*)
     !> Pointer where number of attributes will be stored. Ignored if NULL.
     integer(c_int), intent(out) :: nattsp
-    !> Options:
+    !> **Options:**
     !> - NC_NOERR No error.
     !> - NC_EBADID Bad ncid.
     !> - NC_ENOTVAR Invalid variable ID.
@@ -426,7 +426,7 @@ interface
     integer(c_int), value :: attnum
     !> Pointer to the location for the returned attribute NetCDF Names.
     character(kind=c_char), intent(inout) :: name(*)
-    !> Options:
+    !> **Options:**
     !> - NC_NOERR no error.
     !> - NC_EBADID bad ncid.
     !> - NC_ENOTVAR bad varid.
@@ -449,7 +449,7 @@ interface
     integer(c_int), value :: varid
     !> Pointer where number of attributes will be stored. Ignored if NULL.
     integer(c_int), intent(out) :: nattsp
-    !> Options:
+    !> **Options:**
     !> - NC_NOERR No error.
     !> - NC_EBADID Bad ncid.
     !> - NC_ENOTVAR Invalid variable ID.
@@ -472,7 +472,7 @@ interface
     integer(c_size_t), value :: len
     !> Pointer to one or more values.
     type(c_ptr), value :: value
-    !> Options:
+    !> **Options:**
     !> - NC_NOERR No error.
     !> - NC_EINVAL Invalid or global _FillValue.
     !> - NC_ENOTVAR Couldn't find varid.
@@ -492,7 +492,7 @@ interface
     integer(c_int), value :: dimid
     !> Pointer where the length will be stored.
     integer(c_size_t), intent(out) :: lenp
-    !> Options:
+    !> **Options:**
     !> - NC_NOERR No error.
     !> - NC_EBADID Not a valid ID.
     !> - NC_EBADDIM Invalid dimension ID or name.
@@ -527,7 +527,7 @@ interface
     character(kind=c_char), intent(in) :: name(*)
     !> Pointer where dimension ID will be stored.
     integer(c_int), intent(out) :: idp
-    !> Options:
+    !> **Options:**
     !> - NC_NOERR No error.
     !> - NC_EBADID Not a valid ID.
     !> - NC_EBADDIM Invalid dimension ID.
@@ -548,7 +548,7 @@ interface
     !> null terminator, so declare your array to be size NC_MAX_NAME+1). The
     !> returned character array will be null-terminated. Ignored if NULL.
     character(kind=c_char), intent(out) :: name(*)
-    !> Options:
+    !> **Options:**
     !> - NC_NOERR No error.
     !> - NC_EBADID Not a valid ID.
     !> - NC_EBADDIM Invalid dimension ID or name.
@@ -564,7 +564,7 @@ interface
     !> Pointer where unlimited dimension ID will be stored. If there is no
     !> unlimited dimension, -1 will be stored here. Ignored if NULL.
     integer(c_int), intent(out) :: unlimdimidp
-    !> Options:
+    !> **Options:**
     !> - NC_NOERR No error.
     !> - NC_EBADID Not a valid ID.
     integer(c_int) :: nc_inq_unlimdim
@@ -598,7 +598,7 @@ interface
     integer(c_size_t), value :: len
     !> Pointer where dimension ID will be stored.
     integer(c_int), intent(inout) :: idp
-    !> Options:
+    !> **Options:**
     !> - NC_NOERR No error.
     !> - NC_EBADID Not a valid ID.
     !> - NC_EMAXNAME Name is too long.
@@ -624,7 +624,7 @@ interface
     character(kind=c_char), intent(in) :: name(*)
     !> Pointer to location for returned variable ID. Ignored if NULL.
     integer(c_int), intent(out) :: varidp
-    !> Options:
+    !> **Options:**
     !> - NC_NOERR No error.
     !> - NC_EBADID Bad ncid.
     !> - NC_ENOTVAR Invalid variable ID.
@@ -641,7 +641,7 @@ interface
     integer(c_int), value :: varid
     !> Pointer where typeid will be stored. Ignored if NULL.
     integer(c_int), intent(out) :: typep
-    !> Options:
+    !> **Options:**
     !> - NC_NOERR No error.
     !> - NC_EBADID Bad ncid.
     !> - NC_ENOTVAR Invalid variable ID.
@@ -658,7 +658,7 @@ interface
     integer(c_int), value :: varid
     !> Pointer where array of dimension IDs will be stored. Ignored if NULL.
     integer(c_int), intent(out) :: dimidsp(*)
-    !> Options:
+    !> **Options:**
     !> - NC_NOERR No error.
     !> - NC_EBADID Bad ncid.
     !> - NC_ENOTVAR Invalid variable ID.
@@ -675,7 +675,7 @@ interface
     integer(c_int), value :: varid
     !> Pointer where number of dimensions will be stored. Ignored if NULL.
     integer(c_int), intent(out) :: ndimsp
-    !> Options:
+    !> **Options:**
     !> - NC_NOERR No error.
     !> - NC_EBADID Bad ncid.
     !> - NC_ENOTVAR Invalid variable ID.
@@ -693,7 +693,7 @@ interface
     !> Pointer where the data will be copied. Memory must be allocated by the
     !> user before this function is called.
     type(c_ptr), value :: ip
-    !> Options:
+    !> **Options:**
     !> - NC_NOERR No error.
     !> - NC_ENOTVAR Variable not found.
     !> - NC_ERANGE One or more of the values are out of range.
@@ -747,7 +747,7 @@ interface
     integer(c_int), intent(in) :: dimidsp(*)
     !> Pointer to location for the returned variable ID.
     integer(c_int), intent(out) :: varidp
-    !> Options:
+    !> **Options:**
     !> - NC_NOERR No error.
     !> - NC_EBADID Bad ncid.
     !> - NC_ENOTINDEFINE Not in define mode.
@@ -770,7 +770,7 @@ interface
     integer(c_int), value :: varid
     !> Pointer from where the data will be copied.
     type(c_ptr), value :: op
-    !> Options:
+    !> **Options:**
     !> - NC_NOERR No error.
     !> - NC_ENOTVAR Variable not found.
     !> - NC_EINVALCOORDS Index exceeds dimension bound.

@@ -236,6 +236,7 @@ module subroutine extract_att_char_scalar(att, ptr)
   integer :: i
 
   call validate_att_data(att, CHAR_TYPE, "[extract_att_char_scalar]")
+  !> Procedure argument: `ptr`.
   allocate (character(len=att%len) :: ptr)
   if (att%len == 0) return
   call extract_att_char_vector(att, ptrs)

@@ -4,6 +4,7 @@ implicit none (type, external)
 
 contains
 
+!> Execute `hyperslab_rd`.
 module subroutine hyperslab_rd(passed)
   !> Input/output argument(s): `passed`.
   logical, intent(inout) :: passed
@@ -33,6 +34,7 @@ module subroutine hyperslab_rd(passed)
   passed = round_trip == actual
 end subroutine hyperslab_rd
 
+!> Execute `hyperslab_wr`.
 module subroutine hyperslab_wr(passed)
   !> Input/output argument(s): `passed`.
   logical, intent(inout) :: passed
@@ -94,6 +96,7 @@ module subroutine hyperslab_wr(passed)
   passed = actual%dims(2)%is_unlim .and. all(actual_values == expected)
 end subroutine hyperslab_wr
 
+!> Execute `unlimited_wr`.
 module subroutine unlimited_wr(passed)
   !> Input/output argument(s): `passed`.
   logical, intent(inout) :: passed
@@ -115,6 +118,7 @@ module subroutine unlimited_wr(passed)
     & all(actual%dims == var%dims) .and. all(actual_values == values)
 end subroutine unlimited_wr
 
+!> Execute `unlimited_dims`.
 module subroutine unlimited_dims(passed)
   !> Input/output argument(s): `passed`.
   logical, intent(inout) :: passed

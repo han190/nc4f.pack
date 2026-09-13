@@ -7,7 +7,9 @@ implicit none (type, external)
 
 contains
 
+!> Execute `copy_semantics`.
 module subroutine copy_semantics(passed)
+  !> Input/output argument: `passed`.
   logical, intent(inout) :: passed
   type(group_type) :: child, deep_group, grandchild, shallow_group
   type(group_type) :: child_grps(1), grandchild_grps(1)

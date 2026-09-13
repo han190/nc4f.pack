@@ -5,12 +5,19 @@ implicit none (type, external)
 
 contains
 
+!> Execute `write_frmt_dim`.
 module subroutine write_frmt_dim(dim, unit, iotype, v_list, iostat, iomsg)
+  !> Input argument: `dim`.
   class(dimension_type), intent(in) :: dim
+  !> Input argument: `unit`.
   integer, intent(in) :: unit
+  !> Input argument: `iotype`.
   character(len=*), intent(in) :: iotype
+  !> Input argument: `v_list`.
   integer, intent(in) :: v_list(:)
+  !> Output argument: `iostat`.
   integer, intent(out) :: iostat
+  !> Input/output argument: `iomsg`.
   character(len=*), intent(inout) :: iomsg
 
   associate (ignored_v_list => v_list)
@@ -25,12 +32,19 @@ module subroutine write_frmt_dim(dim, unit, iotype, v_list, iostat, iomsg)
   end if
 end subroutine write_frmt_dim
 
+!> Execute `write_frmt_att`.
 module subroutine write_frmt_att(att, unit, iotype, v_list, iostat, iomsg)
+  !> Input argument: `att`.
   class(attribute_type), intent(in) :: att
+  !> Input argument: `unit`.
   integer, intent(in) :: unit
+  !> Input argument: `iotype`.
   character(len=*), intent(in) :: iotype
+  !> Input argument: `v_list`.
   integer, intent(in) :: v_list(:)
+  !> Output argument: `iostat`.
   integer, intent(out) :: iostat
+  !> Input/output argument: `iomsg`.
   character(len=*), intent(inout) :: iomsg
   character(len=16) :: dtype
 
@@ -39,15 +53,23 @@ module subroutine write_frmt_att(att, unit, iotype, v_list, iostat, iomsg)
   iostat = 1
   if (iotype /= "LISTDIRECTED" .and. iotype /= "DT") return
   call type_name_(att%dtype, dtype)
+  !> Procedure argument: `att`.
   write (unit, "(a, ' ', a, ' ;')", iostat=iostat, iomsg=iomsg) trim(dtype)//" ::", att%name
 end subroutine write_frmt_att
 
+!> Execute `write_frmt_var`.
 module subroutine write_frmt_var(var, unit, iotype, v_list, iostat, iomsg)
+  !> Input argument: `var`.
   class(variable_type), intent(in) :: var
+  !> Input argument: `unit`.
   integer, intent(in) :: unit
+  !> Input argument: `iotype`.
   character(len=*), intent(in) :: iotype
+  !> Input argument: `v_list`.
   integer, intent(in) :: v_list(:)
+  !> Output argument: `iostat`.
   integer, intent(out) :: iostat
+  !> Input/output argument: `iomsg`.
   character(len=*), intent(inout) :: iomsg
   character(len=16) :: dtype
   character(len=:), allocatable :: dims
@@ -72,12 +94,19 @@ module subroutine write_frmt_var(var, unit, iotype, v_list, iostat, iomsg)
   write (unit, "(a, 1x, a, a, ' ;')", iostat=iostat, iomsg=iomsg) trim(dtype), var%name, dims
 end subroutine write_frmt_var
 
+!> Execute `write_frmt_grp`.
 module subroutine write_frmt_grp(grp, unit, iotype, v_list, iostat, iomsg)
+  !> Input argument: `grp`.
   class(group_type), intent(in) :: grp
+  !> Input argument: `unit`.
   integer, intent(in) :: unit
+  !> Input argument: `iotype`.
   character(len=*), intent(in) :: iotype
+  !> Input argument: `v_list`.
   integer, intent(in) :: v_list(:)
+  !> Output argument: `iostat`.
   integer, intent(out) :: iostat
+  !> Input/output argument: `iomsg`.
   character(len=*), intent(inout) :: iomsg
   character(len=:), allocatable :: text
 
@@ -91,11 +120,17 @@ end subroutine write_frmt_grp
 
 !> Write an operation result in formatted derived-type I/O.
 module subroutine write_frmt_error(error, unit, iotype, v_list, iostat, iomsg)
+  !> Input argument: `error`.
   class(error_type), intent(in) :: error
+  !> Input argument: `unit`.
   integer, intent(in) :: unit
+  !> Input argument: `iotype`.
   character(len=*), intent(in) :: iotype
+  !> Input argument: `v_list`.
   integer, intent(in) :: v_list(:)
+  !> Output argument: `iostat`.
   integer, intent(out) :: iostat
+  !> Input/output argument: `iomsg`.
   character(len=*), intent(inout) :: iomsg
 
   associate (ignored_v_list => v_list)
@@ -112,9 +147,13 @@ module subroutine write_frmt_error(error, unit, iotype, v_list, iostat, iomsg)
   end if
 end subroutine write_frmt_error
 
+!> Compute `render_grp_`.
 recursive function render_grp_(grp, depth) result(text)
+  !> Input argument: `grp`.
   class(group_type), intent(in) :: grp
+  !> Input argument: `depth`.
   integer, intent(in) :: depth
+  !> Return value: `text`.
   character(len=:), allocatable :: text
   character(len=:), allocatable :: indent, name
   integer :: i
@@ -159,9 +198,13 @@ recursive function render_grp_(grp, depth) result(text)
   text = text//indent//"}"
 end function render_grp_
 
+!> Compute `render_dim_`.
 function render_dim_(dim, indent) result(line)
+  !> Input argument: `dim`.
   type(dimension_type), intent(in) :: dim
+  !> Input argument: `indent`.
   character(len=*), intent(in) :: indent
+  !> Return value: `line`.
   character(len=:), allocatable :: line
   character(len=64) :: len_text
 
@@ -173,9 +216,13 @@ function render_dim_(dim, indent) result(line)
   end if
 end function render_dim_
 
+!> Compute `render_att_`.
 function render_att_(att, indent) result(line)
+  !> Input argument: `att`.
   type(attribute_type), intent(in) :: att
+  !> Input argument: `indent`.
   character(len=*), intent(in) :: indent
+  !> Return value: `line`.
   character(len=:), allocatable :: line
   character(len=16) :: dtype
 
@@ -183,9 +230,13 @@ function render_att_(att, indent) result(line)
   line = indent//trim(dtype)//" :: "//att%name//" ;"
 end function render_att_
 
+!> Compute `render_var_`.
 function render_var_(var, indent) result(line)
+  !> Input argument: `var`.
   type(variable_type), intent(in) :: var
+  !> Input argument: `indent`.
   character(len=*), intent(in) :: indent
+  !> Return value: `line`.
   character(len=:), allocatable :: line
   character(len=16) :: dtype
   character(len=:), allocatable :: dims
@@ -206,8 +257,11 @@ function render_var_(var, indent) result(line)
   line = indent//trim(dtype)//" "//var%name//dims//" ;"
 end function render_var_
 
+!> Execute `type_name_`.
 subroutine type_name_(dtype, name)
+  !> Input argument: `dtype`.
   integer(data_type), intent(in) :: dtype
+  !> Output argument: `name`.
   character(len=*), intent(out) :: name
 
   select case (dtype)

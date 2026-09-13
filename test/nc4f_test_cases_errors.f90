@@ -4,6 +4,7 @@ implicit none (type, external)
 
 contains
 
+!> Execute `creation_policy`.
 module subroutine creation_policy(passed)
   !> Input/output argument(s): `passed`.
   logical, intent(inout) :: passed
@@ -37,6 +38,7 @@ module subroutine creation_policy(passed)
   passed = error%code == NC_NOERR
 end subroutine creation_policy
 
+!> Execute `error_handling`.
 module subroutine error_handling(passed)
   !> Input/output argument(s): `passed`.
   logical, intent(inout) :: passed

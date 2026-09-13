@@ -7,6 +7,7 @@ contains
 
 !> Allocate a fresh byte buffer for an attribute read from a NetCDF file.
 module subroutine initialize_att(att)
+  !> Input/output argument: `att`.
   type(attribute_type), intent(inout) :: att
   integer :: nbytes
 
@@ -17,6 +18,7 @@ end subroutine initialize_att
 
 !> Allocate a fresh byte buffer for a variable read from a NetCDF file.
 module subroutine initialize_var(var)
+  !> Input/output argument: `var`.
   type(variable_type), intent(inout) :: var
   integer :: nbytes
 
@@ -27,7 +29,9 @@ end subroutine initialize_var
 
 !> Trim space from both ends of a character string.
 module pure function clip(string) result(clipped)
+  !> Input argument: `string`.
   character(len=*), intent(in) :: string
+  !> Return value: `clipped`.
   character(len=:), allocatable :: clipped
 
   clipped = trim(adjustl(string))
@@ -35,7 +39,9 @@ end function clip
 
 !> Convert a NUL-terminated C string into a Fortran string.
 module pure function c2fstr(cstr) result(fstr)
+  !> Input argument: `cstr`.
   character(kind=c_char, len=*), intent(in) :: cstr
+  !> Return value: `fstr`.
   character(len=:), allocatable :: fstr
   integer :: inull, str_len
 
@@ -48,7 +54,9 @@ end function c2fstr
 
 !> Convert a Fortran string into a NUL-terminated C string.
 module pure function f2cstr(fstr) result(cstr)
+  !> Input argument: `fstr`.
   character(len=*), intent(in) :: fstr
+  !> Return value: `cstr`.
   character(kind=c_char, len=:), allocatable :: cstr
 
   cstr = trim(fstr)//c_null_char
@@ -56,7 +64,9 @@ end function f2cstr
 
 !> Validate a variable byte buffer before passing it to the C API.
 module subroutine validate_var_buffer(var, context)
+  !> Input argument: `var`.
   type(variable_type), intent(in) :: var
+  !> Input argument: `context`.
   character(len=*), intent(in) :: context
   integer :: required_bytes
 
@@ -72,7 +82,9 @@ end subroutine validate_var_buffer
 
 !> Validate an attribute byte buffer before passing it to the C API.
 module subroutine validate_att_buffer(att, context)
+  !> Input argument: `att`.
   type(attribute_type), intent(in) :: att
+  !> Input argument: `context`.
   character(len=*), intent(in) :: context
   integer :: required_bytes
 

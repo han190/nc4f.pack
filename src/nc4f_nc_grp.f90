@@ -4,9 +4,13 @@ contains
 
 !> Return a direct child group by name.
 module function get_grp(parent, name, error) result(group)
+  !> Input argument: `parent`.
   class(group_type), intent(in) :: parent
+  !> Input argument: `name`.
   character(len=*), intent(in) :: name
+  !> Output argument: `error`.
   type(error_type), intent(out), optional :: error
+  !> Return value: `group`.
   type(group_type) :: group
   type(error_type) :: operation_error
 
@@ -20,8 +24,11 @@ end function get_grp
 
 !> Return direct child groups with IDs and names populated.
 module function inq_grps(parent, error) result(grps)
+  !> Input argument: `parent`.
   class(group_type), intent(in) :: parent
+  !> Output argument: `error`.
   type(error_type), intent(out), optional :: error
+  !> Return value: `grps`.
   type(group_type), allocatable :: grps(:)
   type(error_type) :: operation_error
 
@@ -84,9 +91,13 @@ end function inq_grp
 
 !> Serialize one group as an existing file root.
 module subroutine serialize_grp_(root, grp, atts, error)
+  !> Input argument: `root`.
   class(group_type), intent(in) :: root
+  !> Input argument: `grp`.
   type(group_type), intent(in) :: grp
+  !> Input argument: `atts`.
   type(attribute_type), intent(in), optional :: atts(:)
+  !> Output argument: `error`.
   type(error_type), intent(out) :: error
 
   call define_grp_tree_(root, grp, error)
@@ -100,9 +111,13 @@ end subroutine serialize_grp_
 
 !> Serialize groups as direct children of an existing file root.
 module subroutine serialize_grps_(root, grps, atts, error)
+  !> Input argument: `root`.
   class(group_type), intent(in) :: root
+  !> Input argument: `grps`.
   type(group_type), target, intent(in) :: grps(:)
+  !> Input argument: `atts`.
   type(attribute_type), intent(in), optional :: atts(:)
+  !> Output argument: `error`.
   type(error_type), intent(out) :: error
   type(group_type) :: child
   type(group_type), pointer :: source_child
@@ -147,8 +162,11 @@ end subroutine serialize_grps_
 
 !> Define all metadata in a group tree before any data are transferred.
 recursive subroutine define_grp_tree_(target, source, error)
+  !> Input argument: `target`.
   class(group_type), intent(in) :: target
+  !> Input argument: `source`.
   type(group_type), target, intent(in) :: source
+  !> Output argument: `error`.
   type(error_type), intent(out) :: error
   type(dimension_type) :: defined_dim
   type(group_type) :: child
@@ -198,8 +216,11 @@ end subroutine define_grp_tree_
 
 !> Write group attributes without changing the in-memory group model.
 subroutine write_grp_atts_(target, atts, error)
+  !> Input argument: `target`.
   class(group_type), intent(in) :: target
+  !> Input argument: `atts`.
   type(attribute_type), intent(in) :: atts(:)
+  !> Output argument: `error`.
   type(error_type), intent(out) :: error
   type(group_type) :: metadata
 
@@ -210,8 +231,11 @@ end subroutine write_grp_atts_
 
 !> Write all data buffers after the complete group tree has been defined.
 recursive subroutine write_grp_tree_data_(target, source, error)
+  !> Input argument: `target`.
   class(group_type), intent(in) :: target
+  !> Input argument: `source`.
   type(group_type), target, intent(in) :: source
+  !> Output argument: `error`.
   type(error_type), intent(out) :: error
   type(group_type) :: child
   type(group_type), pointer :: source_child
@@ -249,9 +273,13 @@ end subroutine write_grp_tree_data_
 
 !> Define a direct child group while retaining NetCDF's status result.
 function def_grp_(parent, name, error) result(group)
+  !> Input argument: `parent`.
   class(group_type), intent(in) :: parent
+  !> Input argument: `name`.
   character(len=*), intent(in) :: name
+  !> Output argument: `error`.
   type(error_type), intent(out) :: error
+  !> Return value: `group`.
   type(group_type) :: group
   integer(c_int) :: stat
 
@@ -262,9 +290,13 @@ end function def_grp_
 
 !> Get a direct child group while retaining NetCDF's status result.
 function get_grp_(parent, name, error) result(group)
+  !> Input argument: `parent`.
   class(group_type), intent(in) :: parent
+  !> Input argument: `name`.
   character(len=*), intent(in) :: name
+  !> Output argument: `error`.
   type(error_type), intent(out) :: error
+  !> Return value: `group`.
   type(group_type) :: group
   integer(c_int) :: stat
 
@@ -275,8 +307,11 @@ end function get_grp_
 
 !> Return direct child group handles with their IDs and local names.
 function inq_grps_(parent, error) result(grps)
+  !> Input argument: `parent`.
   class(group_type), intent(in) :: parent
+  !> Output argument: `error`.
   type(error_type), intent(out) :: error
+  !> Return value: `grps`.
   type(group_type), allocatable :: grps(:)
   integer(c_int), allocatable, target :: ids(:)
   character(kind=c_char, len=NC_MAX_NAME + 1) :: name
@@ -304,8 +339,11 @@ end function inq_grps_
 
 !> Return local variables declared by a group.
 function inq_vars_(group, error) result(vars)
+  !> Input argument: `group`.
   class(group_type), intent(in) :: group
+  !> Output argument: `error`.
   type(error_type), intent(out) :: error
+  !> Return value: `vars`.
   type(variable_type), allocatable :: vars(:)
   integer(c_int), allocatable, target :: ids(:)
   character(kind=c_char, len=NC_MAX_NAME + 1) :: name
@@ -333,8 +371,11 @@ end function inq_vars_
 
 !> Recursively materialize already-discovered child groups.
 subroutine materialize_children(grps, want_dims, want_atts, want_vars, error)
+  !> Input/output argument: `grps`.
   type(group_type), intent(inout) :: grps(:)
+  !> Input arguments: `want_dims`, `want_atts`, and `want_vars`.
   logical, intent(in) :: want_dims, want_atts, want_vars
+  !> Output argument: `error`.
   type(error_type), intent(out) :: error
   integer :: i
 
@@ -348,6 +389,7 @@ end subroutine materialize_children
 
 !> Return the value of an optional logical inquiry flag.
 pure logical function requested(flag)
+  !> Input argument: `flag`.
   logical, intent(in), optional :: flag
 
   requested = .false.
