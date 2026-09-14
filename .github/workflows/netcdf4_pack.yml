@@ -19,7 +19,7 @@ jobs:
           - name: gfortran 16
             command: gfortran
           - name: LLVM flang
-            commnad: flang
+            command: flang
 
     steps:
       - name: Check out repository
