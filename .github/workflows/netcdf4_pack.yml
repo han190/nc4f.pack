@@ -18,6 +18,8 @@ jobs:
             command: gfortran-15
           - name: gfortran 16
             command: gfortran
+          - name: LLVM flang
+            commnad: flang
 
     steps:
       - name: Check out repository
@@ -29,6 +31,7 @@ jobs:
             curl \
             gcc-gfortran \
             gcc15-gfortran \
+            flang \
             make \
             netcdf \
             netcdf-devel \
