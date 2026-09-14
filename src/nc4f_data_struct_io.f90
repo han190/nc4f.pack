@@ -56,8 +56,8 @@ module subroutine write_frmt_att(att, unit, iotype, v_list, iostat, iomsg)
   end associate
   iostat = 1
   if (iotype /= "LISTDIRECTED" .and. iotype /= "DT") return
-  call type_name_(att%dtype, dtype)
-  value = render_att_value_(att)
+  call type_name(att%dtype, dtype)
+  value = render_att_value(att)
   write (unit, "(a, ' = ', a, ' ;')", iostat=iostat, iomsg=iomsg) &
     & trim(dtype)//":"//att%name, value
 end subroutine write_frmt_att
@@ -82,7 +82,7 @@ module subroutine write_frmt_var(var, unit, iotype, v_list, iostat, iomsg)
   end associate
   iostat = 1
   if (iotype /= "LISTDIRECTED" .and. iotype /= "DT") return
-  text = render_var_(var, "")
+  text = render_var(var, "")
   write (unit, "(a)", iostat=iostat, iomsg=iomsg) text
 end subroutine write_frmt_var
 
@@ -106,7 +106,7 @@ module subroutine write_frmt_grp(grp, unit, iotype, v_list, iostat, iomsg)
   end associate
   iostat = 1
   if (iotype /= "LISTDIRECTED" .and. iotype /= "DT") return
-  text = render_grp_(grp, 0)
+  text = render_grp(grp, 0)
   write (unit, "(a)", iostat=iostat, iomsg=iomsg) text
 end subroutine write_frmt_grp
 
@@ -130,7 +130,7 @@ module subroutine write_frmt_netcdf(grp, unit, iotype, v_list, iostat, iomsg)
   end associate
   iostat = 1
   if (iotype /= "LISTDIRECTED" .and. iotype /= "DT") return
-  text = render_netcdf_(grp)
+  text = render_netcdf(grp)
   write (unit, "(a)", iostat=iostat, iomsg=iomsg) text
 end subroutine write_frmt_netcdf
 
@@ -169,8 +169,8 @@ module subroutine write_frmt_error(error, unit, iotype, v_list, iostat, iomsg)
   end if
 end subroutine write_frmt_error
 
-!> Compute `render_grp_`.
-recursive function render_grp_(grp, depth) result(text)
+!> Compute `render_grp`.
+recursive function render_grp(grp, depth) result(text)
   !> Input argument: `grp`.
   class(group_type), intent(in) :: grp
   !> Input argument: `depth`.
@@ -184,12 +184,12 @@ recursive function render_grp_(grp, depth) result(text)
   if (allocated(grp%name)) name = grp%name
   text = indent//"group: "//trim(name)//" {"//new_line('a')
 
-  text = text//render_grp_body_(grp, indent, depth)
+  text = text//render_grp_body(grp, indent, depth)
   text = text//indent//"}"
-end function render_grp_
+end function render_grp
 
 !> Compute the ncdump-like representation of an open NetCDF dataset.
-function render_netcdf_(nc) result(text)
+function render_netcdf(nc) result(text)
   !> Input argument: `nc`.
   type(netcdf_type), intent(in) :: nc
   !> Return value: `text`.
@@ -197,14 +197,14 @@ function render_netcdf_(nc) result(text)
   character(len=:), allocatable :: name
 
   name = "unnamed"
-  if (allocated(nc%filename)) name = filename_stem_(nc%filename)
+  if (allocated(nc%filename)) name = filename_stem(nc%filename)
   text = "netcdf "//name//" {"//new_line('a')
-  text = text//render_grp_body_(nc, "", 0)
+  text = text//render_grp_body(nc, "", 0)
   text = text//"}"
-end function render_netcdf_
+end function render_netcdf
 
 !> Compute the contents of a group in ncdump-like formatted output.
-recursive function render_grp_body_(grp, indent, depth) result(text)
+recursive function render_grp_body(grp, indent, depth) result(text)
   !> Input argument: `grp`.
   class(group_type), intent(in) :: grp
   !> Input argument: `indent`.
@@ -213,46 +213,88 @@ recursive function render_grp_body_(grp, indent, depth) result(text)
   integer, intent(in) :: depth
   !> Return value: `text`.
   character(len=:), allocatable :: text
-  integer :: i
+  character, allocatable :: buffer(:)
+  integer :: i, used
+  character(len=:), allocatable :: ind
+  character, parameter :: nl = new_line('a')
 
-  text = ""
+  used = 0
+  ind = indent//repeat(" ", 4)
 
   if (allocated(grp%dims)) then
     if (size(grp%dims) > 0) then
-      text = text//indent//"dimensions:"//new_line('a')
+      call append(buffer, used, indent//"dimensions:"//nl)
       do i = 1, size(grp%dims)
-        text = text//render_dim_(grp%dims(i), indent//"    ")//new_line('a')
+        call append(buffer, used, render_dim(grp%dims(i), ind)//nl)
       end do
     end if
   end if
+
   if (allocated(grp%vars)) then
     if (size(grp%vars) > 0) then
-      text = text//indent//"variables:"//new_line('a')
+      call append(buffer, used, indent//"variables:"//nl)
       do i = 1, size(grp%vars)
-        text = text//render_var_(grp%vars(i), indent//"    ")//new_line('a')
+        call append(buffer, used, render_var(grp%vars(i), ind)//nl)
       end do
     end if
   end if
+
   if (allocated(grp%atts)) then
     if (size(grp%atts) > 0) then
-      text = text//indent//"// global attributes:"//new_line('a')
+      call append(buffer, used, &
+        & indent//"// global attributes:"//nl)
       do i = 1, size(grp%atts)
-        text = text//render_att_(grp%atts(i), indent//"    ")//new_line('a')
+        call append(buffer, used, render_att(grp%atts(i), ind)//nl)
       end do
     end if
   end if
+
   if (associated(grp%grps)) then
     if (size(grp%grps) > 0) then
-      text = text//indent//"groups:"//new_line('a')
+      call append(buffer, used, indent//"groups:"//nl)
       do i = 1, size(grp%grps)
-        text = text//render_grp_(grp%grps(i), depth + 1)//new_line('a')
+        call append(buffer, used, render_grp(grp%grps(i), depth + 1)//nl)
       end do
     end if
   end if
-end function render_grp_body_
+
+  if (used == 0) then
+    text = ""
+  else
+    text = transfer(buffer(:used), repeat(" ", used))
+  end if
+end function render_grp_body
+
+!> Append a text fragment to a dynamically grown character buffer.
+subroutine append(buffer, used, fragment)
+  !> Storage for the text accumulated so far.
+  character, allocatable, intent(inout) :: buffer(:)
+  !> Number of occupied characters in `buffer`.
+  integer, intent(inout) :: used
+  !> Text to append.
+  character(len=*), intent(in) :: fragment
+  character, allocatable :: expanded(:)
+  integer :: capacity, i, needed
+
+  if (len(fragment) == 0) return
+  needed = used + len(fragment)
+  if (.not. allocated(buffer)) then
+    allocate (buffer(max(256, needed)))
+  else if (size(buffer) < needed) then
+    capacity = max(2*size(buffer), needed)
+    allocate (expanded(capacity))
+    if (used > 0) expanded(:used) = buffer(:used)
+    call move_alloc(expanded, buffer)
+  end if
+
+  do i = 1, len(fragment)
+    buffer(used + i) = fragment(i:i)
+  end do
+  used = needed
+end subroutine append
 
 !> Return the final path component of a filename without its final extension.
-function filename_stem_(filename) result(stem)
+function filename_stem(filename) result(stem)
   !> Input argument: `filename`.
   character(len=*), intent(in) :: filename
   !> Return value: `stem`.
@@ -274,10 +316,10 @@ function filename_stem_(filename) result(stem)
   extension = index(stem, ".", back=.true.)
   if (extension > 1) stem = stem(:extension - 1)
   if (len(stem) == 0) stem = "unnamed"
-end function filename_stem_
+end function filename_stem
 
-!> Compute `render_dim_`.
-function render_dim_(dim, indent) result(line)
+!> Compute `render_dim`.
+function render_dim(dim, indent) result(line)
   !> Input argument: `dim`.
   type(dimension_type), intent(in) :: dim
   !> Input argument: `indent`.
@@ -294,10 +336,10 @@ function render_dim_(dim, indent) result(line)
   else
     line = indent//dim%name//" = "//trim(len_text)//" ;"
   end if
-end function render_dim_
+end function render_dim
 
-!> Compute `render_att_`.
-function render_att_(att, indent) result(line)
+!> Compute `render_att`.
+function render_att(att, indent) result(line)
   !> Input argument: `att`.
   type(attribute_type), intent(in) :: att
   !> Input argument: `indent`.
@@ -306,12 +348,12 @@ function render_att_(att, indent) result(line)
   character(len=:), allocatable :: line
   character(len=16) :: dtype
 
-  call type_name_(att%dtype, dtype)
-  line = indent//trim(dtype)//":"//att%name//" = "//render_att_value_(att)//" ;"
-end function render_att_
+  call type_name(att%dtype, dtype)
+  line = indent//trim(dtype)//":"//att%name//" = "//render_att_value(att)//" ;"
+end function render_att
 
 !> Render an attribute buffer as an ncdump-like literal.
-function render_att_value_(att) result(rendered)
+function render_att_value(att) result(rendered)
   !> Input argument: `att`.
   type(attribute_type), intent(in) :: att
   !> Return value: `value`.
@@ -358,30 +400,30 @@ function render_att_value_(att) result(rendered)
   select case (att%dtype)
   case (BYTE_TYPE)
     int8_values = transfer(att%buffer, 0_int8, int(att%len))
-    rendered = render_int8_values_(int8_values)
+    rendered = render_int8_values(int8_values)
   case (CHAR_TYPE)
     chars = transfer(att%buffer, ' ', int(att%len))
-    rendered = render_char_values_(chars)
+    rendered = render_char_values(chars)
   case (SHORT_TYPE)
     int16_values = transfer(att%buffer, 0_int16, int(att%len))
-    rendered = render_int16_values_(int16_values)
+    rendered = render_int16_values(int16_values)
   case (INT_TYPE)
     int32_values = transfer(att%buffer, 0_int32, int(att%len))
-    rendered = render_int32_values_(int32_values)
+    rendered = render_int32_values(int32_values)
   case (INT64_TYPE)
     int64_values = transfer(att%buffer, 0_int64, int(att%len))
-    rendered = render_int64_values_(int64_values)
+    rendered = render_int64_values(int64_values)
   case (FLOAT_TYPE)
     real32_values = transfer(att%buffer, 0.0_real32, int(att%len))
-    rendered = render_real32_values_(real32_values)
+    rendered = render_real32_values(real32_values)
   case (DOUBLE_TYPE)
     real64_values = transfer(att%buffer, 0.0_real64, int(att%len))
-    rendered = render_real64_values_(real64_values)
+    rendered = render_real64_values(real64_values)
   end select
-end function render_att_value_
+end function render_att_value
 
 !> Render a character attribute as a quoted string.
-function render_char_values_(values) result(text)
+function render_char_values(values) result(text)
   !> Input argument: `values`.
   character, intent(in) :: values(:)
   !> Return value: `text`.
@@ -426,10 +468,10 @@ function render_char_values_(values) result(text)
     end select
   end do
   text(position:position) = '"'
-end function render_char_values_
+end function render_char_values
 
 !> Render integer(kind=int8) attribute values.
-function render_int8_values_(values) result(text)
+function render_int8_values(values) result(text)
   integer(int8), intent(in) :: values(:)
   character(len=:), allocatable :: text
   character(len=64) :: item
@@ -441,10 +483,10 @@ function render_int8_values_(values) result(text)
     write (item, "(i0)") values(i)
     text = text//trim(item)
   end do
-end function render_int8_values_
+end function render_int8_values
 
 !> Render integer(kind=int16) attribute values.
-function render_int16_values_(values) result(text)
+function render_int16_values(values) result(text)
   integer(int16), intent(in) :: values(:)
   character(len=:), allocatable :: text
   character(len=64) :: item
@@ -456,10 +498,10 @@ function render_int16_values_(values) result(text)
     write (item, "(i0)") values(i)
     text = text//trim(item)
   end do
-end function render_int16_values_
+end function render_int16_values
 
 !> Render integer(kind=int32) attribute values.
-function render_int32_values_(values) result(text)
+function render_int32_values(values) result(text)
   integer(int32), intent(in) :: values(:)
   character(len=:), allocatable :: text
   character(len=64) :: item
@@ -471,10 +513,10 @@ function render_int32_values_(values) result(text)
     write (item, "(i0)") values(i)
     text = text//trim(item)
   end do
-end function render_int32_values_
+end function render_int32_values
 
 !> Render integer(kind=int64) attribute values.
-function render_int64_values_(values) result(text)
+function render_int64_values(values) result(text)
   integer(int64), intent(in) :: values(:)
   character(len=:), allocatable :: text
   character(len=64) :: item
@@ -486,10 +528,10 @@ function render_int64_values_(values) result(text)
     write (item, "(i0)") values(i)
     text = text//trim(item)
   end do
-end function render_int64_values_
+end function render_int64_values
 
 !> Render real(kind=real32) attribute values.
-function render_real32_values_(values) result(text)
+function render_real32_values(values) result(text)
   real(real32), intent(in) :: values(:)
   character(len=:), allocatable :: text
   character(len=64) :: item
@@ -499,12 +541,12 @@ function render_real32_values_(values) result(text)
   do i = 1, size(values)
     if (i > 1) text = text//", "
     write (item, "(g0.15)") values(i)
-    text = text//trim_trailing_zeros_(item)
+    text = text//trim_trailing_zeros(item)
   end do
-end function render_real32_values_
+end function render_real32_values
 
 !> Render real(kind=real64) attribute values.
-function render_real64_values_(values) result(text)
+function render_real64_values(values) result(text)
   real(real64), intent(in) :: values(:)
   character(len=:), allocatable :: text
   character(len=64) :: item
@@ -514,15 +556,15 @@ function render_real64_values_(values) result(text)
   do i = 1, size(values)
     if (i > 1) text = text//", "
     write (item, "(g0.15)") values(i)
-    text = text//trim_trailing_zeros_(item)
+    text = text//trim_trailing_zeros(item)
   end do
-end function render_real64_values_
+end function render_real64_values
 
 !> Remove redundant fractional zeroes from a formatted real literal.
 !>
 !> An integral finite value retains one digit after its decimal point. Any
 !> exponent suffix is retained without modification.
-function trim_trailing_zeros_(text) result(trimmed)
+function trim_trailing_zeros(text) result(trimmed)
   !> Input argument: `text`.
   character(len=*), intent(in) :: text
   !> Return value: `trimmed`.
@@ -559,10 +601,10 @@ function trim_trailing_zeros_(text) result(trimmed)
     mantissa = mantissa(:last)
   end if
   trimmed = mantissa//exponent
-end function trim_trailing_zeros_
+end function trim_trailing_zeros
 
-!> Compute `render_var_`.
-function render_var_(var, indent) result(line)
+!> Compute `render_var`.
+function render_var(var, indent) result(line)
   !> Input argument: `var`.
   type(variable_type), intent(in) :: var
   !> Input argument: `indent`.
@@ -573,7 +615,7 @@ function render_var_(var, indent) result(line)
   character(len=:), allocatable :: dims
   integer :: i
 
-  call type_name_(var%dtype, dtype)
+  call type_name(var%dtype, dtype)
   dims = ""
   if (allocated(var%dims)) then
     if (size(var%dims) > 0) then
@@ -588,13 +630,13 @@ function render_var_(var, indent) result(line)
   line = indent//trim(dtype)//" "//var%name//dims//" ;"
   if (allocated(var%atts)) then
     do i = 1, size(var%atts)
-      line = line//new_line('a')//render_att_(var%atts(i), indent//"    ")
+      line = line//new_line('a')//render_att(var%atts(i), indent//"    ")
     end do
   end if
-end function render_var_
+end function render_var
 
-!> Execute `type_name_`.
-subroutine type_name_(dtype, name)
+!> Execute `type_name`.
+subroutine type_name(dtype, name)
   !> Input argument: `dtype`.
   integer(data_type), intent(in) :: dtype
   !> Output argument: `name`.
@@ -618,6 +660,6 @@ subroutine type_name_(dtype, name)
   case default
     name = "unknown"
   end select
-end subroutine type_name_
+end subroutine type_name
 
 end submodule nc4f_data_struct_io
