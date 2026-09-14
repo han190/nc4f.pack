@@ -1,8 +1,5 @@
-!> NetCDF-status translation and fail-fast behavior.
 submodule(nc4f_nc) nc4f_nc_err
-
 implicit none (type, external)
-
 contains
 
 !> Return true when `error` represents a failed operation.

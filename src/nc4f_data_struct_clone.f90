@@ -1,8 +1,6 @@
 !> Deep-cloning helpers for the direct data model.
 submodule(nc4f_data_struct) nc4f_data_struct_clone
-
 implicit none (type, external)
-
 contains
 
 !> Execute `clone_att_`.

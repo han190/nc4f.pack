@@ -1,8 +1,6 @@
 !> ncdump-like formatted output for the direct v2 data model.
 submodule(nc4f_data_struct) nc4f_data_struct_io
-
 implicit none (type, external)
-
 contains
 
 !> Execute `write_frmt_dim`.

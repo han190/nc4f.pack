@@ -1,8 +1,6 @@
 !> Arithmetic on homogeneous variable collections.
 submodule(nc4f_data_struct) nc4f_data_struct_arith
-
 implicit none (type, external)
-
 contains
 
 !> Return the element-wise sum of compatible variables in `vars`.

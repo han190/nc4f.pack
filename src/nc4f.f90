@@ -1,4 +1,3 @@
-!> Public facade for the v2 package while its operational APIs are ported.
 module nc4f
 
 use, non_intrinsic :: nc4f_data_struct

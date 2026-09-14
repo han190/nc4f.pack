@@ -1,8 +1,3 @@
-!> The v2 public data model.
-!>
-!> Attributes, variables, and groups use ordinary Fortran value components.
-!> Their data buffers and child-group collections are pointers: this keeps
-!> large values and recursive group trees shallow under intrinsic assignment.
 module nc4f_data_struct
 
 use, intrinsic :: iso_fortran_env, only: &

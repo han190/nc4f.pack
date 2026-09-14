@@ -1,8 +1,6 @@
 !> Pointer-aware validation used by the extraction API.
 submodule(nc4f_data_struct) nc4f_data_struct_access
-
 implicit none (type, external)
-
 contains
 
 !> Validate an attribute before mapping its byte buffer.

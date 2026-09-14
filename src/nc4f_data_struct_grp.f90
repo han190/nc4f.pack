@@ -1,8 +1,6 @@
 !> Constructors and group composition for the direct data model.
 submodule(nc4f_data_struct) nc4f_data_struct_grp
-
 implicit none (type, external)
-
 contains
 
 !> Initialize an owning attribute buffer.

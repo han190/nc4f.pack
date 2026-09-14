@@ -1,8 +1,6 @@
 !> Attribute construction and equality for the direct v2 data model.
 submodule(nc4f_data_struct) nc4f_data_struct_att
-
 implicit none (type, external)
-
 contains
 
 !> Initialize an owning attribute from existing attribute metadata.

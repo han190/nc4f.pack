@@ -1,8 +1,5 @@
-!> Shared non-error utilities for NetCDF operational submodules.
 submodule(nc4f_nc) nc4f_nc_util
-
 implicit none (type, external)
-
 contains
 
 !> Allocate a fresh byte buffer for an attribute read from a NetCDF file.
