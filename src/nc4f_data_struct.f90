@@ -16,7 +16,7 @@ public :: attribute_type, dimension_type, error_type, group_type, netcdf_type, v
 public :: NC_EBADID, NC_EBADDIM, NC_EBADGRPID, NC_EEDGE, NC_EINVAL, NC_EINVALCOORDS, NC_ENOGRP, &
   & NC_ENOTATT, NC_ENOTFOUND, NC_ENOTVAR, NC_NOERR
 public :: datarray, dataset, extract, initialize, operator(.att.), operator(.and.), operator(.dim.), &
-  & operator(==), operator(/=), shape, size, sum, write(formatted)
+  & operator(==), operator(/=), shape, size, sum
 !> Internal shared utilities used by operational submodules.  They are not
 !> re-exported through the user-facing `nc4f` facade.
 public :: buffer_size, validate_buffer
@@ -32,6 +32,9 @@ integer(int64), parameter :: INVALID_INT64 = -9223372036854775807_int64
 type :: error_type
   integer(c_int) :: code = NC_NOERR
   character(len=:), allocatable :: message
+contains
+  procedure, private :: write_frmt_error
+  generic, public :: write(formatted) => write_frmt_error
 end type error_type
 
 !> Type constant used for NetCDF external data types.
@@ -58,6 +61,9 @@ type :: dimension_type
   character(len=:), allocatable :: name
   integer(int64) :: len = INVALID_INT64
   logical :: is_unlim = .false.
+contains
+  procedure, private :: write_frmt_dim
+  generic, public :: write(formatted) => write_frmt_dim
 end type dimension_type
 
 !> Arguments used to construct an unlimited dimension with `.and.`.
@@ -75,6 +81,9 @@ type :: attribute_type
   integer(data_type) :: dtype = NAT_TYPE
   integer(int64) :: len = INVALID_INT64
   integer(int8), pointer :: buffer(:) => null()
+contains
+  procedure, private :: write_frmt_att
+  generic, public :: write(formatted) => write_frmt_att
 end type attribute_type
 
 !> NetCDF variable metadata, dimensions, attributes, and values.
@@ -86,6 +95,9 @@ type :: variable_type
   type(dimension_type), allocatable :: dims(:)
   type(attribute_type), allocatable :: atts(:)
   integer(int8), pointer :: buffer(:) => null()
+contains
+  procedure, private :: write_frmt_var
+  generic, public :: write(formatted) => write_frmt_var
 end type variable_type
 
 !> NetCDF group metadata.
@@ -99,12 +111,17 @@ type :: group_type
   type(attribute_type), allocatable :: atts(:)
   type(variable_type), allocatable :: vars(:)
   type(group_type), pointer :: grps(:) => null()
+contains
+  procedure, private :: write_frmt_grp
+  generic, public :: write(formatted) => write_frmt_grp
 end type group_type
 
 !> An open NetCDF file: a root-group value plus file-specific state.
 type, extends(group_type) :: netcdf_type
   character(len=:), allocatable :: filename
   integer(c_int) :: mode = NC_NOWRITE
+contains
+  procedure, private :: write_frmt_grp => write_frmt_netcdf
 end type netcdf_type
 
 include "nc4f_data_struct_att_ctor.inc"
@@ -152,15 +169,6 @@ interface initialize
   module procedure :: init_var
   module procedure :: init_var_mold
 end interface initialize
-
-!> Formatted derived-type I/O in a compact ncdump-like layout.
-interface write(formatted)
-  module procedure :: write_frmt_att
-  module procedure :: write_frmt_dim
-  module procedure :: write_frmt_var
-  module procedure :: write_frmt_grp
-  module procedure :: write_frmt_error
-end interface write(formatted)
 
 !> Assemble a group from existing handles and metadata.
 !>
@@ -312,6 +320,15 @@ interface
     integer, intent(out) :: iostat
     character(len=*), intent(inout) :: iomsg
   end subroutine write_frmt_grp
+
+  module subroutine write_frmt_netcdf(grp, unit, iotype, v_list, iostat, iomsg)
+    class(netcdf_type), intent(in) :: grp
+    integer, intent(in) :: unit
+    character(len=*), intent(in) :: iotype
+    integer, intent(in) :: v_list(:)
+    integer, intent(out) :: iostat
+    character(len=*), intent(inout) :: iomsg
+  end subroutine write_frmt_netcdf
 
   module subroutine write_frmt_error(error, unit, iotype, v_list, iostat, iomsg)
     class(error_type), intent(in) :: error

@@ -9,26 +9,29 @@ COMPILER_NAME := $(notdir $(FC))
 BUILD_DIR := build/makefile_$(COMPILER_NAME)
 LIB := $(BUILD_DIR)/ncpack.a
 TEST_TARGET := $(BUILD_DIR)/test
-NCFLAGS := $(shell pkg-config --cflags --libs netcdf)
+NC_CFLAGS := $(shell pkg-config --cflags netcdf)
+NC_LIBS := $(shell pkg-config --libs netcdf)
 
 ifneq (,$(findstring gfortran,$(notdir $(FC))))
 	ifeq ($(PROFILE),release)
 		FFLAGS ?= -O3 -funroll-loops -Wimplicit-interface -fPIC -fmax-errors=1 \
-			-fcoarray=single -J$(BUILD_DIR) -I$(SRC_DIR) $(NCFLAGS)
+			-fcoarray=single -J$(BUILD_DIR) -I$(SRC_DIR) $(NC_CFLAGS)
 	else ifeq ($(PROFILE),debug)
 		FFLAGS ?= -O0 -g -Wall -Wextra -fPIC -fmax-errors=1 -fcheck=bounds \
 			-fcheck=array-temps -fbacktrace -fcoarray=single \
-			-J$(BUILD_DIR) -I$(SRC_DIR) $(NCFLAGS)
+			-J$(BUILD_DIR) -I$(SRC_DIR) $(NC_CFLAGS)
 	endif
 else ifneq (,$(findstring flang,$(notdir $(FC))))
 	ifeq ($(PROFILE),release)
 		FFLAGS ?= -O3 -funroll-loops -fimplicit-none -fPIC \
-			-J$(BUILD_DIR) -I$(SRC_DIR) $(NCFLAGS)
+			-J$(BUILD_DIR) -I$(SRC_DIR) $(NC_CFLAGS)
 	else ifeq ($(PROFILE),debug)
 		FFLAGS ?= -O0 -g -funroll-loops -fimplicit-none -fPIC \
-			-J$(BUILD_DIR) -I$(SRC_DIR) $(NCFLAGS)
+			-J$(BUILD_DIR) -I$(SRC_DIR) $(NC_CFLAGS)
 	endif
 endif
+
+LINK_FFLAGS := $(filter-out -J$(BUILD_DIR),$(FFLAGS))
 
 FYPP_INC = \
 	$(FYPP_DIR)/nc4f_data_struct_att_ctor_inc.fypp \
@@ -126,7 +129,7 @@ prepare: create_build_dir
 
 $(TEST_TARGET): $(TEST_OBJS) $(LIB)
 	@printf "\r\033[2K[test] create executable: $(TEST_TARGET)"
-	@$(FC) -o $(TEST_TARGET) $(TEST_OBJS) $(LIB) $(FFLAGS)
+	@$(FC) -o $(TEST_TARGET) $(TEST_OBJS) $(LIB) $(LINK_FFLAGS) $(NC_LIBS)
 
 $(BUILD_DIR)/%.o: $(TEST_DIR)/%.f90
 	@printf "\r\033[2K[compile] $<"

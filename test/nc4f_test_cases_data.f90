@@ -179,9 +179,8 @@ module subroutine nasa_cosp_read(passed)
   type(error_type) :: error
   type(group_type), allocatable :: grps(:)
   type(group_type) :: root, solar_zenith
-  type(netcdf_type), target :: nc
+  type(netcdf_type) :: nc
   type(variable_type) :: latitude_var, longitude_var
-  class(group_type), pointer :: nc_group
   integer :: file_unit, io_stat
   logical :: is_open, output_open
 
@@ -203,13 +202,11 @@ module subroutine nasa_cosp_read(passed)
     nc%atts = root%atts
     nc%vars = root%vars
     if (associated(root%grps)) nc%grps => root%grps
-    nc_group => nc
-
     open (newunit=file_unit, file=NETCDF_TYPE_RESULT_FILE, status="replace", &
       & action="write", iostat=io_stat)
     if (io_stat /= 0) exit nasa_read
     output_open = .true.
-    write (file_unit, "(dt)", iostat=io_stat) nc_group
+    write (file_unit, "(dt)", iostat=io_stat) nc
     close (file_unit, iostat=io_stat)
     output_open = .false.
     if (io_stat /= 0) exit nasa_read
@@ -394,7 +391,7 @@ module subroutine sresa1b_ccsm3_read(passed)
   end if
 end subroutine sresa1b_ccsm3_read
 
-!> Render every externally produced NetCDF fixture through group UDDTIO.
+!> Render every externally produced NetCDF fixture through NetCDF UDDTIO.
 module subroutine sample_uddtio(passed)
   !> Input/output argument: `passed`.
   logical, intent(inout) :: passed
@@ -454,9 +451,9 @@ function render_sample_uddtio_(filename, label, expected_dim, expected_var, expe
   !> Return value: `rendered`.
   logical :: rendered
   character(len=256) :: line
-  character(len=:), allocatable :: output_file
-  integer :: file_unit, iostat
-  logical :: attribute_found, child_group_found, dimension_found, group_found, variable_attribute_found, variable_found
+  character(len=:), allocatable :: expected_header, output_file
+  integer :: base, extension, file_unit, iostat
+  logical :: attribute_found, child_group_found, dataset_found, dimension_found, variable_attribute_found, variable_found
   type(error_type) :: error
   type(group_type) :: description
   type(netcdf_type) :: nc
@@ -470,11 +467,23 @@ function render_sample_uddtio_(filename, label, expected_dim, expected_var, expe
     call close_dataset(nc)
     return
   end if
+  nc%dims = description%dims
+  nc%atts = description%atts
+  nc%vars = description%vars
+  if (associated(description%grps)) nc%grps => description%grps
+
+  base = scan(filename, "/", back=.true.) + 1
+  extension = index(filename(base:), ".", back=.true.)
+  if (extension > 1) then
+    expected_header = "netcdf "//filename(base:base + extension - 2)//" {"
+  else
+    expected_header = "netcdf "//filename(base:)//" {"
+  end if
 
   output_file = TEST_RESULTS_DIR//label//"_uddtio.txt"
   open (newunit=file_unit, file=output_file, status="replace", action="write", iostat=iostat)
   if (iostat == 0) then
-    write (file_unit, "(dt)", iostat=iostat) description
+    write (file_unit, "(dt)", iostat=iostat) nc
     close (file_unit, iostat=iostat)
   end if
   if (iostat /= 0) then
@@ -482,7 +491,7 @@ function render_sample_uddtio_(filename, label, expected_dim, expected_var, expe
     return
   end if
 
-  group_found = .false.
+  dataset_found = .false.
   dimension_found = .false.
   variable_found = .false.
   variable_attribute_found = .false.
@@ -493,7 +502,7 @@ function render_sample_uddtio_(filename, label, expected_dim, expected_var, expe
     do
       read (file_unit, "(a)", iostat=iostat) line
       if (iostat /= 0) exit
-      if (index(line, "group: / {") > 0) group_found = .true.
+      if (index(line, expected_header) > 0) dataset_found = .true.
       if (index(line, expected_dim) > 0) dimension_found = .true.
       if (index(line, expected_var) > 0) variable_found = .true.
       if (index(line, expected_var_att) > 0) variable_attribute_found = .true.
@@ -504,7 +513,7 @@ function render_sample_uddtio_(filename, label, expected_dim, expected_var, expe
   end if
   call close_dataset(nc, error)
   if (.exists. error) return
-  rendered = group_found .and. dimension_found .and. variable_found .and. variable_attribute_found .and. &
+  rendered = dataset_found .and. dimension_found .and. variable_found .and. variable_attribute_found .and. &
     & attribute_found .and. child_group_found
 end function render_sample_uddtio_
 

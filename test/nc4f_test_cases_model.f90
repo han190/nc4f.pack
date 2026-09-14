@@ -24,6 +24,7 @@ module subroutine data_model(passed)
   integer(int64), allocatable :: extents(:)
   character(len=256) :: iomsg, line
   integer :: iostat, unit
+  logical :: netcdf_found
 
   passed = .false.
   dim%name = "sample"
@@ -77,12 +78,23 @@ module subroutine data_model(passed)
   if (iostat /= 0) return
   write (unit, *, iostat=iostat, iomsg=iomsg) grp
   if (iostat /= 0) return
+  write (unit, *, iostat=iostat, iomsg=iomsg) nc
+  if (iostat /= 0) return
   rewind (unit)
   read (unit, "(a)", iostat=iostat, iomsg=iomsg) line
   if (iostat /= 0 .or. index(line, "NetCDF status (0)") == 0) return
   read (unit, "(a)", iostat=iostat, iomsg=iomsg) line
-  close (unit)
   if (iostat /= 0 .or. index(line, "group: root {") == 0) return
+  netcdf_found = .false.
+  do
+    read (unit, "(a)", iostat=iostat, iomsg=iomsg) line
+    if (iostat /= 0) exit
+    if (index(line, "netcdf model {") == 0) cycle
+    netcdf_found = .true.
+    exit
+  end do
+  close (unit)
+  if (.not. netcdf_found) return
 
   call to_netcdf(TEST_RESULTS_DIR//"data_model.nc", grp, error=error)
   if (error%code /= NC_NOERR) return

@@ -110,6 +110,30 @@ module subroutine write_frmt_grp(grp, unit, iotype, v_list, iostat, iomsg)
   write (unit, "(a)", iostat=iostat, iomsg=iomsg) text
 end subroutine write_frmt_grp
 
+!> Execute `write_frmt_netcdf`.
+module subroutine write_frmt_netcdf(grp, unit, iotype, v_list, iostat, iomsg)
+  !> Input argument: `grp`.
+  class(netcdf_type), intent(in) :: grp
+  !> Input argument: `unit`.
+  integer, intent(in) :: unit
+  !> Input argument: `iotype`.
+  character(len=*), intent(in) :: iotype
+  !> Input argument: `v_list`.
+  integer, intent(in) :: v_list(:)
+  !> Output argument: `iostat`.
+  integer, intent(out) :: iostat
+  !> Input/output argument: `iomsg`.
+  character(len=*), intent(inout) :: iomsg
+  character(len=:), allocatable :: text
+
+  associate (ignored_v_list => v_list)
+  end associate
+  iostat = 1
+  if (iotype /= "LISTDIRECTED" .and. iotype /= "DT") return
+  text = render_netcdf_(grp)
+  write (unit, "(a)", iostat=iostat, iomsg=iomsg) text
+end subroutine write_frmt_netcdf
+
 !> Write an operation result in formatted derived-type I/O.
 module subroutine write_frmt_error(error, unit, iotype, v_list, iostat, iomsg)
   !> Input argument: `error`.
@@ -154,12 +178,44 @@ recursive function render_grp_(grp, depth) result(text)
   !> Return value: `text`.
   character(len=:), allocatable :: text
   character(len=:), allocatable :: indent, name
-  integer :: i
 
   indent = repeat(" ", 4*depth)
   name = "/"
   if (allocated(grp%name)) name = grp%name
   text = indent//"group: "//trim(name)//" {"//new_line('a')
+
+  text = text//render_grp_body_(grp, indent, depth)
+  text = text//indent//"}"
+end function render_grp_
+
+!> Compute the ncdump-like representation of an open NetCDF dataset.
+function render_netcdf_(nc) result(text)
+  !> Input argument: `nc`.
+  type(netcdf_type), intent(in) :: nc
+  !> Return value: `text`.
+  character(len=:), allocatable :: text
+  character(len=:), allocatable :: name
+
+  name = "unnamed"
+  if (allocated(nc%filename)) name = filename_stem_(nc%filename)
+  text = "netcdf "//name//" {"//new_line('a')
+  text = text//render_grp_body_(nc, "", 0)
+  text = text//"}"
+end function render_netcdf_
+
+!> Compute the contents of a group in ncdump-like formatted output.
+recursive function render_grp_body_(grp, indent, depth) result(text)
+  !> Input argument: `grp`.
+  class(group_type), intent(in) :: grp
+  !> Input argument: `indent`.
+  character(len=*), intent(in) :: indent
+  !> Input argument: `depth`.
+  integer, intent(in) :: depth
+  !> Return value: `text`.
+  character(len=:), allocatable :: text
+  integer :: i
+
+  text = ""
 
   if (allocated(grp%dims)) then
     if (size(grp%dims) > 0) then
@@ -193,8 +249,32 @@ recursive function render_grp_(grp, depth) result(text)
       end do
     end if
   end if
-  text = text//indent//"}"
-end function render_grp_
+end function render_grp_body_
+
+!> Return the final path component of a filename without its final extension.
+function filename_stem_(filename) result(stem)
+  !> Input argument: `filename`.
+  character(len=*), intent(in) :: filename
+  !> Return value: `stem`.
+  character(len=:), allocatable :: stem
+  integer :: base, extension, filename_len
+
+  filename_len = len_trim(filename)
+  if (filename_len == 0) then
+    stem = "unnamed"
+    return
+  end if
+  base = scan(filename(:filename_len), "/", back=.true.) + 1
+  if (base > filename_len) then
+    stem = "unnamed"
+    return
+  end if
+
+  stem = filename(base:filename_len)
+  extension = index(stem, ".", back=.true.)
+  if (extension > 1) stem = stem(:extension - 1)
+  if (len(stem) == 0) stem = "unnamed"
+end function filename_stem_
 
 !> Compute `render_dim_`.
 function render_dim_(dim, indent) result(line)
@@ -303,29 +383,46 @@ function render_char_values_(values) result(text)
   character, intent(in) :: values(:)
   !> Return value: `text`.
   character(len=:), allocatable :: text
-  integer :: i, last
+  integer :: i, last, position, text_len
 
   last = size(values)
   do while (last > 0)
     if (values(last) /= achar(0)) exit
     last = last - 1
   end do
-  text = '"'
+  text_len = 2
+  do i = 1, last
+    select case (values(i))
+    case ('"', '\', achar(0), new_line('a'))
+      text_len = text_len + 2
+    case default
+      text_len = text_len + 1
+    end select
+  end do
+
+  allocate (character(len=text_len) :: text)
+  text(1:1) = '"'
+  position = 2
   do i = 1, last
     select case (values(i))
     case ('"')
-      text = text//'\"'
+      text(position:position + 1) = '\"'
+      position = position + 2
     case ('\')
-      text = text//'\\'
+      text(position:position + 1) = '\\'
+      position = position + 2
     case (achar(0))
-      text = text//'\0'
+      text(position:position + 1) = '\0'
+      position = position + 2
     case (new_line('a'))
-      text = text//'\n'
+      text(position:position + 1) = '\n'
+      position = position + 2
     case default
-      text = text//values(i)
+      text(position:position) = values(i)
+      position = position + 1
     end select
   end do
-  text = text//'"'
+  text(position:position) = '"'
 end function render_char_values_
 
 !> Render integer(kind=int8) attribute values.
