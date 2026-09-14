@@ -1,13 +1,14 @@
 SRC_DIR := src
 FYPP_DIR := fypp
-BUILD_DIR := build/makefile
 TEST_DIR := test
-LIB := $(BUILD_DIR)/ncpack.a
-TEST_TARGET := $(BUILD_DIR)/test
 PROFILE ?= debug
 ifeq ($(origin FC), default)
   FC := gfortran
 endif
+COMPILER_NAME := $(notdir $(FC))
+BUILD_DIR := build/makefile_$(COMPILER_NAME)
+LIB := $(BUILD_DIR)/ncpack.a
+TEST_TARGET := $(BUILD_DIR)/test
 NCFLAGS := $(shell pkg-config --cflags --libs netcdf)
 
 ifneq (,$(findstring gfortran,$(notdir $(FC))))
@@ -123,7 +124,7 @@ build: preprocess $(OBJ)
 preprocess: prepare $(SRC_INC) $(SRC_F90)
 prepare: create_build_dir
 
-$(TEST_TARGET): $(TEST_OBJS)
+$(TEST_TARGET): $(TEST_OBJS) $(LIB)
 	@printf "\r\033[2K[test] create executable: $(TEST_TARGET)"
 	@$(FC) -o $(TEST_TARGET) $(TEST_OBJS) $(LIB) $(FFLAGS)
 

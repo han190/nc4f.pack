@@ -394,6 +394,120 @@ module subroutine sresa1b_ccsm3_read(passed)
   end if
 end subroutine sresa1b_ccsm3_read
 
+!> Render every externally produced NetCDF fixture through group UDDTIO.
+module subroutine sample_uddtio(passed)
+  !> Input/output argument: `passed`.
+  logical, intent(inout) :: passed
+  character(len=96), parameter :: files(6) = [character(len=96) :: &
+    & "data/CLDPROPCOSP_M3_MODIS_Aqua.A2014032.011.2020112203433.nc", &
+    & "data/ECMWF_ERA-40_subset.nc", &
+    & "data/cami_0000-09-01_64x128_L26_c030918.nc", &
+    & "data/sresa1b_ncar_ccsm3-example.nc", &
+    & "data/test_echam_spectral.nc", &
+    & "data/tos_O1_2001-2002.nc"]
+  character(len=24), parameter :: labels(6) = [character(len=24) :: &
+    & "cldprop", "ecmwf_era40", "cami", "sresa1b", "echam_spectral", "tos_o1"]
+  character(len=128), parameter :: dimensions(6) = [character(len=128) :: &
+    & "latitude = 180 ;", "longitude = 144 ;", "lat = 64 ;", "lat = 128 ;", &
+    & "lat = 96 ;", "lon = 180 ;"]
+  character(len=128), parameter :: variables(6) = [character(len=128) :: &
+    & "double latitude(latitude) ;", "float longitude(longitude) ;", "double lat(lat) ;", &
+    & "float lat(lat) ;", "float abso4(lon, lat, time) ;", "double lon(lon) ;"]
+  character(len=128), parameter :: variable_attributes(6) = [character(len=128) :: &
+    & 'char:units = "degrees_north" ;', 'char:units = "degrees_east" ;', &
+    & 'char:units = "degrees_north" ;', 'char:units = "degrees_north" ;', &
+    & 'char:units = "kg/m**2" ;', 'char:units = "degrees_east" ;']
+  character(len=128), parameter :: attributes(6) = [character(len=128) :: &
+    & 'char:Yori_version = "1.3.13" ;', 'char:Conventions = "CF-1.0" ;', &
+    & 'char:Conventions = "CF-1.0" ;', 'int:realization = 1 ;', &
+    & 'char:CDI = "Climate Data Interface version 1.4.6 (http://code.zmaw.de/projects/cdi)" ;', &
+    & 'int:realization = 1 ;']
+  character(len=32), parameter :: child_groups(6) = [character(len=32) :: &
+    & "group: Solar_Zenith {", "", "", "", "", ""]
+  integer :: i
+
+  passed = .false.
+  do i = 1, size(files)
+    if (.not. render_sample_uddtio_(trim(files(i)), trim(labels(i)), trim(dimensions(i)), &
+      & trim(variables(i)), trim(variable_attributes(i)), trim(attributes(i)), trim(child_groups(i)))) return
+  end do
+  passed = .true.
+end subroutine sample_uddtio
+
+!> Render one externally produced NetCDF fixture and verify key output lines.
+function render_sample_uddtio_(filename, label, expected_dim, expected_var, expected_var_att, &
+  & expected_att, expected_group) result(rendered)
+  !> Input argument: `filename`.
+  character(len=*), intent(in) :: filename
+  !> Input argument: `label`.
+  character(len=*), intent(in) :: label
+  !> Input argument: `expected_dim`.
+  character(len=*), intent(in) :: expected_dim
+  !> Input argument: `expected_var`.
+  character(len=*), intent(in) :: expected_var
+  !> Input argument: `expected_var_att`.
+  character(len=*), intent(in) :: expected_var_att
+  !> Input argument: `expected_att`.
+  character(len=*), intent(in) :: expected_att
+  !> Input argument: `expected_group`.
+  character(len=*), intent(in) :: expected_group
+  !> Return value: `rendered`.
+  logical :: rendered
+  character(len=256) :: line
+  character(len=:), allocatable :: output_file
+  integer :: file_unit, iostat
+  logical :: attribute_found, child_group_found, dimension_found, group_found, variable_attribute_found, variable_found
+  type(error_type) :: error
+  type(group_type) :: description
+  type(netcdf_type) :: nc
+
+  rendered = .false.
+  nc = open_dataset(filename, "r", error=error)
+  if (.exists. error) return
+  description = inquire_group(nc, inq_dims=.true., inq_atts=.true., inq_vars=.true., &
+    & inq_grps=.true., recursive=.true., error=error)
+  if (.exists. error) then
+    call close_dataset(nc)
+    return
+  end if
+
+  output_file = TEST_RESULTS_DIR//label//"_uddtio.txt"
+  open (newunit=file_unit, file=output_file, status="replace", action="write", iostat=iostat)
+  if (iostat == 0) then
+    write (file_unit, "(dt)", iostat=iostat) description
+    close (file_unit, iostat=iostat)
+  end if
+  if (iostat /= 0) then
+    call close_dataset(nc)
+    return
+  end if
+
+  group_found = .false.
+  dimension_found = .false.
+  variable_found = .false.
+  variable_attribute_found = .false.
+  attribute_found = .false.
+  child_group_found = len(expected_group) == 0
+  open (newunit=file_unit, file=output_file, status="old", action="read", iostat=iostat)
+  if (iostat == 0) then
+    do
+      read (file_unit, "(a)", iostat=iostat) line
+      if (iostat /= 0) exit
+      if (index(line, "group: / {") > 0) group_found = .true.
+      if (index(line, expected_dim) > 0) dimension_found = .true.
+      if (index(line, expected_var) > 0) variable_found = .true.
+      if (index(line, expected_var_att) > 0) variable_attribute_found = .true.
+      if (index(line, expected_att) > 0) attribute_found = .true.
+      if (index(line, expected_group) > 0) child_group_found = .true.
+    end do
+    close (file_unit)
+  end if
+  call close_dataset(nc, error)
+  if (.exists. error) return
+  rendered = group_found .and. dimension_found .and. variable_found .and. variable_attribute_found .and. &
+    & attribute_found .and. child_group_found
+end function render_sample_uddtio_
+
 !> Read CAM initial-condition data with a four-dimensional hyperslab.
 module subroutine cami_initial_read(passed)
   !> Input/output argument: `passed`.

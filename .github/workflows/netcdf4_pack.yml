@@ -7,8 +7,17 @@ on:
 
 jobs:
   test:
+    name: Test with ${{ matrix.compiler.name }}
     runs-on: ubuntu-24.04
     container: fedora:45
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler:
+          - name: gfortran 15
+            command: gfortran-15
+          - name: gfortran 16
+            command: gfortran
 
     steps:
       - name: Check out repository
@@ -19,6 +28,7 @@ jobs:
           dnf install --assumeyes \
             curl \
             gcc-gfortran \
+            gcc15-gfortran \
             make \
             netcdf \
             netcdf-devel \
@@ -27,16 +37,16 @@ jobs:
             python3-fypp
 
       - name: Report compiler
-        run: gfortran --version
+        run: ${{ matrix.compiler.command }} --version
 
       - name: Build
-        run: FC=gfortran make
+        run: FC=${{ matrix.compiler.command }} make
 
       - name: Download integration fixtures
         run: make download-test-data
 
       - name: Test
-        run: FC=gfortran make test
+        run: FC=${{ matrix.compiler.command }} make test
 
       - name: Inspect generated NetCDF file
         run: ncdump -h build/test-results/characters.nc

@@ -11,7 +11,7 @@ public :: sum_vars_test, sfc_pres_temp_wr, sfc_pres_temp_rd, extensive_wr, exten
 public :: group_model, group_write
 public :: nasa_cosp_read
 public :: ecmwf_era40_read
-public :: sresa1b_ccsm3_read, cami_initial_read, tos_o1_read, echam_spectral_read
+public :: sresa1b_ccsm3_read, sample_uddtio, cami_initial_read, tos_o1_read, echam_spectral_read
 public :: copy_semantics
 public :: data_model
 private
@@ -117,6 +117,10 @@ interface
   module subroutine sresa1b_ccsm3_read(passed)
     logical, intent(inout) :: passed
   end subroutine sresa1b_ccsm3_read
+
+  module subroutine sample_uddtio(passed)
+    logical, intent(inout) :: passed
+  end subroutine sample_uddtio
 
   module subroutine cami_initial_read(passed)
     logical, intent(inout) :: passed

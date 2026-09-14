@@ -28,6 +28,7 @@ tests = [&
   & test_type("nasa_cosp_read", nasa_cosp_read), &
   & test_type("ecmwf_era40_read", ecmwf_era40_read), &
   & test_type("sresa1b_ccsm3_read", sresa1b_ccsm3_read), &
+  & test_type("sample_uddtio", sample_uddtio), &
   & test_type("cami_initial_read", cami_initial_read), &
   & test_type("tos_o1_read", tos_o1_read), &
   & test_type("echam_spectral_read", echam_spectral_read)]
