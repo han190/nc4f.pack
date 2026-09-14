@@ -26,7 +26,8 @@ subroutine setup_test_results()
   integer :: exitstat
 
   call execute_command_line("mkdir -p build/test-results", exitstat=exitstat)
-  if (exitstat /= 0) error stop "[setup_test_results] Cannot create build/test-results."
+  if (exitstat /= 0) error stop &
+    & "[setup_test_results] Cannot create build/test-results."
 end subroutine setup_test_results
 
 !> Execute `run_tests`.

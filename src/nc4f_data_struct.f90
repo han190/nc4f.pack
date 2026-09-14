@@ -5,17 +5,21 @@
 !> large values and recursive group trees shallow under intrinsic assignment.
 module nc4f_data_struct
 
-use, intrinsic :: iso_fortran_env, only: int8, int16, int32, int64, real32, real64
+use, intrinsic :: iso_fortran_env, only: &
+  & int8, int16, int32, int64, real32, real64
 use, intrinsic :: iso_c_binding, only: c_f_pointer, c_int, c_loc, c_ptr
 use, non_intrinsic :: nc4f_c_interface, only: &
-  NC_EBADID, NC_EBADDIM, NC_EBADGRPID, NC_EEDGE, NC_EINVAL, NC_EINVALCOORDS, NC_ENOGRP, &
-  NC_ENOTATT, NC_ENOTFOUND, NC_ENOTVAR, NC_NOERR, NC_NOWRITE
+  & NC_EBADID, NC_EBADDIM, NC_EBADGRPID, NC_EEDGE, NC_EINVAL, NC_EINVALCOORDS, &
+  & NC_ENOGRP, NC_ENOTATT, NC_ENOTFOUND, NC_ENOTVAR, NC_NOERR, NC_NOWRITE
 implicit none (type, external)
 
-public :: attribute_type, dimension_type, error_type, group_type, netcdf_type, variable_type
-public :: NC_EBADID, NC_EBADDIM, NC_EBADGRPID, NC_EEDGE, NC_EINVAL, NC_EINVALCOORDS, NC_ENOGRP, &
+public :: attribute_type, dimension_type, error_type, &
+  & group_type, netcdf_type, variable_type
+public :: NC_EBADID, NC_EBADDIM, NC_EBADGRPID, NC_EEDGE, NC_EINVAL, &
+  & NC_EINVALCOORDS, NC_ENOGRP, &
   & NC_ENOTATT, NC_ENOTFOUND, NC_ENOTVAR, NC_NOERR
-public :: datarray, dataset, extract, initialize, operator(.att.), operator(.and.), operator(.dim.), &
+public :: datarray, dataset, extract, initialize, operator(.att.), &
+  & operator(.and.), operator(.dim.), &
   & operator(==), operator(/=), shape, size, sum
 !> Internal shared utilities used by operational submodules.  They are not
 !> re-exported through the user-facing `nc4f` facade.

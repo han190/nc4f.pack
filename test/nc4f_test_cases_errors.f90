@@ -59,7 +59,8 @@ module subroutine error_handling(passed)
   nc = open_dataset(TEST_RESULTS_DIR//"unused.nc", "invalid", error=error)
   if (.not. ((error%code /= NC_NOERR) .and. error%code == NC_EINVAL)) return
 
-  nc = open_dataset(TEST_RESULTS_DIR//"missing-error-fixture/no-file.nc", error=error)
+  nc = open_dataset(TEST_RESULTS_DIR// &
+    & "missing-error-fixture/no-file.nc", error=error)
   if (.not. (.exists.error .and. allocated(error%message))) return
   write (stdout, "(dt)", iostat=io_stat) error
   if (io_stat /= 0 .or. len_trim(stdout) == 0) return
@@ -114,7 +115,7 @@ module subroutine error_handling(passed)
   vars = [present, invalid]
   call to_netcdf(TEST_RESULTS_DIR//"failed-write-cleanup.nc", vars, error=error)
   if (error%code == NC_NOERR) return
-  nc = open_dataset(TEST_RESULTS_DIR//"failed-write-cleanup.nc", "a", error=error)
+nc = open_dataset(TEST_RESULTS_DIR//"failed-write-cleanup.nc", "a", error=error)
   if ((error%code /= NC_NOERR)) return
   var = get_variable(nc, "present", error)
   call close_dataset(nc)

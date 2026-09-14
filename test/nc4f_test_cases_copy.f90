@@ -24,7 +24,8 @@ module subroutine copy_semantics(passed)
   call extract(deep_var, deep_values)
   call extract(shallow_var, shallow_values)
   if (c_associated(c_loc(deep_var%buffer(1)), c_loc(raw_values(1)))) return
-  if (.not. c_associated(c_loc(shallow_var%buffer(1)), c_loc(raw_values(1)))) return
+  if (.not. c_associated(c_loc(shallow_var%buffer(1)), &
+    & c_loc(raw_values(1)))) return
   if (abs(deep_values(1) - 1.0_real32) > epsilon(1.0_real32) .or. &
     & abs(shallow_values(1) - 9.0_real32) > epsilon(1.0_real32)) return
 
@@ -40,8 +41,10 @@ module subroutine copy_semantics(passed)
   call extract(shallow_group%vars(1), shallow_values)
   call extract(deep_group%vars(1), deep_values)
 
-  passed = c_associated(c_loc(shallow_group%vars(1)%buffer(1)), c_loc(source_var%buffer(1))) .and. &
-    & .not. c_associated(c_loc(deep_group%vars(1)%buffer(1)), c_loc(source_var%buffer(1))) .and. &
+  passed = c_associated(c_loc(shallow_group%vars(1)%buffer(1)), &
+    & c_loc(source_var%buffer(1))) .and. &
+    & .not. c_associated(c_loc(deep_group%vars(1)%buffer(1)), &
+    & c_loc(source_var%buffer(1))) .and. &
     & abs(shallow_values(2) - 17.0_real32) <= epsilon(1.0_real32) .and. &
     & abs(deep_values(2) - 2.0_real32) <= epsilon(1.0_real32) .and. &
     & associated(shallow_group%grps(1)%grps, child%grps) .and. &

@@ -197,7 +197,8 @@ function collect_dims_(vars) result(dims)
           has_name = .true.
           if (collected(k)%len /= vars(i)%dims(j)%len .or. &
             & collected(k)%is_unlim .neqv. vars(i)%dims(j)%is_unlim) then
-            error stop "[dataset] Conflicting definitions for one dimension name."
+            error stop "[dataset] Conflicting"// &
+              & " definitions for one dimension name."
           end if
           exit
         end if

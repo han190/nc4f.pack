@@ -15,7 +15,8 @@ module subroutine validate_att_data(att, dtype, context)
   character(len=*), intent(in) :: context
   integer :: nbytes
 
-  if (att%dtype /= dtype) error stop trim(context)//" Unexpected attribute type."
+  if (att%dtype /= dtype) error stop trim(context)// &
+    & " Unexpected attribute type."
   if (att%len < 0) error stop trim(context)//" Negative attribute length."
   nbytes = buffer_size(att%dtype, att%len, context)
   call validate_buffer(att%buffer, int(nbytes, int64), "Attribute", context)
@@ -34,12 +35,14 @@ module subroutine validate_var_data(var, dtype, rank, context)
   integer :: nbytes
 
   if (var%dtype /= dtype) error stop trim(context)//" Unexpected variable type."
-  if (.not. allocated(var%dims)) error stop trim(context)//" Variable dimensions are not allocated."
+  if (.not. allocated(var%dims)) error stop &
+    & trim(context)//" Variable dimensions are not allocated."
   if (rank > 1 .and. size(var%dims) /= rank) then
     error stop trim(context)//" Unexpected variable rank."
   end if
 
-  if (size(var) /= var%len) error stop trim(context)//" Dimension product differs from length."
+  if (size(var) /= var%len) error stop &
+    & trim(context)//" Dimension product differs from length."
 
   nbytes = buffer_size(var%dtype, var%len, context)
   call validate_buffer(var%buffer, int(nbytes, int64), "Variable", context)

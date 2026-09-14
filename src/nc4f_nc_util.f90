@@ -77,7 +77,8 @@ module subroutine validate_var_buffer(var, context)
     error stop trim(context)//" Dimension product differs from variable length."
   end if
   required_bytes = buffer_size(var%dtype, var%len, context)
-  call validate_buffer(var%buffer, int(required_bytes, int64), "Variable", context)
+  call validate_buffer(var%buffer, &
+    & int(required_bytes, int64), "Variable", context)
 end subroutine validate_var_buffer
 
 !> Validate an attribute byte buffer before passing it to the C API.
@@ -89,7 +90,8 @@ module subroutine validate_att_buffer(att, context)
   integer :: required_bytes
 
   required_bytes = buffer_size(att%dtype, att%len, context)
-  call validate_buffer(att%buffer, int(required_bytes, int64), "Attribute", context)
+  call validate_buffer(att%buffer, &
+    & int(required_bytes, int64), "Attribute", context)
 end subroutine validate_att_buffer
 
 end submodule nc4f_nc_util

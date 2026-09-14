@@ -11,7 +11,8 @@ module subroutine group_model(passed)
   character(len=256) :: line
   integer :: child_at, dims_at, file_unit, groups_at, iostat, line_number, &
     & root_at, vars_at, atts_at
-  logical :: child_title_found, compact_found, offset_found, root_title_found, scale_found
+  logical :: child_title_found, compact_found, &
+    & offset_found, root_title_found, scale_found
   type(group_type) :: child, container, root
   type(group_type) :: child_grps(1)
   type(variable_type) :: child_var, root_var
@@ -25,8 +26,8 @@ module subroutine group_model(passed)
   child_grps(1) = child
   container = dataset("container", grps=child_grps)
   root = dataset("/", vars=[root_var], atts=["title".att."root group", &
-    & "scale".att.[1.5_real32], "offset".att.[-999.0_real64], &
-    & "compact".att.[2.1760000000000002_real64]], grps=child_grps)
+    & "scale".att. [1.5_real32], "offset".att. [-999.0_real64], &
+    & "compact".att. [2.1760000000000002_real64]], grps=child_grps)
 
   root_at = 0
   dims_at = 0
@@ -55,17 +56,28 @@ module subroutine group_model(passed)
       read (file_unit, "(a)", iostat=iostat) line
       if (iostat /= 0) exit
       line_number = line_number + 1
-      if (index(line, "group: / {") > 0 .and. root_at == 0) root_at = line_number
-      if (index(line, "dimensions:") > 0 .and. dims_at == 0) dims_at = line_number
-      if (index(line, "variables:") > 0 .and. vars_at == 0) vars_at = line_number
-      if (index(line, "// global attributes:") > 0 .and. atts_at == 0) atts_at = line_number
-      if (index(line, "groups:") > 0 .and. groups_at == 0) groups_at = line_number
-      if (index(line, "    group: child {") > 0) child_at = line_number
-      if (index(line, 'char:title = "root group" ;') > 0) root_title_found = .true.
-      if (index(line, 'char:title = "child group" ;') > 0) child_title_found = .true.
-      if (index(line, "float:scale = 1.5 ;") > 0) scale_found = .true.
-      if (index(line, "double:offset = -999.0 ;") > 0) offset_found = .true.
-      if (index(line, "double:compact = 2.176 ;") > 0) compact_found = .true.
+      if (index(line, "group: / {") > 0 .and. root_at == 0) &
+        & root_at = line_number
+      if (index(line, "dimensions:") > 0 .and. dims_at == 0) &
+        & dims_at = line_number
+      if (index(line, "variables:") > 0 .and. vars_at == 0) &
+        & vars_at = line_number
+      if (index(line, "// global attributes:") > 0 .and. atts_at == 0) &
+        & atts_at = line_number
+      if (index(line, "groups:") > 0 .and. groups_at == 0) &
+        & groups_at = line_number
+      if (index(line, "    group: child {") > 0) &
+        & child_at = line_number
+      if (index(line, 'char:title = "root group" ;') > 0) &
+        & root_title_found = .true.
+      if (index(line, 'char:title = "child group" ;') > 0) &
+        & child_title_found = .true.
+      if (index(line, "float:scale = 1.5 ;") > 0) &
+        & scale_found = .true.
+      if (index(line, "double:offset = -999.0 ;") > 0) &
+        & offset_found = .true.
+      if (index(line, "double:compact = 2.176 ;") > 0) &
+        & compact_found = .true.
     end do
     close (file_unit)
   end if
@@ -73,14 +85,20 @@ module subroutine group_model(passed)
   passed = root%name == "/" .and. &
     & size(root%dims) == 1 .and. root%dims(1)%name == "root_x" .and. &
     & size(root%vars) == 1 .and. size(root%atts) == 4 .and. &
-    & associated(root%grps) .and. size(root%grps) == 1 .and. root%grps(1)%name == "child" .and. &
-    & size(root%grps(1)%dims) == 1 .and. root%grps(1)%dims(1)%name == "child_x" .and. &
-    & container%name == "container" .and. .not. allocated(container%dims) .and. &
-    & .not. allocated(container%vars) .and. associated(container%grps) .and. &
+    & associated(root%grps) .and. size(root%grps) == 1 .and. &
+    & root%grps(1)%name == "child" .and. &
+    & size(root%grps(1)%dims) == 1 .and. &
+    & root%grps(1)%dims(1)%name == "child_x" .and. &
+    & container%name == "container" .and. &
+    & .not. allocated(container%dims) .and. &
+    & .not. allocated(container%vars) .and. &
+    & associated(container%grps) .and. &
     & container%grps(1)%name == "child" .and. &
     & root_at > 0 .and. root_at < dims_at .and. dims_at < vars_at .and. &
-    & vars_at < atts_at .and. atts_at < groups_at .and. groups_at < child_at .and. &
-    & root_title_found .and. child_title_found .and. scale_found .and. offset_found .and. compact_found
+    & vars_at < atts_at .and. atts_at < groups_at .and. &
+    & groups_at < child_at .and. &
+    & root_title_found .and. child_title_found .and. scale_found .and. &
+    & offset_found .and. compact_found
 end subroutine group_model
 
 !> Write recursive group descriptions through both group serialization APIs.
@@ -175,20 +193,22 @@ module subroutine group_write(passed)
     call close_dataset(nc)
     return
   end if
-  parent_on_disk = inquire_group(top_level(1), inq_grps=.true., recursive=.true., &
-    & error=error)
+  parent_on_disk = inquire_group(top_level(1), inq_grps=.true., &
+    & recursive=.true., error=error)
   if ((error%code /= NC_NOERR)) then
     call close_dataset(nc)
     return
   end if
   call close_dataset(nc, error)
   if ((error%code /= NC_NOERR)) return
-  if (.not. (associated(parent_on_disk%grps) .and. size(parent_on_disk%grps) == 1 .and. &
+  if (.not. (associated(parent_on_disk%grps) .and. &
+    & size(parent_on_disk%grps) == 1 .and. &
     & parent_on_disk%grps(1)%name == "child")) return
 
   invalid = dataset("/")
   top_level_input(1) = invalid
-  call to_netcdf(TEST_RESULTS_DIR//"invalid-root-child.nc", top_level_input(:1), error=error)
+  call to_netcdf(TEST_RESULTS_DIR//"invalid-root-child.nc", &
+    & top_level_input(:1), error=error)
   passed = (error%code /= NC_NOERR) .and. error%code == NC_EINVAL
 end subroutine group_write
 

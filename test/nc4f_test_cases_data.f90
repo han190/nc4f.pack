@@ -9,9 +9,11 @@ module subroutine sum_vars_test(passed)
   !> Input/output argument(s): `passed`.
   logical, intent(inout) :: passed
   real(real64), parameter :: a(2, 3) = reshape([ &
-    & 1.0_real64, 2.0_real64, 3.0_real64, 4.0_real64, 5.0_real64, 6.0_real64], [2, 3])
+    & 1.0_real64, 2.0_real64, 3.0_real64, 4.0_real64, &
+    & 5.0_real64, 6.0_real64], [2, 3])
   real(real64), parameter :: b(2, 3) = reshape([ &
-    & 10.0_real64, 20.0_real64, 30.0_real64, 40.0_real64, 50.0_real64, 60.0_real64], [2, 3])
+    & 10.0_real64, 20.0_real64, 30.0_real64, 40.0_real64, &
+    & 50.0_real64, 60.0_real64], [2, 3])
   real(real64), parameter :: c(2, 3) = -a
   real(real64), pointer :: actual(:, :)
   type(variable_type) :: result, vars(3)
@@ -22,7 +24,8 @@ module subroutine sum_vars_test(passed)
   result = sum(vars)
   call extract(result, actual)
 
-  passed = all(abs(actual - b) <= epsilon(b)) .and. all(result%dims == vars(1)%dims)
+  passed = all(abs(actual - b) <= epsilon(b)) .and. &
+    & all(result%dims == vars(1)%dims)
 end subroutine sum_vars_test
 
 !> Execute `sfc_pres_temp_wr`.
@@ -116,7 +119,8 @@ module subroutine extensive_wr(passed)
 
   vars = extensive_variables()
   call to_netcdf(TEST_RESULTS_DIR//"extensive.nc", vars, extensive_attributes())
-  inquire (file=TEST_RESULTS_DIR//"extensive.nc", exist=file_exists, size=file_size)
+  inquire (file=TEST_RESULTS_DIR//"extensive.nc", &
+    & exist=file_exists, size=file_size)
   passed = file_exists
   if (passed) passed = file_size > 0
 end subroutine extensive_wr
@@ -136,7 +140,8 @@ module subroutine extensive_rd(passed)
 
   expected = extensive_variables()
   expected_atts = extensive_attributes()
-  nc = open_dataset(TEST_RESULTS_DIR//"extensive.nc", "r", inq_dims=.true., inq_atts=.true.)
+  nc = open_dataset(TEST_RESULTS_DIR//"extensive.nc", "r", &
+    & inq_dims=.true., inq_atts=.true.)
   actual = get_variable(nc, names)
 
   passed = size(actual) == size(expected)
@@ -195,8 +200,8 @@ module subroutine nasa_cosp_read(passed)
   nasa_read: block
     grps = inquire_groups(nc, error)
     if ((error%code /= NC_NOERR)) exit nasa_read
-    root = inquire_group(nc, inq_dims=.true., inq_atts=.true., inq_vars=.true., &
-      & inq_grps=.true., recursive=.true., error=error)
+   root = inquire_group(nc, inq_dims=.true., inq_atts=.true., &
+    & inq_vars=.true., inq_grps=.true., recursive=.true., error=error)
     if ((error%code /= NC_NOERR)) exit nasa_read
     nc%dims = root%dims
     nc%atts = root%atts
@@ -213,8 +218,8 @@ module subroutine nasa_cosp_read(passed)
 
     solar_zenith = get_group(nc, "Solar_Zenith", error)
     if ((error%code /= NC_NOERR)) exit nasa_read
-    solar_zenith = inquire_group(solar_zenith, inq_dims=.true., inq_atts=.true., &
-      & inq_vars=.true., inq_grps=.true., error=error)
+    solar_zenith = inquire_group(solar_zenith, inq_dims=.true., &
+      & inq_atts=.true., inq_vars=.true., inq_grps=.true., error=error)
     if ((error%code /= NC_NOERR)) exit nasa_read
 
     latitude_var = get_variable(nc, "latitude", error)
@@ -237,7 +242,8 @@ module subroutine nasa_cosp_read(passed)
     if (len(yaml) <= 1024) exit nasa_read
 
     passed = size(nc%dims) == 9 .and. size(grps) == 23 .and. &
-      & grps(1)%name == "Solar_Zenith" .and. solar_zenith%name == "Solar_Zenith" .and. &
+      & grps(1)%name == "Solar_Zenith" .and. &
+      & solar_zenith%name == "Solar_Zenith" .and. &
       & size(solar_zenith%dims) == 0 .and. size(solar_zenith%atts) == 7 .and. &
       & size(solar_zenith%vars) == 5 .and. associated(solar_zenith%grps) .and. &
       & size(solar_zenith%grps) == 0 .and. &
@@ -268,7 +274,8 @@ module subroutine ecmwf_era40_read(passed)
   character(len=:), pointer :: conventions, longitude_units, temperature_units
   integer(int16), pointer :: temperature(:, :, :)
   real(real32), pointer :: latitude(:), longitude(:)
-  type(attribute_type) :: conventions_att, longitude_units_att, temperature_units_att
+  type(attribute_type) :: conventions_att, &
+    & longitude_units_att, temperature_units_att
   type(error_type) :: error
   type(netcdf_type) :: nc
   type(variable_type) :: latitude_var, longitude_var, temperature_var
@@ -276,7 +283,8 @@ module subroutine ecmwf_era40_read(passed)
 
   passed = .false.
   is_open = .false.
-  nullify (conventions, longitude_units, temperature_units, temperature, latitude, longitude)
+  nullify (conventions, longitude_units, &
+    & temperature_units, temperature, latitude, longitude)
   nc = open_dataset(SAMPLE_FILE, "r", inq_dims=.true., error=error)
   if ((error%code /= NC_NOERR)) return
   is_open = .true.
@@ -301,9 +309,12 @@ module subroutine ecmwf_era40_read(passed)
     call extract(conventions_att, conventions)
     call extract(longitude_units_att, longitude_units)
     call extract(temperature_units_att, temperature_units)
-    if (.not. associated(conventions) .or. .not. associated(longitude_units) .or. &
-      & .not. associated(temperature_units) .or. .not. associated(temperature) .or. &
-      & .not. associated(latitude) .or. .not. associated(longitude)) exit era40_read
+    if (.not. associated(conventions) .or. &
+      & .not. associated(longitude_units) .or. &
+      & .not. associated(temperature_units) .or. &
+      & .not. associated(temperature) .or. &
+      & .not. associated(latitude) .or. &
+      & .not. associated(longitude)) exit era40_read
 
     passed = size(nc%dims) == 3 .and. &
       & size(latitude) == 73 .and. size(longitude) == 144 .and. &
@@ -355,8 +366,8 @@ module subroutine sresa1b_ccsm3_read(passed)
   ccsm3_read: block
     grps = inquire_groups(nc, error)
     if (error%code /= NC_NOERR) exit ccsm3_read
-    root = inquire_group(nc, inq_dims=.true., inq_atts=.true., inq_vars=.true., &
-      & inq_grps=.true., error=error)
+    root = inquire_group(nc, inq_dims=.true., inq_atts=.true., &
+      & inq_vars=.true., inq_grps=.true., error=error)
     if (error%code /= NC_NOERR) exit ccsm3_read
     tas = get_variable(nc, "tas", [1, 1, 1], [4, 3, 1], error)
     if (error%code /= NC_NOERR) exit ccsm3_read
@@ -379,7 +390,8 @@ module subroutine sresa1b_ccsm3_read(passed)
       & all(shape(values) == [4, 3, 1]) .and. &
       & all(values > 100.0_real32 .and. values < 400.0_real32) .and. &
       & tas%dims(1)%name == "lon" .and. tas%dims(2)%name == "lat" .and. &
-      & tas%dims(3)%name == "time" .and. starts_with(conventions, "CF-1.0") .and. &
+      & tas%dims(3)%name == "time" .and. &
+      & starts_with(conventions, "CF-1.0") .and. &
       & starts_with(units, "K")
   end block ccsm3_read
 
@@ -408,16 +420,19 @@ module subroutine sample_uddtio(passed)
     & "latitude = 180 ;", "longitude = 144 ;", "lat = 64 ;", "lat = 128 ;", &
     & "lat = 96 ;", "lon = 180 ;"]
   character(len=128), parameter :: variables(6) = [character(len=128) :: &
-    & "double latitude(latitude) ;", "float longitude(longitude) ;", "double lat(lat) ;", &
+    & "double latitude(latitude) ;", "float longitude(longitude) ;", &
+    & "double lat(lat) ;", &
     & "float lat(lat) ;", "float abso4(lon, lat, time) ;", "double lon(lon) ;"]
-  character(len=128), parameter :: variable_attributes(6) = [character(len=128) :: &
+  character(len=128), parameter :: variable_attributes(6) = &
+    & [character(len=128) :: &
     & 'char:units = "degrees_north" ;', 'char:units = "degrees_east" ;', &
     & 'char:units = "degrees_north" ;', 'char:units = "degrees_north" ;', &
     & 'char:units = "kg/m**2" ;', 'char:units = "degrees_east" ;']
   character(len=128), parameter :: attributes(6) = [character(len=128) :: &
     & 'char:Yori_version = "1.3.13" ;', 'char:Conventions = "CF-1.0" ;', &
     & 'char:Conventions = "CF-1.0" ;', 'int:realization = 1 ;', &
-    & 'char:CDI = "Climate Data Interface version 1.4.6 (http://code.zmaw.de/projects/cdi)" ;', &
+    & 'char:CDI = "Climate Data Interface version 1.4.6 ('// &
+    & 'http://code.zmaw.de/projects/cdi)" ;', &
     & 'int:realization = 1 ;']
   character(len=32), parameter :: child_groups(6) = [character(len=32) :: &
     & "group: Solar_Zenith {", "", "", "", "", ""]
@@ -425,15 +440,17 @@ module subroutine sample_uddtio(passed)
 
   passed = .false.
   do i = 1, size(files)
-    if (.not. render_sample_uddtio_(trim(files(i)), trim(labels(i)), trim(dimensions(i)), &
-      & trim(variables(i)), trim(variable_attributes(i)), trim(attributes(i)), trim(child_groups(i)))) return
+    if (.not. render_sample_uddtio_(trim(files(i)), trim(labels(i)), &
+      & trim(dimensions(i)), trim(variables(i)), &
+      & trim(variable_attributes(i)), trim(attributes(i)), &
+      & trim(child_groups(i)))) return
   end do
   passed = .true.
 end subroutine sample_uddtio
 
 !> Render one externally produced NetCDF fixture and verify key output lines.
-function render_sample_uddtio_(filename, label, expected_dim, expected_var, expected_var_att, &
-  & expected_att, expected_group) result(rendered)
+function render_sample_uddtio_(filename, label, expected_dim, expected_var, &
+  & expected_var_att, expected_att, expected_group) result(rendered)
   !> Input argument: `filename`.
   character(len=*), intent(in) :: filename
   !> Input argument: `label`.
@@ -453,17 +470,18 @@ function render_sample_uddtio_(filename, label, expected_dim, expected_var, expe
   character(len=256) :: line
   character(len=:), allocatable :: expected_header, output_file
   integer :: base, extension, file_unit, iostat
-  logical :: attribute_found, child_group_found, dataset_found, dimension_found, variable_attribute_found, variable_found
+  logical :: attribute_found, child_group_found, dataset_found, &
+    & dimension_found, variable_attribute_found, variable_found
   type(error_type) :: error
   type(group_type) :: description
   type(netcdf_type) :: nc
 
   rendered = .false.
   nc = open_dataset(filename, "r", error=error)
-  if (.exists. error) return
-  description = inquire_group(nc, inq_dims=.true., inq_atts=.true., inq_vars=.true., &
-    & inq_grps=.true., recursive=.true., error=error)
-  if (.exists. error) then
+  if (.exists.error) return
+  description = inquire_group(nc, inq_dims=.true., inq_atts=.true., &
+    & inq_vars=.true., inq_grps=.true., recursive=.true., error=error)
+  if (.exists.error) then
     call close_dataset(nc)
     return
   end if
@@ -481,7 +499,8 @@ function render_sample_uddtio_(filename, label, expected_dim, expected_var, expe
   end if
 
   output_file = TEST_RESULTS_DIR//label//"_uddtio.txt"
-  open (newunit=file_unit, file=output_file, status="replace", action="write", iostat=iostat)
+  open (newunit=file_unit, file=output_file, &
+    & status="replace", action="write", iostat=iostat)
   if (iostat == 0) then
     write (file_unit, "(dt)", iostat=iostat) nc
     close (file_unit, iostat=iostat)
@@ -497,7 +516,8 @@ function render_sample_uddtio_(filename, label, expected_dim, expected_var, expe
   variable_attribute_found = .false.
   attribute_found = .false.
   child_group_found = len(expected_group) == 0
-  open (newunit=file_unit, file=output_file, status="old", action="read", iostat=iostat)
+  open (newunit=file_unit, file=output_file, &
+    & status="old", action="read", iostat=iostat)
   if (iostat == 0) then
     do
       read (file_unit, "(a)", iostat=iostat) line
@@ -512,8 +532,10 @@ function render_sample_uddtio_(filename, label, expected_dim, expected_var, expe
     close (file_unit)
   end if
   call close_dataset(nc, error)
-  if (.exists. error) return
-  rendered = dataset_found .and. dimension_found .and. variable_found .and. variable_attribute_found .and. &
+  if (.exists.error) return
+  rendered = dataset_found .and. dimension_found .and. &
+    & variable_found .and. &
+    & variable_attribute_found .and. &
     & attribute_found .and. child_group_found
 end function render_sample_uddtio_
 
@@ -521,7 +543,8 @@ end function render_sample_uddtio_
 module subroutine cami_initial_read(passed)
   !> Input/output argument: `passed`.
   logical, intent(inout) :: passed
-  character(*), parameter :: SAMPLE_FILE = "data/cami_0000-09-01_64x128_L26_c030918.nc"
+  character(*), parameter :: SAMPLE_FILE = &
+    & "data/cami_0000-09-01_64x128_L26_c030918.nc"
   character(len=:), pointer :: conventions, units
   real(real64), pointer :: values(:, :, :, :)
   type(attribute_type) :: conventions_att, units_att
@@ -542,8 +565,8 @@ module subroutine cami_initial_read(passed)
   cami_read: block
     grps = inquire_groups(nc, error)
     if (error%code /= NC_NOERR) exit cami_read
-    root = inquire_group(nc, inq_dims=.true., inq_atts=.true., inq_vars=.true., &
-      & inq_grps=.true., error=error)
+    root = inquire_group(nc, inq_dims=.true., inq_atts=.true., &
+      & inq_vars=.true., inq_grps=.true., error=error)
     if (error%code /= NC_NOERR) exit cami_read
     temperature = get_variable(nc, "T", [1, 1, 1, 1], [2, 3, 4, 1], error)
     if (error%code /= NC_NOERR) exit cami_read
@@ -606,8 +629,8 @@ module subroutine tos_o1_read(passed)
   tos_read: block
     grps = inquire_groups(nc, error)
     if (error%code /= NC_NOERR) exit tos_read
-    root = inquire_group(nc, inq_dims=.true., inq_atts=.true., inq_vars=.true., &
-      & inq_grps=.true., error=error)
+    root = inquire_group(nc, inq_dims=.true., inq_atts=.true., &
+      & inq_vars=.true., inq_grps=.true., error=error)
     if (error%code /= NC_NOERR) exit tos_read
     tos = get_variable(nc, "tos", [1, 85, 1], [4, 3, 2], error)
     if (error%code /= NC_NOERR) exit tos_read
@@ -628,7 +651,8 @@ module subroutine tos_o1_read(passed)
       & has_dim(root%dims, "time", 24_int64, .true.) .and. &
       & all(shape(values) == [4, 3, 2]) .and. &
       & tos%dims(1)%name == "lon" .and. tos%dims(2)%name == "lat" .and. &
-      & tos%dims(3)%name == "time" .and. conventions == "CF-1.0" .and. units == "K"
+      & tos%dims(3)%name == "time" .and. &
+      & conventions == "CF-1.0" .and. units == "K"
   end block tos_read
 
   if (associated(conventions)) deallocate (conventions)
@@ -664,8 +688,8 @@ module subroutine echam_spectral_read(passed)
   echam_read: block
     grps = inquire_groups(nc, error)
     if (error%code /= NC_NOERR) exit echam_read
-    root = inquire_group(nc, inq_dims=.true., inq_atts=.true., inq_vars=.true., &
-      & inq_grps=.true., error=error)
+    root = inquire_group(nc, inq_dims=.true., inq_atts=.true., &
+      & inq_vars=.true., inq_grps=.true., error=error)
     if (error%code /= NC_NOERR) exit echam_read
     lsp = get_variable(nc, "lsp", [1, 1, 1], [2, 4, 1], error)
     if (error%code /= NC_NOERR) exit echam_read
@@ -689,7 +713,8 @@ module subroutine echam_spectral_read(passed)
       & all(shape(values) == [2, 4, 1]) .and. &
       & all(abs(values) < 20.0_real32) .and. &
       & lsp%dims(1)%name == "complex" .and. lsp%dims(2)%name == "spc" .and. &
-      & lsp%dims(3)%name == "time" .and. starts_with(conventions, "CF-1.0") .and. &
+      & lsp%dims(3)%name == "time" .and. &
+      & starts_with(conventions, "CF-1.0") .and. &
       & starts_with(grid_type, "spectral")
   end block echam_read
 
@@ -752,24 +777,37 @@ function extensive_variables() result(vars)
   dims = ["d1".dim.2, "d2".dim.2, "d3".dim.2, "d4".dim.2, &
     & "d5".dim.2, "d6".dim.2, "d7".dim.2]
   int8_values = [-7_int8, 12_int8]
-  int16_values = reshape([(int(10*i - 25, int16), i=1, size(int16_values))], shape(int16_values))
-  int32_values = reshape([(int(100*i - 450, int32), i=1, size(int32_values))], shape(int32_values))
-  int64_values = reshape([(int(1000*i - 8500, int64), i=1, size(int64_values))], shape(int64_values))
-  real32_values_5d = reshape([(real(i - 17, real32)/3.0_real32, i=1, size(real32_values_5d))], &
+  int16_values = reshape([(int(10*i - 25, int16), &
+    & i=1, size(int16_values))], shape(int16_values))
+  int32_values = reshape([(int(100*i - 450, int32), &
+    & i=1, size(int32_values))], shape(int32_values))
+  int64_values = reshape([(int(1000*i - 8500, int64), &
+    & i=1, size(int64_values))], shape(int64_values))
+  real32_values_5d = reshape([ &
+    & (real(i - 17, real32)/3.0_real32, i=1, size(real32_values_5d))], &
     & shape(real32_values_5d))
-  real64_values_6d = reshape([(real(i - 33, real64)/7.0_real64, i=1, size(real64_values_6d))], &
+  real64_values_6d = reshape([ &
+    & (real(i - 33, real64)/7.0_real64, i=1, size(real64_values_6d))], &
     & shape(real64_values_6d))
-  real32_values_7d = reshape([(real(i - 65, real32)/11.0_real32, i=1, size(real32_values_7d))], &
+  real32_values_7d = reshape([ &
+    & (real(i - 65, real32)/11.0_real32, i=1, size(real32_values_7d))], &
     & shape(real32_values_7d))
 
   vars = [ &
-    & datarray("int8_rank1", int8_values, dims(:1), ["marker".att. (-7_int8)]), &
-    & datarray("int16_rank2", int16_values, dims(:2), ["marker".att. (-15_int16)]), &
-    & datarray("int32_rank3", int32_values, dims(:3), ["marker".att.350_int32]), &
-    & datarray("int64_rank4", int64_values, dims(:4), ["marker".att.7500_int64]), &
-    & datarray("real32_rank5", real32_values_5d, dims(:5), ["marker".att.1.25_real32]), &
-    & datarray("real64_rank6", real64_values_6d, dims(:6), ["marker".att.2.5_real64]), &
-    & datarray("real32_rank7", real32_values_7d, dims, ["description".att."rank-seven variable"])]
+    & datarray("int8_rank1", int8_values, dims(:1), &
+    &   ["marker".att. (-7_int8)]), &
+    & datarray("int16_rank2", int16_values, dims(:2), &
+    &   ["marker".att. (-15_int16)]), &
+    & datarray("int32_rank3", int32_values, dims(:3), &
+    &   ["marker".att.350_int32]), &
+    & datarray("int64_rank4", int64_values, dims(:4), &
+    &   ["marker".att.7500_int64]), &
+    & datarray("real32_rank5", real32_values_5d, dims(:5), &
+    &   ["marker".att.1.25_real32]), &
+    & datarray("real64_rank6", real64_values_6d, dims(:6), &
+    &   ["marker".att.2.5_real64]), &
+    & datarray("real32_rank7", real32_values_7d, dims, &
+    &   ["description".att."rank-seven variable"])]
 end function extensive_variables
 
 !> Compute `extensive_attributes`.

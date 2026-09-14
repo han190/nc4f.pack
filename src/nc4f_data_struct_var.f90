@@ -13,7 +13,8 @@ module subroutine init_var_mold(var, mold)
   type(variable_type), intent(in) :: mold
 
   if (allocated(mold%atts)) then
-    call init_var(var, mold%name, mold%dtype, mold%len, mold%dims, atts=mold%atts)
+    call init_var(var, mold%name, mold%dtype, &
+      & mold%len, mold%dims, atts=mold%atts)
   else
     call init_var(var, mold%name, mold%dtype, mold%len, mold%dims)
   end if
@@ -29,7 +30,8 @@ module pure function get_size(var, dim) result(n)
   integer(int64) :: n
   integer :: dim_, i
 
-  if (.not. allocated(var%dims)) error stop "[size] Variable dimensions are not allocated."
+  if (.not. allocated(var%dims)) error stop &
+    & "[size] Variable dimensions are not allocated."
   dim_ = 0
   if (present(dim)) dim_ = dim
 
@@ -60,7 +62,8 @@ module pure function get_shape(var) result(extents)
   integer, allocatable :: extents(:)
   integer :: i
 
-  if (.not. allocated(var%dims)) error stop "[shape] Variable dimensions are not allocated."
+  if (.not. allocated(var%dims)) error stop &
+    & "[shape] Variable dimensions are not allocated."
   allocate (extents(size(var%dims)))
   do i = 1, size(var%dims)
     if (var%dims(i)%len > int(huge(extents(i)), int64)) then

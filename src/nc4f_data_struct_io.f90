@@ -288,7 +288,9 @@ function render_dim_(dim, indent) result(line)
 
   write (len_text, "(i0)") dim%len
   if (dim%is_unlim) then
-    line = indent//dim%name//" = UNLIMITED ; // ("//trim(len_text)//" currently)"
+    associate (unlim => " = UNLIMITED ; // (")
+      line = indent//dim%name//unlim//trim(len_text)//" currently)"
+    end associate
   else
     line = indent//dim%name//" = "//trim(len_text)//" ;"
   end if
@@ -341,7 +343,8 @@ function render_att_value_(att) result(rendered)
   end if
 
   select case (att%dtype)
-  case (BYTE_TYPE, CHAR_TYPE, SHORT_TYPE, INT_TYPE, INT64_TYPE, FLOAT_TYPE, DOUBLE_TYPE)
+  case (BYTE_TYPE, CHAR_TYPE, SHORT_TYPE, &
+    & INT_TYPE, INT64_TYPE, FLOAT_TYPE, DOUBLE_TYPE)
     nbytes = buffer_size(att%dtype, att%len, "[render_att_value]")
     if (size(att%buffer, kind=int64) < int(nbytes, int64)) then
       rendered = "unavailable"

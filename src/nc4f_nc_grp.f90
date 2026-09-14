@@ -78,7 +78,8 @@ module function inq_grp(group, inq_dims, inq_atts, inq_vars, &
       description%grps = children
     end if
     if (.not. has_error(operation_error) .and. descend) then
-      call materialize_children(description%grps, want_dims, want_atts, want_vars, operation_error)
+      call materialize_children(description%grps, &
+        & want_dims, want_atts, want_vars, operation_error)
     end if
   end if
 

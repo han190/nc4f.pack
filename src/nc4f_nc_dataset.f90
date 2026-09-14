@@ -3,7 +3,8 @@ implicit none (type, external)
 contains
 
 !> Open or create a dataset and return a `netcdf_type` handle.
-module function open_dataset(filename, mode, inq_dims, inq_atts, error) result(nc)
+module function open_dataset(filename, mode, inq_dims, inq_atts, error) &
+  & result(nc)
   !> Path to the dataset file.
   character(len=*), intent(in) :: filename
   !> Mode to open the file: 'r' for read, 'w' to recreate, or 'a' for
@@ -110,7 +111,9 @@ function open_dataset_(filename, mode, inq_dims, inq_atts, error) result(nc)
     end if
 
   case default
-    write (msg, "('[open_dataset]', 1x, 'Invalid mode:', 1x, a)") trim(open_mode)
+    associate (fmt => "('[open_dataset]', 1x, 'Invalid mode:', 1x, a)")
+      write (msg, fmt) trim(open_mode)
+    end associate
     error = error_type(NC_EINVAL, clip(msg))
     return
   end select

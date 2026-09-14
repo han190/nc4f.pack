@@ -14,9 +14,9 @@ public :: &
   NC_ENOTATT, NC_ENOTFOUND, NC_ENOTVAR, NC_NOERR
 public :: &
   datarray, dataset, extract, initialize, &
-  operator(.att.), operator( .and. ), operator(.dim.), &
+  operator(.att.), operator(.and.), operator(.dim.), &
   operator(==), operator(/=), operator(.exists.), &
-  shape, size, sum, write (formatted)
+  shape, size, sum, write(formatted)
 public :: &
   open_dataset, close_dataset, to_netcdf, &
   inquire_dimensions, inquire_variable, &

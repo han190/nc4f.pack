@@ -33,7 +33,8 @@ module subroutine simple_rd(passed)
   type(error_type) :: error
   character(len=1024) :: stdout
 
-  nc = open_dataset(TEST_RESULTS_DIR//"file_that_does_not_exist.nc", error=error)
+  nc = open_dataset(TEST_RESULTS_DIR// &
+    & "file_that_does_not_exist.nc", error=error)
   passed = .exists.error
   if (.not. passed) return
 
@@ -55,7 +56,8 @@ end subroutine simple_rd
 module subroutine character_variables(passed)
   !> Input/output argument(s): `passed`.
   logical, intent(inout) :: passed
-  character, parameter :: values(2, 3) = reshape(["a", "b", "c", "d", "e", "f"], [2, 3])
+  character, parameter :: values(2, 3) = &
+    & reshape(["a", "b", "c", "d", "e", "f"], [2, 3])
   character, pointer :: actual_values(:, :)
   type(error_type) :: error
   type(netcdf_type) :: nc

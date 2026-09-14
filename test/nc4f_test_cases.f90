@@ -1,17 +1,20 @@
 module nc4f_test_cases
 
-use, intrinsic :: iso_fortran_env, only: int8, int16, int32, int64, real32, real64
+use, intrinsic :: iso_fortran_env, only: int8, int16, int32, int64, real32, &
+  & real64
 use, non_intrinsic :: nc4f
 implicit none (type, external)
 
 public :: simple_wr, simple_rd, character_variables, buffer_edges
 public :: creation_policy, error_handling
 public :: hyperslab_rd, hyperslab_wr, unlimited_wr, unlimited_dims
-public :: sum_vars_test, sfc_pres_temp_wr, sfc_pres_temp_rd, extensive_wr, extensive_rd
+public :: sum_vars_test, sfc_pres_temp_wr, &
+  & sfc_pres_temp_rd, extensive_wr, extensive_rd
 public :: group_model, group_write
 public :: nasa_cosp_read
 public :: ecmwf_era40_read
-public :: sresa1b_ccsm3_read, sample_uddtio, cami_initial_read, tos_o1_read, echam_spectral_read
+public :: sresa1b_ccsm3_read, sample_uddtio, &
+  & cami_initial_read, tos_o1_read, echam_spectral_read
 public :: copy_semantics
 public :: data_model
 private

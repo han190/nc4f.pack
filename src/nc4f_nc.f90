@@ -229,7 +229,8 @@ interface
   end function neq_att
 
   !> Open or create a dataset and return a `netcdf_type` handle.
-  module function open_dataset(filename, mode, inq_dims, inq_atts, error) result(nc)
+  module function open_dataset(filename, mode, inq_dims, inq_atts, error) &
+    & result(nc)
     !> Path to the dataset file.
     character(len=*), intent(in) :: filename
     !> Mode to open the file: 'r' for read, 'w' to recreate, or 'a' for

@@ -38,9 +38,11 @@ end subroutine hyperslab_rd
 module subroutine hyperslab_wr(passed)
   !> Input/output argument(s): `passed`.
   logical, intent(inout) :: passed
-  integer(int32), parameter :: initial(2, 3) = reshape([1_int32, 2_int32, 3_int32, &
+  integer(int32), parameter :: initial(2, 3) = &
+    & reshape([1_int32, 2_int32, 3_int32, &
     & 4_int32, 5_int32, 6_int32], [2, 3])
-  integer(int32), parameter :: updates(2, 2) = reshape([7_int32, 8_int32, 9_int32, 10_int32], [2, 2])
+  integer(int32), parameter :: updates(2, 2) = &
+    & reshape([7_int32, 8_int32, 9_int32, 10_int32], [2, 2])
   integer(int32) :: expected(2, 5)
   integer(int32), pointer :: actual_values(:, :)
   type(error_type) :: error

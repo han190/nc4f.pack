@@ -243,7 +243,8 @@ interface
   end function nc_inq_grpname_full
 
   !> Return the parent group identifier.
-  function nc_inq_grp_parent(ncid, parent_ncid) bind(c, name="nc_inq_grp_parent")
+  function nc_inq_grp_parent(ncid, parent_ncid) &
+    & bind(c, name="nc_inq_grp_parent")
     import :: c_int
     !> Identifier of the group whose parent is queried.
     integer(c_int), value :: ncid
@@ -751,7 +752,8 @@ interface
     !> - NC_NOERR No error.
     !> - NC_EBADID Bad ncid.
     !> - NC_ENOTINDEFINE Not in define mode.
-    !> - NC_ESTRICTNC3 Attempting netcdf-4 operation on strict nc3 netcdf-4 file.
+    !> - NC_ESTRICTNC3 Attempting netcdf-4 operation on strict nc3
+    !>   netcdf-4 file.
     !> - NC_EMAXVARS NC_MAX_VARS exceeded [Not enforced after 4.5.0]
     !> - NC_EBADTYPE Bad type.
     !> - NC_EINVAL Invalid input.
