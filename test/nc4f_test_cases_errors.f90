@@ -44,7 +44,7 @@ module subroutine error_handling(passed)
   logical, intent(inout) :: passed
   real, parameter :: values(1) = [42.0]
   character(len=1024) :: stdout
-  integer :: io_stat
+  integer :: iostat
   type(attribute_type) :: att
   type(error_type) :: error
   type(netcdf_type) :: nc
@@ -62,8 +62,8 @@ module subroutine error_handling(passed)
   nc = open_dataset(TEST_RESULTS_DIR// &
     & "missing-error-fixture/no-file.nc", error=error)
   if (.not. (.exists.error .and. allocated(error%message))) return
-  write (stdout, "(dt)", iostat=io_stat) error
-  if (io_stat /= 0 .or. len_trim(stdout) == 0) return
+  write (stdout, "(dt)", iostat=iostat) error
+  if (iostat /= 0 .or. len_trim(stdout) == 0) return
 
   present = datarray("present", values, ["x".dim.1], ["units".att."1"])
   call to_netcdf(TEST_RESULTS_DIR//"error-handling.nc", present, error=error)

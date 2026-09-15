@@ -23,7 +23,7 @@ source-dir = "test"
 main = "nc4f_test.f90"
 
 [extra.fortitude.check]
-ignore = ['C002', 'C071', 'C072', 'C121']
+ignore = ['C002', 'C071', 'C072', 'C121', 'C152', 'C181']
 line-length = 120
 
 [extra.release]

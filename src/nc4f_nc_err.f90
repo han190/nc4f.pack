@@ -75,7 +75,7 @@ module function netcdf_message(status, context) result(message)
   end if
 
   if (present(context)) then
-    message = trim(status_message)//new_line('a')//clip(context)
+    message = trim(status_message)//new_line("a")//clip(context)
   else
     message = trim(status_message)
   end if

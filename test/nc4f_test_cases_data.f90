@@ -186,7 +186,7 @@ module subroutine nasa_cosp_read(passed)
   type(group_type) :: root, solar_zenith
   type(netcdf_type) :: nc
   type(variable_type) :: latitude_var, longitude_var
-  integer :: file_unit, io_stat
+  integer :: file_unit, iostat
   logical :: is_open, output_open
 
   passed = .false.
@@ -208,13 +208,13 @@ module subroutine nasa_cosp_read(passed)
     nc%vars = root%vars
     if (associated(root%grps)) nc%grps => root%grps
     open (newunit=file_unit, file=NETCDF_TYPE_RESULT_FILE, status="replace", &
-      & action="write", iostat=io_stat)
-    if (io_stat /= 0) exit nasa_read
+      & action="write", iostat=iostat)
+    if (iostat /= 0) exit nasa_read
     output_open = .true.
-    write (file_unit, "(dt)", iostat=io_stat) nc
-    close (file_unit, iostat=io_stat)
+    write (file_unit, "(dt)", iostat=iostat) nc
+    close (file_unit, iostat=iostat)
     output_open = .false.
-    if (io_stat /= 0) exit nasa_read
+    if (iostat /= 0) exit nasa_read
 
     solar_zenith = get_group(nc, "Solar_Zenith", error)
     if ((error%code /= NC_NOERR)) exit nasa_read
@@ -430,10 +430,10 @@ module subroutine sample_uddtio(passed)
     & 'char:units = "kg/m**2" ;', 'char:units = "degrees_east" ;']
   character(len=128), parameter :: attributes(6) = [character(len=128) :: &
     & 'char:Yori_version = "1.3.13" ;', 'char:Conventions = "CF-1.0" ;', &
-    & 'char:Conventions = "CF-1.0" ;', 'int:realization = 1 ;', &
+    & 'char:Conventions = "CF-1.0" ;', "int:realization = 1 ;", &
     & 'char:CDI = "Climate Data Interface version 1.4.6 ('// &
     & 'http://code.zmaw.de/projects/cdi)" ;', &
-    & 'int:realization = 1 ;']
+    & "int:realization = 1 ;"]
   character(len=32), parameter :: child_groups(6) = [character(len=32) :: &
     & "group: Solar_Zenith {", "", "", "", "", ""]
   integer :: i

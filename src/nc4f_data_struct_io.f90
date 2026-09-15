@@ -180,9 +180,9 @@ recursive function render_grp(grp, depth) result(text)
   indent = repeat(" ", 4*depth)
   name = "/"
   if (allocated(grp%name)) name = grp%name
-  text = indent//"group: "//trim(name)//" {"//new_line('a')
+  text = indent//"group: "//trim(name)//" {"//new_line("a")
 
-  text = text//render_grp_body(grp, indent, depth)
+  text = text//render_grp_(grp, indent, depth)
   text = text//indent//"}"
 end function render_grp
 
@@ -196,13 +196,13 @@ function render_netcdf(nc) result(text)
 
   name = "unnamed"
   if (allocated(nc%filename)) name = filename_stem(nc%filename)
-  text = "netcdf "//name//" {"//new_line('a')
-  text = text//render_grp_body(nc, "", 0)
+  text = "netcdf "//name//" {"//new_line("a")
+  text = text//render_grp_(nc, "", 0)
   text = text//"}"
 end function render_netcdf
 
 !> Compute the contents of a group in ncdump-like formatted output.
-recursive function render_grp_body(grp, indent, depth) result(text)
+recursive function render_grp_(grp, indent, depth) result(text)
   !> Input argument: `grp`.
   class(group_type), intent(in) :: grp
   !> Input argument: `indent`.
@@ -213,39 +213,13 @@ recursive function render_grp_body(grp, indent, depth) result(text)
   character(len=:), allocatable :: text
   character, allocatable :: buffer(:)
   integer :: i, used
-  character(len=:), allocatable :: ind
-  character, parameter :: nl = new_line('a')
+  character, parameter :: nl = new_line("a")
 
   used = 0
-  ind = indent//repeat(" ", 4)
 
-  if (allocated(grp%dims)) then
-    if (size(grp%dims) > 0) then
-      call append(buffer, used, indent//"dimensions:"//nl)
-      do i = 1, size(grp%dims)
-        call append(buffer, used, render_dim(grp%dims(i), ind)//nl)
-      end do
-    end if
-  end if
-
-  if (allocated(grp%vars)) then
-    if (size(grp%vars) > 0) then
-      call append(buffer, used, indent//"variables:"//nl)
-      do i = 1, size(grp%vars)
-        call append(buffer, used, render_var(grp%vars(i), ind)//nl)
-      end do
-    end if
-  end if
-
-  if (allocated(grp%atts)) then
-    if (size(grp%atts) > 0) then
-      call append(buffer, used, &
-        & indent//"// global attributes:"//nl)
-      do i = 1, size(grp%atts)
-        call append(buffer, used, render_att(grp%atts(i), ind)//nl)
-      end do
-    end if
-  end if
+  call append(buffer, used, render_dims(grp, indent))
+  call append(buffer, used, render_vars(grp, indent))
+  call append(buffer, used, render_atts(grp, indent))
 
   if (associated(grp%grps)) then
     if (size(grp%grps) > 0) then
@@ -261,7 +235,100 @@ recursive function render_grp_body(grp, indent, depth) result(text)
   else
     text = transfer(buffer(:used), repeat(" ", used))
   end if
-end function render_grp_body
+end function render_grp_
+
+!> Compute the dimensions section of a group in ncdump-like formatted output.
+function render_dims(grp, indent) result(text)
+  !> Input argument: `grp`.
+  class(group_type), intent(in) :: grp
+  !> Input argument: `indent`.
+  character(len=*), intent(in) :: indent
+  !> Return value: `text`.
+  character(len=:), allocatable :: text
+  character, allocatable :: buffer(:)
+  integer :: i, used
+  character(len=:), allocatable :: ind
+  character, parameter :: nl = new_line("a")
+
+  used = 0
+  ind = indent//repeat(" ", 4)
+  if (allocated(grp%dims)) then
+    if (size(grp%dims) > 0) then
+      call append(buffer, used, indent//"dimensions:"//nl)
+      do i = 1, size(grp%dims)
+        call append(buffer, used, render_dim(grp%dims(i), ind)//nl)
+      end do
+    end if
+  end if
+
+  if (used == 0) then
+    text = ""
+  else
+    text = transfer(buffer(:used), repeat(" ", used))
+  end if
+end function render_dims
+
+!> Compute the variables section of a group in ncdump-like formatted output.
+function render_vars(grp, indent) result(text)
+  !> Input argument: `grp`.
+  class(group_type), intent(in) :: grp
+  !> Input argument: `indent`.
+  character(len=*), intent(in) :: indent
+  !> Return value: `text`.
+  character(len=:), allocatable :: text
+  character, allocatable :: buffer(:)
+  integer :: i, used
+  character(len=:), allocatable :: ind
+  character, parameter :: nl = new_line("a")
+
+  used = 0
+  ind = indent//repeat(" ", 4)
+  if (allocated(grp%vars)) then
+    if (size(grp%vars) > 0) then
+      call append(buffer, used, indent//"variables:"//nl)
+      do i = 1, size(grp%vars)
+        call append(buffer, used, render_var(grp%vars(i), ind)//nl)
+      end do
+    end if
+  end if
+
+  if (used == 0) then
+    text = ""
+  else
+    text = transfer(buffer(:used), repeat(" ", used))
+  end if
+end function render_vars
+
+!> Compute the attributes section of a group in ncdump-like formatted output.
+function render_atts(grp, indent) result(text)
+  !> Input argument: `grp`.
+  class(group_type), intent(in) :: grp
+  !> Input argument: `indent`.
+  character(len=*), intent(in) :: indent
+  !> Return value: `text`.
+  character(len=:), allocatable :: text
+  character, allocatable :: buffer(:)
+  integer :: i, used
+  character(len=:), allocatable :: ind
+  character, parameter :: nl = new_line("a")
+
+  used = 0
+  ind = indent//repeat(" ", 4)
+  if (allocated(grp%atts)) then
+    if (size(grp%atts) > 0) then
+      call append(buffer, used, indent//"// global attributes:"//nl)
+      do i = 1, size(grp%atts)
+        call append(buffer, used, render_att(grp%atts(i), ind)//nl)
+      end do
+    end if
+  end if
+
+  if (used == 0) then
+    text = ""
+  else
+    text = transfer(buffer(:used), repeat(" ", used))
+  end if
+end function render_atts
 
 !> Append a text fragment to a dynamically grown character buffer.
 subroutine append(buffer, used, fragment)
@@ -400,7 +467,7 @@ function render_att_value(att) result(rendered)
     int8_values = transfer(att%buffer, 0_int8, int(att%len))
     rendered = render_int8_values(int8_values)
   case (CHAR_TYPE)
-    chars = transfer(att%buffer, ' ', int(att%len))
+    chars = transfer(att%buffer, " ", int(att%len))
     rendered = render_char_values(chars)
   case (SHORT_TYPE)
     int16_values = transfer(att%buffer, 0_int16, int(att%len))
@@ -436,7 +503,7 @@ function render_char_values(values) result(text)
   text_len = 2
   do i = 1, last
     select case (values(i))
-    case ('"', '\', achar(0), new_line('a'))
+    case ('"', "\", achar(0), new_line("a"))
       text_len = text_len + 2
     case default
       text_len = text_len + 1
@@ -451,14 +518,14 @@ function render_char_values(values) result(text)
     case ('"')
       text(position:position + 1) = '\"'
       position = position + 2
-    case ('\')
-      text(position:position + 1) = '\\'
+    case ("\")
+      text(position:position + 1) = "\\"
       position = position + 2
     case (achar(0))
-      text(position:position + 1) = '\0'
+      text(position:position + 1) = "\0"
       position = position + 2
-    case (new_line('a'))
-      text(position:position + 1) = '\n'
+    case (new_line("a"))
+      text(position:position + 1) = "\n"
       position = position + 2
     case default
       text(position:position) = values(i)
@@ -628,7 +695,7 @@ function render_var(var, indent) result(line)
   line = indent//trim(dtype)//" "//var%name//dims//" ;"
   if (allocated(var%atts)) then
     do i = 1, size(var%atts)
-      line = line//new_line('a')//render_att(var%atts(i), indent//"    ")
+      line = line//new_line("a")//render_att(var%atts(i), indent//"    ")
     end do
   end if
 end function render_var
