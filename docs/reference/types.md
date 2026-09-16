@@ -11,6 +11,11 @@ described on the NetCDF website. Its basic types include the following component
   * `netcdf_type`: the root group that also contains metadata like filename and I/O mode;
   * `error_type`: this is a library specific type for handling errors.
 
+## Supported NetCDF Types
+
+The currently supported and unsupported [NetCDF types](https://docs.unidata.ucar.edu/nug/current/md_types.html) are:
+- &#x2611; Supported: `CHAR`, `BYTE`, `SHORT`, `INT`, `INT64`, `FLOAT`, `DOUBLE`
+- &#x2612; Unsupported: `UNSIGNED BYTE`, `UNSIGNED SHORT`, `UNSIGNED INT`, `UNSIGNED INT64`, `STRING`
 
 ## Constructions
 
@@ -59,7 +64,7 @@ The main constructor of `variable_type` is `datarray`. You will need at least a 
 For example, let's say we would like to create a 3D geospatial variable 
 
 ```fortran
-type(dimension_type) :: lon, lat, time
+type(dimension_type) :: lon, lat, tme
 type(variable_type) :: var
 logical, parameter :: UNLIMITED = .true.
 real, allocatable :: values(:, :, :)

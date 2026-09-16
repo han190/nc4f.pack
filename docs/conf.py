@@ -4,7 +4,7 @@ project = "nc4f"
 author = "Han Tang"
 copyright = "2019-2026, Han Tang"
 
-extensions = ["myst_parser"]
+extensions = ["myst_parser", "sphinx_design"]
 source_suffix = {".rst": "restructuredtext", ".md": "markdown"}
 exclude_patterns = ["_build"]
 
