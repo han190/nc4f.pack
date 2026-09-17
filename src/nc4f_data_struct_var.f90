@@ -38,8 +38,10 @@ module pure function get_size(var, dim) result(n)
     n = 1_int64
     do i = 1, size(var%dims)
       if (var%dims(i)%len < 0) error stop "[size] Negative dimension length."
-      if (var%dims(i)%len /= 0 .and. n > huge(n)/var%dims(i)%len) then
-        error stop "[size] Dimension product overflow."
+      if (var%dims(i)%len /= 0) then
+        if (n > huge(n)/var%dims(i)%len) then
+          error stop "[size] Dimension product overflow."
+        end if
       end if
       n = n*var%dims(i)%len
     end do
