@@ -51,13 +51,12 @@ function get_var_(nc, name, error) result(var)
 
   zero_size_var: if (var%len == 0) then
     call validate_var_buffer(var, "[get_var]")
-    if (associated(var%buffer)) nullify (var%buffer)
     return
   end if zero_size_var
 
   call initialize(var)
   call validate_var_buffer(var, "[get_var]")
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   write (msg, "('[get_var] Invalid variable:', 1x, a)") name
   stat = nc_get_var(nc%id, var%id, cptr)
   error = make_netcdf_error(stat, msg)
@@ -156,7 +155,7 @@ function get_vara_(nc, name, start, count, error) result(var)
     startp = c_null_ptr
     countp = c_null_ptr
   end if
-  datap = c_loc(var%buffer(1))
+  datap = buffer2cptr(var)
   write (msg, "('[get_vara] Invalid variable:', 1x, a)") name
   stat = nc_get_vara(nc%id, var%id, startp, countp, datap)
   error = make_netcdf_error(stat, msg)
@@ -372,7 +371,7 @@ subroutine put_vara_(nc, var, start, count, error)
     countp = c_null_ptr
   end if
   write (msg, "('[put_vara] Invalid variable:', 1x, a)") var%name
-  stat = nc_put_vara(nc%id, target%id, startp, countp, c_loc(var%buffer(1)))
+  stat = nc_put_vara(nc%id, target%id, startp, countp, buffer2cptr(var))
   error = make_netcdf_error(stat, msg)
 end subroutine put_vara_
 
@@ -414,7 +413,7 @@ subroutine put_var_(nc, var, error)
     startp = c_null_ptr
     countp = c_null_ptr
   end if
-  stat = nc_put_vara(nc%id, tmp%id, startp, countp, c_loc(var%buffer(1)))
+  stat = nc_put_vara(nc%id, tmp%id, startp, countp, buffer2cptr(var))
   error = make_netcdf_error(stat, "[put_var] Write variable data.")
 end subroutine put_var_
 

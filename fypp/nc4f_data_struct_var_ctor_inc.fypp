@@ -2,8 +2,8 @@
 !> Construct a variable from raw values.
 !>
 !> Raw values are copied into owning storage by default.  With `deep=.false.`,
-!> numeric `values` must be a contiguous target array that remains allocated
-!> and valid until the resulting variable is no longer used.
+!> numeric `values` must be a simply contiguous target array that remains
+!> allocated and valid until the resulting variable is no longer used.
 interface datarray
   #: for K in kinds
   #: for R in range(1, MAX_RANK+1)
@@ -24,7 +24,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank ${R}$ and element type `${T}$` of kind `${K}$`.
-    ${T}$(${K}$), contiguous, target, intent(in) :: values(${COLONS(R)}$)
+    ${T}$(${K}$), target, intent(in) :: values(${COLONS(R)}$)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -42,7 +42,7 @@ interface
     !> Name of the variable to create (will be trimmed).
     character(len=*), intent(in) :: name
     !> Single-character values to populate the variable's data buffer.
-    character, contiguous, target, intent(in) :: values(${COLONS(R)}$)
+    character, target, intent(in) :: values(${COLONS(R)}$)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.

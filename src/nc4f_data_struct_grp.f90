@@ -15,7 +15,8 @@ module subroutine init_att(att, name, dtype, len)
   integer(int64), intent(in) :: len
 
   if (len < 0) error stop "[init_att] Negative attribute length."
-  nullify (att%buffer)
+  if (allocated(att%buffer)) deallocate (att%buffer)
+  nullify (att%ptr)
   att%name = trim(name)
   att%dtype = dtype
   att%len = len
@@ -43,7 +44,8 @@ module subroutine init_var(var, name, dtype, len, dims, atts, deep)
   if (len < 0) error stop "[init_var] Negative variable length."
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
-  nullify (var%buffer)
+  if (allocated(var%buffer)) deallocate (var%buffer)
+  nullify (var%ptr)
   var%name = trim(name)
   var%dtype = dtype
   var%dims = dims
@@ -114,7 +116,7 @@ module function new_dataset_all(name, vars, grps, atts, deep) result(grp)
   call new_dataset_(grp, name, vars, grps, atts, deep)
 end function new_dataset_all
 
-!> Populate a group with shallow or deep child values.
+!> Populate a group with intrinsic or explicit deep child copies.
 module subroutine new_dataset_(grp, name, vars, grps, atts, deep)
   !> Output argument: `grp`.
   type(group_type), intent(out) :: grp
@@ -211,7 +213,7 @@ function collect_dims_(vars) result(dims)
 end function collect_dims_
 
 !> Compute `buffer_size`.
-module function buffer_size(dtype, len, context) result(nbytes)
+pure module function buffer_size(dtype, len, context) result(nbytes)
   !> Input argument: `dtype`.
   integer(data_type), intent(in) :: dtype
   !> Input argument: `len`.

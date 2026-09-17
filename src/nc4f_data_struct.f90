@@ -2,7 +2,8 @@ module nc4f_data_struct
 
 use, intrinsic :: iso_fortran_env, only: &
   & int8, int16, int32, int64, real32, real64
-use, intrinsic :: iso_c_binding, only: c_f_pointer, c_int, c_loc, c_ptr
+use, intrinsic :: iso_c_binding, only: &
+  & c_f_pointer, c_int, c_loc, c_null_ptr, c_ptr
 use, non_intrinsic :: nc4f_c_interface, only: &
   & NC_EBADID, NC_EBADDIM, NC_EBADGRPID, NC_EEDGE, NC_EINVAL, NC_EINVALCOORDS, &
   & NC_ENOGRP, NC_ENOTATT, NC_ENOTFOUND, NC_ENOTVAR, NC_NOERR, NC_NOWRITE
@@ -16,9 +17,7 @@ public :: NC_EBADID, NC_EBADDIM, NC_EBADGRPID, NC_EEDGE, NC_EINVAL, &
 public :: datarray, dataset, extract, initialize, operator(.att.), &
   & operator(.and.), operator(.dim.), &
   & operator(==), operator(/=), shape, size, sum
-!> Internal shared utilities used by operational submodules.  They are not
-!> re-exported through the user-facing `nc4f` facade.
-public :: buffer_size, validate_buffer
+public :: buffer_size, buffer2cptr, validate, validate_buffer
 private
 
 integer(int32), parameter :: INVALID_INT32 = -2147483647_int32
@@ -73,13 +72,19 @@ end type dimension_argument_type
 
 !> NetCDF attribute metadata and values.
 !>
-!> `buffer` either owns an allocation or borrows contiguous caller storage.
+!> `buffer` owns copied data, while `ptr` borrows contiguous caller storage.
+!>
+!> Exactly one backing store is present for a nonempty value: either
+!> `buffer` is allocated or `ptr` is associated.  The allocatable component
+!> gives copied values normal Fortran lifetime management; the pointer is
+!> reserved exclusively for caller-owned storage.
 type :: attribute_type
   integer(c_int) :: id = INVALID_INT32
   character(len=:), allocatable :: name
   integer(data_type) :: dtype = NAT_TYPE
   integer(int64) :: len = INVALID_INT64
-  integer(int8), pointer :: buffer(:) => null()
+  integer(int8), allocatable :: buffer(:)
+  integer(int8), contiguous, pointer :: ptr(:) => null()
 contains
   procedure, private :: write_frmt_att
   generic, public :: write(formatted) => write_frmt_att
@@ -93,7 +98,8 @@ type :: variable_type
   integer(int64) :: len = INVALID_INT64
   type(dimension_type), allocatable :: dims(:)
   type(attribute_type), allocatable :: atts(:)
-  integer(int8), pointer :: buffer(:) => null()
+  integer(int8), allocatable :: buffer(:)
+  integer(int8), contiguous, pointer :: ptr(:) => null()
 contains
   procedure, private :: write_frmt_var
   generic, public :: write(formatted) => write_frmt_var
@@ -169,10 +175,24 @@ interface initialize
   module procedure :: init_var_mold
 end interface initialize
 
+!> Return the C address of the active byte storage for an attribute or
+!> variable.
+interface buffer2cptr
+  module procedure :: get_att_buffer_cptr
+  module procedure :: get_var_buffer_cptr
+end interface buffer2cptr
+
+!> Validate the metadata and active byte storage of an attribute or variable.
+interface validate
+  module procedure :: validate_att
+  module procedure :: validate_var
+end interface validate
+
 !> Assemble a group from existing handles and metadata.
 !>
-!> The default `deep=.false.` preserves data-buffer and descendant-group
-!> pointers.  With `deep=.true.`, all data buffers and descendants are cloned.
+!> The default `deep=.false.` uses intrinsic assignment: owned buffers are
+!> copied, borrowed pointers are preserved, and descendant groups are shared.
+!> With `deep=.true.`, all data buffers and descendants are cloned.
 interface dataset
   module procedure :: new_dataset_empty
   module procedure :: new_dataset_vars
@@ -264,25 +284,35 @@ interface
     type(group_type), intent(out) :: dest
   end subroutine clone_grp_
 
-  module subroutine validate_att_data(att, dtype, context)
+  module pure subroutine validate_att(att, dtype, context)
     type(attribute_type), intent(in) :: att
-    integer(data_type), intent(in) :: dtype
+    integer(data_type), intent(in), optional :: dtype
     character(len=*), intent(in) :: context
-  end subroutine validate_att_data
+  end subroutine validate_att
 
-  module subroutine validate_var_data(var, dtype, rank, context)
+  module pure subroutine validate_var(var, dtype, rank, context)
     type(variable_type), intent(in) :: var
-    integer(data_type), intent(in) :: dtype
-    integer, intent(in) :: rank
+    integer(data_type), intent(in), optional :: dtype
+    integer, intent(in), optional :: rank
     character(len=*), intent(in) :: context
-  end subroutine validate_var_data
+  end subroutine validate_var
 
   module subroutine validate_buffer(buffer, bytes, name, context)
-    integer(int8), pointer, intent(in) :: buffer(:)
+    integer(int8), pointer, contiguous, intent(in) :: buffer(:)
     integer(int64), intent(in) :: bytes
     character(len=*), intent(in) :: name
     character(len=*), intent(in) :: context
   end subroutine validate_buffer
+
+  module function get_att_buffer_cptr(att) result(cptr)
+    type(attribute_type), target, intent(in) :: att
+    type(c_ptr) :: cptr
+  end function get_att_buffer_cptr
+
+  module function get_var_buffer_cptr(var) result(cptr)
+    type(variable_type), target, intent(in) :: var
+    type(c_ptr) :: cptr
+  end function get_var_buffer_cptr
 
   module subroutine write_frmt_att(att, unit, iotype, v_list, iostat, iomsg)
     class(attribute_type), intent(in) :: att
@@ -408,7 +438,7 @@ interface
     type(variable_type) :: total
   end function sum_vars
 
-  module function buffer_size(dtype, len, context) result(nbytes)
+  module pure function buffer_size(dtype, len, context) result(nbytes)
     integer(data_type), intent(in) :: dtype
     integer(int64), intent(in) :: len
     character(len=*), intent(in), optional :: context

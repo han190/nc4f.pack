@@ -420,7 +420,7 @@ end function render_att
 !> Render an attribute buffer as an ncdump-like literal.
 function render_att_value(att) result(rendered)
   !> Input argument: `att`.
-  type(attribute_type), intent(in) :: att
+  type(attribute_type), target, intent(in) :: att
   !> Return value: `value`.
   character(len=:), allocatable :: rendered
   character, allocatable :: chars(:)
@@ -430,12 +430,8 @@ function render_att_value(att) result(rendered)
   integer(int64), allocatable :: int64_values(:)
   real(real32), allocatable :: real32_values(:)
   real(real64), allocatable :: real64_values(:)
-  integer :: nbytes
-
-  if (att%len < 0) then
-    rendered = "invalid length"
-    return
-  end if
+  integer(int8), pointer, contiguous :: bytes(:)
+  call validate(att, context="[render_att_value]")
   if (att%len == 0) then
     if (att%dtype == CHAR_TYPE) then
       rendered = '""'
@@ -444,19 +440,15 @@ function render_att_value(att) result(rendered)
     end if
     return
   end if
-  if (.not. associated(att%buffer)) then
-    rendered = "unavailable"
-    return
+  if (allocated(att%buffer)) then
+    bytes => att%buffer
+  else
+    bytes => att%ptr
   end if
 
   select case (att%dtype)
   case (BYTE_TYPE, CHAR_TYPE, SHORT_TYPE, &
     & INT_TYPE, INT64_TYPE, FLOAT_TYPE, DOUBLE_TYPE)
-    nbytes = buffer_size(att%dtype, att%len, "[render_att_value]")
-    if (size(att%buffer, kind=int64) < int(nbytes, int64)) then
-      rendered = "unavailable"
-      return
-    end if
   case default
     rendered = "unsupported"
     return
@@ -464,26 +456,28 @@ function render_att_value(att) result(rendered)
 
   select case (att%dtype)
   case (BYTE_TYPE)
-    int8_values = transfer(att%buffer, 0_int8, int(att%len))
+    int8_values = transfer(bytes, 0_int8, int(att%len))
     rendered = render_int8_values(int8_values)
   case (CHAR_TYPE)
-    chars = transfer(att%buffer, " ", int(att%len))
+    chars = transfer(bytes, " ", int(att%len))
     rendered = render_char_values(chars)
   case (SHORT_TYPE)
-    int16_values = transfer(att%buffer, 0_int16, int(att%len))
+    int16_values = transfer(bytes, 0_int16, int(att%len))
     rendered = render_int16_values(int16_values)
   case (INT_TYPE)
-    int32_values = transfer(att%buffer, 0_int32, int(att%len))
+    int32_values = transfer(bytes, 0_int32, int(att%len))
     rendered = render_int32_values(int32_values)
   case (INT64_TYPE)
-    int64_values = transfer(att%buffer, 0_int64, int(att%len))
+    int64_values = transfer(bytes, 0_int64, int(att%len))
     rendered = render_int64_values(int64_values)
   case (FLOAT_TYPE)
-    real32_values = transfer(att%buffer, 0.0_real32, int(att%len))
+    real32_values = transfer(bytes, 0.0_real32, int(att%len))
     rendered = render_real32_values(real32_values)
   case (DOUBLE_TYPE)
-    real64_values = transfer(att%buffer, 0.0_real64, int(att%len))
+    real64_values = transfer(bytes, 0.0_real64, int(att%len))
     rendered = render_real64_values(real64_values)
+  case default
+    rendered = "unsupported"
   end select
 end function render_att_value
 

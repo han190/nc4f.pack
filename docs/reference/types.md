@@ -67,7 +67,7 @@ For example, let's say we would like to create a 3D geospatial variable
 type(dimension_type) :: lon, lat, tme
 type(variable_type) :: var
 logical, parameter :: UNLIMITED = .true.
-real, allocatable :: values(:, :, :)
+real, allocatable, target :: values(:, :, :)
 integer :: nlon, nlat, nt, i, j, k
 
 nlon = 360
@@ -87,13 +87,19 @@ var = datarray("dummy variable", values, [tme, lat, lon])
 print *, var ! Yes, you can use UDDTIO to print the metadata. Try it.
 ```
 
-In this way the `values` are copied to `var%buffer`. If the array `values` is big you can avoid deep copy by
+In this way the `values` are copied to the owned, allocatable `var%buffer`.
+If the array `values` is big, you can avoid the copy by using a contiguous
+caller-owned target:
 
 ```fortran
 var = datarray("dummy variable", values, [tme, lat, lon], deep=.false.)
 ```
 
-then `var%buffer` is assocaited with `values`. This is efficient but you are responsible for the lifetime of the pointer. Also, you can attach attributes as well
+Then `var%ptr` is associated with `values` while `var%buffer` remains
+unallocated. This is efficient, but `values` must be a simply contiguous,
+named target and remain alive for as long as the variable is used; do not pass
+an expression, array constructor, or noncontiguous section. Also, you can
+attach attributes as well:
 
 ```fortran
 var = datarray("dummy variable", values, [tme, lat, lon], &

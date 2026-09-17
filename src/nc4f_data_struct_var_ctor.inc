@@ -1,8 +1,8 @@
 !> Construct a variable from raw values.
 !>
 !> Raw values are copied into owning storage by default.  With `deep=.false.`,
-!> numeric `values` must be a contiguous target array that remains allocated
-!> and valid until the resulting variable is no longer used.
+!> numeric `values` must be a simply contiguous target array that remains
+!> allocated and valid until the resulting variable is no longer used.
 interface datarray
   module procedure :: new_var_int8_1d
   module procedure :: new_var_int8_2d
@@ -118,7 +118,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 1 and element type `integer` of kind `int8`.
-    integer(int8), contiguous, target, intent(in) :: values(:)
+    integer(int8), target, intent(in) :: values(:)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -135,7 +135,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 2 and element type `integer` of kind `int8`.
-    integer(int8), contiguous, target, intent(in) :: values(:, :)
+    integer(int8), target, intent(in) :: values(:, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -152,7 +152,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 3 and element type `integer` of kind `int8`.
-    integer(int8), contiguous, target, intent(in) :: values(:, :, :)
+    integer(int8), target, intent(in) :: values(:, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -169,7 +169,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 4 and element type `integer` of kind `int8`.
-    integer(int8), contiguous, target, intent(in) :: values(:, :, :, :)
+    integer(int8), target, intent(in) :: values(:, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -186,7 +186,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 5 and element type `integer` of kind `int8`.
-    integer(int8), contiguous, target, intent(in) :: values(:, :, :, :, :)
+    integer(int8), target, intent(in) :: values(:, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -203,7 +203,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 6 and element type `integer` of kind `int8`.
-    integer(int8), contiguous, target, intent(in) :: values(:, :, :, :, :, :)
+    integer(int8), target, intent(in) :: values(:, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -220,7 +220,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 7 and element type `integer` of kind `int8`.
-    integer(int8), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :)
+    integer(int8), target, intent(in) :: values(:, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -237,7 +237,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 8 and element type `integer` of kind `int8`.
-    integer(int8), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :)
+    integer(int8), target, intent(in) :: values(:, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -254,7 +254,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 9 and element type `integer` of kind `int8`.
-    integer(int8), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :)
+    integer(int8), target, intent(in) :: values(:, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -271,7 +271,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 10 and element type `integer` of kind `int8`.
-    integer(int8), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :)
+    integer(int8), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -288,7 +288,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 11 and element type `integer` of kind `int8`.
-    integer(int8), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :)
+    integer(int8), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -305,7 +305,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 12 and element type `integer` of kind `int8`.
-    integer(int8), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :)
+    integer(int8), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -322,7 +322,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 13 and element type `integer` of kind `int8`.
-    integer(int8), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :)
+    integer(int8), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -339,7 +339,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 14 and element type `integer` of kind `int8`.
-    integer(int8), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
+    integer(int8), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -356,7 +356,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 15 and element type `integer` of kind `int8`.
-    integer(int8), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
+    integer(int8), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -373,7 +373,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 1 and element type `integer` of kind `int16`.
-    integer(int16), contiguous, target, intent(in) :: values(:)
+    integer(int16), target, intent(in) :: values(:)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -390,7 +390,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 2 and element type `integer` of kind `int16`.
-    integer(int16), contiguous, target, intent(in) :: values(:, :)
+    integer(int16), target, intent(in) :: values(:, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -407,7 +407,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 3 and element type `integer` of kind `int16`.
-    integer(int16), contiguous, target, intent(in) :: values(:, :, :)
+    integer(int16), target, intent(in) :: values(:, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -424,7 +424,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 4 and element type `integer` of kind `int16`.
-    integer(int16), contiguous, target, intent(in) :: values(:, :, :, :)
+    integer(int16), target, intent(in) :: values(:, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -441,7 +441,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 5 and element type `integer` of kind `int16`.
-    integer(int16), contiguous, target, intent(in) :: values(:, :, :, :, :)
+    integer(int16), target, intent(in) :: values(:, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -458,7 +458,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 6 and element type `integer` of kind `int16`.
-    integer(int16), contiguous, target, intent(in) :: values(:, :, :, :, :, :)
+    integer(int16), target, intent(in) :: values(:, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -475,7 +475,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 7 and element type `integer` of kind `int16`.
-    integer(int16), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :)
+    integer(int16), target, intent(in) :: values(:, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -492,7 +492,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 8 and element type `integer` of kind `int16`.
-    integer(int16), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :)
+    integer(int16), target, intent(in) :: values(:, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -509,7 +509,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 9 and element type `integer` of kind `int16`.
-    integer(int16), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :)
+    integer(int16), target, intent(in) :: values(:, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -526,7 +526,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 10 and element type `integer` of kind `int16`.
-    integer(int16), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :)
+    integer(int16), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -543,7 +543,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 11 and element type `integer` of kind `int16`.
-    integer(int16), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :)
+    integer(int16), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -560,7 +560,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 12 and element type `integer` of kind `int16`.
-    integer(int16), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :)
+    integer(int16), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -577,7 +577,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 13 and element type `integer` of kind `int16`.
-    integer(int16), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :)
+    integer(int16), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -594,7 +594,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 14 and element type `integer` of kind `int16`.
-    integer(int16), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
+    integer(int16), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -611,7 +611,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 15 and element type `integer` of kind `int16`.
-    integer(int16), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
+    integer(int16), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -628,7 +628,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 1 and element type `integer` of kind `int32`.
-    integer(int32), contiguous, target, intent(in) :: values(:)
+    integer(int32), target, intent(in) :: values(:)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -645,7 +645,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 2 and element type `integer` of kind `int32`.
-    integer(int32), contiguous, target, intent(in) :: values(:, :)
+    integer(int32), target, intent(in) :: values(:, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -662,7 +662,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 3 and element type `integer` of kind `int32`.
-    integer(int32), contiguous, target, intent(in) :: values(:, :, :)
+    integer(int32), target, intent(in) :: values(:, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -679,7 +679,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 4 and element type `integer` of kind `int32`.
-    integer(int32), contiguous, target, intent(in) :: values(:, :, :, :)
+    integer(int32), target, intent(in) :: values(:, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -696,7 +696,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 5 and element type `integer` of kind `int32`.
-    integer(int32), contiguous, target, intent(in) :: values(:, :, :, :, :)
+    integer(int32), target, intent(in) :: values(:, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -713,7 +713,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 6 and element type `integer` of kind `int32`.
-    integer(int32), contiguous, target, intent(in) :: values(:, :, :, :, :, :)
+    integer(int32), target, intent(in) :: values(:, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -730,7 +730,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 7 and element type `integer` of kind `int32`.
-    integer(int32), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :)
+    integer(int32), target, intent(in) :: values(:, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -747,7 +747,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 8 and element type `integer` of kind `int32`.
-    integer(int32), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :)
+    integer(int32), target, intent(in) :: values(:, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -764,7 +764,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 9 and element type `integer` of kind `int32`.
-    integer(int32), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :)
+    integer(int32), target, intent(in) :: values(:, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -781,7 +781,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 10 and element type `integer` of kind `int32`.
-    integer(int32), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :)
+    integer(int32), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -798,7 +798,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 11 and element type `integer` of kind `int32`.
-    integer(int32), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :)
+    integer(int32), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -815,7 +815,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 12 and element type `integer` of kind `int32`.
-    integer(int32), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :)
+    integer(int32), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -832,7 +832,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 13 and element type `integer` of kind `int32`.
-    integer(int32), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :)
+    integer(int32), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -849,7 +849,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 14 and element type `integer` of kind `int32`.
-    integer(int32), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
+    integer(int32), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -866,7 +866,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 15 and element type `integer` of kind `int32`.
-    integer(int32), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
+    integer(int32), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -883,7 +883,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 1 and element type `integer` of kind `int64`.
-    integer(int64), contiguous, target, intent(in) :: values(:)
+    integer(int64), target, intent(in) :: values(:)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -900,7 +900,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 2 and element type `integer` of kind `int64`.
-    integer(int64), contiguous, target, intent(in) :: values(:, :)
+    integer(int64), target, intent(in) :: values(:, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -917,7 +917,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 3 and element type `integer` of kind `int64`.
-    integer(int64), contiguous, target, intent(in) :: values(:, :, :)
+    integer(int64), target, intent(in) :: values(:, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -934,7 +934,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 4 and element type `integer` of kind `int64`.
-    integer(int64), contiguous, target, intent(in) :: values(:, :, :, :)
+    integer(int64), target, intent(in) :: values(:, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -951,7 +951,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 5 and element type `integer` of kind `int64`.
-    integer(int64), contiguous, target, intent(in) :: values(:, :, :, :, :)
+    integer(int64), target, intent(in) :: values(:, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -968,7 +968,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 6 and element type `integer` of kind `int64`.
-    integer(int64), contiguous, target, intent(in) :: values(:, :, :, :, :, :)
+    integer(int64), target, intent(in) :: values(:, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -985,7 +985,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 7 and element type `integer` of kind `int64`.
-    integer(int64), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :)
+    integer(int64), target, intent(in) :: values(:, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1002,7 +1002,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 8 and element type `integer` of kind `int64`.
-    integer(int64), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :)
+    integer(int64), target, intent(in) :: values(:, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1019,7 +1019,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 9 and element type `integer` of kind `int64`.
-    integer(int64), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :)
+    integer(int64), target, intent(in) :: values(:, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1036,7 +1036,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 10 and element type `integer` of kind `int64`.
-    integer(int64), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :)
+    integer(int64), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1053,7 +1053,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 11 and element type `integer` of kind `int64`.
-    integer(int64), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :)
+    integer(int64), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1070,7 +1070,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 12 and element type `integer` of kind `int64`.
-    integer(int64), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :)
+    integer(int64), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1087,7 +1087,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 13 and element type `integer` of kind `int64`.
-    integer(int64), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :)
+    integer(int64), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1104,7 +1104,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 14 and element type `integer` of kind `int64`.
-    integer(int64), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
+    integer(int64), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1121,7 +1121,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 15 and element type `integer` of kind `int64`.
-    integer(int64), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
+    integer(int64), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1138,7 +1138,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 1 and element type `real` of kind `real32`.
-    real(real32), contiguous, target, intent(in) :: values(:)
+    real(real32), target, intent(in) :: values(:)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1155,7 +1155,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 2 and element type `real` of kind `real32`.
-    real(real32), contiguous, target, intent(in) :: values(:, :)
+    real(real32), target, intent(in) :: values(:, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1172,7 +1172,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 3 and element type `real` of kind `real32`.
-    real(real32), contiguous, target, intent(in) :: values(:, :, :)
+    real(real32), target, intent(in) :: values(:, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1189,7 +1189,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 4 and element type `real` of kind `real32`.
-    real(real32), contiguous, target, intent(in) :: values(:, :, :, :)
+    real(real32), target, intent(in) :: values(:, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1206,7 +1206,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 5 and element type `real` of kind `real32`.
-    real(real32), contiguous, target, intent(in) :: values(:, :, :, :, :)
+    real(real32), target, intent(in) :: values(:, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1223,7 +1223,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 6 and element type `real` of kind `real32`.
-    real(real32), contiguous, target, intent(in) :: values(:, :, :, :, :, :)
+    real(real32), target, intent(in) :: values(:, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1240,7 +1240,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 7 and element type `real` of kind `real32`.
-    real(real32), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :)
+    real(real32), target, intent(in) :: values(:, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1257,7 +1257,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 8 and element type `real` of kind `real32`.
-    real(real32), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :)
+    real(real32), target, intent(in) :: values(:, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1274,7 +1274,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 9 and element type `real` of kind `real32`.
-    real(real32), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :)
+    real(real32), target, intent(in) :: values(:, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1291,7 +1291,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 10 and element type `real` of kind `real32`.
-    real(real32), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :)
+    real(real32), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1308,7 +1308,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 11 and element type `real` of kind `real32`.
-    real(real32), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :)
+    real(real32), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1325,7 +1325,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 12 and element type `real` of kind `real32`.
-    real(real32), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :)
+    real(real32), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1342,7 +1342,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 13 and element type `real` of kind `real32`.
-    real(real32), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :)
+    real(real32), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1359,7 +1359,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 14 and element type `real` of kind `real32`.
-    real(real32), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
+    real(real32), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1376,7 +1376,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 15 and element type `real` of kind `real32`.
-    real(real32), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
+    real(real32), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1393,7 +1393,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 1 and element type `real` of kind `real64`.
-    real(real64), contiguous, target, intent(in) :: values(:)
+    real(real64), target, intent(in) :: values(:)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1410,7 +1410,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 2 and element type `real` of kind `real64`.
-    real(real64), contiguous, target, intent(in) :: values(:, :)
+    real(real64), target, intent(in) :: values(:, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1427,7 +1427,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 3 and element type `real` of kind `real64`.
-    real(real64), contiguous, target, intent(in) :: values(:, :, :)
+    real(real64), target, intent(in) :: values(:, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1444,7 +1444,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 4 and element type `real` of kind `real64`.
-    real(real64), contiguous, target, intent(in) :: values(:, :, :, :)
+    real(real64), target, intent(in) :: values(:, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1461,7 +1461,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 5 and element type `real` of kind `real64`.
-    real(real64), contiguous, target, intent(in) :: values(:, :, :, :, :)
+    real(real64), target, intent(in) :: values(:, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1478,7 +1478,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 6 and element type `real` of kind `real64`.
-    real(real64), contiguous, target, intent(in) :: values(:, :, :, :, :, :)
+    real(real64), target, intent(in) :: values(:, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1495,7 +1495,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 7 and element type `real` of kind `real64`.
-    real(real64), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :)
+    real(real64), target, intent(in) :: values(:, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1512,7 +1512,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 8 and element type `real` of kind `real64`.
-    real(real64), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :)
+    real(real64), target, intent(in) :: values(:, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1529,7 +1529,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 9 and element type `real` of kind `real64`.
-    real(real64), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :)
+    real(real64), target, intent(in) :: values(:, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1546,7 +1546,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 10 and element type `real` of kind `real64`.
-    real(real64), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :)
+    real(real64), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1563,7 +1563,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 11 and element type `real` of kind `real64`.
-    real(real64), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :)
+    real(real64), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1580,7 +1580,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 12 and element type `real` of kind `real64`.
-    real(real64), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :)
+    real(real64), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1597,7 +1597,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 13 and element type `real` of kind `real64`.
-    real(real64), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :)
+    real(real64), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1614,7 +1614,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 14 and element type `real` of kind `real64`.
-    real(real64), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
+    real(real64), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1631,7 +1631,7 @@ interface
     character(len=*), intent(in) :: name
     !> Array of values to populate the variable's data buffer.
     !> The array has rank 15 and element type `real` of kind `real64`.
-    real(real64), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
+    real(real64), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1646,7 +1646,7 @@ interface
     !> Name of the variable to create (will be trimmed).
     character(len=*), intent(in) :: name
     !> Single-character values to populate the variable's data buffer.
-    character, contiguous, target, intent(in) :: values(:)
+    character, target, intent(in) :: values(:)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1662,7 +1662,7 @@ interface
     !> Name of the variable to create (will be trimmed).
     character(len=*), intent(in) :: name
     !> Single-character values to populate the variable's data buffer.
-    character, contiguous, target, intent(in) :: values(:, :)
+    character, target, intent(in) :: values(:, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1678,7 +1678,7 @@ interface
     !> Name of the variable to create (will be trimmed).
     character(len=*), intent(in) :: name
     !> Single-character values to populate the variable's data buffer.
-    character, contiguous, target, intent(in) :: values(:, :, :)
+    character, target, intent(in) :: values(:, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1694,7 +1694,7 @@ interface
     !> Name of the variable to create (will be trimmed).
     character(len=*), intent(in) :: name
     !> Single-character values to populate the variable's data buffer.
-    character, contiguous, target, intent(in) :: values(:, :, :, :)
+    character, target, intent(in) :: values(:, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1710,7 +1710,7 @@ interface
     !> Name of the variable to create (will be trimmed).
     character(len=*), intent(in) :: name
     !> Single-character values to populate the variable's data buffer.
-    character, contiguous, target, intent(in) :: values(:, :, :, :, :)
+    character, target, intent(in) :: values(:, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1726,7 +1726,7 @@ interface
     !> Name of the variable to create (will be trimmed).
     character(len=*), intent(in) :: name
     !> Single-character values to populate the variable's data buffer.
-    character, contiguous, target, intent(in) :: values(:, :, :, :, :, :)
+    character, target, intent(in) :: values(:, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1742,7 +1742,7 @@ interface
     !> Name of the variable to create (will be trimmed).
     character(len=*), intent(in) :: name
     !> Single-character values to populate the variable's data buffer.
-    character, contiguous, target, intent(in) :: values(:, :, :, :, :, :, :)
+    character, target, intent(in) :: values(:, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1758,7 +1758,7 @@ interface
     !> Name of the variable to create (will be trimmed).
     character(len=*), intent(in) :: name
     !> Single-character values to populate the variable's data buffer.
-    character, contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :)
+    character, target, intent(in) :: values(:, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1774,7 +1774,7 @@ interface
     !> Name of the variable to create (will be trimmed).
     character(len=*), intent(in) :: name
     !> Single-character values to populate the variable's data buffer.
-    character, contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :)
+    character, target, intent(in) :: values(:, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1790,7 +1790,7 @@ interface
     !> Name of the variable to create (will be trimmed).
     character(len=*), intent(in) :: name
     !> Single-character values to populate the variable's data buffer.
-    character, contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :)
+    character, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1806,7 +1806,7 @@ interface
     !> Name of the variable to create (will be trimmed).
     character(len=*), intent(in) :: name
     !> Single-character values to populate the variable's data buffer.
-    character, contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :)
+    character, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1822,7 +1822,7 @@ interface
     !> Name of the variable to create (will be trimmed).
     character(len=*), intent(in) :: name
     !> Single-character values to populate the variable's data buffer.
-    character, contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :)
+    character, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1838,7 +1838,7 @@ interface
     !> Name of the variable to create (will be trimmed).
     character(len=*), intent(in) :: name
     !> Single-character values to populate the variable's data buffer.
-    character, contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :)
+    character, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1854,7 +1854,7 @@ interface
     !> Name of the variable to create (will be trimmed).
     character(len=*), intent(in) :: name
     !> Single-character values to populate the variable's data buffer.
-    character, contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
+    character, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.
@@ -1870,7 +1870,7 @@ interface
     !> Name of the variable to create (will be trimmed).
     character(len=*), intent(in) :: name
     !> Single-character values to populate the variable's data buffer.
-    character, contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
+    character, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
     !> Dimensions describing the variable's shape, ordered in Fortran order.
     type(dimension_type), intent(in) :: dims(:)
     !> Optional list of attributes to attach to the variable.

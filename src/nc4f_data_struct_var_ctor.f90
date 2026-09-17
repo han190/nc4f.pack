@@ -8,7 +8,7 @@ module function new_var_int8_1d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 1 and element type `integer` of kind `int8`.
-  integer(int8), contiguous, target, intent(in) :: values(:)
+  integer(int8), target, intent(in) :: values(:)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -22,17 +22,18 @@ module function new_var_int8_1d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(BYTE_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int8_1d
 
@@ -42,7 +43,7 @@ module function new_var_int8_2d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 2 and element type `integer` of kind `int8`.
-  integer(int8), contiguous, target, intent(in) :: values(:, :)
+  integer(int8), target, intent(in) :: values(:, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -56,17 +57,18 @@ module function new_var_int8_2d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(BYTE_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int8_2d
 
@@ -76,7 +78,7 @@ module function new_var_int8_3d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 3 and element type `integer` of kind `int8`.
-  integer(int8), contiguous, target, intent(in) :: values(:, :, :)
+  integer(int8), target, intent(in) :: values(:, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -90,17 +92,18 @@ module function new_var_int8_3d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(BYTE_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int8_3d
 
@@ -110,7 +113,7 @@ module function new_var_int8_4d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 4 and element type `integer` of kind `int8`.
-  integer(int8), contiguous, target, intent(in) :: values(:, :, :, :)
+  integer(int8), target, intent(in) :: values(:, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -124,17 +127,18 @@ module function new_var_int8_4d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(BYTE_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int8_4d
 
@@ -144,7 +148,7 @@ module function new_var_int8_5d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 5 and element type `integer` of kind `int8`.
-  integer(int8), contiguous, target, intent(in) :: values(:, :, :, :, :)
+  integer(int8), target, intent(in) :: values(:, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -158,17 +162,18 @@ module function new_var_int8_5d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(BYTE_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int8_5d
 
@@ -178,7 +183,7 @@ module function new_var_int8_6d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 6 and element type `integer` of kind `int8`.
-  integer(int8), contiguous, target, intent(in) :: values(:, :, :, :, :, :)
+  integer(int8), target, intent(in) :: values(:, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -192,17 +197,18 @@ module function new_var_int8_6d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(BYTE_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int8_6d
 
@@ -212,7 +218,7 @@ module function new_var_int8_7d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 7 and element type `integer` of kind `int8`.
-  integer(int8), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :)
+  integer(int8), target, intent(in) :: values(:, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -226,17 +232,18 @@ module function new_var_int8_7d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(BYTE_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int8_7d
 
@@ -246,7 +253,7 @@ module function new_var_int8_8d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 8 and element type `integer` of kind `int8`.
-  integer(int8), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :)
+  integer(int8), target, intent(in) :: values(:, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -260,17 +267,18 @@ module function new_var_int8_8d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(BYTE_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int8_8d
 
@@ -280,7 +288,7 @@ module function new_var_int8_9d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 9 and element type `integer` of kind `int8`.
-  integer(int8), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :)
+  integer(int8), target, intent(in) :: values(:, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -294,17 +302,18 @@ module function new_var_int8_9d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(BYTE_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int8_9d
 
@@ -314,7 +323,7 @@ module function new_var_int8_10d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 10 and element type `integer` of kind `int8`.
-  integer(int8), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :)
+  integer(int8), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -328,17 +337,18 @@ module function new_var_int8_10d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(BYTE_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int8_10d
 
@@ -348,7 +358,7 @@ module function new_var_int8_11d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 11 and element type `integer` of kind `int8`.
-  integer(int8), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :)
+  integer(int8), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -362,17 +372,18 @@ module function new_var_int8_11d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(BYTE_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int8_11d
 
@@ -382,7 +393,7 @@ module function new_var_int8_12d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 12 and element type `integer` of kind `int8`.
-  integer(int8), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :)
+  integer(int8), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -396,17 +407,18 @@ module function new_var_int8_12d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(BYTE_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int8_12d
 
@@ -416,7 +428,7 @@ module function new_var_int8_13d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 13 and element type `integer` of kind `int8`.
-  integer(int8), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :)
+  integer(int8), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -430,17 +442,18 @@ module function new_var_int8_13d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(BYTE_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int8_13d
 
@@ -450,7 +463,7 @@ module function new_var_int8_14d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 14 and element type `integer` of kind `int8`.
-  integer(int8), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  integer(int8), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -464,17 +477,18 @@ module function new_var_int8_14d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(BYTE_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int8_14d
 
@@ -484,7 +498,7 @@ module function new_var_int8_15d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 15 and element type `integer` of kind `int8`.
-  integer(int8), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  integer(int8), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -498,17 +512,18 @@ module function new_var_int8_15d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(BYTE_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int8_15d
 
@@ -518,7 +533,7 @@ module function new_var_int16_1d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 1 and element type `integer` of kind `int16`.
-  integer(int16), contiguous, target, intent(in) :: values(:)
+  integer(int16), target, intent(in) :: values(:)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -532,17 +547,18 @@ module function new_var_int16_1d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(SHORT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int16_1d
 
@@ -552,7 +568,7 @@ module function new_var_int16_2d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 2 and element type `integer` of kind `int16`.
-  integer(int16), contiguous, target, intent(in) :: values(:, :)
+  integer(int16), target, intent(in) :: values(:, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -566,17 +582,18 @@ module function new_var_int16_2d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(SHORT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int16_2d
 
@@ -586,7 +603,7 @@ module function new_var_int16_3d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 3 and element type `integer` of kind `int16`.
-  integer(int16), contiguous, target, intent(in) :: values(:, :, :)
+  integer(int16), target, intent(in) :: values(:, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -600,17 +617,18 @@ module function new_var_int16_3d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(SHORT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int16_3d
 
@@ -620,7 +638,7 @@ module function new_var_int16_4d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 4 and element type `integer` of kind `int16`.
-  integer(int16), contiguous, target, intent(in) :: values(:, :, :, :)
+  integer(int16), target, intent(in) :: values(:, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -634,17 +652,18 @@ module function new_var_int16_4d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(SHORT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int16_4d
 
@@ -654,7 +673,7 @@ module function new_var_int16_5d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 5 and element type `integer` of kind `int16`.
-  integer(int16), contiguous, target, intent(in) :: values(:, :, :, :, :)
+  integer(int16), target, intent(in) :: values(:, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -668,17 +687,18 @@ module function new_var_int16_5d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(SHORT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int16_5d
 
@@ -688,7 +708,7 @@ module function new_var_int16_6d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 6 and element type `integer` of kind `int16`.
-  integer(int16), contiguous, target, intent(in) :: values(:, :, :, :, :, :)
+  integer(int16), target, intent(in) :: values(:, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -702,17 +722,18 @@ module function new_var_int16_6d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(SHORT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int16_6d
 
@@ -722,7 +743,7 @@ module function new_var_int16_7d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 7 and element type `integer` of kind `int16`.
-  integer(int16), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :)
+  integer(int16), target, intent(in) :: values(:, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -736,17 +757,18 @@ module function new_var_int16_7d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(SHORT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int16_7d
 
@@ -756,7 +778,7 @@ module function new_var_int16_8d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 8 and element type `integer` of kind `int16`.
-  integer(int16), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :)
+  integer(int16), target, intent(in) :: values(:, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -770,17 +792,18 @@ module function new_var_int16_8d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(SHORT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int16_8d
 
@@ -790,7 +813,7 @@ module function new_var_int16_9d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 9 and element type `integer` of kind `int16`.
-  integer(int16), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :)
+  integer(int16), target, intent(in) :: values(:, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -804,17 +827,18 @@ module function new_var_int16_9d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(SHORT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int16_9d
 
@@ -824,7 +848,7 @@ module function new_var_int16_10d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 10 and element type `integer` of kind `int16`.
-  integer(int16), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :)
+  integer(int16), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -838,17 +862,18 @@ module function new_var_int16_10d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(SHORT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int16_10d
 
@@ -858,7 +883,7 @@ module function new_var_int16_11d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 11 and element type `integer` of kind `int16`.
-  integer(int16), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :)
+  integer(int16), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -872,17 +897,18 @@ module function new_var_int16_11d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(SHORT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int16_11d
 
@@ -892,7 +918,7 @@ module function new_var_int16_12d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 12 and element type `integer` of kind `int16`.
-  integer(int16), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :)
+  integer(int16), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -906,17 +932,18 @@ module function new_var_int16_12d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(SHORT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int16_12d
 
@@ -926,7 +953,7 @@ module function new_var_int16_13d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 13 and element type `integer` of kind `int16`.
-  integer(int16), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :)
+  integer(int16), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -940,17 +967,18 @@ module function new_var_int16_13d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(SHORT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int16_13d
 
@@ -960,7 +988,7 @@ module function new_var_int16_14d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 14 and element type `integer` of kind `int16`.
-  integer(int16), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  integer(int16), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -974,17 +1002,18 @@ module function new_var_int16_14d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(SHORT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int16_14d
 
@@ -994,7 +1023,7 @@ module function new_var_int16_15d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 15 and element type `integer` of kind `int16`.
-  integer(int16), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  integer(int16), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -1008,17 +1037,18 @@ module function new_var_int16_15d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(SHORT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int16_15d
 
@@ -1028,7 +1058,7 @@ module function new_var_int32_1d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 1 and element type `integer` of kind `int32`.
-  integer(int32), contiguous, target, intent(in) :: values(:)
+  integer(int32), target, intent(in) :: values(:)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -1042,17 +1072,18 @@ module function new_var_int32_1d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int32_1d
 
@@ -1062,7 +1093,7 @@ module function new_var_int32_2d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 2 and element type `integer` of kind `int32`.
-  integer(int32), contiguous, target, intent(in) :: values(:, :)
+  integer(int32), target, intent(in) :: values(:, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -1076,17 +1107,18 @@ module function new_var_int32_2d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int32_2d
 
@@ -1096,7 +1128,7 @@ module function new_var_int32_3d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 3 and element type `integer` of kind `int32`.
-  integer(int32), contiguous, target, intent(in) :: values(:, :, :)
+  integer(int32), target, intent(in) :: values(:, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -1110,17 +1142,18 @@ module function new_var_int32_3d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int32_3d
 
@@ -1130,7 +1163,7 @@ module function new_var_int32_4d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 4 and element type `integer` of kind `int32`.
-  integer(int32), contiguous, target, intent(in) :: values(:, :, :, :)
+  integer(int32), target, intent(in) :: values(:, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -1144,17 +1177,18 @@ module function new_var_int32_4d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int32_4d
 
@@ -1164,7 +1198,7 @@ module function new_var_int32_5d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 5 and element type `integer` of kind `int32`.
-  integer(int32), contiguous, target, intent(in) :: values(:, :, :, :, :)
+  integer(int32), target, intent(in) :: values(:, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -1178,17 +1212,18 @@ module function new_var_int32_5d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int32_5d
 
@@ -1198,7 +1233,7 @@ module function new_var_int32_6d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 6 and element type `integer` of kind `int32`.
-  integer(int32), contiguous, target, intent(in) :: values(:, :, :, :, :, :)
+  integer(int32), target, intent(in) :: values(:, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -1212,17 +1247,18 @@ module function new_var_int32_6d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int32_6d
 
@@ -1232,7 +1268,7 @@ module function new_var_int32_7d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 7 and element type `integer` of kind `int32`.
-  integer(int32), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :)
+  integer(int32), target, intent(in) :: values(:, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -1246,17 +1282,18 @@ module function new_var_int32_7d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int32_7d
 
@@ -1266,7 +1303,7 @@ module function new_var_int32_8d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 8 and element type `integer` of kind `int32`.
-  integer(int32), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :)
+  integer(int32), target, intent(in) :: values(:, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -1280,17 +1317,18 @@ module function new_var_int32_8d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int32_8d
 
@@ -1300,7 +1338,7 @@ module function new_var_int32_9d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 9 and element type `integer` of kind `int32`.
-  integer(int32), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :)
+  integer(int32), target, intent(in) :: values(:, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -1314,17 +1352,18 @@ module function new_var_int32_9d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int32_9d
 
@@ -1334,7 +1373,7 @@ module function new_var_int32_10d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 10 and element type `integer` of kind `int32`.
-  integer(int32), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :)
+  integer(int32), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -1348,17 +1387,18 @@ module function new_var_int32_10d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int32_10d
 
@@ -1368,7 +1408,7 @@ module function new_var_int32_11d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 11 and element type `integer` of kind `int32`.
-  integer(int32), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :)
+  integer(int32), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -1382,17 +1422,18 @@ module function new_var_int32_11d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int32_11d
 
@@ -1402,7 +1443,7 @@ module function new_var_int32_12d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 12 and element type `integer` of kind `int32`.
-  integer(int32), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :)
+  integer(int32), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -1416,17 +1457,18 @@ module function new_var_int32_12d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int32_12d
 
@@ -1436,7 +1478,7 @@ module function new_var_int32_13d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 13 and element type `integer` of kind `int32`.
-  integer(int32), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :)
+  integer(int32), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -1450,17 +1492,18 @@ module function new_var_int32_13d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int32_13d
 
@@ -1470,7 +1513,7 @@ module function new_var_int32_14d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 14 and element type `integer` of kind `int32`.
-  integer(int32), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  integer(int32), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -1484,17 +1527,18 @@ module function new_var_int32_14d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int32_14d
 
@@ -1504,7 +1548,7 @@ module function new_var_int32_15d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 15 and element type `integer` of kind `int32`.
-  integer(int32), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  integer(int32), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -1518,17 +1562,18 @@ module function new_var_int32_15d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int32_15d
 
@@ -1538,7 +1583,7 @@ module function new_var_int64_1d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 1 and element type `integer` of kind `int64`.
-  integer(int64), contiguous, target, intent(in) :: values(:)
+  integer(int64), target, intent(in) :: values(:)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -1552,17 +1597,18 @@ module function new_var_int64_1d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT64_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int64_1d
 
@@ -1572,7 +1618,7 @@ module function new_var_int64_2d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 2 and element type `integer` of kind `int64`.
-  integer(int64), contiguous, target, intent(in) :: values(:, :)
+  integer(int64), target, intent(in) :: values(:, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -1586,17 +1632,18 @@ module function new_var_int64_2d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT64_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int64_2d
 
@@ -1606,7 +1653,7 @@ module function new_var_int64_3d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 3 and element type `integer` of kind `int64`.
-  integer(int64), contiguous, target, intent(in) :: values(:, :, :)
+  integer(int64), target, intent(in) :: values(:, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -1620,17 +1667,18 @@ module function new_var_int64_3d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT64_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int64_3d
 
@@ -1640,7 +1688,7 @@ module function new_var_int64_4d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 4 and element type `integer` of kind `int64`.
-  integer(int64), contiguous, target, intent(in) :: values(:, :, :, :)
+  integer(int64), target, intent(in) :: values(:, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -1654,17 +1702,18 @@ module function new_var_int64_4d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT64_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int64_4d
 
@@ -1674,7 +1723,7 @@ module function new_var_int64_5d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 5 and element type `integer` of kind `int64`.
-  integer(int64), contiguous, target, intent(in) :: values(:, :, :, :, :)
+  integer(int64), target, intent(in) :: values(:, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -1688,17 +1737,18 @@ module function new_var_int64_5d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT64_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int64_5d
 
@@ -1708,7 +1758,7 @@ module function new_var_int64_6d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 6 and element type `integer` of kind `int64`.
-  integer(int64), contiguous, target, intent(in) :: values(:, :, :, :, :, :)
+  integer(int64), target, intent(in) :: values(:, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -1722,17 +1772,18 @@ module function new_var_int64_6d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT64_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int64_6d
 
@@ -1742,7 +1793,7 @@ module function new_var_int64_7d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 7 and element type `integer` of kind `int64`.
-  integer(int64), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :)
+  integer(int64), target, intent(in) :: values(:, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -1756,17 +1807,18 @@ module function new_var_int64_7d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT64_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int64_7d
 
@@ -1776,7 +1828,7 @@ module function new_var_int64_8d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 8 and element type `integer` of kind `int64`.
-  integer(int64), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :)
+  integer(int64), target, intent(in) :: values(:, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -1790,17 +1842,18 @@ module function new_var_int64_8d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT64_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int64_8d
 
@@ -1810,7 +1863,7 @@ module function new_var_int64_9d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 9 and element type `integer` of kind `int64`.
-  integer(int64), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :)
+  integer(int64), target, intent(in) :: values(:, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -1824,17 +1877,18 @@ module function new_var_int64_9d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT64_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int64_9d
 
@@ -1844,7 +1898,7 @@ module function new_var_int64_10d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 10 and element type `integer` of kind `int64`.
-  integer(int64), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :)
+  integer(int64), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -1858,17 +1912,18 @@ module function new_var_int64_10d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT64_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int64_10d
 
@@ -1878,7 +1933,7 @@ module function new_var_int64_11d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 11 and element type `integer` of kind `int64`.
-  integer(int64), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :)
+  integer(int64), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -1892,17 +1947,18 @@ module function new_var_int64_11d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT64_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int64_11d
 
@@ -1912,7 +1968,7 @@ module function new_var_int64_12d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 12 and element type `integer` of kind `int64`.
-  integer(int64), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :)
+  integer(int64), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -1926,17 +1982,18 @@ module function new_var_int64_12d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT64_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int64_12d
 
@@ -1946,7 +2003,7 @@ module function new_var_int64_13d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 13 and element type `integer` of kind `int64`.
-  integer(int64), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :)
+  integer(int64), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -1960,17 +2017,18 @@ module function new_var_int64_13d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT64_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int64_13d
 
@@ -1980,7 +2038,7 @@ module function new_var_int64_14d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 14 and element type `integer` of kind `int64`.
-  integer(int64), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  integer(int64), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -1994,17 +2052,18 @@ module function new_var_int64_14d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT64_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int64_14d
 
@@ -2014,7 +2073,7 @@ module function new_var_int64_15d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 15 and element type `integer` of kind `int64`.
-  integer(int64), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  integer(int64), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -2028,17 +2087,18 @@ module function new_var_int64_15d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT64_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_int64_15d
 
@@ -2048,7 +2108,7 @@ module function new_var_real32_1d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 1 and element type `real` of kind `real32`.
-  real(real32), contiguous, target, intent(in) :: values(:)
+  real(real32), target, intent(in) :: values(:)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -2062,17 +2122,18 @@ module function new_var_real32_1d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(FLOAT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_real32_1d
 
@@ -2082,7 +2143,7 @@ module function new_var_real32_2d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 2 and element type `real` of kind `real32`.
-  real(real32), contiguous, target, intent(in) :: values(:, :)
+  real(real32), target, intent(in) :: values(:, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -2096,17 +2157,18 @@ module function new_var_real32_2d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(FLOAT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_real32_2d
 
@@ -2116,7 +2178,7 @@ module function new_var_real32_3d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 3 and element type `real` of kind `real32`.
-  real(real32), contiguous, target, intent(in) :: values(:, :, :)
+  real(real32), target, intent(in) :: values(:, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -2130,17 +2192,18 @@ module function new_var_real32_3d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(FLOAT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_real32_3d
 
@@ -2150,7 +2213,7 @@ module function new_var_real32_4d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 4 and element type `real` of kind `real32`.
-  real(real32), contiguous, target, intent(in) :: values(:, :, :, :)
+  real(real32), target, intent(in) :: values(:, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -2164,17 +2227,18 @@ module function new_var_real32_4d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(FLOAT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_real32_4d
 
@@ -2184,7 +2248,7 @@ module function new_var_real32_5d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 5 and element type `real` of kind `real32`.
-  real(real32), contiguous, target, intent(in) :: values(:, :, :, :, :)
+  real(real32), target, intent(in) :: values(:, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -2198,17 +2262,18 @@ module function new_var_real32_5d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(FLOAT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_real32_5d
 
@@ -2218,7 +2283,7 @@ module function new_var_real32_6d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 6 and element type `real` of kind `real32`.
-  real(real32), contiguous, target, intent(in) :: values(:, :, :, :, :, :)
+  real(real32), target, intent(in) :: values(:, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -2232,17 +2297,18 @@ module function new_var_real32_6d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(FLOAT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_real32_6d
 
@@ -2252,7 +2318,7 @@ module function new_var_real32_7d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 7 and element type `real` of kind `real32`.
-  real(real32), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :)
+  real(real32), target, intent(in) :: values(:, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -2266,17 +2332,18 @@ module function new_var_real32_7d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(FLOAT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_real32_7d
 
@@ -2286,7 +2353,7 @@ module function new_var_real32_8d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 8 and element type `real` of kind `real32`.
-  real(real32), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :)
+  real(real32), target, intent(in) :: values(:, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -2300,17 +2367,18 @@ module function new_var_real32_8d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(FLOAT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_real32_8d
 
@@ -2320,7 +2388,7 @@ module function new_var_real32_9d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 9 and element type `real` of kind `real32`.
-  real(real32), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :)
+  real(real32), target, intent(in) :: values(:, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -2334,17 +2402,18 @@ module function new_var_real32_9d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(FLOAT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_real32_9d
 
@@ -2354,7 +2423,7 @@ module function new_var_real32_10d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 10 and element type `real` of kind `real32`.
-  real(real32), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :)
+  real(real32), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -2368,17 +2437,18 @@ module function new_var_real32_10d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(FLOAT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_real32_10d
 
@@ -2388,7 +2458,7 @@ module function new_var_real32_11d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 11 and element type `real` of kind `real32`.
-  real(real32), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :)
+  real(real32), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -2402,17 +2472,18 @@ module function new_var_real32_11d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(FLOAT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_real32_11d
 
@@ -2422,7 +2493,7 @@ module function new_var_real32_12d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 12 and element type `real` of kind `real32`.
-  real(real32), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :)
+  real(real32), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -2436,17 +2507,18 @@ module function new_var_real32_12d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(FLOAT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_real32_12d
 
@@ -2456,7 +2528,7 @@ module function new_var_real32_13d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 13 and element type `real` of kind `real32`.
-  real(real32), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :)
+  real(real32), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -2470,17 +2542,18 @@ module function new_var_real32_13d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(FLOAT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_real32_13d
 
@@ -2490,7 +2563,7 @@ module function new_var_real32_14d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 14 and element type `real` of kind `real32`.
-  real(real32), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  real(real32), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -2504,17 +2577,18 @@ module function new_var_real32_14d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(FLOAT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_real32_14d
 
@@ -2524,7 +2598,7 @@ module function new_var_real32_15d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 15 and element type `real` of kind `real32`.
-  real(real32), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  real(real32), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -2538,17 +2612,18 @@ module function new_var_real32_15d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(FLOAT_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_real32_15d
 
@@ -2558,7 +2633,7 @@ module function new_var_real64_1d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 1 and element type `real` of kind `real64`.
-  real(real64), contiguous, target, intent(in) :: values(:)
+  real(real64), target, intent(in) :: values(:)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -2572,17 +2647,18 @@ module function new_var_real64_1d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(DOUBLE_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_real64_1d
 
@@ -2592,7 +2668,7 @@ module function new_var_real64_2d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 2 and element type `real` of kind `real64`.
-  real(real64), contiguous, target, intent(in) :: values(:, :)
+  real(real64), target, intent(in) :: values(:, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -2606,17 +2682,18 @@ module function new_var_real64_2d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(DOUBLE_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_real64_2d
 
@@ -2626,7 +2703,7 @@ module function new_var_real64_3d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 3 and element type `real` of kind `real64`.
-  real(real64), contiguous, target, intent(in) :: values(:, :, :)
+  real(real64), target, intent(in) :: values(:, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -2640,17 +2717,18 @@ module function new_var_real64_3d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(DOUBLE_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_real64_3d
 
@@ -2660,7 +2738,7 @@ module function new_var_real64_4d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 4 and element type `real` of kind `real64`.
-  real(real64), contiguous, target, intent(in) :: values(:, :, :, :)
+  real(real64), target, intent(in) :: values(:, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -2674,17 +2752,18 @@ module function new_var_real64_4d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(DOUBLE_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_real64_4d
 
@@ -2694,7 +2773,7 @@ module function new_var_real64_5d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 5 and element type `real` of kind `real64`.
-  real(real64), contiguous, target, intent(in) :: values(:, :, :, :, :)
+  real(real64), target, intent(in) :: values(:, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -2708,17 +2787,18 @@ module function new_var_real64_5d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(DOUBLE_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_real64_5d
 
@@ -2728,7 +2808,7 @@ module function new_var_real64_6d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 6 and element type `real` of kind `real64`.
-  real(real64), contiguous, target, intent(in) :: values(:, :, :, :, :, :)
+  real(real64), target, intent(in) :: values(:, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -2742,17 +2822,18 @@ module function new_var_real64_6d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(DOUBLE_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_real64_6d
 
@@ -2762,7 +2843,7 @@ module function new_var_real64_7d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 7 and element type `real` of kind `real64`.
-  real(real64), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :)
+  real(real64), target, intent(in) :: values(:, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -2776,17 +2857,18 @@ module function new_var_real64_7d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(DOUBLE_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_real64_7d
 
@@ -2796,7 +2878,7 @@ module function new_var_real64_8d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 8 and element type `real` of kind `real64`.
-  real(real64), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :)
+  real(real64), target, intent(in) :: values(:, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -2810,17 +2892,18 @@ module function new_var_real64_8d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(DOUBLE_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_real64_8d
 
@@ -2830,7 +2913,7 @@ module function new_var_real64_9d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 9 and element type `real` of kind `real64`.
-  real(real64), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :)
+  real(real64), target, intent(in) :: values(:, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -2844,17 +2927,18 @@ module function new_var_real64_9d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(DOUBLE_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_real64_9d
 
@@ -2864,7 +2948,7 @@ module function new_var_real64_10d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 10 and element type `real` of kind `real64`.
-  real(real64), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :)
+  real(real64), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -2878,17 +2962,18 @@ module function new_var_real64_10d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(DOUBLE_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_real64_10d
 
@@ -2898,7 +2983,7 @@ module function new_var_real64_11d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 11 and element type `real` of kind `real64`.
-  real(real64), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :)
+  real(real64), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -2912,17 +2997,18 @@ module function new_var_real64_11d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(DOUBLE_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_real64_11d
 
@@ -2932,7 +3018,7 @@ module function new_var_real64_12d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 12 and element type `real` of kind `real64`.
-  real(real64), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :)
+  real(real64), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -2946,17 +3032,18 @@ module function new_var_real64_12d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(DOUBLE_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_real64_12d
 
@@ -2966,7 +3053,7 @@ module function new_var_real64_13d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 13 and element type `real` of kind `real64`.
-  real(real64), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :)
+  real(real64), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -2980,17 +3067,18 @@ module function new_var_real64_13d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(DOUBLE_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_real64_13d
 
@@ -3000,7 +3088,7 @@ module function new_var_real64_14d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 14 and element type `real` of kind `real64`.
-  real(real64), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  real(real64), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -3014,17 +3102,18 @@ module function new_var_real64_14d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(DOUBLE_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_real64_14d
 
@@ -3034,7 +3123,7 @@ module function new_var_real64_15d(name, values, dims, atts, deep) result(var)
   character(len=*), intent(in) :: name
   !> Array of values to populate the variable's data buffer.
   !> The array has rank 15 and element type `real` of kind `real64`.
-  real(real64), contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  real(real64), target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -3048,17 +3137,18 @@ module function new_var_real64_15d(name, values, dims, atts, deep) result(var)
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
+  if (.not. deep_copy .and. .not. is_contiguous(values)) then
+    error stop "[datarray] Shallow values must be contiguous."
+  end if
   call init_var(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
       cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
-      call c_f_pointer(cptr, var%buffer, &
+      call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(DOUBLE_TYPE, size(values, kind=int64))])
     end if
-  else if (.not. deep_copy) then
-    allocate (var%buffer(0))
   end if
 end function new_var_real64_15d
 
@@ -3067,7 +3157,7 @@ module function new_var_char_1d(name, values, dims, atts, deep) result(var)
   !> Name of the variable to create (will be trimmed).
   character(len=*), intent(in) :: name
   !> Single-character values to populate the variable's data buffer.
-  character, contiguous, target, intent(in) :: values(:)
+  character, target, intent(in) :: values(:)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -3090,7 +3180,7 @@ module function new_var_char_2d(name, values, dims, atts, deep) result(var)
   !> Name of the variable to create (will be trimmed).
   character(len=*), intent(in) :: name
   !> Single-character values to populate the variable's data buffer.
-  character, contiguous, target, intent(in) :: values(:, :)
+  character, target, intent(in) :: values(:, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -3113,7 +3203,7 @@ module function new_var_char_3d(name, values, dims, atts, deep) result(var)
   !> Name of the variable to create (will be trimmed).
   character(len=*), intent(in) :: name
   !> Single-character values to populate the variable's data buffer.
-  character, contiguous, target, intent(in) :: values(:, :, :)
+  character, target, intent(in) :: values(:, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -3136,7 +3226,7 @@ module function new_var_char_4d(name, values, dims, atts, deep) result(var)
   !> Name of the variable to create (will be trimmed).
   character(len=*), intent(in) :: name
   !> Single-character values to populate the variable's data buffer.
-  character, contiguous, target, intent(in) :: values(:, :, :, :)
+  character, target, intent(in) :: values(:, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -3159,7 +3249,7 @@ module function new_var_char_5d(name, values, dims, atts, deep) result(var)
   !> Name of the variable to create (will be trimmed).
   character(len=*), intent(in) :: name
   !> Single-character values to populate the variable's data buffer.
-  character, contiguous, target, intent(in) :: values(:, :, :, :, :)
+  character, target, intent(in) :: values(:, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -3182,7 +3272,7 @@ module function new_var_char_6d(name, values, dims, atts, deep) result(var)
   !> Name of the variable to create (will be trimmed).
   character(len=*), intent(in) :: name
   !> Single-character values to populate the variable's data buffer.
-  character, contiguous, target, intent(in) :: values(:, :, :, :, :, :)
+  character, target, intent(in) :: values(:, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -3205,7 +3295,7 @@ module function new_var_char_7d(name, values, dims, atts, deep) result(var)
   !> Name of the variable to create (will be trimmed).
   character(len=*), intent(in) :: name
   !> Single-character values to populate the variable's data buffer.
-  character, contiguous, target, intent(in) :: values(:, :, :, :, :, :, :)
+  character, target, intent(in) :: values(:, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -3228,7 +3318,7 @@ module function new_var_char_8d(name, values, dims, atts, deep) result(var)
   !> Name of the variable to create (will be trimmed).
   character(len=*), intent(in) :: name
   !> Single-character values to populate the variable's data buffer.
-  character, contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :)
+  character, target, intent(in) :: values(:, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -3251,7 +3341,7 @@ module function new_var_char_9d(name, values, dims, atts, deep) result(var)
   !> Name of the variable to create (will be trimmed).
   character(len=*), intent(in) :: name
   !> Single-character values to populate the variable's data buffer.
-  character, contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :)
+  character, target, intent(in) :: values(:, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -3274,7 +3364,7 @@ module function new_var_char_10d(name, values, dims, atts, deep) result(var)
   !> Name of the variable to create (will be trimmed).
   character(len=*), intent(in) :: name
   !> Single-character values to populate the variable's data buffer.
-  character, contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :)
+  character, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -3297,7 +3387,7 @@ module function new_var_char_11d(name, values, dims, atts, deep) result(var)
   !> Name of the variable to create (will be trimmed).
   character(len=*), intent(in) :: name
   !> Single-character values to populate the variable's data buffer.
-  character, contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :)
+  character, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -3320,7 +3410,7 @@ module function new_var_char_12d(name, values, dims, atts, deep) result(var)
   !> Name of the variable to create (will be trimmed).
   character(len=*), intent(in) :: name
   !> Single-character values to populate the variable's data buffer.
-  character, contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :)
+  character, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -3343,7 +3433,7 @@ module function new_var_char_13d(name, values, dims, atts, deep) result(var)
   !> Name of the variable to create (will be trimmed).
   character(len=*), intent(in) :: name
   !> Single-character values to populate the variable's data buffer.
-  character, contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :)
+  character, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -3366,7 +3456,7 @@ module function new_var_char_14d(name, values, dims, atts, deep) result(var)
   !> Name of the variable to create (will be trimmed).
   character(len=*), intent(in) :: name
   !> Single-character values to populate the variable's data buffer.
-  character, contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  character, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.
@@ -3389,7 +3479,7 @@ module function new_var_char_15d(name, values, dims, atts, deep) result(var)
   !> Name of the variable to create (will be trimmed).
   character(len=*), intent(in) :: name
   !> Single-character values to populate the variable's data buffer.
-  character, contiguous, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  character, target, intent(in) :: values(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
   !> Dimensions describing the variable's shape, ordered in Fortran order.
   type(dimension_type), intent(in) :: dims(:)
   !> Optional list of attributes to attach to the variable.

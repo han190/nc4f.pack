@@ -9,13 +9,18 @@ module subroutine clone_att_(src, dest)
   type(attribute_type), intent(in) :: src
   !> Output argument: `dest`.
   type(attribute_type), intent(out) :: dest
+  call validate(src, context="[clone_att]")
   dest%id = src%id
   dest%name = src%name
   dest%dtype = src%dtype
   dest%len = src%len
-  if (associated(src%buffer)) then
+  nullify (dest%ptr)
+  if (allocated(src%buffer)) then
     allocate (dest%buffer(size(src%buffer)))
     dest%buffer = src%buffer
+  else if (associated(src%ptr)) then
+    allocate (dest%buffer(size(src%ptr)))
+    dest%buffer = src%ptr
   end if
 end subroutine clone_att_
 
@@ -26,14 +31,19 @@ module subroutine clone_var_(src, dest)
   !> Output argument: `dest`.
   type(variable_type), intent(out) :: dest
   integer :: i
+  call validate(src, context="[clone_var]")
   dest%id = src%id
   dest%name = src%name
   dest%dtype = src%dtype
   dest%len = src%len
   if (allocated(src%dims)) dest%dims = src%dims
-  if (associated(src%buffer)) then
+  nullify (dest%ptr)
+  if (allocated(src%buffer)) then
     allocate (dest%buffer(size(src%buffer)))
     dest%buffer = src%buffer
+  else if (associated(src%ptr)) then
+    allocate (dest%buffer(size(src%ptr)))
+    dest%buffer = src%ptr
   end if
   if (allocated(src%atts)) then
     allocate (dest%atts(size(src%atts)))

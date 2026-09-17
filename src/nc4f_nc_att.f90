@@ -160,13 +160,12 @@ function get_att_(ncid, varid, name, error) result(att)
 
   zero_size_attr: if (att%len == 0) then
     call validate_att_buffer(att, "[get_att]")
-    if (associated(att%buffer)) nullify (att%buffer)
     return
   end if zero_size_attr
 
   call initialize(att)
   call validate_att_buffer(att, "[get_att]")
-  stat = nc_get_att(ncid, varid, f2cstr(att%name), c_loc(att%buffer(1)))
+  stat = nc_get_att(ncid, varid, f2cstr(att%name), buffer2cptr(att))
   error = make_netcdf_error(stat, context)
 end function get_att_
 
@@ -216,7 +215,7 @@ subroutine put_att_var_(nc, var, error)
       if (att%len == 0) then
         cptr = c_null_ptr
       else
-        cptr = c_loc(att%buffer(1))
+        cptr = buffer2cptr(att)
       end if
       context = "[put_att] Invalid attribute: "//att%name//"."
       stat = nc_put_att(nc%id, var%id, f2cstr(att%name), &
@@ -267,7 +266,7 @@ subroutine put_att_grp_(nc, error)
       if (att%len == 0) then
         cptr = c_null_ptr
       else
-        cptr = c_loc(att%buffer(1))
+        cptr = buffer2cptr(att)
       end if
       context = "[put_att] Invalid attribute: "//att%name//"."
       stat = nc_put_att(nc%id, NC_GLOBAL, f2cstr(att%name), &

@@ -11,12 +11,12 @@ module subroutine extract_att_int8_vector(att, ptr)
   !> C pointer used to map the attribute buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_att_data(att, BYTE_TYPE, "[extract_att_int8_vector]")
+  call validate(att, BYTE_TYPE, "[extract_att_int8_vector]")
   if (att%len == 0) then
     nullify (ptr)
     return
   end if
-  cptr = c_loc(att%buffer(1))
+  cptr = buffer2cptr(att)
   call c_f_pointer(cptr, ptr, [att%len])
 end subroutine extract_att_int8_vector
 
@@ -29,10 +29,10 @@ module subroutine extract_att_int8_scalar(att, ptr)
   !> C pointer used to map the attribute buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_att_data(att, BYTE_TYPE, "[extract_att_int8_scalar]")
+  call validate(att, BYTE_TYPE, "[extract_att_int8_scalar]")
   if (att%len /= 1) error stop &
     & "[extract_att_int8_scalar] Not a scalar."
-  cptr = c_loc(att%buffer(1))
+  cptr = buffer2cptr(att)
   call c_f_pointer(cptr, ptr)
 end subroutine extract_att_int8_scalar
 
@@ -45,12 +45,12 @@ module subroutine extract_att_int16_vector(att, ptr)
   !> C pointer used to map the attribute buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_att_data(att, SHORT_TYPE, "[extract_att_int16_vector]")
+  call validate(att, SHORT_TYPE, "[extract_att_int16_vector]")
   if (att%len == 0) then
     nullify (ptr)
     return
   end if
-  cptr = c_loc(att%buffer(1))
+  cptr = buffer2cptr(att)
   call c_f_pointer(cptr, ptr, [att%len])
 end subroutine extract_att_int16_vector
 
@@ -63,10 +63,10 @@ module subroutine extract_att_int16_scalar(att, ptr)
   !> C pointer used to map the attribute buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_att_data(att, SHORT_TYPE, "[extract_att_int16_scalar]")
+  call validate(att, SHORT_TYPE, "[extract_att_int16_scalar]")
   if (att%len /= 1) error stop &
     & "[extract_att_int16_scalar] Not a scalar."
-  cptr = c_loc(att%buffer(1))
+  cptr = buffer2cptr(att)
   call c_f_pointer(cptr, ptr)
 end subroutine extract_att_int16_scalar
 
@@ -79,12 +79,12 @@ module subroutine extract_att_int32_vector(att, ptr)
   !> C pointer used to map the attribute buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_att_data(att, INT_TYPE, "[extract_att_int32_vector]")
+  call validate(att, INT_TYPE, "[extract_att_int32_vector]")
   if (att%len == 0) then
     nullify (ptr)
     return
   end if
-  cptr = c_loc(att%buffer(1))
+  cptr = buffer2cptr(att)
   call c_f_pointer(cptr, ptr, [att%len])
 end subroutine extract_att_int32_vector
 
@@ -97,10 +97,10 @@ module subroutine extract_att_int32_scalar(att, ptr)
   !> C pointer used to map the attribute buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_att_data(att, INT_TYPE, "[extract_att_int32_scalar]")
+  call validate(att, INT_TYPE, "[extract_att_int32_scalar]")
   if (att%len /= 1) error stop &
     & "[extract_att_int32_scalar] Not a scalar."
-  cptr = c_loc(att%buffer(1))
+  cptr = buffer2cptr(att)
   call c_f_pointer(cptr, ptr)
 end subroutine extract_att_int32_scalar
 
@@ -113,12 +113,12 @@ module subroutine extract_att_int64_vector(att, ptr)
   !> C pointer used to map the attribute buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_att_data(att, INT64_TYPE, "[extract_att_int64_vector]")
+  call validate(att, INT64_TYPE, "[extract_att_int64_vector]")
   if (att%len == 0) then
     nullify (ptr)
     return
   end if
-  cptr = c_loc(att%buffer(1))
+  cptr = buffer2cptr(att)
   call c_f_pointer(cptr, ptr, [att%len])
 end subroutine extract_att_int64_vector
 
@@ -131,10 +131,10 @@ module subroutine extract_att_int64_scalar(att, ptr)
   !> C pointer used to map the attribute buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_att_data(att, INT64_TYPE, "[extract_att_int64_scalar]")
+  call validate(att, INT64_TYPE, "[extract_att_int64_scalar]")
   if (att%len /= 1) error stop &
     & "[extract_att_int64_scalar] Not a scalar."
-  cptr = c_loc(att%buffer(1))
+  cptr = buffer2cptr(att)
   call c_f_pointer(cptr, ptr)
 end subroutine extract_att_int64_scalar
 
@@ -147,12 +147,12 @@ module subroutine extract_att_real32_vector(att, ptr)
   !> C pointer used to map the attribute buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_att_data(att, FLOAT_TYPE, "[extract_att_real32_vector]")
+  call validate(att, FLOAT_TYPE, "[extract_att_real32_vector]")
   if (att%len == 0) then
     nullify (ptr)
     return
   end if
-  cptr = c_loc(att%buffer(1))
+  cptr = buffer2cptr(att)
   call c_f_pointer(cptr, ptr, [att%len])
 end subroutine extract_att_real32_vector
 
@@ -165,10 +165,10 @@ module subroutine extract_att_real32_scalar(att, ptr)
   !> C pointer used to map the attribute buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_att_data(att, FLOAT_TYPE, "[extract_att_real32_scalar]")
+  call validate(att, FLOAT_TYPE, "[extract_att_real32_scalar]")
   if (att%len /= 1) error stop &
     & "[extract_att_real32_scalar] Not a scalar."
-  cptr = c_loc(att%buffer(1))
+  cptr = buffer2cptr(att)
   call c_f_pointer(cptr, ptr)
 end subroutine extract_att_real32_scalar
 
@@ -181,12 +181,12 @@ module subroutine extract_att_real64_vector(att, ptr)
   !> C pointer used to map the attribute buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_att_data(att, DOUBLE_TYPE, "[extract_att_real64_vector]")
+  call validate(att, DOUBLE_TYPE, "[extract_att_real64_vector]")
   if (att%len == 0) then
     nullify (ptr)
     return
   end if
-  cptr = c_loc(att%buffer(1))
+  cptr = buffer2cptr(att)
   call c_f_pointer(cptr, ptr, [att%len])
 end subroutine extract_att_real64_vector
 
@@ -199,10 +199,10 @@ module subroutine extract_att_real64_scalar(att, ptr)
   !> C pointer used to map the attribute buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_att_data(att, DOUBLE_TYPE, "[extract_att_real64_scalar]")
+  call validate(att, DOUBLE_TYPE, "[extract_att_real64_scalar]")
   if (att%len /= 1) error stop &
     & "[extract_att_real64_scalar] Not a scalar."
-  cptr = c_loc(att%buffer(1))
+  cptr = buffer2cptr(att)
   call c_f_pointer(cptr, ptr)
 end subroutine extract_att_real64_scalar
 
@@ -215,12 +215,12 @@ module subroutine extract_att_char_vector(att, ptr)
   !> C pointer used to map the attribute buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_att_data(att, CHAR_TYPE, "[extract_att_char_vector]")
+  call validate(att, CHAR_TYPE, "[extract_att_char_vector]")
   if (att%len == 0) then
     nullify (ptr)
     return
   end if
-  cptr = c_loc(att%buffer(1))
+  cptr = buffer2cptr(att)
   call c_f_pointer(cptr, ptr, [att%len])
 end subroutine extract_att_char_vector
 
@@ -235,7 +235,7 @@ module subroutine extract_att_char_scalar(att, ptr)
   !> Loop index for copying characters.
   integer :: i
 
-  call validate_att_data(att, CHAR_TYPE, "[extract_att_char_scalar]")
+  call validate(att, CHAR_TYPE, "[extract_att_char_scalar]")
   allocate (character(len=att%len) :: ptr)
   if (att%len == 0) return
   call extract_att_char_vector(att, ptrs)
@@ -253,13 +253,13 @@ module subroutine extract_var_int8_1d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, BYTE_TYPE, 1, "[extract_var_int8_1d]")
+  call validate(var, BYTE_TYPE, 1, "[extract_var_int8_1d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, [var%len])
 end subroutine extract_var_int8_1d
 
@@ -272,13 +272,13 @@ module subroutine extract_var_int8_2d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, BYTE_TYPE, 2, "[extract_var_int8_2d]")
+  call validate(var, BYTE_TYPE, 2, "[extract_var_int8_2d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int8_2d
 
@@ -291,13 +291,13 @@ module subroutine extract_var_int8_3d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, BYTE_TYPE, 3, "[extract_var_int8_3d]")
+  call validate(var, BYTE_TYPE, 3, "[extract_var_int8_3d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int8_3d
 
@@ -310,13 +310,13 @@ module subroutine extract_var_int8_4d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, BYTE_TYPE, 4, "[extract_var_int8_4d]")
+  call validate(var, BYTE_TYPE, 4, "[extract_var_int8_4d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int8_4d
 
@@ -329,13 +329,13 @@ module subroutine extract_var_int8_5d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, BYTE_TYPE, 5, "[extract_var_int8_5d]")
+  call validate(var, BYTE_TYPE, 5, "[extract_var_int8_5d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int8_5d
 
@@ -348,13 +348,13 @@ module subroutine extract_var_int8_6d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, BYTE_TYPE, 6, "[extract_var_int8_6d]")
+  call validate(var, BYTE_TYPE, 6, "[extract_var_int8_6d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int8_6d
 
@@ -367,13 +367,13 @@ module subroutine extract_var_int8_7d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, BYTE_TYPE, 7, "[extract_var_int8_7d]")
+  call validate(var, BYTE_TYPE, 7, "[extract_var_int8_7d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int8_7d
 
@@ -386,13 +386,13 @@ module subroutine extract_var_int8_8d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, BYTE_TYPE, 8, "[extract_var_int8_8d]")
+  call validate(var, BYTE_TYPE, 8, "[extract_var_int8_8d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int8_8d
 
@@ -405,13 +405,13 @@ module subroutine extract_var_int8_9d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, BYTE_TYPE, 9, "[extract_var_int8_9d]")
+  call validate(var, BYTE_TYPE, 9, "[extract_var_int8_9d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int8_9d
 
@@ -424,13 +424,13 @@ module subroutine extract_var_int8_10d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, BYTE_TYPE, 10, "[extract_var_int8_10d]")
+  call validate(var, BYTE_TYPE, 10, "[extract_var_int8_10d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int8_10d
 
@@ -443,13 +443,13 @@ module subroutine extract_var_int8_11d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, BYTE_TYPE, 11, "[extract_var_int8_11d]")
+  call validate(var, BYTE_TYPE, 11, "[extract_var_int8_11d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int8_11d
 
@@ -462,13 +462,13 @@ module subroutine extract_var_int8_12d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, BYTE_TYPE, 12, "[extract_var_int8_12d]")
+  call validate(var, BYTE_TYPE, 12, "[extract_var_int8_12d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int8_12d
 
@@ -481,13 +481,13 @@ module subroutine extract_var_int8_13d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, BYTE_TYPE, 13, "[extract_var_int8_13d]")
+  call validate(var, BYTE_TYPE, 13, "[extract_var_int8_13d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int8_13d
 
@@ -500,13 +500,13 @@ module subroutine extract_var_int8_14d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, BYTE_TYPE, 14, "[extract_var_int8_14d]")
+  call validate(var, BYTE_TYPE, 14, "[extract_var_int8_14d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int8_14d
 
@@ -519,13 +519,13 @@ module subroutine extract_var_int8_15d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, BYTE_TYPE, 15, "[extract_var_int8_15d]")
+  call validate(var, BYTE_TYPE, 15, "[extract_var_int8_15d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int8_15d
 
@@ -538,13 +538,13 @@ module subroutine extract_var_int16_1d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, SHORT_TYPE, 1, "[extract_var_int16_1d]")
+  call validate(var, SHORT_TYPE, 1, "[extract_var_int16_1d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, [var%len])
 end subroutine extract_var_int16_1d
 
@@ -557,13 +557,13 @@ module subroutine extract_var_int16_2d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, SHORT_TYPE, 2, "[extract_var_int16_2d]")
+  call validate(var, SHORT_TYPE, 2, "[extract_var_int16_2d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int16_2d
 
@@ -576,13 +576,13 @@ module subroutine extract_var_int16_3d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, SHORT_TYPE, 3, "[extract_var_int16_3d]")
+  call validate(var, SHORT_TYPE, 3, "[extract_var_int16_3d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int16_3d
 
@@ -595,13 +595,13 @@ module subroutine extract_var_int16_4d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, SHORT_TYPE, 4, "[extract_var_int16_4d]")
+  call validate(var, SHORT_TYPE, 4, "[extract_var_int16_4d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int16_4d
 
@@ -614,13 +614,13 @@ module subroutine extract_var_int16_5d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, SHORT_TYPE, 5, "[extract_var_int16_5d]")
+  call validate(var, SHORT_TYPE, 5, "[extract_var_int16_5d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int16_5d
 
@@ -633,13 +633,13 @@ module subroutine extract_var_int16_6d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, SHORT_TYPE, 6, "[extract_var_int16_6d]")
+  call validate(var, SHORT_TYPE, 6, "[extract_var_int16_6d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int16_6d
 
@@ -652,13 +652,13 @@ module subroutine extract_var_int16_7d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, SHORT_TYPE, 7, "[extract_var_int16_7d]")
+  call validate(var, SHORT_TYPE, 7, "[extract_var_int16_7d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int16_7d
 
@@ -671,13 +671,13 @@ module subroutine extract_var_int16_8d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, SHORT_TYPE, 8, "[extract_var_int16_8d]")
+  call validate(var, SHORT_TYPE, 8, "[extract_var_int16_8d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int16_8d
 
@@ -690,13 +690,13 @@ module subroutine extract_var_int16_9d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, SHORT_TYPE, 9, "[extract_var_int16_9d]")
+  call validate(var, SHORT_TYPE, 9, "[extract_var_int16_9d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int16_9d
 
@@ -709,13 +709,13 @@ module subroutine extract_var_int16_10d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, SHORT_TYPE, 10, "[extract_var_int16_10d]")
+  call validate(var, SHORT_TYPE, 10, "[extract_var_int16_10d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int16_10d
 
@@ -728,13 +728,13 @@ module subroutine extract_var_int16_11d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, SHORT_TYPE, 11, "[extract_var_int16_11d]")
+  call validate(var, SHORT_TYPE, 11, "[extract_var_int16_11d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int16_11d
 
@@ -747,13 +747,13 @@ module subroutine extract_var_int16_12d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, SHORT_TYPE, 12, "[extract_var_int16_12d]")
+  call validate(var, SHORT_TYPE, 12, "[extract_var_int16_12d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int16_12d
 
@@ -766,13 +766,13 @@ module subroutine extract_var_int16_13d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, SHORT_TYPE, 13, "[extract_var_int16_13d]")
+  call validate(var, SHORT_TYPE, 13, "[extract_var_int16_13d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int16_13d
 
@@ -785,13 +785,13 @@ module subroutine extract_var_int16_14d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, SHORT_TYPE, 14, "[extract_var_int16_14d]")
+  call validate(var, SHORT_TYPE, 14, "[extract_var_int16_14d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int16_14d
 
@@ -804,13 +804,13 @@ module subroutine extract_var_int16_15d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, SHORT_TYPE, 15, "[extract_var_int16_15d]")
+  call validate(var, SHORT_TYPE, 15, "[extract_var_int16_15d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int16_15d
 
@@ -823,13 +823,13 @@ module subroutine extract_var_int32_1d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, INT_TYPE, 1, "[extract_var_int32_1d]")
+  call validate(var, INT_TYPE, 1, "[extract_var_int32_1d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, [var%len])
 end subroutine extract_var_int32_1d
 
@@ -842,13 +842,13 @@ module subroutine extract_var_int32_2d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, INT_TYPE, 2, "[extract_var_int32_2d]")
+  call validate(var, INT_TYPE, 2, "[extract_var_int32_2d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int32_2d
 
@@ -861,13 +861,13 @@ module subroutine extract_var_int32_3d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, INT_TYPE, 3, "[extract_var_int32_3d]")
+  call validate(var, INT_TYPE, 3, "[extract_var_int32_3d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int32_3d
 
@@ -880,13 +880,13 @@ module subroutine extract_var_int32_4d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, INT_TYPE, 4, "[extract_var_int32_4d]")
+  call validate(var, INT_TYPE, 4, "[extract_var_int32_4d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int32_4d
 
@@ -899,13 +899,13 @@ module subroutine extract_var_int32_5d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, INT_TYPE, 5, "[extract_var_int32_5d]")
+  call validate(var, INT_TYPE, 5, "[extract_var_int32_5d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int32_5d
 
@@ -918,13 +918,13 @@ module subroutine extract_var_int32_6d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, INT_TYPE, 6, "[extract_var_int32_6d]")
+  call validate(var, INT_TYPE, 6, "[extract_var_int32_6d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int32_6d
 
@@ -937,13 +937,13 @@ module subroutine extract_var_int32_7d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, INT_TYPE, 7, "[extract_var_int32_7d]")
+  call validate(var, INT_TYPE, 7, "[extract_var_int32_7d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int32_7d
 
@@ -956,13 +956,13 @@ module subroutine extract_var_int32_8d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, INT_TYPE, 8, "[extract_var_int32_8d]")
+  call validate(var, INT_TYPE, 8, "[extract_var_int32_8d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int32_8d
 
@@ -975,13 +975,13 @@ module subroutine extract_var_int32_9d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, INT_TYPE, 9, "[extract_var_int32_9d]")
+  call validate(var, INT_TYPE, 9, "[extract_var_int32_9d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int32_9d
 
@@ -994,13 +994,13 @@ module subroutine extract_var_int32_10d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, INT_TYPE, 10, "[extract_var_int32_10d]")
+  call validate(var, INT_TYPE, 10, "[extract_var_int32_10d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int32_10d
 
@@ -1013,13 +1013,13 @@ module subroutine extract_var_int32_11d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, INT_TYPE, 11, "[extract_var_int32_11d]")
+  call validate(var, INT_TYPE, 11, "[extract_var_int32_11d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int32_11d
 
@@ -1032,13 +1032,13 @@ module subroutine extract_var_int32_12d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, INT_TYPE, 12, "[extract_var_int32_12d]")
+  call validate(var, INT_TYPE, 12, "[extract_var_int32_12d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int32_12d
 
@@ -1051,13 +1051,13 @@ module subroutine extract_var_int32_13d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, INT_TYPE, 13, "[extract_var_int32_13d]")
+  call validate(var, INT_TYPE, 13, "[extract_var_int32_13d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int32_13d
 
@@ -1070,13 +1070,13 @@ module subroutine extract_var_int32_14d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, INT_TYPE, 14, "[extract_var_int32_14d]")
+  call validate(var, INT_TYPE, 14, "[extract_var_int32_14d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int32_14d
 
@@ -1089,13 +1089,13 @@ module subroutine extract_var_int32_15d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, INT_TYPE, 15, "[extract_var_int32_15d]")
+  call validate(var, INT_TYPE, 15, "[extract_var_int32_15d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int32_15d
 
@@ -1108,13 +1108,13 @@ module subroutine extract_var_int64_1d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, INT64_TYPE, 1, "[extract_var_int64_1d]")
+  call validate(var, INT64_TYPE, 1, "[extract_var_int64_1d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, [var%len])
 end subroutine extract_var_int64_1d
 
@@ -1127,13 +1127,13 @@ module subroutine extract_var_int64_2d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, INT64_TYPE, 2, "[extract_var_int64_2d]")
+  call validate(var, INT64_TYPE, 2, "[extract_var_int64_2d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int64_2d
 
@@ -1146,13 +1146,13 @@ module subroutine extract_var_int64_3d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, INT64_TYPE, 3, "[extract_var_int64_3d]")
+  call validate(var, INT64_TYPE, 3, "[extract_var_int64_3d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int64_3d
 
@@ -1165,13 +1165,13 @@ module subroutine extract_var_int64_4d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, INT64_TYPE, 4, "[extract_var_int64_4d]")
+  call validate(var, INT64_TYPE, 4, "[extract_var_int64_4d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int64_4d
 
@@ -1184,13 +1184,13 @@ module subroutine extract_var_int64_5d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, INT64_TYPE, 5, "[extract_var_int64_5d]")
+  call validate(var, INT64_TYPE, 5, "[extract_var_int64_5d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int64_5d
 
@@ -1203,13 +1203,13 @@ module subroutine extract_var_int64_6d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, INT64_TYPE, 6, "[extract_var_int64_6d]")
+  call validate(var, INT64_TYPE, 6, "[extract_var_int64_6d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int64_6d
 
@@ -1222,13 +1222,13 @@ module subroutine extract_var_int64_7d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, INT64_TYPE, 7, "[extract_var_int64_7d]")
+  call validate(var, INT64_TYPE, 7, "[extract_var_int64_7d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int64_7d
 
@@ -1241,13 +1241,13 @@ module subroutine extract_var_int64_8d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, INT64_TYPE, 8, "[extract_var_int64_8d]")
+  call validate(var, INT64_TYPE, 8, "[extract_var_int64_8d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int64_8d
 
@@ -1260,13 +1260,13 @@ module subroutine extract_var_int64_9d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, INT64_TYPE, 9, "[extract_var_int64_9d]")
+  call validate(var, INT64_TYPE, 9, "[extract_var_int64_9d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int64_9d
 
@@ -1279,13 +1279,13 @@ module subroutine extract_var_int64_10d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, INT64_TYPE, 10, "[extract_var_int64_10d]")
+  call validate(var, INT64_TYPE, 10, "[extract_var_int64_10d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int64_10d
 
@@ -1298,13 +1298,13 @@ module subroutine extract_var_int64_11d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, INT64_TYPE, 11, "[extract_var_int64_11d]")
+  call validate(var, INT64_TYPE, 11, "[extract_var_int64_11d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int64_11d
 
@@ -1317,13 +1317,13 @@ module subroutine extract_var_int64_12d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, INT64_TYPE, 12, "[extract_var_int64_12d]")
+  call validate(var, INT64_TYPE, 12, "[extract_var_int64_12d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int64_12d
 
@@ -1336,13 +1336,13 @@ module subroutine extract_var_int64_13d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, INT64_TYPE, 13, "[extract_var_int64_13d]")
+  call validate(var, INT64_TYPE, 13, "[extract_var_int64_13d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int64_13d
 
@@ -1355,13 +1355,13 @@ module subroutine extract_var_int64_14d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, INT64_TYPE, 14, "[extract_var_int64_14d]")
+  call validate(var, INT64_TYPE, 14, "[extract_var_int64_14d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int64_14d
 
@@ -1374,13 +1374,13 @@ module subroutine extract_var_int64_15d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, INT64_TYPE, 15, "[extract_var_int64_15d]")
+  call validate(var, INT64_TYPE, 15, "[extract_var_int64_15d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_int64_15d
 
@@ -1393,13 +1393,13 @@ module subroutine extract_var_real32_1d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, FLOAT_TYPE, 1, "[extract_var_real32_1d]")
+  call validate(var, FLOAT_TYPE, 1, "[extract_var_real32_1d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, [var%len])
 end subroutine extract_var_real32_1d
 
@@ -1412,13 +1412,13 @@ module subroutine extract_var_real32_2d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, FLOAT_TYPE, 2, "[extract_var_real32_2d]")
+  call validate(var, FLOAT_TYPE, 2, "[extract_var_real32_2d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_real32_2d
 
@@ -1431,13 +1431,13 @@ module subroutine extract_var_real32_3d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, FLOAT_TYPE, 3, "[extract_var_real32_3d]")
+  call validate(var, FLOAT_TYPE, 3, "[extract_var_real32_3d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_real32_3d
 
@@ -1450,13 +1450,13 @@ module subroutine extract_var_real32_4d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, FLOAT_TYPE, 4, "[extract_var_real32_4d]")
+  call validate(var, FLOAT_TYPE, 4, "[extract_var_real32_4d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_real32_4d
 
@@ -1469,13 +1469,13 @@ module subroutine extract_var_real32_5d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, FLOAT_TYPE, 5, "[extract_var_real32_5d]")
+  call validate(var, FLOAT_TYPE, 5, "[extract_var_real32_5d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_real32_5d
 
@@ -1488,13 +1488,13 @@ module subroutine extract_var_real32_6d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, FLOAT_TYPE, 6, "[extract_var_real32_6d]")
+  call validate(var, FLOAT_TYPE, 6, "[extract_var_real32_6d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_real32_6d
 
@@ -1507,13 +1507,13 @@ module subroutine extract_var_real32_7d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, FLOAT_TYPE, 7, "[extract_var_real32_7d]")
+  call validate(var, FLOAT_TYPE, 7, "[extract_var_real32_7d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_real32_7d
 
@@ -1526,13 +1526,13 @@ module subroutine extract_var_real32_8d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, FLOAT_TYPE, 8, "[extract_var_real32_8d]")
+  call validate(var, FLOAT_TYPE, 8, "[extract_var_real32_8d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_real32_8d
 
@@ -1545,13 +1545,13 @@ module subroutine extract_var_real32_9d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, FLOAT_TYPE, 9, "[extract_var_real32_9d]")
+  call validate(var, FLOAT_TYPE, 9, "[extract_var_real32_9d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_real32_9d
 
@@ -1564,13 +1564,13 @@ module subroutine extract_var_real32_10d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, FLOAT_TYPE, 10, "[extract_var_real32_10d]")
+  call validate(var, FLOAT_TYPE, 10, "[extract_var_real32_10d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_real32_10d
 
@@ -1583,13 +1583,13 @@ module subroutine extract_var_real32_11d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, FLOAT_TYPE, 11, "[extract_var_real32_11d]")
+  call validate(var, FLOAT_TYPE, 11, "[extract_var_real32_11d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_real32_11d
 
@@ -1602,13 +1602,13 @@ module subroutine extract_var_real32_12d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, FLOAT_TYPE, 12, "[extract_var_real32_12d]")
+  call validate(var, FLOAT_TYPE, 12, "[extract_var_real32_12d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_real32_12d
 
@@ -1621,13 +1621,13 @@ module subroutine extract_var_real32_13d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, FLOAT_TYPE, 13, "[extract_var_real32_13d]")
+  call validate(var, FLOAT_TYPE, 13, "[extract_var_real32_13d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_real32_13d
 
@@ -1640,13 +1640,13 @@ module subroutine extract_var_real32_14d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, FLOAT_TYPE, 14, "[extract_var_real32_14d]")
+  call validate(var, FLOAT_TYPE, 14, "[extract_var_real32_14d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_real32_14d
 
@@ -1659,13 +1659,13 @@ module subroutine extract_var_real32_15d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, FLOAT_TYPE, 15, "[extract_var_real32_15d]")
+  call validate(var, FLOAT_TYPE, 15, "[extract_var_real32_15d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_real32_15d
 
@@ -1678,13 +1678,13 @@ module subroutine extract_var_real64_1d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, DOUBLE_TYPE, 1, "[extract_var_real64_1d]")
+  call validate(var, DOUBLE_TYPE, 1, "[extract_var_real64_1d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, [var%len])
 end subroutine extract_var_real64_1d
 
@@ -1697,13 +1697,13 @@ module subroutine extract_var_real64_2d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, DOUBLE_TYPE, 2, "[extract_var_real64_2d]")
+  call validate(var, DOUBLE_TYPE, 2, "[extract_var_real64_2d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_real64_2d
 
@@ -1716,13 +1716,13 @@ module subroutine extract_var_real64_3d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, DOUBLE_TYPE, 3, "[extract_var_real64_3d]")
+  call validate(var, DOUBLE_TYPE, 3, "[extract_var_real64_3d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_real64_3d
 
@@ -1735,13 +1735,13 @@ module subroutine extract_var_real64_4d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, DOUBLE_TYPE, 4, "[extract_var_real64_4d]")
+  call validate(var, DOUBLE_TYPE, 4, "[extract_var_real64_4d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_real64_4d
 
@@ -1754,13 +1754,13 @@ module subroutine extract_var_real64_5d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, DOUBLE_TYPE, 5, "[extract_var_real64_5d]")
+  call validate(var, DOUBLE_TYPE, 5, "[extract_var_real64_5d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_real64_5d
 
@@ -1773,13 +1773,13 @@ module subroutine extract_var_real64_6d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, DOUBLE_TYPE, 6, "[extract_var_real64_6d]")
+  call validate(var, DOUBLE_TYPE, 6, "[extract_var_real64_6d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_real64_6d
 
@@ -1792,13 +1792,13 @@ module subroutine extract_var_real64_7d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, DOUBLE_TYPE, 7, "[extract_var_real64_7d]")
+  call validate(var, DOUBLE_TYPE, 7, "[extract_var_real64_7d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_real64_7d
 
@@ -1811,13 +1811,13 @@ module subroutine extract_var_real64_8d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, DOUBLE_TYPE, 8, "[extract_var_real64_8d]")
+  call validate(var, DOUBLE_TYPE, 8, "[extract_var_real64_8d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_real64_8d
 
@@ -1830,13 +1830,13 @@ module subroutine extract_var_real64_9d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, DOUBLE_TYPE, 9, "[extract_var_real64_9d]")
+  call validate(var, DOUBLE_TYPE, 9, "[extract_var_real64_9d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_real64_9d
 
@@ -1849,13 +1849,13 @@ module subroutine extract_var_real64_10d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, DOUBLE_TYPE, 10, "[extract_var_real64_10d]")
+  call validate(var, DOUBLE_TYPE, 10, "[extract_var_real64_10d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_real64_10d
 
@@ -1868,13 +1868,13 @@ module subroutine extract_var_real64_11d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, DOUBLE_TYPE, 11, "[extract_var_real64_11d]")
+  call validate(var, DOUBLE_TYPE, 11, "[extract_var_real64_11d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_real64_11d
 
@@ -1887,13 +1887,13 @@ module subroutine extract_var_real64_12d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, DOUBLE_TYPE, 12, "[extract_var_real64_12d]")
+  call validate(var, DOUBLE_TYPE, 12, "[extract_var_real64_12d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_real64_12d
 
@@ -1906,13 +1906,13 @@ module subroutine extract_var_real64_13d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, DOUBLE_TYPE, 13, "[extract_var_real64_13d]")
+  call validate(var, DOUBLE_TYPE, 13, "[extract_var_real64_13d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_real64_13d
 
@@ -1925,13 +1925,13 @@ module subroutine extract_var_real64_14d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, DOUBLE_TYPE, 14, "[extract_var_real64_14d]")
+  call validate(var, DOUBLE_TYPE, 14, "[extract_var_real64_14d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_real64_14d
 
@@ -1944,13 +1944,13 @@ module subroutine extract_var_real64_15d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, DOUBLE_TYPE, 15, "[extract_var_real64_15d]")
+  call validate(var, DOUBLE_TYPE, 15, "[extract_var_real64_15d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_real64_15d
 
@@ -1963,13 +1963,13 @@ module subroutine extract_var_char_1d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, CHAR_TYPE, 1, "[extract_var_char_1d]")
+  call validate(var, CHAR_TYPE, 1, "[extract_var_char_1d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, [var%len])
 end subroutine extract_var_char_1d
 
@@ -1982,13 +1982,13 @@ module subroutine extract_var_char_2d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, CHAR_TYPE, 2, "[extract_var_char_2d]")
+  call validate(var, CHAR_TYPE, 2, "[extract_var_char_2d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_char_2d
 
@@ -2001,13 +2001,13 @@ module subroutine extract_var_char_3d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, CHAR_TYPE, 3, "[extract_var_char_3d]")
+  call validate(var, CHAR_TYPE, 3, "[extract_var_char_3d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_char_3d
 
@@ -2020,13 +2020,13 @@ module subroutine extract_var_char_4d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, CHAR_TYPE, 4, "[extract_var_char_4d]")
+  call validate(var, CHAR_TYPE, 4, "[extract_var_char_4d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_char_4d
 
@@ -2039,13 +2039,13 @@ module subroutine extract_var_char_5d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, CHAR_TYPE, 5, "[extract_var_char_5d]")
+  call validate(var, CHAR_TYPE, 5, "[extract_var_char_5d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_char_5d
 
@@ -2058,13 +2058,13 @@ module subroutine extract_var_char_6d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, CHAR_TYPE, 6, "[extract_var_char_6d]")
+  call validate(var, CHAR_TYPE, 6, "[extract_var_char_6d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_char_6d
 
@@ -2077,13 +2077,13 @@ module subroutine extract_var_char_7d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, CHAR_TYPE, 7, "[extract_var_char_7d]")
+  call validate(var, CHAR_TYPE, 7, "[extract_var_char_7d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_char_7d
 
@@ -2096,13 +2096,13 @@ module subroutine extract_var_char_8d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, CHAR_TYPE, 8, "[extract_var_char_8d]")
+  call validate(var, CHAR_TYPE, 8, "[extract_var_char_8d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_char_8d
 
@@ -2115,13 +2115,13 @@ module subroutine extract_var_char_9d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, CHAR_TYPE, 9, "[extract_var_char_9d]")
+  call validate(var, CHAR_TYPE, 9, "[extract_var_char_9d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_char_9d
 
@@ -2134,13 +2134,13 @@ module subroutine extract_var_char_10d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, CHAR_TYPE, 10, "[extract_var_char_10d]")
+  call validate(var, CHAR_TYPE, 10, "[extract_var_char_10d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_char_10d
 
@@ -2153,13 +2153,13 @@ module subroutine extract_var_char_11d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, CHAR_TYPE, 11, "[extract_var_char_11d]")
+  call validate(var, CHAR_TYPE, 11, "[extract_var_char_11d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_char_11d
 
@@ -2172,13 +2172,13 @@ module subroutine extract_var_char_12d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, CHAR_TYPE, 12, "[extract_var_char_12d]")
+  call validate(var, CHAR_TYPE, 12, "[extract_var_char_12d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_char_12d
 
@@ -2191,13 +2191,13 @@ module subroutine extract_var_char_13d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, CHAR_TYPE, 13, "[extract_var_char_13d]")
+  call validate(var, CHAR_TYPE, 13, "[extract_var_char_13d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_char_13d
 
@@ -2210,13 +2210,13 @@ module subroutine extract_var_char_14d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, CHAR_TYPE, 14, "[extract_var_char_14d]")
+  call validate(var, CHAR_TYPE, 14, "[extract_var_char_14d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_char_14d
 
@@ -2229,13 +2229,13 @@ module subroutine extract_var_char_15d(var, ptr)
   !> C pointer used to map the variable buffer into the Fortran pointer.
   type(c_ptr) :: cptr
 
-  call validate_var_data(var, CHAR_TYPE, 15, "[extract_var_char_15d]")
+  call validate(var, CHAR_TYPE, 15, "[extract_var_char_15d]")
   if (var%len == 0) then
     nullify (ptr)
     return
   end if
 
-  cptr = c_loc(var%buffer(1))
+  cptr = buffer2cptr(var)
   call c_f_pointer(cptr, ptr, shape(var))
 end subroutine extract_var_char_15d
 

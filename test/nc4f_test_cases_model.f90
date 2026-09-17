@@ -42,9 +42,12 @@ module subroutine data_model(passed)
   owned_var = datarray("owned", values, ["x".dim.2, "y".dim.2], deep=.true.)
   borrowed_var = datarray("borrowed", values, &
     & ["x".dim.2, "y".dim.2], deep=.false.)
-  if (c_associated(c_loc(owned_var%buffer(1)), c_loc(values(1, 1)))) return
-  if (.not. c_associated(c_loc(borrowed_var%buffer(1)), &
+  if (.not. allocated(owned_var%buffer) .or. associated(owned_var%ptr)) return
+  if (allocated(borrowed_var%buffer) .or. .not. associated(borrowed_var%ptr)) return
+  if (.not. c_associated(c_loc(borrowed_var%ptr(1)), &
     & c_loc(values(1, 1)))) return
+  if (.not. is_contiguous(owned_var%buffer) .or. &
+    & .not. is_contiguous(borrowed_var%ptr)) return
   call extract(borrowed_var, extracted)
   if (.not. c_associated(c_loc(extracted(1, 1)), c_loc(values(1, 1)))) return
 
@@ -57,11 +60,11 @@ module subroutine data_model(passed)
   group_only = dataset("groups", child_grps, [atts(1)])
   grp = dataset("root", [vars(1)], child_grps, [atts(1)])
   deep_grp = dataset("deep", [borrowed_var], child_grps, [atts(1)], deep=.true.)
-  if (c_associated(c_loc(deep_grp%vars(1)%buffer(1)), &
-    & c_loc(values(1, 1)))) return
+  if (.not. allocated(deep_grp%vars(1)%buffer) .or. &
+    & associated(deep_grp%vars(1)%ptr)) return
   if (.not. associated(grp%grps(1)%grps, child%grps)) return
-  if (.not. c_associated(c_loc(grp%vars(1)%buffer(1)), &
-    & c_loc(vars(1)%buffer(1)))) return
+  if (.not. allocated(grp%vars(1)%buffer) .or. &
+    & associated(grp%vars(1)%ptr)) return
   if (associated(deep_grp%grps(1)%grps, child%grps)) return
 
   dim = "time".dim. (0 .and. .true.)
@@ -69,6 +72,7 @@ module subroutine data_model(passed)
   call initialize(cloned_att, mold=atts(1))
   if (cloned_att%name /= atts(1)%name .or. &
     & cloned_att%dtype /= atts(1)%dtype) return
+  if (.not. allocated(cloned_att%buffer) .or. associated(cloned_att%ptr)) return
   if (.not. (owned_var == owned_var) .or. owned_var == borrowed_var) return
   if (size(owned_var) /= 4 .or. size(owned_var, 1) /= 2) return
   extents = shape(owned_var)

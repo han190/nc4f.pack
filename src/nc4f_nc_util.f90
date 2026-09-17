@@ -9,7 +9,8 @@ module subroutine initialize_att(att)
   integer :: nbytes
 
   nbytes = buffer_size(att%dtype, att%len, "[initialize_att]")
-  if (associated(att%buffer)) nullify (att%buffer)
+  if (allocated(att%buffer)) deallocate (att%buffer)
+  nullify (att%ptr)
   allocate (att%buffer(nbytes))
 end subroutine initialize_att
 
@@ -20,7 +21,8 @@ module subroutine initialize_var(var)
   integer :: nbytes
 
   nbytes = buffer_size(var%dtype, var%len, "[initialize_var]")
-  if (associated(var%buffer)) nullify (var%buffer)
+  if (allocated(var%buffer)) deallocate (var%buffer)
+  nullify (var%ptr)
   allocate (var%buffer(nbytes))
 end subroutine initialize_var
 
@@ -65,17 +67,7 @@ module subroutine validate_var_buffer(var, context)
   type(variable_type), intent(in) :: var
   !> Input argument: `context`.
   character(len=*), intent(in) :: context
-  integer :: required_bytes
-
-  if (.not. allocated(var%dims)) then
-    error stop trim(context)//" Variable dimensions are not allocated."
-  end if
-  if (size(var) /= var%len) then
-    error stop trim(context)//" Dimension product differs from variable length."
-  end if
-  required_bytes = buffer_size(var%dtype, var%len, context)
-  call validate_buffer(var%buffer, &
-    & int(required_bytes, int64), "Variable", context)
+  call validate(var, context=context)
 end subroutine validate_var_buffer
 
 !> Validate an attribute byte buffer before passing it to the C API.
@@ -84,11 +76,7 @@ module subroutine validate_att_buffer(att, context)
   type(attribute_type), intent(in) :: att
   !> Input argument: `context`.
   character(len=*), intent(in) :: context
-  integer :: required_bytes
-
-  required_bytes = buffer_size(att%dtype, att%len, context)
-  call validate_buffer(att%buffer, &
-    & int(required_bytes, int64), "Attribute", context)
+  call validate(att, context=context)
 end subroutine validate_att_buffer
 
 end submodule nc4f_nc_util
