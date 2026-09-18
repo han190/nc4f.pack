@@ -167,112 +167,53 @@ subroutine close_dataset_(nc, error)
   if (associated(nc%grps)) nullify (nc%grps)
 end subroutine close_dataset_
 
-!> Create a netCDF file from an array of `variable_type` objects.
-module subroutine to_netcdf_vars(filename, vars, atts, error)
+!> Create a netCDF file from one variable or a rank-one variable array.
+module subroutine to_netcdf_var(filename, vars, atts, error)
   !> Output filename to create.
   character(len=*), intent(in) :: filename
-  !> Array of variables to write into the file.
-  type(variable_type), intent(in) :: vars(:)
+  !> Variable or array of variables to write into the file.
+  type(variable_type), intent(in) :: vars(..)
   !> Optional array of global attributes to attach to the dataset.
   type(attribute_type), intent(in), optional :: atts(:)
   !> Optional error result. When absent, failures stop the program.
   type(error_type), intent(out), optional :: error
-  type(error_type) :: operation_error
-
-  call to_netcdf_vars_(filename, vars, atts, operation_error)
-  if (present(error)) then
-    error = operation_error
-  else if (handle_error(operation_error)) then
-    return
-  end if
-end subroutine to_netcdf_vars
-
-!> Create a netCDF file from an array and construct the operation result.
-subroutine to_netcdf_vars_(filename, vars, atts, error)
-  !> Input argument(s): `filename`.
-  character(len=*), intent(in) :: filename
-  !> Input argument(s): `vars(:)`.
-  type(variable_type), intent(in) :: vars(:)
-  !> Input argument(s): `atts(:)`.
-  type(attribute_type), intent(in), optional :: atts(:)
-  !> Output argument(s): `error`.
-  type(error_type), intent(out) :: error
   type(netcdf_type) :: nc
-  type(error_type) :: cleanup_error
+  type(error_type) :: operation_error, cleanup_error
   integer :: i
 
-  error = error_type()
-  nc = open_dataset_(filename, mode="w", error=error)
-  if (has_error(error)) return
-  do i = 1, size(vars)
-    call put_var_error(nc, vars(i), error)
-    if (has_error(error)) then
-      call close_dataset_(nc, cleanup_error)
-      return
+  operation_error = error_type()
+  nc = open_dataset_(filename, mode="w", error=operation_error)
+  if (.not. has_error(operation_error)) then
+    select rank (items => vars)
+    rank (0)
+      call put_var_error(nc, items, operation_error)
+    rank (1)
+      do i = 1, size(items)
+        call put_var_error(nc, items(i), operation_error)
+        if (has_error(operation_error)) exit
+      end do
+    rank default
+      operation_error = error_type(NC_EINVAL, &
+        & "[to_netcdf_var] Expected a scalar or rank-one variable array.")
+    end select
+
+    if (.not. has_error(operation_error) .and. present(atts)) then
+      nc%atts = atts
+      call put_att_grp_error(nc, operation_error)
     end if
-  end do
-  if (present(atts)) then
-    nc%atts = atts
-    call put_att_grp_error(nc, error)
-    if (has_error(error)) then
+    if (has_error(operation_error)) then
       call close_dataset_(nc, cleanup_error)
-      return
+    else
+      call close_dataset_(nc, operation_error)
     end if
   end if
-  call close_dataset_(nc, error)
-end subroutine to_netcdf_vars_
 
-!> Create a netCDF file and write a single `variable_type` object.
-module subroutine to_netcdf_var(filename, var, atts, error)
-  !> Output filename to create.
-  character(len=*), intent(in) :: filename
-  !> Variable to write into the file.
-  type(variable_type), intent(in) :: var
-  !> Optional array of global attributes to attach to the dataset.
-  type(attribute_type), intent(in), optional :: atts(:)
-  !> Optional error result. When absent, failures stop the program.
-  type(error_type), intent(out), optional :: error
-  type(error_type) :: operation_error
-
-  call to_netcdf_var_(filename, var, atts, operation_error)
   if (present(error)) then
     error = operation_error
   else if (handle_error(operation_error)) then
     return
   end if
 end subroutine to_netcdf_var
-
-!> Create a netCDF file from one variable and construct the operation result.
-subroutine to_netcdf_var_(filename, var, atts, error)
-  !> Input argument(s): `filename`.
-  character(len=*), intent(in) :: filename
-  !> Input argument(s): `var`.
-  type(variable_type), intent(in) :: var
-  !> Input argument(s): `atts(:)`.
-  type(attribute_type), intent(in), optional :: atts(:)
-  !> Output argument(s): `error`.
-  type(error_type), intent(out) :: error
-  type(netcdf_type) :: nc
-  type(error_type) :: cleanup_error
-
-  error = error_type()
-  nc = open_dataset_(filename, mode="w", error=error)
-  if (has_error(error)) return
-  call put_var_error(nc, var, error)
-  if (has_error(error)) then
-    call close_dataset_(nc, cleanup_error)
-    return
-  end if
-  if (present(atts)) then
-    nc%atts = atts
-    call put_att_grp_error(nc, error)
-    if (has_error(error)) then
-      call close_dataset_(nc, cleanup_error)
-      return
-    end if
-  end if
-  call close_dataset_(nc, error)
-end subroutine to_netcdf_var_
 
 !> Create a NetCDF file whose root group has the supplied group's contents.
 module subroutine to_netcdf_grp(filename, grp, atts, error)

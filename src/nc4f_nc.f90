@@ -70,7 +70,6 @@ end interface inquire_group
 
 interface to_netcdf
   module procedure :: to_netcdf_var
-  module procedure :: to_netcdf_vars
   module procedure :: to_netcdf_grp
   module procedure :: to_netcdf_grps
 end interface to_netcdf
@@ -254,24 +253,12 @@ interface
     type(error_type), intent(out), optional :: error
   end subroutine close_dataset
 
-  !> Create a netCDF file from an array of `variable_type` objects.
-  module subroutine to_netcdf_vars(filename, vars, atts, error)
+  !> Create a netCDF file from one variable or a rank-one variable array.
+  module subroutine to_netcdf_var(filename, vars, atts, error)
     !> Output filename to create.
     character(len=*), intent(in) :: filename
-    !> Array of variables to write into the file.
-    type(variable_type), intent(in) :: vars(:)
-    !> Optional array of global attributes to attach to the dataset.
-    type(attribute_type), intent(in), optional :: atts(:)
-    !> Optional error result. When absent, failures stop the program.
-    type(error_type), intent(out), optional :: error
-  end subroutine to_netcdf_vars
-
-  !> Create a netCDF file and write a single `variable_type` object.
-  module subroutine to_netcdf_var(filename, var, atts, error)
-    !> Output filename to create.
-    character(len=*), intent(in) :: filename
-    !> Variable to write into the file.
-    type(variable_type), intent(in) :: var
+    !> Variable or array of variables to write into the file.
+    type(variable_type), intent(in) :: vars(..)
     !> Optional array of global attributes to attach to the dataset.
     type(attribute_type), intent(in), optional :: atts(:)
     !> Optional error result. When absent, failures stop the program.
