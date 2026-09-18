@@ -130,7 +130,6 @@ module subroutine new_dataset_(grp, name, vars, grps, atts, deep)
   type(attribute_type), intent(in), optional :: atts(:)
   !> Input argument: `deep`.
   logical, intent(in), optional :: deep
-  integer :: i
   logical :: deep_copy
 
   deep_copy = .false.
@@ -139,9 +138,7 @@ module subroutine new_dataset_(grp, name, vars, grps, atts, deep)
   if (present(atts)) then
     allocate (grp%atts(size(atts)))
     if (deep_copy) then
-      do i = 1, size(atts)
-        call clone_att_(atts(i), grp%atts(i))
-      end do
+      call clone_att(atts, grp%atts)
     else
       grp%atts = atts
     end if
@@ -149,9 +146,7 @@ module subroutine new_dataset_(grp, name, vars, grps, atts, deep)
   if (present(vars)) then
     allocate (grp%vars(size(vars)))
     if (deep_copy) then
-      do i = 1, size(vars)
-        call clone_var_(vars(i), grp%vars(i))
-      end do
+      call clone_var(vars, grp%vars)
     else
       grp%vars = vars
     end if
@@ -160,9 +155,7 @@ module subroutine new_dataset_(grp, name, vars, grps, atts, deep)
   if (present(grps)) then
     allocate (grp%grps(size(grps)))
     if (deep_copy) then
-      do i = 1, size(grps)
-        call clone_grp_(grps(i), grp%grps(i))
-      end do
+      call clone_grp(grps, grp%grps)
     else
       grp%grps = grps
     end if

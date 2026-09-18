@@ -261,20 +261,20 @@ interface
     logical, intent(in), optional :: deep
   end subroutine new_dataset_
 
-  module subroutine clone_att_(src, dest)
+  module impure elemental subroutine clone_att(src, dest)
     type(attribute_type), intent(in) :: src
     type(attribute_type), intent(out) :: dest
-  end subroutine clone_att_
+  end subroutine clone_att
 
-  module subroutine clone_var_(src, dest)
+  module impure elemental subroutine clone_var(src, dest)
     type(variable_type), intent(in) :: src
     type(variable_type), intent(out) :: dest
-  end subroutine clone_var_
+  end subroutine clone_var
 
-  recursive module subroutine clone_grp_(src, dest)
+  module impure elemental subroutine clone_grp(src, dest)
     type(group_type), intent(in) :: src
     type(group_type), intent(out) :: dest
-  end subroutine clone_grp_
+  end subroutine clone_grp
 
   module pure subroutine validate_att(att, dtype, context)
     type(attribute_type), intent(in) :: att

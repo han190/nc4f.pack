@@ -29,7 +29,7 @@ module function sum_vars(vars) result(total)
       & "[sum] Variable lengths are incompatible."
   end do
 
-  call clone_var_(vars(1), total)
+  call clone_var(vars(1), total)
   if (total%len == 0) return
 
   select case (total%dtype)
