@@ -50,12 +50,12 @@ function get_var_(nc, name, error) result(var)
   if (has_error(error)) return
 
   zero_size_var: if (var%len == 0) then
-    call validate_var_buffer(var, "[get_var]")
+    call validate(var, context="[get_var]")
     return
   end if zero_size_var
 
   call initialize(var)
-  call validate_var_buffer(var, "[get_var]")
+  call validate(var, context="[get_var]")
   cptr = buffer2cptr(var)
   write (msg, "('[get_var] Invalid variable:', 1x, a)") name
   stat = nc_get_var(nc%id, var%id, cptr)
@@ -146,7 +146,7 @@ function get_vara_(nc, name, start, count, error) result(var)
   end do
   var%len = size(var)
   call initialize(var)
-  call validate_var_buffer(var, "[get_vara]")
+  call validate(var, context="[get_vara]")
 
   if (ndims > 0) then
     startp = c_loc(c_start(1))
@@ -327,7 +327,7 @@ subroutine put_vara_(nc, var, start, count, error)
     return
   end if
 
-  call validate_var_buffer(var, "[put_vara]")
+  call validate(var, context="[put_vara]")
   allocate (c_start(ndims), c_count(ndims))
   do i = 1, ndims
     f_start = int(start(i), int64)
@@ -390,7 +390,7 @@ subroutine put_var_(nc, var, error)
   integer :: i, j, ndims
 
   error = error_type()
-  call validate_var_buffer(var, "[put_var]")
+  call validate(var, context="[put_var]")
   tmp = def_var_(nc, var, error)
   if (has_error(error)) return
   if (allocated(var%atts)) then

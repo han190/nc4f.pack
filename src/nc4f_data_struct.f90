@@ -17,7 +17,7 @@ public :: NC_EBADID, NC_EBADDIM, NC_EBADGRPID, NC_EEDGE, NC_EINVAL, &
 public :: datarray, dataset, extract, initialize, operator(.att.), &
   & operator(.and.), operator(.dim.), &
   & operator(==), operator(/=), shape, size, sum
-public :: buffer_size, buffer2cptr, validate, validate_buffer
+public :: buffer_size, buffer2cptr, validate
 private
 
 integer(int32), parameter :: INVALID_INT32 = -2147483647_int32
@@ -175,24 +175,16 @@ interface initialize
   module procedure :: init_var_mold
 end interface initialize
 
-!> Return the C address of the active byte storage for an attribute or
-!> variable.
 interface buffer2cptr
-  module procedure :: get_att_buffer_cptr
-  module procedure :: get_var_buffer_cptr
+  module procedure :: buffer2cptr_att
+  module procedure :: buffer2cptr_var
 end interface buffer2cptr
 
-!> Validate the metadata and active byte storage of an attribute or variable.
 interface validate
   module procedure :: validate_att
   module procedure :: validate_var
 end interface validate
 
-!> Assemble a group from existing handles and metadata.
-!>
-!> The default `deep=.false.` uses intrinsic assignment: owned buffers are
-!> copied, borrowed pointers are preserved, and descendant groups are shared.
-!> With `deep=.true.`, all data buffers and descendants are cloned.
 interface dataset
   module procedure :: new_dataset_empty
   module procedure :: new_dataset_vars
@@ -297,22 +289,15 @@ interface
     character(len=*), intent(in) :: context
   end subroutine validate_var
 
-  module subroutine validate_buffer(buffer, bytes, name, context)
-    integer(int8), pointer, contiguous, intent(in) :: buffer(:)
-    integer(int64), intent(in) :: bytes
-    character(len=*), intent(in) :: name
-    character(len=*), intent(in) :: context
-  end subroutine validate_buffer
-
-  module function get_att_buffer_cptr(att) result(cptr)
+  module function buffer2cptr_att(att) result(cptr)
     type(attribute_type), target, intent(in) :: att
     type(c_ptr) :: cptr
-  end function get_att_buffer_cptr
+  end function buffer2cptr_att
 
-  module function get_var_buffer_cptr(var) result(cptr)
+  module function buffer2cptr_var(var) result(cptr)
     type(variable_type), target, intent(in) :: var
     type(c_ptr) :: cptr
-  end function get_var_buffer_cptr
+  end function buffer2cptr_var
 
   module subroutine write_frmt_att(att, unit, iotype, v_list, iostat, iomsg)
     class(attribute_type), intent(in) :: att

@@ -61,22 +61,4 @@ module pure function f2cstr(fstr) result(cstr)
   cstr = trim(fstr)//c_null_char
 end function f2cstr
 
-!> Validate a variable byte buffer before passing it to the C API.
-module subroutine validate_var_buffer(var, context)
-  !> Input argument: `var`.
-  type(variable_type), intent(in) :: var
-  !> Input argument: `context`.
-  character(len=*), intent(in) :: context
-  call validate(var, context=context)
-end subroutine validate_var_buffer
-
-!> Validate an attribute byte buffer before passing it to the C API.
-module subroutine validate_att_buffer(att, context)
-  !> Input argument: `att`.
-  type(attribute_type), intent(in) :: att
-  !> Input argument: `context`.
-  character(len=*), intent(in) :: context
-  call validate(att, context=context)
-end subroutine validate_att_buffer
-
 end submodule nc4f_nc_util

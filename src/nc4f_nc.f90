@@ -398,22 +398,6 @@ interface
     character(kind=c_char, len=:), allocatable :: cstr
   end function f2cstr
 
-  !> Validate a variable before exposing its byte buffer to the C API.
-  module subroutine validate_var_buffer(var, context)
-    !> Input argument(s): `var`.
-    type(variable_type), intent(in) :: var
-    !> Input argument(s): `context`.
-    character(len=*), intent(in) :: context
-  end subroutine validate_var_buffer
-
-  !> Validate an attribute before exposing its byte buffer to the C API.
-  module subroutine validate_att_buffer(att, context)
-    !> Input argument(s): `att`.
-    type(attribute_type), intent(in) :: att
-    !> Input argument(s): `context`.
-    character(len=*), intent(in) :: context
-  end subroutine validate_att_buffer
-
   !> Allocate a fresh byte buffer for an attribute read from a NetCDF file.
   module subroutine initialize_att(att)
     type(attribute_type), intent(inout) :: att

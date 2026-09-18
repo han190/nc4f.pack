@@ -11,30 +11,12 @@ pure module subroutine validate_att(att, dtype, context)
   integer(data_type), intent(in), optional :: dtype
   !> Input argument: `context`.
   character(len=*), intent(in) :: context
-  integer :: nbytes
+  integer(int64) :: ptr_size
 
-  if (present(dtype)) then
-    if (att%dtype /= dtype) error stop trim(context)// &
-      & " Unexpected attribute type."
-  end if
-  if (att%len < 0) error stop trim(context)//" Negative attribute length."
-  nbytes = buffer_size(att%dtype, att%len, context)
-  if (allocated(att%buffer)) then
-    if (associated(att%ptr)) error stop trim(context)// &
-      & " Attribute has both owned and borrowed buffers."
-    if (size(att%buffer, kind=int64) < int(nbytes, int64)) then
-      error stop trim(context)//" Attribute buffer is too small."
-    end if
-  else
-    if (nbytes > 0) then
-      if (.not. associated(att%ptr)) then
-        error stop trim(context)//" Attribute buffer is not associated."
-      end if
-      if (size(att%ptr, kind=int64) < int(nbytes, int64)) then
-        error stop trim(context)//" Attribute buffer is too small."
-      end if
-    end if
-  end if
+  ptr_size = 0
+  if (associated(att%ptr)) ptr_size = size(att%ptr, kind=int64)
+  call validate_(att%dtype, att%len, att%buffer, &
+    & associated(att%ptr), ptr_size, dtype, context, "Attribute")
 end subroutine validate_att
 
 !> Validate a variable's metadata and active byte storage.
@@ -47,11 +29,8 @@ pure module subroutine validate_var(var, dtype, rank, context)
   integer, intent(in), optional :: rank
   !> Input argument: `context`.
   character(len=*), intent(in) :: context
-  integer :: nbytes
+  integer(int64) :: ptr_size
 
-  if (present(dtype)) then
-    if (var%dtype /= dtype) error stop trim(context)//" Unexpected variable type."
-  end if
   if (.not. allocated(var%dims)) error stop &
     & trim(context)//" Variable dimensions are not allocated."
   if (present(rank)) then
@@ -63,81 +42,101 @@ pure module subroutine validate_var(var, dtype, rank, context)
   if (size(var) /= var%len) error stop &
     & trim(context)//" Dimension product differs from length."
 
-  nbytes = buffer_size(var%dtype, var%len, context)
-  if (allocated(var%buffer)) then
-    if (associated(var%ptr)) error stop trim(context)// &
-      & " Variable has both owned and borrowed buffers."
-    if (size(var%buffer, kind=int64) < int(nbytes, int64)) then
-      error stop trim(context)//" Variable buffer is too small."
-    end if
-  else
-    if (nbytes > 0) then
-      if (.not. associated(var%ptr)) then
-        error stop trim(context)//" Variable buffer is not associated."
-      end if
-      if (size(var%ptr, kind=int64) < int(nbytes, int64)) then
-        error stop trim(context)//" Variable buffer is too small."
-      end if
-    end if
-  end if
+  ptr_size = 0
+  if (associated(var%ptr)) ptr_size = size(var%ptr, kind=int64)
+  call validate_(var%dtype, var%len, var%buffer, &
+    & associated(var%ptr), ptr_size, dtype, context, "Variable")
 end subroutine validate_var
 
-!> Validate capacity of a pointer-backed raw byte buffer.
-module subroutine validate_buffer(buffer, bytes, name, context)
-  !> Input argument: `buffer`.
-  integer(int8), pointer, contiguous, intent(in) :: buffer(:)
-  !> Input argument: `bytes`.
-  integer(int64), intent(in) :: bytes
-  !> Input argument: `name`.
-  character(len=*), intent(in) :: name
-  !> Input argument: `context`.
+!> Validate common data-type, length, and byte-storage invariants.
+pure subroutine validate_(idtype, ilen, ibuffer, iassoc, &
+  & ptr_size, dtype, context, type_context)
+  !> Stored NetCDF data type.
+  integer(data_type), intent(in) :: idtype
+  !> Stored element count.
+  integer(int64), intent(in) :: ilen
+  !> Owned byte storage.
+  integer(int8), allocatable, intent(in) :: ibuffer(:)
+  !> Whether borrowed byte storage is associated.
+  logical, intent(in) :: iassoc
+  !> Capacity of borrowed byte storage in bytes.
+  integer(int64), intent(in) :: ptr_size
+  !> Expected NetCDF data type.
+  integer(data_type), intent(in), optional :: dtype
+  !> Validation operation context.
   character(len=*), intent(in) :: context
+  !> Data-model type used in diagnostics.
+  character(len=*), intent(in) :: type_context
+  integer :: nbytes
 
-  if (bytes == 0) return
-  if (.not. associated(buffer)) then
-    error stop trim(context)//" "//name//" buffer is not associated."
+  if (present(dtype)) then
+    if (idtype /= dtype) error stop trim(context)//" Unexpected "// &
+      & trim(type_context)//" type."
   end if
-  if (size(buffer, kind=int64) < bytes) then
-    error stop trim(context)//" "//name//" buffer is too small."
+  if (ilen < 0) error stop trim(context)//" Negative "// &
+    & trim(type_context)//" length."
+  nbytes = buffer_size(idtype, ilen, context)
+  if (allocated(ibuffer)) then
+    if (iassoc) error stop trim(context)//" "// &
+      & trim(type_context)//" has both owned and borrowed buffers."
+    if (size(ibuffer, kind=int64) < int(nbytes, int64)) then
+      error stop trim(context)//" "// &
+        & trim(type_context)//" buffer is too small."
+    end if
+  else if (nbytes > 0) then
+    if (.not. iassoc) then
+      error stop trim(context)//" "// &
+        & trim(type_context)//" buffer is not associated."
+    end if
+    if (ptr_size < int(nbytes, int64)) then
+      error stop trim(context)//" "// &
+        & trim(type_context)//" buffer is too small."
+    end if
   end if
-end subroutine validate_buffer
+end subroutine validate_
 
 !> Return the C address of an attribute's active byte storage.
-module function get_att_buffer_cptr(att) result(cptr)
+module function buffer2cptr_att(att) result(cptr)
   !> Input argument: `att`.
   type(attribute_type), target, intent(in) :: att
   !> Return value: `cptr`.
   type(c_ptr) :: cptr
 
-  call validate(att, context="[get_att_buffer_cptr]")
-  if (att%len == 0) then
-    cptr = c_null_ptr
-    return
-  end if
-  if (allocated(att%buffer)) then
-    cptr = c_loc(att%buffer(1))
-  else
-    cptr = c_loc(att%ptr(1))
-  end if
-end function get_att_buffer_cptr
+  call validate(att, context="[buffer2cptr_att]")
+  cptr = buffer2cptr_(att%len, att%buffer, att%ptr)
+end function buffer2cptr_att
 
 !> Return the C address of a variable's active byte storage.
-module function get_var_buffer_cptr(var) result(cptr)
+module function buffer2cptr_var(var) result(cptr)
   !> Input argument: `var`.
   type(variable_type), target, intent(in) :: var
   !> Return value: `cptr`.
   type(c_ptr) :: cptr
 
-  call validate(var, context="[get_var_buffer_cptr]")
-  if (var%len == 0) then
+  call validate(var, context="[buffer2cptr_var]")
+  cptr = buffer2cptr_(var%len, var%buffer, var%ptr)
+end function buffer2cptr_var
+
+!> Return the C address of active owned or borrowed byte storage.
+function buffer2cptr_(ilen, ibuffer, iptr) result(cptr)
+  !> Number of stored elements.
+  integer(int64), intent(in) :: ilen
+  !> Owned byte storage.
+  integer(int8), allocatable, target, intent(in) :: ibuffer(:)
+  !> Borrowed byte storage.
+  integer(int8), contiguous, pointer, intent(in) :: iptr(:)
+  !> C address of the active storage.
+  type(c_ptr) :: cptr
+
+  if (ilen == 0) then
     cptr = c_null_ptr
     return
   end if
-  if (allocated(var%buffer)) then
-    cptr = c_loc(var%buffer(1))
+  if (allocated(ibuffer)) then
+    cptr = c_loc(ibuffer(1))
   else
-    cptr = c_loc(var%ptr(1))
+    cptr = c_loc(iptr(1))
   end if
-end function get_var_buffer_cptr
+end function buffer2cptr_
 
 end submodule nc4f_data_struct_access
