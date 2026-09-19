@@ -25,14 +25,14 @@ integer(int64), parameter :: INVALID_INT64 = -9223372036854775807_int64
 
 !> Result of an nc4f operation that was allowed to return normally on error.
 !>
-!> A zero `code` denotes success. On failure, `message` contains an nc4f
+!> A zero `code` denotes success. On failure, `msg` contains an nc4f
 !> diagnostic and `code` preserves the originating NetCDF status.
 type :: error_type
   integer(c_int) :: code = NC_NOERR
-  character(len=:), allocatable :: message
+  character(len=:), allocatable :: msg
 contains
-  procedure, private :: write_frmt_error
-  generic, public :: write(formatted) => write_frmt_error
+  procedure, private :: write_frmt_err
+  generic, public :: write(formatted) => write_frmt_err
 end type error_type
 
 !> Type constant used for NetCDF external data types.
@@ -344,14 +344,14 @@ interface
     character(len=*), intent(inout) :: iomsg
   end subroutine write_frmt_netcdf
 
-  module subroutine write_frmt_error(error, unit, iotype, v_list, iostat, iomsg)
-    class(error_type), intent(in) :: error
+  module subroutine write_frmt_err(err, unit, iotype, v_list, iostat, iomsg)
+    class(error_type), intent(in) :: err
     integer, intent(in) :: unit
     character(len=*), intent(in) :: iotype
     integer, intent(in) :: v_list(:)
     integer, intent(out) :: iostat
     character(len=*), intent(inout) :: iomsg
-  end subroutine write_frmt_error
+  end subroutine write_frmt_err
 
   module elemental function new_dim_len_int32(name, len) result(dim)
     character(len=*), intent(in) :: name

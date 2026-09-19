@@ -30,17 +30,17 @@ module subroutine simple_rd(passed)
   type(netcdf_type) :: nc
   type(variable_type) :: var
   integer, parameter :: nx = 47, ny = 83
-  type(error_type) :: error
+  type(error_type) :: err
   character(len=1024) :: stdout
 
   nc = open_dataset(TEST_RESULTS_DIR// &
-    & "file_that_does_not_exist.nc", error=error)
-  passed = .exists.error
+    & "file_that_does_not_exist.nc", err=err)
+  passed = .exists.err
   if (.not. passed) return
 
   nc = open_dataset(TEST_RESULTS_DIR//"simple_wr.nc", "r")
-  var = inquire_variable(nc, "data", error)
-  if ((error%code /= NC_NOERR)) then
+  var = inquire_variable(nc, "data", err)
+  if ((err%code /= NC_NOERR)) then
     call close_dataset(nc)
     passed = .false.
     return
@@ -59,24 +59,24 @@ module subroutine character_variables(passed)
   character, parameter :: values(2, 3) = &
     & reshape(["a", "b", "c", "d", "e", "f"], [2, 3])
   character, pointer :: actual_values(:, :)
-  type(error_type) :: error
+  type(error_type) :: err
   type(netcdf_type) :: nc
   type(variable_type) :: actual, var
 
   var = datarray("letters", values, ["x".dim.2, "y".dim.3])
-  call to_netcdf(TEST_RESULTS_DIR//"characters.nc", var, error=error)
-  if ((error%code /= NC_NOERR)) then
+  call to_netcdf(TEST_RESULTS_DIR//"characters.nc", var, err=err)
+  if ((err%code /= NC_NOERR)) then
     passed = .false.
     return
   end if
-  nc = open_dataset(TEST_RESULTS_DIR//"characters.nc", "r", error=error)
-  if ((error%code /= NC_NOERR)) then
+  nc = open_dataset(TEST_RESULTS_DIR//"characters.nc", "r", err=err)
+  if ((err%code /= NC_NOERR)) then
     passed = .false.
     return
   end if
-  actual = get_variable(nc, "letters", error)
+  actual = get_variable(nc, "letters", err)
   call close_dataset(nc)
-  if ((error%code /= NC_NOERR)) then
+  if ((err%code /= NC_NOERR)) then
     passed = .false.
     return
   end if

@@ -11,7 +11,7 @@ type(error_type) :: error
 
 nc = open_dataset("missing.nc", "r", error=error)
 if (.exists. error) then
-  print '(a)', error%message
+  print '(a)', error%msg
   error stop "NetCDF operation failed"
 end if
 ```

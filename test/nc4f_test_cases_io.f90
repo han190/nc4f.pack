@@ -45,50 +45,50 @@ module subroutine hyperslab_wr(passed)
     & reshape([7_int32, 8_int32, 9_int32, 10_int32], [2, 2])
   integer(int32) :: expected(2, 5)
   integer(int32), pointer :: actual_values(:, :)
-  type(error_type) :: error
+  type(error_type) :: err
   type(netcdf_type) :: nc
   type(variable_type) :: actual, chunk, var
 
   var = datarray("records", initial, ["x".dim.2, "time".dim.3])
   var%dims(2)%is_unlim = .true.
-  call to_netcdf(TEST_RESULTS_DIR//"hyperslab-write.nc", var, error=error)
-  if ((error%code /= NC_NOERR)) then
+  call to_netcdf(TEST_RESULTS_DIR//"hyperslab-write.nc", var, err=err)
+  if ((err%code /= NC_NOERR)) then
     passed = .false.
     return
   end if
 
   chunk = datarray("records", updates, ["x".dim.2, "time".dim.2])
-  nc = open_dataset(TEST_RESULTS_DIR//"hyperslab-write.nc", "a", error=error)
-  if ((error%code /= NC_NOERR)) then
+  nc = open_dataset(TEST_RESULTS_DIR//"hyperslab-write.nc", "a", err=err)
+  if ((err%code /= NC_NOERR)) then
     passed = .false.
     return
   end if
-  call put_variable(nc, chunk, [1, 4], [2, 2], error)
-  if ((error%code /= NC_NOERR)) then
+  call put_variable(nc, chunk, [1, 4], [2, 2], err)
+  if ((err%code /= NC_NOERR)) then
     call close_dataset(nc)
     passed = .false.
     return
   end if
-  call put_variable(nc, chunk, [2, 1], [2, 2], error)
-  if (.not. ((error%code /= NC_NOERR) .and. error%code == NC_EEDGE)) then
+  call put_variable(nc, chunk, [2, 1], [2, 2], err)
+  if (.not. ((err%code /= NC_NOERR) .and. err%code == NC_EEDGE)) then
     call close_dataset(nc)
     passed = .false.
     return
   end if
-  call close_dataset(nc, error)
-  if ((error%code /= NC_NOERR)) then
+  call close_dataset(nc, err)
+  if ((err%code /= NC_NOERR)) then
     passed = .false.
     return
   end if
 
-  nc = open_dataset(TEST_RESULTS_DIR//"hyperslab-write.nc", "r", error=error)
-  if ((error%code /= NC_NOERR)) then
+  nc = open_dataset(TEST_RESULTS_DIR//"hyperslab-write.nc", "r", err=err)
+  if ((err%code /= NC_NOERR)) then
     passed = .false.
     return
   end if
-  actual = get_variable(nc, "records", error)
+  actual = get_variable(nc, "records", err)
   call close_dataset(nc)
-  if ((error%code /= NC_NOERR)) then
+  if ((err%code /= NC_NOERR)) then
     passed = .false.
     return
   end if
@@ -126,25 +126,25 @@ module subroutine unlimited_dims(passed)
   logical, intent(inout) :: passed
   integer(int32), parameter :: values(2, 3) = reshape([ &
     & 1_int32, 2_int32, 3_int32, 4_int32, 5_int32, 6_int32], [2, 3])
-  type(error_type) :: error
+  type(error_type) :: err
   type(netcdf_type) :: nc
   type(variable_type) :: actual, var
 
   var = datarray("records", values, ["x".dim.2, "time".dim.3])
   var%dims%is_unlim = .true.
-  call to_netcdf(TEST_RESULTS_DIR//"multiple-unlimited.nc", var, error=error)
-  if ((error%code /= NC_NOERR)) then
+  call to_netcdf(TEST_RESULTS_DIR//"multiple-unlimited.nc", var, err=err)
+  if ((err%code /= NC_NOERR)) then
     passed = .false.
     return
   end if
-  nc = open_dataset(TEST_RESULTS_DIR//"multiple-unlimited.nc", "r", error=error)
-  if ((error%code /= NC_NOERR)) then
+  nc = open_dataset(TEST_RESULTS_DIR//"multiple-unlimited.nc", "r", err=err)
+  if ((err%code /= NC_NOERR)) then
     passed = .false.
     return
   end if
-  actual = get_variable(nc, "records", error)
+  actual = get_variable(nc, "records", err)
   call close_dataset(nc)
-  passed = error%code == NC_NOERR .and. all(actual%dims%is_unlim) .and. &
+  passed = err%code == NC_NOERR .and. all(actual%dims%is_unlim) .and. &
     & all(actual%dims == var%dims)
 end subroutine unlimited_dims
 

@@ -133,9 +133,9 @@ module subroutine write_frmt_netcdf(grp, unit, iotype, v_list, iostat, iomsg)
 end subroutine write_frmt_netcdf
 
 !> Write an operation result in formatted derived-type I/O.
-module subroutine write_frmt_error(error, unit, iotype, v_list, iostat, iomsg)
-  !> Input argument: `error`.
-  class(error_type), intent(in) :: error
+module subroutine write_frmt_err(err, unit, iotype, v_list, iostat, iomsg)
+  !> Input argument: `err`.
+  class(error_type), intent(in) :: err
   !> Input argument: `unit`.
   integer, intent(in) :: unit
   !> Input argument: `iotype`.
@@ -151,21 +151,21 @@ module subroutine write_frmt_error(error, unit, iotype, v_list, iostat, iomsg)
   end associate
   iostat = 1
   if (iotype /= "LISTDIRECTED" .and. iotype /= "DT") return
-  if (error%code == NC_NOERR) then
+  if (err%code == NC_NOERR) then
     associate (fmt => "('NetCDF status (', i0, ')')")
-      write (unit, fmt, iostat=iostat, iomsg=iomsg) error%code
+      write (unit, fmt, iostat=iostat, iomsg=iomsg) err%code
     end associate
-  else if (allocated(error%message)) then
+  else if (allocated(err%msg)) then
     associate (fmt => "('NetCDF error (', i0, '): ', a)")
       write (unit, fmt, iostat=iostat, iomsg=iomsg) &
-        & error%code, trim(error%message)
+        & err%code, trim(err%msg)
     end associate
   else
     associate (fmt => "('NetCDF status (', i0, ')')")
-      write (unit, fmt, iostat=iostat, iomsg=iomsg) error%code
+      write (unit, fmt, iostat=iostat, iomsg=iomsg) err%code
     end associate
   end if
-end subroutine write_frmt_error
+end subroutine write_frmt_err
 
 !> Compute `render_grp`.
 recursive function render_grp(grp, depth) result(text)

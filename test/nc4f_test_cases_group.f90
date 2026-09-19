@@ -107,7 +107,7 @@ module subroutine group_write(passed)
   logical, intent(inout) :: passed
   real, pointer :: child_values(:), root_values(:)
   type(attribute_type) :: root_att
-  type(error_type) :: error
+  type(error_type) :: err
   type(group_type) :: child, child_on_disk, invalid, parent, parent_on_disk, &
     & root, root_on_disk, sibling
   type(group_type), allocatable :: top_level(:)
@@ -128,40 +128,40 @@ module subroutine group_write(passed)
     & atts=["title".att."root"], grps=root_grps)
 
   call to_netcdf(TEST_RESULTS_DIR//"group-root.nc", root, &
-    & atts=["writer".att."group_write"], error=error)
-  if ((error%code /= NC_NOERR)) return
-  nc = open_dataset(TEST_RESULTS_DIR//"group-root.nc", "r", error=error)
-  if ((error%code /= NC_NOERR)) return
+    & atts=["writer".att."group_write"], err=err)
+  if ((err%code /= NC_NOERR)) return
+  nc = open_dataset(TEST_RESULTS_DIR//"group-root.nc", "r", err=err)
+  if ((err%code /= NC_NOERR)) return
   root_on_disk = inquire_group(nc, inq_dims=.true., inq_atts=.true., &
-    & inq_vars=.true., inq_grps=.true., recursive=.true., error=error)
-  if ((error%code /= NC_NOERR)) then
+    & inq_vars=.true., inq_grps=.true., recursive=.true., err=err)
+  if ((err%code /= NC_NOERR)) then
     call close_dataset(nc)
     return
   end if
-  parent_on_disk = get_group(nc, "parent", error)
-  if ((error%code /= NC_NOERR)) then
+  parent_on_disk = get_group(nc, "parent", err)
+  if ((err%code /= NC_NOERR)) then
     call close_dataset(nc)
     return
   end if
-  child_on_disk = get_group(parent_on_disk, "child", error)
-  if ((error%code /= NC_NOERR)) then
+  child_on_disk = get_group(parent_on_disk, "child", err)
+  if ((err%code /= NC_NOERR)) then
     call close_dataset(nc)
     return
   end if
-  root_data = get_variable(nc, "root_data", error)
-  if ((error%code /= NC_NOERR)) then
+  root_data = get_variable(nc, "root_data", err)
+  if ((err%code /= NC_NOERR)) then
     call close_dataset(nc)
     return
   end if
   call extract(root_data, root_values)
-  child_data = get_variable(child_on_disk, "child_data", error)
-  if ((error%code /= NC_NOERR)) then
+  child_data = get_variable(child_on_disk, "child_data", err)
+  if ((err%code /= NC_NOERR)) then
     call close_dataset(nc)
     return
   end if
   call extract(child_data, child_values)
-  call close_dataset(nc, error)
-  if ((error%code /= NC_NOERR)) then
+  call close_dataset(nc, err)
+  if ((err%code /= NC_NOERR)) then
     return
   end if
   if (.not. (root_on_disk%name == "/" .and. size(root_on_disk%vars) == 1 .and. &
@@ -177,14 +177,14 @@ module subroutine group_write(passed)
   top_level_input(1) = parent
   top_level_input(2) = sibling
   call to_netcdf(TEST_RESULTS_DIR//"group-children.nc", top_level_input, &
-    & atts=["title".att."group collection"], error=error)
-  if ((error%code /= NC_NOERR)) return
-  nc = open_dataset(TEST_RESULTS_DIR//"group-children.nc", "r", error=error)
-  if ((error%code /= NC_NOERR)) return
-  top_level = inquire_groups(nc, error)
-  if ((error%code /= NC_NOERR)) return
-  root_att = get_attribute(nc, "title", error)
-  if ((error%code /= NC_NOERR)) then
+    & atts=["title".att."group collection"], err=err)
+  if ((err%code /= NC_NOERR)) return
+  nc = open_dataset(TEST_RESULTS_DIR//"group-children.nc", "r", err=err)
+  if ((err%code /= NC_NOERR)) return
+  top_level = inquire_groups(nc, err)
+  if ((err%code /= NC_NOERR)) return
+  root_att = get_attribute(nc, "title", err)
+  if ((err%code /= NC_NOERR)) then
     call close_dataset(nc)
     return
   end if
@@ -194,13 +194,13 @@ module subroutine group_write(passed)
     return
   end if
   parent_on_disk = inquire_group(top_level(1), inq_grps=.true., &
-    & recursive=.true., error=error)
-  if ((error%code /= NC_NOERR)) then
+    & recursive=.true., err=err)
+  if ((err%code /= NC_NOERR)) then
     call close_dataset(nc)
     return
   end if
-  call close_dataset(nc, error)
-  if ((error%code /= NC_NOERR)) return
+  call close_dataset(nc, err)
+  if ((err%code /= NC_NOERR)) return
   if (.not. (associated(parent_on_disk%grps) .and. &
     & size(parent_on_disk%grps) == 1 .and. &
     & parent_on_disk%grps(1)%name == "child")) return
@@ -208,8 +208,8 @@ module subroutine group_write(passed)
   invalid = dataset("/")
   top_level_input(1) = invalid
   call to_netcdf(TEST_RESULTS_DIR//"invalid-root-child.nc", &
-    & top_level_input(:1), error=error)
-  passed = (error%code /= NC_NOERR) .and. error%code == NC_EINVAL
+    & top_level_input(:1), err=err)
+  passed = (err%code /= NC_NOERR) .and. err%code == NC_EINVAL
 end subroutine group_write
 
 end submodule nc4f_test_cases_group

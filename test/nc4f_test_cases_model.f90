@@ -18,7 +18,7 @@ module subroutine data_model(passed)
   type(group_type) :: child_grps(1), leaf_grps(1)
   type(netcdf_type) :: nc, nc_copy
   type(variable_type) :: borrowed_var, owned_var, restored_var, sum_var, vars(1)
-  type(error_type) :: error
+  type(error_type) :: err
   real(real32), allocatable, target :: values(:, :)
   real(real32), pointer :: extracted(:, :), sum_values(:)
   real, pointer :: restored_values(:)
@@ -82,13 +82,13 @@ module subroutine data_model(passed)
   if (any(abs(sum_values - [546.0_real32, 548.0_real32]) > &
     & epsilon(1.0_real32))) return
 
-  error%code = NC_ENOTFOUND
-  if (.not. .exists.error) return
-  error = error_type()
+  err%code = NC_ENOTFOUND
+  if (.not. .exists.err) return
+  err = error_type()
   open (newunit=unit, status="scratch", action="readwrite", &
     & form="formatted", iostat=iostat, iomsg=iomsg)
   if (iostat /= 0) return
-  write (unit, *, iostat=iostat, iomsg=iomsg) error
+  write (unit, *, iostat=iostat, iomsg=iomsg) err
   if (iostat /= 0) return
   write (unit, *, iostat=iostat, iomsg=iomsg) grp
   if (iostat /= 0) return
@@ -110,20 +110,20 @@ module subroutine data_model(passed)
   close (unit)
   if (.not. netcdf_found) return
 
-  call to_netcdf(TEST_RESULTS_DIR//"data_model.nc", grp, error=error)
-  if (error%code /= NC_NOERR) return
-  nc = open_dataset(TEST_RESULTS_DIR//"data_model.nc", error=error)
-  if (error%code /= NC_NOERR) return
+  call to_netcdf(TEST_RESULTS_DIR//"data_model.nc", grp, err=err)
+  if (err%code /= NC_NOERR) return
+  nc = open_dataset(TEST_RESULTS_DIR//"data_model.nc", err=err)
+  if (err%code /= NC_NOERR) return
   restored = inquire_group(nc, inq_dims=.true., inq_atts=.true., &
-    & inq_vars=.true., inq_grps=.true., recursive=.true., error=error)
-  if (error%code /= NC_NOERR) return
-  restored_child = get_group(nc, "child", error)
-  if (error%code /= NC_NOERR) return
-  restored_var = get_variable(nc, "temperature", error)
-  if (error%code /= NC_NOERR) return
+    & inq_vars=.true., inq_grps=.true., recursive=.true., err=err)
+  if (err%code /= NC_NOERR) return
+  restored_child = get_group(nc, "child", err)
+  if (err%code /= NC_NOERR) return
+  restored_var = get_variable(nc, "temperature", err)
+  if (err%code /= NC_NOERR) return
   call extract(restored_var, restored_values)
-  call close_dataset(nc, error)
-  if (error%code /= NC_NOERR) return
+  call close_dataset(nc, err)
+  if (err%code /= NC_NOERR) return
   if (size(restored%vars) /= 1 .or. size(restored%atts) /= 1 .or. &
     & .not. associated(restored%grps) .or. size(restored%grps) /= 1 .or. &
     & restored_child%name /= "child" .or. &

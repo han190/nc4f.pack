@@ -70,15 +70,15 @@ module subroutine sfc_pres_temp_rd(passed)
   logical, intent(inout) :: passed
   type(netcdf_type) :: nc
   type(variable_type) :: var
-  type(error_type) :: error
+  type(error_type) :: err
   character(len=:), pointer :: units
   type(dimension_type) :: default_dims(2)
   integer, parameter :: nlat = 181, nlon = 361
 
   default_dims = ["longitude".dim.nlon, "latitude".dim.nlat]
   nc = open_dataset(TEST_RESULTS_DIR//"sfc_pres_temp_wr.nc", "r")
-  var = get_variable(nc, "pressure", error)
-  if ((error%code /= NC_NOERR)) then
+  var = get_variable(nc, "pressure", err)
+  if ((err%code /= NC_NOERR)) then
     call close_dataset(nc)
     passed = .false.
     return
@@ -90,8 +90,8 @@ module subroutine sfc_pres_temp_rd(passed)
     return
   end if
 
-  var = get_variable(nc, "temperature", error)
-  if ((error%code /= NC_NOERR)) then
+  var = get_variable(nc, "temperature", err)
+  if ((err%code /= NC_NOERR)) then
     call close_dataset(nc)
     passed = .false.
     return
@@ -104,8 +104,8 @@ module subroutine sfc_pres_temp_rd(passed)
     return
   end if
 
-  var = inquire_variable(nc, "relative_humidity", error)
-  passed = .exists.error .and. error%code == NC_ENOTVAR
+  var = inquire_variable(nc, "relative_humidity", err)
+  passed = .exists.err .and. err%code == NC_ENOTVAR
   call close_dataset(nc)
 end subroutine sfc_pres_temp_rd
 
@@ -181,7 +181,7 @@ module subroutine nasa_cosp_read(passed)
   character(len=:), pointer :: yaml
   real(real64), pointer :: latitude(:), longitude(:)
   type(attribute_type) :: units, yaml_config
-  type(error_type) :: error
+  type(error_type) :: err
   type(group_type), allocatable :: grps(:)
   type(group_type) :: root, solar_zenith
   type(netcdf_type) :: nc
@@ -193,16 +193,16 @@ module subroutine nasa_cosp_read(passed)
   is_open = .false.
   output_open = .false.
   nullify (yaml)
-  nc = open_dataset(SAMPLE_FILE, "r", error=error)
-  if ((error%code /= NC_NOERR)) return
+  nc = open_dataset(SAMPLE_FILE, "r", err=err)
+  if ((err%code /= NC_NOERR)) return
   is_open = .true.
 
   nasa_read: block
-    grps = inquire_groups(nc, error)
-    if ((error%code /= NC_NOERR)) exit nasa_read
+    grps = inquire_groups(nc, err)
+    if ((err%code /= NC_NOERR)) exit nasa_read
    root = inquire_group(nc, inq_dims=.true., inq_atts=.true., &
-    & inq_vars=.true., inq_grps=.true., recursive=.true., error=error)
-    if ((error%code /= NC_NOERR)) exit nasa_read
+    & inq_vars=.true., inq_grps=.true., recursive=.true., err=err)
+    if ((err%code /= NC_NOERR)) exit nasa_read
     nc%dims = root%dims
     nc%atts = root%atts
     nc%vars = root%vars
@@ -216,20 +216,20 @@ module subroutine nasa_cosp_read(passed)
     output_open = .false.
     if (iostat /= 0) exit nasa_read
 
-    solar_zenith = get_group(nc, "Solar_Zenith", error)
-    if ((error%code /= NC_NOERR)) exit nasa_read
+    solar_zenith = get_group(nc, "Solar_Zenith", err)
+    if ((err%code /= NC_NOERR)) exit nasa_read
     solar_zenith = inquire_group(solar_zenith, inq_dims=.true., &
-      & inq_atts=.true., inq_vars=.true., inq_grps=.true., error=error)
-    if ((error%code /= NC_NOERR)) exit nasa_read
+      & inq_atts=.true., inq_vars=.true., inq_grps=.true., err=err)
+    if ((err%code /= NC_NOERR)) exit nasa_read
 
-    latitude_var = get_variable(nc, "latitude", error)
-    if ((error%code /= NC_NOERR)) exit nasa_read
-    longitude_var = get_variable(nc, "longitude", error)
-    if ((error%code /= NC_NOERR)) exit nasa_read
-    units = get_attribute(nc, latitude_var, "units", error)
-    if ((error%code /= NC_NOERR)) exit nasa_read
-    yaml_config = get_attribute(nc, "YAML_config", error)
-    if ((error%code /= NC_NOERR)) exit nasa_read
+    latitude_var = get_variable(nc, "latitude", err)
+    if ((err%code /= NC_NOERR)) exit nasa_read
+    longitude_var = get_variable(nc, "longitude", err)
+    if ((err%code /= NC_NOERR)) exit nasa_read
+    units = get_attribute(nc, latitude_var, "units", err)
+    if ((err%code /= NC_NOERR)) exit nasa_read
+    yaml_config = get_attribute(nc, "YAML_config", err)
+    if ((err%code /= NC_NOERR)) exit nasa_read
 
     call extract(latitude_var, latitude)
     call extract(longitude_var, longitude)
@@ -260,8 +260,8 @@ module subroutine nasa_cosp_read(passed)
   if (output_open) close (file_unit)
   if (associated(yaml)) nullify (yaml)
   if (is_open) then
-    call close_dataset(nc, error)
-    if ((error%code /= NC_NOERR)) passed = .false.
+    call close_dataset(nc, err)
+    if ((err%code /= NC_NOERR)) passed = .false.
   end if
 end subroutine nasa_cosp_read
 
@@ -276,7 +276,7 @@ module subroutine ecmwf_era40_read(passed)
   real(real32), pointer :: latitude(:), longitude(:)
   type(attribute_type) :: conventions_att, &
     & longitude_units_att, temperature_units_att
-  type(error_type) :: error
+  type(error_type) :: err
   type(netcdf_type) :: nc
   type(variable_type) :: latitude_var, longitude_var, temperature_var
   logical :: is_open
@@ -285,23 +285,23 @@ module subroutine ecmwf_era40_read(passed)
   is_open = .false.
   nullify (conventions, longitude_units, &
     & temperature_units, temperature, latitude, longitude)
-  nc = open_dataset(SAMPLE_FILE, "r", inq_dims=.true., error=error)
-  if ((error%code /= NC_NOERR)) return
+  nc = open_dataset(SAMPLE_FILE, "r", inq_dims=.true., err=err)
+  if ((err%code /= NC_NOERR)) return
   is_open = .true.
 
   era40_read: block
-    latitude_var = get_variable(nc, "latitude", error)
-    if ((error%code /= NC_NOERR)) exit era40_read
-    longitude_var = get_variable(nc, "longitude", error)
-    if ((error%code /= NC_NOERR)) exit era40_read
-    temperature_var = get_variable(nc, "p2t", [1, 1, 1], [4, 3, 2], error)
-    if ((error%code /= NC_NOERR)) exit era40_read
-    conventions_att = get_attribute(nc, "Conventions", error)
-    if ((error%code /= NC_NOERR)) exit era40_read
-    longitude_units_att = get_attribute(nc, longitude_var, "units", error)
-    if ((error%code /= NC_NOERR)) exit era40_read
-    temperature_units_att = get_attribute(nc, temperature_var, "units", error)
-    if ((error%code /= NC_NOERR)) exit era40_read
+    latitude_var = get_variable(nc, "latitude", err)
+    if ((err%code /= NC_NOERR)) exit era40_read
+    longitude_var = get_variable(nc, "longitude", err)
+    if ((err%code /= NC_NOERR)) exit era40_read
+    temperature_var = get_variable(nc, "p2t", [1, 1, 1], [4, 3, 2], err)
+    if ((err%code /= NC_NOERR)) exit era40_read
+    conventions_att = get_attribute(nc, "Conventions", err)
+    if ((err%code /= NC_NOERR)) exit era40_read
+    longitude_units_att = get_attribute(nc, longitude_var, "units", err)
+    if ((err%code /= NC_NOERR)) exit era40_read
+    temperature_units_att = get_attribute(nc, temperature_var, "units", err)
+    if ((err%code /= NC_NOERR)) exit era40_read
 
     call extract(latitude_var, latitude)
     call extract(longitude_var, longitude)
@@ -336,8 +336,8 @@ module subroutine ecmwf_era40_read(passed)
   if (associated(longitude_units)) deallocate (longitude_units)
   if (associated(temperature_units)) deallocate (temperature_units)
   if (is_open) then
-    call close_dataset(nc, error)
-    if ((error%code /= NC_NOERR)) passed = .false.
+    call close_dataset(nc, err)
+    if ((err%code /= NC_NOERR)) passed = .false.
   end if
 end subroutine ecmwf_era40_read
 
@@ -349,7 +349,7 @@ module subroutine sresa1b_ccsm3_read(passed)
   character(len=:), pointer :: conventions, units
   real(real32), pointer :: values(:, :, :)
   type(attribute_type) :: conventions_att, units_att
-  type(error_type) :: error
+  type(error_type) :: err
   type(group_type), allocatable :: grps(:)
   type(group_type) :: root
   type(netcdf_type) :: nc
@@ -359,22 +359,22 @@ module subroutine sresa1b_ccsm3_read(passed)
   passed = .false.
   is_open = .false.
   nullify (conventions, units, values)
-  nc = open_dataset(SAMPLE_FILE, "r", error=error)
-  if (error%code /= NC_NOERR) return
+  nc = open_dataset(SAMPLE_FILE, "r", err=err)
+  if (err%code /= NC_NOERR) return
   is_open = .true.
 
   ccsm3_read: block
-    grps = inquire_groups(nc, error)
-    if (error%code /= NC_NOERR) exit ccsm3_read
+    grps = inquire_groups(nc, err)
+    if (err%code /= NC_NOERR) exit ccsm3_read
     root = inquire_group(nc, inq_dims=.true., inq_atts=.true., &
-      & inq_vars=.true., inq_grps=.true., error=error)
-    if (error%code /= NC_NOERR) exit ccsm3_read
-    tas = get_variable(nc, "tas", [1, 1, 1], [4, 3, 1], error)
-    if (error%code /= NC_NOERR) exit ccsm3_read
-    conventions_att = get_attribute(nc, "Conventions", error)
-    if (error%code /= NC_NOERR) exit ccsm3_read
-    units_att = get_attribute(nc, tas, "units", error)
-    if (error%code /= NC_NOERR) exit ccsm3_read
+      & inq_vars=.true., inq_grps=.true., err=err)
+    if (err%code /= NC_NOERR) exit ccsm3_read
+    tas = get_variable(nc, "tas", [1, 1, 1], [4, 3, 1], err)
+    if (err%code /= NC_NOERR) exit ccsm3_read
+    conventions_att = get_attribute(nc, "Conventions", err)
+    if (err%code /= NC_NOERR) exit ccsm3_read
+    units_att = get_attribute(nc, tas, "units", err)
+    if (err%code /= NC_NOERR) exit ccsm3_read
     call extract(tas, values)
     call extract(conventions_att, conventions)
     call extract(units_att, units)
@@ -398,8 +398,8 @@ module subroutine sresa1b_ccsm3_read(passed)
   if (associated(conventions)) deallocate (conventions)
   if (associated(units)) deallocate (units)
   if (is_open) then
-    call close_dataset(nc, error)
-    if (error%code /= NC_NOERR) passed = .false.
+    call close_dataset(nc, err)
+    if (err%code /= NC_NOERR) passed = .false.
   end if
 end subroutine sresa1b_ccsm3_read
 
@@ -472,16 +472,16 @@ function render_sample_uddtio_(filename, label, expected_dim, expected_var, &
   integer :: base, extension, file_unit, iostat
   logical :: attribute_found, child_group_found, dataset_found, &
     & dimension_found, variable_attribute_found, variable_found
-  type(error_type) :: error
+  type(error_type) :: err
   type(group_type) :: description
   type(netcdf_type) :: nc
 
   rendered = .false.
-  nc = open_dataset(filename, "r", error=error)
-  if (.exists.error) return
+  nc = open_dataset(filename, "r", err=err)
+  if (.exists.err) return
   description = inquire_group(nc, inq_dims=.true., inq_atts=.true., &
-    & inq_vars=.true., inq_grps=.true., recursive=.true., error=error)
-  if (.exists.error) then
+    & inq_vars=.true., inq_grps=.true., recursive=.true., err=err)
+  if (.exists.err) then
     call close_dataset(nc)
     return
   end if
@@ -531,8 +531,8 @@ function render_sample_uddtio_(filename, label, expected_dim, expected_var, &
     end do
     close (file_unit)
   end if
-  call close_dataset(nc, error)
-  if (.exists.error) return
+  call close_dataset(nc, err)
+  if (.exists.err) return
   rendered = dataset_found .and. dimension_found .and. &
     & variable_found .and. &
     & variable_attribute_found .and. &
@@ -548,7 +548,7 @@ module subroutine cami_initial_read(passed)
   character(len=:), pointer :: conventions, units
   real(real64), pointer :: values(:, :, :, :)
   type(attribute_type) :: conventions_att, units_att
-  type(error_type) :: error
+  type(error_type) :: err
   type(group_type), allocatable :: grps(:)
   type(group_type) :: root
   type(netcdf_type) :: nc
@@ -558,22 +558,22 @@ module subroutine cami_initial_read(passed)
   passed = .false.
   is_open = .false.
   nullify (conventions, units, values)
-  nc = open_dataset(SAMPLE_FILE, "r", error=error)
-  if (error%code /= NC_NOERR) return
+  nc = open_dataset(SAMPLE_FILE, "r", err=err)
+  if (err%code /= NC_NOERR) return
   is_open = .true.
 
   cami_read: block
-    grps = inquire_groups(nc, error)
-    if (error%code /= NC_NOERR) exit cami_read
+    grps = inquire_groups(nc, err)
+    if (err%code /= NC_NOERR) exit cami_read
     root = inquire_group(nc, inq_dims=.true., inq_atts=.true., &
-      & inq_vars=.true., inq_grps=.true., error=error)
-    if (error%code /= NC_NOERR) exit cami_read
-    temperature = get_variable(nc, "T", [1, 1, 1, 1], [2, 3, 4, 1], error)
-    if (error%code /= NC_NOERR) exit cami_read
-    conventions_att = get_attribute(nc, "Conventions", error)
-    if (error%code /= NC_NOERR) exit cami_read
-    units_att = get_attribute(nc, temperature, "units", error)
-    if (error%code /= NC_NOERR) exit cami_read
+      & inq_vars=.true., inq_grps=.true., err=err)
+    if (err%code /= NC_NOERR) exit cami_read
+    temperature = get_variable(nc, "T", [1, 1, 1, 1], [2, 3, 4, 1], err)
+    if (err%code /= NC_NOERR) exit cami_read
+    conventions_att = get_attribute(nc, "Conventions", err)
+    if (err%code /= NC_NOERR) exit cami_read
+    units_att = get_attribute(nc, temperature, "units", err)
+    if (err%code /= NC_NOERR) exit cami_read
     call extract(temperature, values)
     call extract(conventions_att, conventions)
     call extract(units_att, units)
@@ -599,8 +599,8 @@ module subroutine cami_initial_read(passed)
   if (associated(conventions)) deallocate (conventions)
   if (associated(units)) deallocate (units)
   if (is_open) then
-    call close_dataset(nc, error)
-    if (error%code /= NC_NOERR) passed = .false.
+    call close_dataset(nc, err)
+    if (err%code /= NC_NOERR) passed = .false.
   end if
 end subroutine cami_initial_read
 
@@ -612,7 +612,7 @@ module subroutine tos_o1_read(passed)
   character(len=:), pointer :: conventions, units
   real(real32), pointer :: values(:, :, :)
   type(attribute_type) :: conventions_att, units_att
-  type(error_type) :: error
+  type(error_type) :: err
   type(group_type), allocatable :: grps(:)
   type(group_type) :: root
   type(netcdf_type) :: nc
@@ -622,22 +622,22 @@ module subroutine tos_o1_read(passed)
   passed = .false.
   is_open = .false.
   nullify (conventions, units, values)
-  nc = open_dataset(SAMPLE_FILE, "r", error=error)
-  if (error%code /= NC_NOERR) return
+  nc = open_dataset(SAMPLE_FILE, "r", err=err)
+  if (err%code /= NC_NOERR) return
   is_open = .true.
 
   tos_read: block
-    grps = inquire_groups(nc, error)
-    if (error%code /= NC_NOERR) exit tos_read
+    grps = inquire_groups(nc, err)
+    if (err%code /= NC_NOERR) exit tos_read
     root = inquire_group(nc, inq_dims=.true., inq_atts=.true., &
-      & inq_vars=.true., inq_grps=.true., error=error)
-    if (error%code /= NC_NOERR) exit tos_read
-    tos = get_variable(nc, "tos", [1, 85, 1], [4, 3, 2], error)
-    if (error%code /= NC_NOERR) exit tos_read
-    conventions_att = get_attribute(nc, "Conventions", error)
-    if (error%code /= NC_NOERR) exit tos_read
-    units_att = get_attribute(nc, tos, "units", error)
-    if (error%code /= NC_NOERR) exit tos_read
+      & inq_vars=.true., inq_grps=.true., err=err)
+    if (err%code /= NC_NOERR) exit tos_read
+    tos = get_variable(nc, "tos", [1, 85, 1], [4, 3, 2], err)
+    if (err%code /= NC_NOERR) exit tos_read
+    conventions_att = get_attribute(nc, "Conventions", err)
+    if (err%code /= NC_NOERR) exit tos_read
+    units_att = get_attribute(nc, tos, "units", err)
+    if (err%code /= NC_NOERR) exit tos_read
     call extract(tos, values)
     call extract(conventions_att, conventions)
     call extract(units_att, units)
@@ -658,8 +658,8 @@ module subroutine tos_o1_read(passed)
   if (associated(conventions)) deallocate (conventions)
   if (associated(units)) deallocate (units)
   if (is_open) then
-    call close_dataset(nc, error)
-    if (error%code /= NC_NOERR) passed = .false.
+    call close_dataset(nc, err)
+    if (err%code /= NC_NOERR) passed = .false.
   end if
 end subroutine tos_o1_read
 
@@ -671,7 +671,7 @@ module subroutine echam_spectral_read(passed)
   character(len=:), pointer :: conventions, grid_type
   real(real32), pointer :: values(:, :, :)
   type(attribute_type) :: conventions_att, grid_type_att
-  type(error_type) :: error
+  type(error_type) :: err
   type(group_type), allocatable :: grps(:)
   type(group_type) :: root
   type(netcdf_type) :: nc
@@ -681,22 +681,22 @@ module subroutine echam_spectral_read(passed)
   passed = .false.
   is_open = .false.
   nullify (conventions, grid_type, values)
-  nc = open_dataset(SAMPLE_FILE, "r", error=error)
-  if (error%code /= NC_NOERR) return
+  nc = open_dataset(SAMPLE_FILE, "r", err=err)
+  if (err%code /= NC_NOERR) return
   is_open = .true.
 
   echam_read: block
-    grps = inquire_groups(nc, error)
-    if (error%code /= NC_NOERR) exit echam_read
+    grps = inquire_groups(nc, err)
+    if (err%code /= NC_NOERR) exit echam_read
     root = inquire_group(nc, inq_dims=.true., inq_atts=.true., &
-      & inq_vars=.true., inq_grps=.true., error=error)
-    if (error%code /= NC_NOERR) exit echam_read
-    lsp = get_variable(nc, "lsp", [1, 1, 1], [2, 4, 1], error)
-    if (error%code /= NC_NOERR) exit echam_read
-    conventions_att = get_attribute(nc, "Conventions", error)
-    if (error%code /= NC_NOERR) exit echam_read
-    grid_type_att = get_attribute(nc, lsp, "grid_type", error)
-    if (error%code /= NC_NOERR) exit echam_read
+      & inq_vars=.true., inq_grps=.true., err=err)
+    if (err%code /= NC_NOERR) exit echam_read
+    lsp = get_variable(nc, "lsp", [1, 1, 1], [2, 4, 1], err)
+    if (err%code /= NC_NOERR) exit echam_read
+    conventions_att = get_attribute(nc, "Conventions", err)
+    if (err%code /= NC_NOERR) exit echam_read
+    grid_type_att = get_attribute(nc, lsp, "grid_type", err)
+    if (err%code /= NC_NOERR) exit echam_read
     call extract(lsp, values)
     call extract(conventions_att, conventions)
     call extract(grid_type_att, grid_type)
@@ -721,8 +721,8 @@ module subroutine echam_spectral_read(passed)
   if (associated(conventions)) deallocate (conventions)
   if (associated(grid_type)) deallocate (grid_type)
   if (is_open) then
-    call close_dataset(nc, error)
-    if (error%code /= NC_NOERR) passed = .false.
+    call close_dataset(nc, err)
+    if (err%code /= NC_NOERR) passed = .false.
   end if
 end subroutine echam_spectral_read
 
