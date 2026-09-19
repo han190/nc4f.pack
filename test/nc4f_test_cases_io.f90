@@ -15,9 +15,9 @@ module subroutine hyperslab_rd(passed)
   type(variable_type) :: actual, round_trip
   integer :: x, y
 
-  nc = open_dataset(TEST_RESULTS_DIR//"simple_wr.nc", "r")
+  nc = open_netcdf(TEST_RESULTS_DIR//"simple_wr.nc", "r")
   actual = get_variable(nc, "data", [4, 6], [3, 2])
-  call close_dataset(nc)
+  call close_netcdf(nc)
   call extract(actual, values)
 
   do concurrent(y=1:2, x=1:3)
@@ -28,9 +28,9 @@ module subroutine hyperslab_rd(passed)
   if (.not. passed) return
 
   call to_netcdf(TEST_RESULTS_DIR//"hyperslab.nc", actual)
-  nc = open_dataset(TEST_RESULTS_DIR//"hyperslab.nc", "r")
+  nc = open_netcdf(TEST_RESULTS_DIR//"hyperslab.nc", "r")
   round_trip = get_variable(nc, "data")
-  call close_dataset(nc)
+  call close_netcdf(nc)
   passed = round_trip == actual
 end subroutine hyperslab_rd
 
@@ -58,36 +58,36 @@ module subroutine hyperslab_wr(passed)
   end if
 
   chunk = datarray("records", updates, ["x".dim.2, "time".dim.2])
-  nc = open_dataset(TEST_RESULTS_DIR//"hyperslab-write.nc", "a", err=err)
+  nc = open_netcdf(TEST_RESULTS_DIR//"hyperslab-write.nc", "a", err=err)
   if ((err%code /= NC_NOERR)) then
     passed = .false.
     return
   end if
   call put_variable(nc, chunk, [1, 4], [2, 2], err)
   if ((err%code /= NC_NOERR)) then
-    call close_dataset(nc)
+    call close_netcdf(nc)
     passed = .false.
     return
   end if
   call put_variable(nc, chunk, [2, 1], [2, 2], err)
   if (.not. ((err%code /= NC_NOERR) .and. err%code == NC_EEDGE)) then
-    call close_dataset(nc)
+    call close_netcdf(nc)
     passed = .false.
     return
   end if
-  call close_dataset(nc, err)
+  call close_netcdf(nc, err)
   if ((err%code /= NC_NOERR)) then
     passed = .false.
     return
   end if
 
-  nc = open_dataset(TEST_RESULTS_DIR//"hyperslab-write.nc", "r", err=err)
+  nc = open_netcdf(TEST_RESULTS_DIR//"hyperslab-write.nc", "r", err=err)
   if ((err%code /= NC_NOERR)) then
     passed = .false.
     return
   end if
   actual = get_variable(nc, "records", err)
-  call close_dataset(nc)
+  call close_netcdf(nc)
   if ((err%code /= NC_NOERR)) then
     passed = .false.
     return
@@ -112,9 +112,9 @@ module subroutine unlimited_wr(passed)
   var%dims(2)%is_unlim = .true.
   call to_netcdf(TEST_RESULTS_DIR//"unlimited.nc", var)
 
-  nc = open_dataset(TEST_RESULTS_DIR//"unlimited.nc", "r")
+  nc = open_netcdf(TEST_RESULTS_DIR//"unlimited.nc", "r")
   actual = get_variable(nc, "records")
-  call close_dataset(nc)
+  call close_netcdf(nc)
   call extract(actual, actual_values)
   passed = actual%dims(2)%is_unlim .and. &
     & all(actual%dims == var%dims) .and. all(actual_values == values)
@@ -137,13 +137,13 @@ module subroutine unlimited_dims(passed)
     passed = .false.
     return
   end if
-  nc = open_dataset(TEST_RESULTS_DIR//"multiple-unlimited.nc", "r", err=err)
+  nc = open_netcdf(TEST_RESULTS_DIR//"multiple-unlimited.nc", "r", err=err)
   if ((err%code /= NC_NOERR)) then
     passed = .false.
     return
   end if
   actual = get_variable(nc, "records", err)
-  call close_dataset(nc)
+  call close_netcdf(nc)
   passed = err%code == NC_NOERR .and. all(actual%dims%is_unlim) .and. &
     & all(actual%dims == var%dims)
 end subroutine unlimited_dims

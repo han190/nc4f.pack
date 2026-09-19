@@ -3,48 +3,38 @@ implicit none (type, external)
 contains
 
 !> Open or create a dataset and return a `netcdf_type` handle.
-module function open_dataset(filename, mode, inq_dims, inq_atts, err) &
-  & result(nc)
+module function open_netcdf(filename, mode, err) result(nc)
   !> Path to the dataset file.
   character(len=*), intent(in) :: filename
   !> Mode to open the file: 'r' for read, 'w' to recreate, or 'a' for
   !> read/write access to an existing dataset.
   character(len=*), intent(in), optional :: mode
-  !> When true, inquire dimensions after opening the file.
-  logical, intent(in), optional :: inq_dims
-  !> When true, inquire global attributes after opening the file.
-  logical, intent(in), optional :: inq_atts
   !> Optional error result. When absent, failures stop the program.
   type(error_type), intent(out), optional :: err
   !> Returned `netcdf_type` describing the opened dataset.
   type(netcdf_type) :: nc
   type(error_type) :: operation_err
 
-  nc = open_dataset_(filename, mode, inq_dims, inq_atts, operation_err)
+  nc = open_netcdf_(filename, mode, operation_err)
   if (present(err)) then
     err = operation_err
   else if (handle_err(operation_err)) then
     return
   end if
-end function open_dataset
+end function open_netcdf
 
 !> Open or create a dataset and construct the operation result.
-function open_dataset_(filename, mode, inq_dims, inq_atts, err) result(nc)
+function open_netcdf_(filename, mode, err) result(nc)
   !> Input argument(s): `filename`.
   character(len=*), intent(in) :: filename
   !> Input argument(s): `mode`.
   character(len=*), intent(in), optional :: mode
-  !> Input argument(s): `inq_dims`.
-  logical, intent(in), optional :: inq_dims
-  !> Input argument(s): `inq_atts`.
-  logical, intent(in), optional :: inq_atts
   !> Output argument(s): `err`.
   type(error_type), intent(out) :: err
   !> Return value: `nc`.
   type(netcdf_type) :: nc
   character(len=MAX_CHAR_LEN) :: msg, open_mode
   integer(c_int) :: stat
-  type(error_type) :: cleanup_err
 
   err = error_type()
   nc%name = "/"
@@ -59,29 +49,15 @@ function open_dataset_(filename, mode, inq_dims, inq_atts, err) result(nc)
 
     nc%filename = clip(filename)
     stat = nc_open(f2cstr(nc%filename), NC_NOWRITE, nc%id)
-    write (msg, "('[open_dataset]', 1x, a)") nc%filename
+    write (msg, "('[open_netcdf]', 1x, a)") nc%filename
     err = netcdf_err(stat, msg)
     if (has_err(err)) return
     nc%mode = NC_NOWRITE
-    if (optval(.false., inq_dims)) then
-      nc%dims = inq_dims_grp(nc, err=err)
-      if (has_err(err)) then
-        call close_dataset_(nc, cleanup_err)
-        return
-      end if
-    end if
-    if (optval(.false., inq_atts)) then
-      nc%atts = get_atts_grp(nc, err=err)
-      if (has_err(err)) then
-        call close_dataset_(nc, cleanup_err)
-        return
-      end if
-    end if
 
   case ("w", "write", "replace", "overwrite")
 
     nc%filename = clip(filename)
-    write (msg, "('[open_dataset]', 1x, a)") nc%filename
+    write (msg, "('[open_netcdf]', 1x, a)") nc%filename
     stat = nc_create(f2cstr(nc%filename), ior(NC_NETCDF4, NC_CLOBBER), nc%id)
     err = netcdf_err(stat, msg)
     if (has_err(err)) return
@@ -91,66 +67,38 @@ function open_dataset_(filename, mode, inq_dims, inq_atts, err) result(nc)
 
     nc%filename = clip(filename)
     stat = nc_open(f2cstr(nc%filename), NC_WRITE, nc%id)
-    write (msg, "('[open_dataset]', 1x, a)") nc%filename
+    write (msg, "('[open_netcdf]', 1x, a)") nc%filename
     err = netcdf_err(stat, msg)
     if (has_err(err)) return
     nc%mode = NC_WRITE
-    if (optval(.false., inq_dims)) then
-      nc%dims = inq_dims_grp(nc, err=err)
-      if (has_err(err)) then
-        call close_dataset_(nc, cleanup_err)
-        return
-      end if
-    end if
-    if (optval(.false., inq_atts)) then
-      nc%atts = get_atts_grp(nc, err=err)
-      if (has_err(err)) then
-        call close_dataset_(nc, cleanup_err)
-        return
-      end if
-    end if
 
   case default
-    associate (fmt => "('[open_dataset]', 1x, 'Invalid mode:', 1x, a)")
+    associate (fmt => "('[open_netcdf]', 1x, 'Invalid mode:', 1x, a)")
       write (msg, fmt) trim(open_mode)
     end associate
     err = error_type(NC_EINVAL, clip(msg))
     return
   end select
-end function open_dataset_
-
-!> Compute `optval`.
-elemental logical function optval(default, opt) result(val)
-  !> Input argument(s): `default`.
-  logical, intent(in) :: default
-  !> Input argument(s): `opt`.
-  logical, intent(in), optional :: opt
-
-  if (present(opt)) then
-    val = opt
-  else
-    val = default
-  end if
-end function optval
+end function open_netcdf_
 
 !> Close a dataset and free associated allocatables.
-module subroutine close_dataset(nc, err)
+module subroutine close_netcdf(nc, err)
   !> `netcdf_type` representing the open dataset to close.
   type(netcdf_type), intent(inout) :: nc
   !> Output argument(s): `err`.
   type(error_type), intent(out), optional :: err
   type(error_type) :: operation_err
 
-  call close_dataset_(nc, operation_err)
+  call close_netcdf_(nc, operation_err)
   if (present(err)) then
     err = operation_err
   else if (handle_err(operation_err)) then
     return
   end if
-end subroutine close_dataset
+end subroutine close_netcdf
 
 !> Close a dataset and construct the operation result.
-subroutine close_dataset_(nc, err)
+subroutine close_netcdf_(nc, err)
   !> Input/output argument(s): `nc`.
   type(netcdf_type), intent(inout) :: nc
   !> Output argument(s): `err`.
@@ -159,13 +107,13 @@ subroutine close_dataset_(nc, err)
 
   err = error_type()
   stat = nc_close(nc%id)
-  err = netcdf_err(stat, "[close_dataset]")
+  err = netcdf_err(stat, "[close_netcdf]")
   if (has_err(err)) return
   if (allocated(nc%atts)) deallocate (nc%atts)
   if (allocated(nc%dims)) deallocate (nc%dims)
   if (allocated(nc%vars)) deallocate (nc%vars)
   if (associated(nc%grps)) nullify (nc%grps)
-end subroutine close_dataset_
+end subroutine close_netcdf_
 
 !> Create a netCDF file from one variable or a rank-one variable array.
 module subroutine to_netcdf_var(filename, vars, atts, err)
@@ -182,7 +130,7 @@ module subroutine to_netcdf_var(filename, vars, atts, err)
   integer :: i
 
   operation_err = error_type()
-  nc = open_dataset_(filename, mode="w", err=operation_err)
+  nc = open_netcdf_(filename, mode="w", err=operation_err)
   if (.not. has_err(operation_err)) then
     select rank (items => vars)
     rank (0)
@@ -202,9 +150,9 @@ module subroutine to_netcdf_var(filename, vars, atts, err)
       call put_att_grp_err(nc, operation_err)
     end if
     if (has_err(operation_err)) then
-      call close_dataset_(nc, cleanup_err)
+      call close_netcdf_(nc, cleanup_err)
     else
-      call close_dataset_(nc, operation_err)
+      call close_netcdf_(nc, operation_err)
     end if
   end if
 
@@ -270,17 +218,17 @@ subroutine to_netcdf_grp_(filename, grp, atts, err)
   type(netcdf_type) :: nc
 
   err = error_type()
-  nc = open_dataset_(filename, mode="w", err=err)
+  nc = open_netcdf_(filename, mode="w", err=err)
   if (has_err(err)) return
 
   file_root%id = nc%id
   file_root%name = "/"
   call serialize_grp_(file_root, grp, atts, err)
   if (has_err(err)) then
-    call close_dataset_(nc, cleanup_err)
+    call close_netcdf_(nc, cleanup_err)
     return
   end if
-  call close_dataset_(nc, err)
+  call close_netcdf_(nc, err)
 end subroutine to_netcdf_grp_
 
 !> Error-returning implementation for direct child groups of a new root.
@@ -298,17 +246,17 @@ subroutine to_netcdf_grps_(filename, grps, atts, err)
   type(netcdf_type) :: nc
 
   err = error_type()
-  nc = open_dataset_(filename, mode="w", err=err)
+  nc = open_netcdf_(filename, mode="w", err=err)
   if (has_err(err)) return
 
   file_root%id = nc%id
   file_root%name = "/"
   call serialize_grps_(file_root, grps, atts, err)
   if (has_err(err)) then
-    call close_dataset_(nc, cleanup_err)
+    call close_netcdf_(nc, cleanup_err)
     return
   end if
-  call close_dataset_(nc, err)
+  call close_netcdf_(nc, err)
 end subroutine to_netcdf_grps_
 
 end submodule nc4f_nc_dataset

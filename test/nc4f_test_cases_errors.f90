@@ -19,22 +19,22 @@ module subroutine creation_policy(passed)
     passed = .false.
     return
   end if
-  nc = open_dataset(TEST_RESULTS_DIR//"creation-policy.nc", "a", err=err)
+  nc = open_netcdf(TEST_RESULTS_DIR//"creation-policy.nc", "a", err=err)
   if ((err%code /= NC_NOERR)) then
     passed = .false.
     return
   end if
-  call close_dataset(nc, err)
+  call close_netcdf(nc, err)
   if ((err%code /= NC_NOERR)) then
     passed = .false.
     return
   end if
-  nc = open_dataset(TEST_RESULTS_DIR//"creation-policy.nc", "w", err=err)
+  nc = open_netcdf(TEST_RESULTS_DIR//"creation-policy.nc", "w", err=err)
   if ((err%code /= NC_NOERR)) then
     passed = .false.
     return
   end if
-  call close_dataset(nc, err)
+  call close_netcdf(nc, err)
   passed = err%code == NC_NOERR
 end subroutine creation_policy
 
@@ -56,10 +56,10 @@ module subroutine error_handling(passed)
   err = error_type()
   if (.exists.err) return
 
-  nc = open_dataset(TEST_RESULTS_DIR//"unused.nc", "invalid", err=err)
+  nc = open_netcdf(TEST_RESULTS_DIR//"unused.nc", "invalid", err=err)
   if (.not. ((err%code /= NC_NOERR) .and. err%code == NC_EINVAL)) return
 
-  nc = open_dataset(TEST_RESULTS_DIR// &
+  nc = open_netcdf(TEST_RESULTS_DIR// &
     & "missing-error-fixture/no-file.nc", err=err)
   if (.not. (.exists.err .and. allocated(err%msg))) return
   write (stdout, "(dt)", iostat=iostat) err
@@ -68,57 +68,57 @@ module subroutine error_handling(passed)
   present = datarray("present", values, ["x".dim.1], ["units".att."1"])
   call to_netcdf(TEST_RESULTS_DIR//"error-handling.nc", present, err=err)
   if ((err%code /= NC_NOERR)) return
-  nc = open_dataset(TEST_RESULTS_DIR//"error-handling.nc", "r", err=err)
+  nc = open_netcdf(TEST_RESULTS_DIR//"error-handling.nc", "r", err=err)
   if ((err%code /= NC_NOERR)) return
 
   var = inquire_variable(nc, "missing", err)
   if (.not. .exists.err .or. err%code /= NC_ENOTVAR) then
-    call close_dataset(nc)
+    call close_netcdf(nc)
     return
   end if
   var = get_variable(nc, "missing", err)
   if (.not. .exists.err .or. err%code /= NC_ENOTVAR) then
-    call close_dataset(nc)
+    call close_netcdf(nc)
     return
   end if
   var = get_variable(nc, "present", err)
   if ((err%code /= NC_NOERR)) then
-    call close_dataset(nc)
+    call close_netcdf(nc)
     return
   end if
 
   att = get_attribute(nc, "missing_global", err)
   if (.not. .exists.err .or. err%code /= NC_ENOTATT) then
-    call close_dataset(nc)
+    call close_netcdf(nc)
     return
   end if
   att = get_attribute(nc, var, "missing", err)
   if (.not. .exists.err .or. err%code /= NC_ENOTATT) then
-    call close_dataset(nc)
+    call close_netcdf(nc)
     return
   end if
 
   var = get_variable(nc, "present", [2], [1], err)
   if (.not. (.exists.err .and. err%code == NC_EEDGE)) then
-    call close_dataset(nc)
+    call close_netcdf(nc)
     return
   end if
   var = get_variable(nc, "present", [0], [1], err)
   if (.not. ((err%code /= NC_NOERR) .and. err%code == NC_EINVALCOORDS)) then
-    call close_dataset(nc)
+    call close_netcdf(nc)
     return
   end if
-  call close_dataset(nc, err)
+  call close_netcdf(nc, err)
   if ((err%code /= NC_NOERR)) return
 
   invalid = datarray("", values, ["x".dim.1])
   vars = [present, invalid]
   call to_netcdf(TEST_RESULTS_DIR//"failed-write-cleanup.nc", vars, err=err)
   if (err%code == NC_NOERR) return
-nc = open_dataset(TEST_RESULTS_DIR//"failed-write-cleanup.nc", "a", err=err)
+nc = open_netcdf(TEST_RESULTS_DIR//"failed-write-cleanup.nc", "a", err=err)
   if ((err%code /= NC_NOERR)) return
   var = get_variable(nc, "present", err)
-  call close_dataset(nc)
+  call close_netcdf(nc)
   passed = err%code == NC_NOERR .and. var%name == "present"
 end subroutine error_handling
 

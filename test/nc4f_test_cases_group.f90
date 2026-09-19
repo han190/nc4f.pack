@@ -109,7 +109,7 @@ module subroutine group_write(passed)
   type(attribute_type) :: root_att
   type(error_type) :: err
   type(group_type) :: child, child_on_disk, invalid, parent, parent_on_disk, &
-    & root, root_on_disk, sibling
+    & root, sibling
   type(group_type), allocatable :: top_level(:)
   type(group_type) :: parent_grps(1), root_grps(1), top_level_input(2)
   type(netcdf_type) :: nc
@@ -130,80 +130,79 @@ module subroutine group_write(passed)
   call to_netcdf(TEST_RESULTS_DIR//"group-root.nc", root, &
     & atts=["writer".att."group_write"], err=err)
   if ((err%code /= NC_NOERR)) return
-  nc = open_dataset(TEST_RESULTS_DIR//"group-root.nc", "r", err=err)
+  nc = open_netcdf(TEST_RESULTS_DIR//"group-root.nc", "r", err=err)
   if ((err%code /= NC_NOERR)) return
-  root_on_disk = inquire_group(nc, inq_dims=.true., inq_atts=.true., &
-    & inq_vars=.true., inq_grps=.true., recursive=.true., err=err)
+  call inquire_group(nc, inq_dims=.true., inq_atts=.true., &
+    & inq_vars=.true., inq_subgrps=.true., recursive=.true., err=err)
   if ((err%code /= NC_NOERR)) then
-    call close_dataset(nc)
+    call close_netcdf(nc)
     return
   end if
   parent_on_disk = get_group(nc, "parent", err)
   if ((err%code /= NC_NOERR)) then
-    call close_dataset(nc)
+    call close_netcdf(nc)
     return
   end if
   child_on_disk = get_group(parent_on_disk, "child", err)
   if ((err%code /= NC_NOERR)) then
-    call close_dataset(nc)
+    call close_netcdf(nc)
     return
   end if
   root_data = get_variable(nc, "root_data", err)
   if ((err%code /= NC_NOERR)) then
-    call close_dataset(nc)
+    call close_netcdf(nc)
     return
   end if
   call extract(root_data, root_values)
   child_data = get_variable(child_on_disk, "child_data", err)
   if ((err%code /= NC_NOERR)) then
-    call close_dataset(nc)
+    call close_netcdf(nc)
     return
   end if
   call extract(child_data, child_values)
-  call close_dataset(nc, err)
-  if ((err%code /= NC_NOERR)) then
-    return
-  end if
-  if (.not. (root_on_disk%name == "/" .and. size(root_on_disk%vars) == 1 .and. &
-    & size(root_on_disk%atts) == 2 .and. associated(root_on_disk%grps) .and. &
-    & root_on_disk%grps(1)%name == "parent" .and. &
-    & associated(root_on_disk%grps(1)%grps) .and. &
-    & root_on_disk%grps(1)%grps(1)%name == "child" .and. &
+  if (.not. (nc%name == "/" .and. size(nc%vars) == 1 .and. &
+    & size(nc%atts) == 2 .and. associated(nc%grps) .and. &
+    & nc%grps(1)%name == "parent" .and. &
+    & associated(nc%grps(1)%grps) .and. &
+    & nc%grps(1)%grps(1)%name == "child" .and. &
     & all(abs(root_values - [1.0, 2.0]) <= epsilon(1.0)) .and. &
     & all(abs(child_values - [3.0, 4.0, 5.0]) <= epsilon(1.0)))) then
+    call close_netcdf(nc)
     return
   end if
+  call close_netcdf(nc, err)
+  if ((err%code /= NC_NOERR)) return
 
   top_level_input(1) = parent
   top_level_input(2) = sibling
   call to_netcdf(TEST_RESULTS_DIR//"group-children.nc", top_level_input, &
     & atts=["title".att."group collection"], err=err)
   if ((err%code /= NC_NOERR)) return
-  nc = open_dataset(TEST_RESULTS_DIR//"group-children.nc", "r", err=err)
+  nc = open_netcdf(TEST_RESULTS_DIR//"group-children.nc", "r", err=err)
   if ((err%code /= NC_NOERR)) return
-  top_level = inquire_groups(nc, err)
+  top_level = inquire_subgroups(nc, err)
   if ((err%code /= NC_NOERR)) return
   root_att = get_attribute(nc, "title", err)
   if ((err%code /= NC_NOERR)) then
-    call close_dataset(nc)
+    call close_netcdf(nc)
     return
   end if
   if (.not. (root_att%name == "title" .and. size(top_level) == 2 .and. &
     & top_level(1)%name == "parent" .and. top_level(2)%name == "sibling")) then
-    call close_dataset(nc)
+    call close_netcdf(nc)
     return
   end if
-  parent_on_disk = inquire_group(top_level(1), inq_grps=.true., &
+  call inquire_group(top_level(1), inq_subgrps=.true., &
     & recursive=.true., err=err)
   if ((err%code /= NC_NOERR)) then
-    call close_dataset(nc)
+    call close_netcdf(nc)
     return
   end if
-  call close_dataset(nc, err)
+  call close_netcdf(nc, err)
   if ((err%code /= NC_NOERR)) return
-  if (.not. (associated(parent_on_disk%grps) .and. &
-    & size(parent_on_disk%grps) == 1 .and. &
-    & parent_on_disk%grps(1)%name == "child")) return
+  if (.not. (associated(top_level(1)%grps) .and. &
+    & size(top_level(1)%grps) == 1 .and. &
+    & top_level(1)%grps(1)%name == "child")) return
 
   invalid = dataset("/")
   top_level_input(1) = invalid

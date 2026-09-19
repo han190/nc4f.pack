@@ -38,10 +38,10 @@ program read_example
   type(variable_type) :: temperature
   real, pointer :: values(:)
 
-  nc = open_dataset("example.nc", "r")
+  nc = open_netcdf("example.nc", "r")
   temperature = get_variable(nc, "temperature")
   call extract(temperature, values)
-  call close_dataset(nc)
+  call close_netcdf(nc)
 end program read_example
 ```
 
@@ -63,7 +63,7 @@ program main
   real, dimension(:, :, :, :), pointer :: p, theta, T
 
   !> Open a WRF output file and extract variables.
-  nc = open_dataset("wrfout.nc", "r")
+  nc = open_netcdf("wrfout.nc", "r")
   inputs = [sum(get_variable(nc, [character(len=2) :: "P", "PB"])), &
     & get_variable(nc, "T")]
 
@@ -80,6 +80,6 @@ program main
 
   !> Save the variable to a new file.
   call to_netcdf("output.nc", output)
-  call close_dataset(nc)
+  call close_netcdf(nc)
 end program main
 ```

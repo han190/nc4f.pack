@@ -23,7 +23,7 @@ module function get_grp(parent, name, err) result(group)
 end function get_grp
 
 !> Return direct child groups with IDs and names populated.
-module function inq_grps(parent, err) result(grps)
+module function inq_subgrps(parent, err) result(grps)
   !> Input argument: `parent`.
   class(group_type), intent(in) :: parent
   !> Output argument: `err`.
@@ -38,48 +38,46 @@ module function inq_grps(parent, err) result(grps)
   else if (handle_err(operation_err)) then
     return
   end if
-end function inq_grps
+end function inq_subgrps
 
 !> Materialize selected metadata for a group.
-module function inq_grp(group, inq_dims, inq_atts, inq_vars, &
-  & inq_grps, recursive, err) result(description)
-  class(group_type), intent(in) :: group
-  logical, intent(in), optional :: inq_dims, inq_atts, inq_vars, inq_grps
+module recursive subroutine inq_grp(group, inq_dims, inq_atts, inq_vars, &
+  & inq_subgrps, recursive, err)
+  class(group_type), intent(inout) :: group
+  logical, intent(in), optional :: inq_dims, inq_atts, inq_vars, inq_subgrps
   logical, intent(in), optional :: recursive
   type(error_type), intent(out), optional :: err
-  type(group_type) :: description
-  type(group_type), allocatable :: children(:)
   type(error_type) :: operation_err
-  logical :: want_dims, want_atts, want_vars, want_groups, descend
+  type(group_type), allocatable :: children(:)
+  logical :: inqd, inqa, inqv, inqg, recu
 
-  want_dims = requested(inq_dims)
-  want_atts = requested(inq_atts)
-  want_vars = requested(inq_vars)
-  descend = requested(recursive)
-  want_groups = requested(inq_grps) .or. descend
+  inqd = requested(.true., inq_dims)
+  inqa = requested(.true., inq_atts)
+  inqv = requested(.true., inq_vars)
+  recu = requested(.false., recursive)
+  inqg = requested(.true., inq_subgrps) .or. recu
 
-  description%id = group%id
-  if (allocated(group%name)) description%name = group%name
   operation_err = error_type()
 
-  if (want_dims) then
-    description%dims = inq_dims_grp(group, err=operation_err)
+  if (inqd) then
+    group%dims = inq_dims_grp(group, err=operation_err)
   end if
-  if (.not. has_err(operation_err) .and. want_atts) then
-    description%atts = get_atts_grp(group, err=operation_err)
+  if (.not. has_err(operation_err) .and. inqa) then
+    group%atts = get_atts_grp(group, err=operation_err)
   end if
-  if (.not. has_err(operation_err) .and. want_vars) then
-    description%vars = inq_vars_(group, operation_err)
+  if (.not. has_err(operation_err) .and. inqv) then
+    group%vars = inq_vars_(group, operation_err)
   end if
-  if (.not. has_err(operation_err) .and. want_groups) then
+  if (.not. has_err(operation_err) .and. inqg) then
     children = inq_grps_(group, operation_err)
     if (.not. has_err(operation_err)) then
-      allocate (description%grps(size(children)))
-      description%grps = children
+      if (associated(group%grps)) deallocate (group%grps)
+      allocate (group%grps(size(children)))
+      group%grps = children
     end if
-    if (.not. has_err(operation_err) .and. descend) then
-      call materialize_children(description%grps, &
-        & want_dims, want_atts, want_vars, operation_err)
+    if (.not. has_err(operation_err) .and. recu) then
+      call materialize_children(group%grps, &
+        & inqd, inqa, inqv, operation_err)
     end if
   end if
 
@@ -88,7 +86,7 @@ module function inq_grp(group, inq_dims, inq_atts, inq_vars, &
   else if (handle_err(operation_err)) then
     return
   end if
-end function inq_grp
+end subroutine inq_grp
 
 !> Serialize one group as an existing file root.
 module subroutine serialize_grp_(root, grp, atts, err)
@@ -320,18 +318,18 @@ function inq_grps_(parent, err) result(grps)
 
   err = error_type()
   stat = nc_inq_grps(parent%id, ngroups, c_null_ptr)
-  err = netcdf_err(stat, "[inq_grps] Group count.")
+  err = netcdf_err(stat, "[inq_subgrps] Group count.")
   if (has_err(err)) return
   allocate (grps(ngroups), ids(ngroups))
   if (ngroups == 0) return
 
   stat = nc_inq_grps(parent%id, ngroups, c_loc(ids(1)))
-  err = netcdf_err(stat, "[inq_grps] Group identifiers.")
+  err = netcdf_err(stat, "[inq_subgrps] Group identifiers.")
   if (has_err(err)) return
   do i = 1, ngroups
     name = c_null_char
     stat = nc_inq_grpname(ids(i), name)
-    err = netcdf_err(stat, "[inq_grps] Group name.")
+    err = netcdf_err(stat, "[inq_subgrps] Group name.")
     if (has_err(err)) return
     grps(i)%id = ids(i)
     grps(i)%name = clip(c2fstr(name))
@@ -371,7 +369,8 @@ function inq_vars_(group, err) result(vars)
 end function inq_vars_
 
 !> Recursively materialize already-discovered child groups.
-subroutine materialize_children(grps, want_dims, want_atts, want_vars, err)
+recursive subroutine materialize_children(grps, want_dims, want_atts, want_vars, &
+  & err)
   !> Input/output argument: `grps`.
   type(group_type), intent(inout) :: grps(:)
   !> Input arguments: `want_dims`, `want_atts`, and `want_vars`.
@@ -382,18 +381,20 @@ subroutine materialize_children(grps, want_dims, want_atts, want_vars, err)
 
   err = error_type()
   do i = 1, size(grps)
-    grps(i) = inq_grp(grps(i), inq_dims=want_dims, inq_atts=want_atts, &
-      & inq_vars=want_vars, inq_grps=.true., recursive=.true., err=err)
+    call inq_grp(grps(i), inq_dims=want_dims, inq_atts=want_atts, &
+      & inq_vars=want_vars, inq_subgrps=.true., recursive=.true., err=err)
     if (has_err(err)) return
   end do
 end subroutine materialize_children
 
 !> Return the value of an optional logical inquiry flag.
-pure logical function requested(flag)
+pure logical function requested(default, flag)
+  !> Input argument: `default`.
+  logical, intent(in) :: default
   !> Input argument: `flag`.
   logical, intent(in), optional :: flag
 
-  requested = .false.
+  requested = default
   if (present(flag)) requested = flag
 end function requested
 

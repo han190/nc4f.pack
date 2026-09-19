@@ -8,11 +8,11 @@ use, non_intrinsic :: nc4f_data_struct
 implicit none (type, external)
 
 public :: &
-  open_dataset, close_dataset, to_netcdf, &
+  open_netcdf, close_netcdf, to_netcdf, &
   inquire_dimensions, inquire_variable, &
   get_attribute, get_variable, &
   put_attribute, put_variable, &
-  get_group, inquire_groups, inquire_group, operator(.exists.)
+  get_group, inquire_subgroups, inquire_group, operator(.exists.)
 private
 
 !> Fixed scratch length for operation-context diagnostics.
@@ -60,9 +60,9 @@ interface get_group
   module procedure :: get_grp
 end interface get_group
 
-interface inquire_groups
-  module procedure :: inq_grps
-end interface inquire_groups
+interface inquire_subgroups
+  module procedure :: inq_subgrps
+end interface inquire_subgroups
 
 interface inquire_group
   module procedure :: inq_grp
@@ -95,21 +95,20 @@ interface
   end function get_grp
 
   !> Return direct child groups with IDs and names populated.
-  module function inq_grps(parent, err) result(grps)
+  module function inq_subgrps(parent, err) result(grps)
     class(group_type), intent(in) :: parent
     type(error_type), intent(out), optional :: err
     type(group_type), allocatable :: grps(:)
-  end function inq_grps
+  end function inq_subgrps
 
   !> Materialize selected metadata for a group.
-  module function inq_grp(group, inq_dims, inq_atts, inq_vars, &
-    & inq_grps, recursive, err) result(description)
-    class(group_type), intent(in) :: group
-    logical, intent(in), optional :: inq_dims, inq_atts, inq_vars, inq_grps
+  module recursive subroutine inq_grp(group, inq_dims, inq_atts, inq_vars, &
+    & inq_subgrps, recursive, err)
+    class(group_type), intent(inout) :: group
+    logical, intent(in), optional :: inq_dims, inq_atts, inq_vars, inq_subgrps
     logical, intent(in), optional :: recursive
     type(error_type), intent(out), optional :: err
-    type(group_type) :: description
-  end function inq_grp
+  end subroutine inq_grp
 
   !> Read a global attribute by name and return it.
   module impure elemental function get_att_grp(nc, name) result(att)
@@ -228,30 +227,25 @@ interface
   end function neq_att
 
   !> Open or create a dataset and return a `netcdf_type` handle.
-  module function open_dataset(filename, mode, inq_dims, inq_atts, err) &
-    & result(nc)
+  module function open_netcdf(filename, mode, err) result(nc)
     !> Path to the dataset file.
     character(len=*), intent(in) :: filename
     !> Mode to open the file: 'r' for read, 'w' to recreate, or 'a' for
     !> read/write access to an existing dataset.
     character(len=*), intent(in), optional :: mode
-    !> When true, inquire dimensions after opening the file.
-    logical, intent(in), optional :: inq_dims
-    !> When true, inquire global attributes after opening the file.
-    logical, intent(in), optional :: inq_atts
     !> Optional error result. When absent, failures stop the program.
     type(error_type), intent(out), optional :: err
     !> Returned `netcdf_type` describing the opened dataset.
     type(netcdf_type) :: nc
-  end function open_dataset
+  end function open_netcdf
 
   !> Close a dataset and free associated allocatables.
-  module subroutine close_dataset(nc, err)
+  module subroutine close_netcdf(nc, err)
     !> `netcdf_type` representing the open dataset to close.
     type(netcdf_type), intent(inout) :: nc
     !> Optional error result. When absent, failures stop the program.
     type(error_type), intent(out), optional :: err
-  end subroutine close_dataset
+  end subroutine close_netcdf
 
   !> Create a netCDF file from one variable or a rank-one variable array.
   module subroutine to_netcdf_var(filename, vars, atts, err)

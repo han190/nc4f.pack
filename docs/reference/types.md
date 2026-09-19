@@ -119,6 +119,6 @@ components.
 
 ```fortran
 type(netcdf_type) :: nc
-nc = open_dataset("input.nc", "r")
-call close_dataset(nc)
+nc = open_netcdf("input.nc", "r")
+call close_netcdf(nc)
 ```

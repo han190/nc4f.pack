@@ -14,7 +14,7 @@ module subroutine data_model(passed)
   type(attribute_type) :: atts(1), cloned_att
   type(dimension_type) :: dim
   type(group_type) :: attrs_only, child, deep_grp, empty, group_only, grp, &
-    & leaf, restored, restored_child
+    & leaf, restored_child
   type(group_type) :: child_grps(1), leaf_grps(1)
   type(netcdf_type) :: nc, nc_copy
   type(variable_type) :: borrowed_var, owned_var, restored_var, sum_var, vars(1)
@@ -112,22 +112,25 @@ module subroutine data_model(passed)
 
   call to_netcdf(TEST_RESULTS_DIR//"data_model.nc", grp, err=err)
   if (err%code /= NC_NOERR) return
-  nc = open_dataset(TEST_RESULTS_DIR//"data_model.nc", err=err)
+  nc = open_netcdf(TEST_RESULTS_DIR//"data_model.nc", err=err)
   if (err%code /= NC_NOERR) return
-  restored = inquire_group(nc, inq_dims=.true., inq_atts=.true., &
-    & inq_vars=.true., inq_grps=.true., recursive=.true., err=err)
+  call inquire_group(nc, inq_dims=.true., inq_atts=.true., &
+    & inq_vars=.true., inq_subgrps=.true., recursive=.true., err=err)
   if (err%code /= NC_NOERR) return
   restored_child = get_group(nc, "child", err)
   if (err%code /= NC_NOERR) return
   restored_var = get_variable(nc, "temperature", err)
   if (err%code /= NC_NOERR) return
   call extract(restored_var, restored_values)
-  call close_dataset(nc, err)
-  if (err%code /= NC_NOERR) return
-  if (size(restored%vars) /= 1 .or. size(restored%atts) /= 1 .or. &
-    & .not. associated(restored%grps) .or. size(restored%grps) /= 1 .or. &
+  if (size(nc%vars) /= 1 .or. size(nc%atts) /= 1 .or. &
+    & .not. associated(nc%grps) .or. size(nc%grps) /= 1 .or. &
     & restored_child%name /= "child" .or. &
-    & any(abs(restored_values - [273.0, 274.0]) > epsilon(1.0))) return
+    & any(abs(restored_values - [273.0, 274.0]) > epsilon(1.0))) then
+    call close_netcdf(nc)
+    return
+  end if
+  call close_netcdf(nc, err)
+  if (err%code /= NC_NOERR) return
   passed = .true.
 end subroutine data_model
 

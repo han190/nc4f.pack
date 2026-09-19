@@ -33,15 +33,15 @@ module subroutine simple_rd(passed)
   type(error_type) :: err
   character(len=1024) :: stdout
 
-  nc = open_dataset(TEST_RESULTS_DIR// &
+  nc = open_netcdf(TEST_RESULTS_DIR// &
     & "file_that_does_not_exist.nc", err=err)
   passed = .exists.err
   if (.not. passed) return
 
-  nc = open_dataset(TEST_RESULTS_DIR//"simple_wr.nc", "r")
+  nc = open_netcdf(TEST_RESULTS_DIR//"simple_wr.nc", "r")
   var = inquire_variable(nc, "data", err)
   if ((err%code /= NC_NOERR)) then
-    call close_dataset(nc)
+    call close_netcdf(nc)
     passed = .false.
     return
   end if
@@ -49,7 +49,7 @@ module subroutine simple_rd(passed)
   passed = var%name == "data" .and. &
          & all(var%dims == ["x".dim.nx, "y".dim.ny]) .and. &
          & index(stdout, "float data(x, y)") > 0
-  call close_dataset(nc)
+  call close_netcdf(nc)
 end subroutine simple_rd
 
 !> Execute `character_variables`.
@@ -69,13 +69,13 @@ module subroutine character_variables(passed)
     passed = .false.
     return
   end if
-  nc = open_dataset(TEST_RESULTS_DIR//"characters.nc", "r", err=err)
+  nc = open_netcdf(TEST_RESULTS_DIR//"characters.nc", "r", err=err)
   if ((err%code /= NC_NOERR)) then
     passed = .false.
     return
   end if
   actual = get_variable(nc, "letters", err)
-  call close_dataset(nc)
+  call close_netcdf(nc)
   if ((err%code /= NC_NOERR)) then
     passed = .false.
     return
@@ -110,7 +110,8 @@ module subroutine buffer_edges(passed)
     & [att_name.att."maximum-length name", "empty".att.""])
   call to_netcdf(TEST_RESULTS_DIR//"buffer_edges.nc", var)
 
-  nc = open_dataset(TEST_RESULTS_DIR//"buffer_edges.nc", "r", inq_dims=.true.)
+  nc = open_netcdf(TEST_RESULTS_DIR//"buffer_edges.nc", "r")
+  call inquire_group(nc)
   var = get_variable(nc, var_name)
   call extract(var, read_values)
   passed = var%name == var_name .and. &
@@ -119,7 +120,7 @@ module subroutine buffer_edges(passed)
     & var%atts(1)%name == att_name .and. size(var%atts) == 2 .and. &
     & var%atts(2)%len == 0 .and. &
     & all(abs(read_values - values) <= epsilon(values))
-  call close_dataset(nc)
+  call close_netcdf(nc)
 end subroutine buffer_edges
 
 end submodule nc4f_test_cases_basic

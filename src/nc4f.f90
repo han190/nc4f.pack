@@ -17,9 +17,9 @@ public :: &
   operator(==), operator(/=), operator(.exists.), &
   shape, size, sum, write(formatted)
 public :: &
-  open_dataset, close_dataset, to_netcdf, &
+  open_netcdf, close_netcdf, to_netcdf, &
   inquire_dimensions, inquire_variable, &
-  inquire_groups, inquire_group, &
+  inquire_subgroups, inquire_group, &
   get_attribute, get_variable, get_group, &
   put_attribute, put_variable
 
