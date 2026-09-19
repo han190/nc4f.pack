@@ -76,12 +76,12 @@ module function get_vara(nc, name, start, count, err) result(var)
   type(error_type), intent(out), optional :: err
   !> Return value: `var`.
   type(variable_type), target :: var
-  type(error_type) :: operation_err
+  type(error_type) :: op_err
 
-  var = get_vara_(nc, name, start, count, operation_err)
+  var = get_vara_(nc, name, start, count, op_err)
   if (present(err)) then
-    err = operation_err
-  else if (handle_err(operation_err)) then
+    err = op_err
+  else if (handle_err(op_err)) then
     return
   end if
 end function get_vara
@@ -276,12 +276,12 @@ module subroutine put_vara(nc, var, start, count, err)
   integer, intent(in) :: count(:)
   !> Output argument(s): `err`.
   type(error_type), intent(out), optional :: err
-  type(error_type) :: operation_err
+  type(error_type) :: op_err
 
-  call put_vara_(nc, var, start, count, operation_err)
+  call put_vara_(nc, var, start, count, op_err)
   if (present(err)) then
-    err = operation_err
-  else if (handle_err(operation_err)) then
+    err = op_err
+  else if (handle_err(op_err)) then
     return
   end if
 end subroutine put_vara

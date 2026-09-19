@@ -13,12 +13,12 @@ module function open_netcdf(filename, mode, err) result(nc)
   type(error_type), intent(out), optional :: err
   !> Returned `netcdf_type` describing the opened dataset.
   type(netcdf_type) :: nc
-  type(error_type) :: operation_err
+  type(error_type) :: op_err
 
-  nc = open_netcdf_(filename, mode, operation_err)
+  nc = open_netcdf_(filename, mode, op_err)
   if (present(err)) then
-    err = operation_err
-  else if (handle_err(operation_err)) then
+    err = op_err
+  else if (handle_err(op_err)) then
     return
   end if
 end function open_netcdf
@@ -87,12 +87,12 @@ module subroutine close_netcdf(nc, err)
   type(netcdf_type), intent(inout) :: nc
   !> Output argument(s): `err`.
   type(error_type), intent(out), optional :: err
-  type(error_type) :: operation_err
+  type(error_type) :: op_err
 
-  call close_netcdf_(nc, operation_err)
+  call close_netcdf_(nc, op_err)
   if (present(err)) then
-    err = operation_err
-  else if (handle_err(operation_err)) then
+    err = op_err
+  else if (handle_err(op_err)) then
     return
   end if
 end subroutine close_netcdf
@@ -126,39 +126,39 @@ module subroutine to_netcdf_var(filename, vars, atts, err)
   !> Optional error result. When absent, failures stop the program.
   type(error_type), intent(out), optional :: err
   type(netcdf_type) :: nc
-  type(error_type) :: operation_err, cleanup_err
+  type(error_type) :: op_err, cleanup_err
   integer :: i
 
-  operation_err = error_type()
-  nc = open_netcdf_(filename, mode="w", err=operation_err)
-  if (.not. has_err(operation_err)) then
+  op_err = error_type()
+  nc = open_netcdf_(filename, mode="w", err=op_err)
+  if (.not. has_err(op_err)) then
     select rank (items => vars)
     rank (0)
-      call put_var_err(nc, items, operation_err)
+      call put_var_err(nc, items, op_err)
     rank (1)
       do i = 1, size(items)
-        call put_var_err(nc, items(i), operation_err)
-        if (has_err(operation_err)) exit
+        call put_var_err(nc, items(i), op_err)
+        if (has_err(op_err)) exit
       end do
     rank default
-      operation_err = error_type(NC_EINVAL, &
+      op_err = error_type(NC_EINVAL, &
         & "[to_netcdf_var] Expected a scalar or rank-one variable array.")
     end select
 
-    if (.not. has_err(operation_err) .and. present(atts)) then
+    if (.not. has_err(op_err) .and. present(atts)) then
       nc%atts = atts
-      call put_att_grp_err(nc, operation_err)
+      call put_att_grp_err(nc, op_err)
     end if
-    if (has_err(operation_err)) then
+    if (has_err(op_err)) then
       call close_netcdf_(nc, cleanup_err)
     else
-      call close_netcdf_(nc, operation_err)
+      call close_netcdf_(nc, op_err)
     end if
   end if
 
   if (present(err)) then
-    err = operation_err
-  else if (handle_err(operation_err)) then
+    err = op_err
+  else if (handle_err(op_err)) then
     return
   end if
 end subroutine to_netcdf_var
@@ -173,12 +173,12 @@ module subroutine to_netcdf_grp(filename, grp, atts, err)
   type(attribute_type), intent(in), optional :: atts(:)
   !> Optional error result. When absent, failures stop the program.
   type(error_type), intent(out), optional :: err
-  type(error_type) :: operation_err
+  type(error_type) :: op_err
 
-  call to_netcdf_grp_(filename, grp, atts, operation_err)
+  call to_netcdf_grp_(filename, grp, atts, op_err)
   if (present(err)) then
-    err = operation_err
-  else if (handle_err(operation_err)) then
+    err = op_err
+  else if (handle_err(op_err)) then
     return
   end if
 end subroutine to_netcdf_grp
@@ -193,12 +193,12 @@ module subroutine to_netcdf_grps(filename, grps, atts, err)
   type(attribute_type), intent(in), optional :: atts(:)
   !> Optional error result. When absent, failures stop the program.
   type(error_type), intent(out), optional :: err
-  type(error_type) :: operation_err
+  type(error_type) :: op_err
 
-  call to_netcdf_grps_(filename, grps, atts, operation_err)
+  call to_netcdf_grps_(filename, grps, atts, op_err)
   if (present(err)) then
-    err = operation_err
-  else if (handle_err(operation_err)) then
+    err = op_err
+  else if (handle_err(op_err)) then
     return
   end if
 end subroutine to_netcdf_grps

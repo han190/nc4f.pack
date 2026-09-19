@@ -10,12 +10,12 @@ module function inq_dims_grp(nc, err) result(dims)
   type(error_type), intent(out), optional :: err
   !> Allocatable array of `dimension_type` in Fortran order.
   type(dimension_type), allocatable :: dims(:)
-  type(error_type) :: operation_err
+  type(error_type) :: op_err
 
-  dims = inq_dims_(nc%id, err=operation_err)
+  dims = inq_dims_(nc%id, err=op_err)
   if (present(err)) then
-    err = operation_err
-  else if (handle_err(operation_err)) then
+    err = op_err
+  else if (handle_err(op_err)) then
     return
   end if
 end function inq_dims_grp
@@ -30,12 +30,12 @@ module function inq_dims_var(nc, var, err) result(dims)
   type(error_type), intent(out), optional :: err
   !> Allocatable array of `dimension_type` for that variable.
   type(dimension_type), allocatable :: dims(:)
-  type(error_type) :: operation_err
+  type(error_type) :: op_err
 
-  dims = inq_dims_(nc%id, var%id, operation_err)
+  dims = inq_dims_(nc%id, var%id, op_err)
   if (present(err)) then
-    err = operation_err
-  else if (handle_err(operation_err)) then
+    err = op_err
+  else if (handle_err(op_err)) then
     return
   end if
 end function inq_dims_var

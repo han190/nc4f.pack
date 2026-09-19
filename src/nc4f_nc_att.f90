@@ -38,12 +38,12 @@ module function get_atts_grp(nc, err) result(atts)
   type(error_type), optional, intent(out) :: err
   !> Return value: `atts`.
   type(attribute_type), allocatable :: atts(:)
-  type(error_type) :: operation_err
+  type(error_type) :: op_err
 
-  atts = get_atts_(nc%id, NC_GLOBAL, operation_err)
+  atts = get_atts_(nc%id, NC_GLOBAL, op_err)
   if (present(err)) then
-    err = operation_err
-  else if (handle_err(operation_err)) then
+    err = op_err
+  else if (handle_err(op_err)) then
     return
   end if
 end function get_atts_grp
@@ -90,12 +90,12 @@ module function get_atts_var(nc, var, err) result(atts)
   type(error_type), optional, intent(out) :: err
   !> Return value: `atts`.
   type(attribute_type), allocatable :: atts(:)
-  type(error_type) :: operation_err
+  type(error_type) :: op_err
 
-  atts = get_atts_(nc%id, var%id, operation_err)
+  atts = get_atts_(nc%id, var%id, op_err)
   if (present(err)) then
-    err = operation_err
-  else if (handle_err(operation_err)) then
+    err = op_err
+  else if (handle_err(op_err)) then
     return
   end if
 end function get_atts_var

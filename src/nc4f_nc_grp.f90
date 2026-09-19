@@ -12,12 +12,12 @@ module function get_grp(parent, name, err) result(group)
   type(error_type), intent(out), optional :: err
   !> Return value: `group`.
   type(group_type) :: group
-  type(error_type) :: operation_err
+  type(error_type) :: op_err
 
-  group = get_grp_(parent, name, operation_err)
+  group = get_grp_(parent, name, op_err)
   if (present(err)) then
-    err = operation_err
-  else if (handle_err(operation_err)) then
+    err = op_err
+  else if (handle_err(op_err)) then
     return
   end if
 end function get_grp
@@ -30,12 +30,12 @@ module function inq_subgrps(parent, err) result(grps)
   type(error_type), intent(out), optional :: err
   !> Return value: `grps`.
   type(group_type), allocatable :: grps(:)
-  type(error_type) :: operation_err
+  type(error_type) :: op_err
 
-  grps = inq_grps_(parent, operation_err)
+  grps = inq_grps_(parent, op_err)
   if (present(err)) then
-    err = operation_err
-  else if (handle_err(operation_err)) then
+    err = op_err
+  else if (handle_err(op_err)) then
     return
   end if
 end function inq_subgrps
@@ -47,8 +47,9 @@ module recursive subroutine inq_grp(group, inq_dims, inq_atts, inq_vars, &
   logical, intent(in), optional :: inq_dims, inq_atts, inq_vars, inq_subgrps
   logical, intent(in), optional :: recursive
   type(error_type), intent(out), optional :: err
-  type(error_type) :: operation_err
+  type(error_type) :: op_err
   type(group_type), allocatable :: children(:)
+  integer :: i
   logical :: inqd, inqa, inqv, inqg, recu
 
   inqd = requested(.true., inq_dims)
@@ -57,33 +58,37 @@ module recursive subroutine inq_grp(group, inq_dims, inq_atts, inq_vars, &
   recu = requested(.false., recursive)
   inqg = requested(.true., inq_subgrps) .or. recu
 
-  operation_err = error_type()
+  op_err = error_type()
 
   if (inqd) then
-    group%dims = inq_dims_grp(group, err=operation_err)
+    group%dims = inq_dims_grp(group, err=op_err)
   end if
-  if (.not. has_err(operation_err) .and. inqa) then
-    group%atts = get_atts_grp(group, err=operation_err)
+  if (.not. has_err(op_err) .and. inqa) then
+    group%atts = get_atts_grp(group, err=op_err)
   end if
-  if (.not. has_err(operation_err) .and. inqv) then
-    group%vars = inq_vars_(group, operation_err)
+  if (.not. has_err(op_err) .and. inqv) then
+    group%vars = inq_vars_(group, op_err)
   end if
-  if (.not. has_err(operation_err) .and. inqg) then
-    children = inq_grps_(group, operation_err)
-    if (.not. has_err(operation_err)) then
+  if (.not. has_err(op_err) .and. inqg) then
+    children = inq_grps_(group, op_err)
+    if (.not. has_err(op_err)) then
       if (associated(group%grps)) deallocate (group%grps)
       allocate (group%grps(size(children)))
       group%grps = children
     end if
-    if (.not. has_err(operation_err) .and. recu) then
-      call materialize_children(group%grps, &
-        & inqd, inqa, inqv, operation_err)
+    if (.not. has_err(op_err) .and. recu) then
+      do i = 1, size(group%grps)
+        call inq_grp(group%grps(i), inq_dims=inqd, &
+          & inq_atts=inqa, inq_vars=inqv, &
+          & inq_subgrps=.true., recursive=.true., err=op_err)
+        if (has_err(op_err)) exit
+      end do
     end if
   end if
 
   if (present(err)) then
-    err = operation_err
-  else if (handle_err(operation_err)) then
+    err = op_err
+  else if (handle_err(op_err)) then
     return
   end if
 end subroutine inq_grp
@@ -367,25 +372,6 @@ function inq_vars_(group, err) result(vars)
     if (has_err(err)) return
   end do
 end function inq_vars_
-
-!> Recursively materialize already-discovered child groups.
-recursive subroutine materialize_children(grps, want_dims, want_atts, want_vars, &
-  & err)
-  !> Input/output argument: `grps`.
-  type(group_type), intent(inout) :: grps(:)
-  !> Input arguments: `want_dims`, `want_atts`, and `want_vars`.
-  logical, intent(in) :: want_dims, want_atts, want_vars
-  !> Output argument: `err`.
-  type(error_type), intent(out) :: err
-  integer :: i
-
-  err = error_type()
-  do i = 1, size(grps)
-    call inq_grp(grps(i), inq_dims=want_dims, inq_atts=want_atts, &
-      & inq_vars=want_vars, inq_subgrps=.true., recursive=.true., err=err)
-    if (has_err(err)) return
-  end do
-end subroutine materialize_children
 
 !> Return the value of an optional logical inquiry flag.
 pure logical function requested(default, flag)
