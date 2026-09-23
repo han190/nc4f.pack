@@ -11,62 +11,23 @@ public :: &
   open_netcdf, close_netcdf, to_netcdf, &
   inquire_dimensions, inquire_variable, &
   get_attribute, get_variable, &
-  put_attribute, put_variable, &
   get_group, inquire_subgroups, inquire_group, operator(.exists.)
 private
 
 !> Fixed scratch length for operation-context diagnostics.
 integer, parameter :: MAX_CHAR_LEN = 1024
 
-interface get_variable
-  module procedure :: get_var !> Impure Elemental
-  module procedure :: get_var_err
-  module procedure :: get_vara
-end interface get_variable
-
-interface put_variable
-  module procedure :: put_var !> Impure Elemental
-  module procedure :: put_var_err
-  module procedure :: put_vara
-end interface put_variable
-
-interface inquire_variable
-  module procedure :: inq_var !> Impure Elemental
-  module procedure :: inq_var_err
-end interface inquire_variable
-
 interface get_attribute
   module procedure :: get_atts_grp
   module procedure :: get_att_grp !> Impure Elemental
-  module procedure :: get_att_grp_err
   module procedure :: get_atts_var
   module procedure :: get_att_var !> Impure Elemental
-  module procedure :: get_att_var_err
 end interface get_attribute
-
-interface put_attribute
-  module procedure :: put_att_grp !> Impure Elemental
-  module procedure :: put_att_grp_err
-  module procedure :: put_att_var !> Impure Elemental
-  module procedure :: put_att_var_err
-end interface put_attribute
 
 interface inquire_dimensions
   module procedure :: inq_dims_grp
   module procedure :: inq_dims_var
 end interface inquire_dimensions
-
-interface get_group
-  module procedure :: get_grp
-end interface get_group
-
-interface inquire_subgroups
-  module procedure :: inq_subgrps
-end interface inquire_subgroups
-
-interface inquire_group
-  module procedure :: inq_grp
-end interface inquire_group
 
 interface to_netcdf
   module procedure :: to_netcdf_var
@@ -87,49 +48,40 @@ end interface initialize
 
 interface
   !> Return a direct child group by name.
-  module function get_grp(parent, name, err) result(group)
+  module function get_group(parent, name, err) result(group)
     class(group_type), intent(in) :: parent
     character(len=*), intent(in) :: name
     type(error_type), intent(out), optional :: err
     type(group_type) :: group
-  end function get_grp
+  end function get_group
 
   !> Return direct child groups with IDs and names populated.
-  module function inq_subgrps(parent, err) result(grps)
+  module function inquire_subgroups(parent, err) result(grps)
     class(group_type), intent(in) :: parent
     type(error_type), intent(out), optional :: err
     type(group_type), allocatable :: grps(:)
-  end function inq_subgrps
+  end function inquire_subgroups
 
   !> Materialize selected metadata for a group.
-  module recursive subroutine inq_grp(group, inq_dims, inq_atts, inq_vars, &
+  module recursive subroutine inquire_group(group, inq_dims, inq_atts, inq_vars, &
     & inq_subgrps, recursive, err)
     class(group_type), intent(inout) :: group
     logical, intent(in), optional :: inq_dims, inq_atts, inq_vars, inq_subgrps
     logical, intent(in), optional :: recursive
     type(error_type), intent(out), optional :: err
-  end subroutine inq_grp
+  end subroutine inquire_group
 
   !> Read a global attribute by name and return it.
-  module impure elemental function get_att_grp(nc, name) result(att)
+  module impure elemental function get_att_grp(nc, name, err) result(att)
     !> High-level `netcdf_type` representing the open file.
     class(group_type), intent(in) :: nc
     !> Name of the global attribute to read.
     character(len=*), intent(in) :: name
+    !> Optional operation error. When absent, failures stop the program.
+    type(error_type), intent(out), optional :: err
     !> Returned attribute object.
     type(attribute_type) :: att
   end function get_att_grp
-
-  !> Read a global attribute by name without stopping on a NetCDF failure.
-  module function get_att_grp_err(nc, name, err) result(att)
-    !> Input argument(s): `nc`.
-    class(group_type), intent(in) :: nc
-    !> Input argument(s): `name`.
-    character(len=*), intent(in) :: name
-    !> Output argument(s): `err`.
-    type(error_type), intent(out) :: err
-    type(attribute_type) :: att
-  end function get_att_grp_err
 
   !> Return all global attributes for a dataset.
   module function get_atts_grp(nc, err) result(atts)
@@ -142,29 +94,18 @@ interface
   end function get_atts_grp
 
   !> Read a named attribute attached to a variable and return it.
-  module function get_att_var(nc, var, name) result(att)
+  module function get_att_var(nc, var, name, err) result(att)
     !> High-level `netcdf_type` representing the open file.
     class(group_type), intent(in) :: nc
     !> Variable whose attribute will be read.
     type(variable_type), intent(in) :: var
     !> Name of the attribute to read.
     character(len=*), intent(in) :: name
+    !> Optional operation error. When absent, failures stop the program.
+    type(error_type), intent(out), optional :: err
     !> Returned attribute object.
     type(attribute_type) :: att
   end function get_att_var
-
-  !> Read a variable attribute by name without stopping on a NetCDF failure.
-  module function get_att_var_err(nc, var, name, err) result(att)
-    !> Input argument(s): `nc`.
-    class(group_type), intent(in) :: nc
-    !> Input argument(s): `var`.
-    type(variable_type), intent(in) :: var
-    !> Input argument(s): `name`.
-    character(len=*), intent(in) :: name
-    !> Output argument(s): `err`.
-    type(error_type), intent(out) :: err
-    type(attribute_type) :: att
-  end function get_att_var_err
 
   !> Return all attributes attached to a variable.
   module function get_atts_var(nc, var, err) result(atts)
@@ -177,38 +118,6 @@ interface
     !> Allocatable array of attributes for the variable.
     type(attribute_type), allocatable :: atts(:)
   end function get_atts_var
-
-  !> Write all attributes of a variable to the dataset.
-  module impure elemental subroutine put_att_var(nc, var)
-    !> High-level `netcdf_type` representing the open file.
-    class(group_type), intent(in) :: nc
-    !> Variable whose attributes will be written to the file.
-    type(variable_type), target, intent(in) :: var
-  end subroutine put_att_var
-
-  !> Write all attributes of a variable without stopping on a NetCDF failure.
-  module subroutine put_att_var_err(nc, var, err)
-    !> Input argument(s): `nc`.
-    class(group_type), intent(in) :: nc
-    !> Input argument(s): `var`.
-    type(variable_type), target, intent(in) :: var
-    !> Output argument(s): `err`.
-    type(error_type), intent(out) :: err
-  end subroutine put_att_var_err
-
-  !> Write all global attributes of the dataset to the file.
-  module impure elemental subroutine put_att_grp(nc)
-    !> High-level `netcdf_type` representing the open file.
-    class(group_type), target, intent(in) :: nc
-  end subroutine put_att_grp
-
-  !> Write all global attributes without stopping on a NetCDF failure.
-  module subroutine put_att_grp_err(nc, err)
-    !> Input argument(s): `nc`.
-    class(group_type), target, intent(in) :: nc
-    !> Output argument(s): `err`.
-    type(error_type), intent(out) :: err
-  end subroutine put_att_grp_err
 
   !> Return true when two `attribute_type` values are identical.
   module elemental logical function eq_att(x, y)
@@ -309,30 +218,6 @@ interface
     type(dimension_type), allocatable :: dims(:)
   end function inq_dims_var
 
-  !> Define a dimension in the netCDF file if it does not already exist.
-  module impure elemental function def_dim(nc, dim) result(new_dim)
-    !> High-level `netcdf_type` for the file.
-    class(group_type), intent(in) :: nc
-    !> `dimension_type` describing the desired dimension (name, len,
-    !> is_unlim).
-    type(dimension_type), intent(in) :: dim
-    !> The `dimension_type` of the existing or newly-created dimension
-    !> (including the assigned `id`). This routine is `impure` because it
-    !> may modify the underlying file state.
-    type(dimension_type) :: new_dim
-  end function def_dim
-
-  !> Define a dimension without stopping on a NetCDF failure.
-  module function def_dim_err(nc, dim, err) result(new_dim)
-    !> Input argument(s): `nc`.
-    class(group_type), intent(in) :: nc
-    !> Input argument(s): `dim`.
-    type(dimension_type), intent(in) :: dim
-    !> Output argument(s): `err`.
-    type(error_type), intent(out) :: err
-    type(dimension_type) :: new_dim
-  end function def_dim_err
-
   !> submodule_utility.f90
 
   !> Apply the library's fail-fast policy to a completed error result.
@@ -393,118 +278,106 @@ interface
   !> submodule_variable.f90
 
   !> Read a variable's data from a netCDF dataset into a `variable_type`.
-  module impure elemental function get_var(nc, name) result(var)
+  module impure elemental function get_variable(nc, name, err) result(var)
     !> High-level `netcdf_type` representing the open file.
     class(group_type), intent(in) :: nc
     !> Name of the variable to read.
     character(len=*), intent(in) :: name
+    !> Optional operation error. When absent, failures stop the program.
+    type(error_type), intent(out), optional :: err
     !> Variable object that will contain metadata and the data buffer.
     type(variable_type), target :: var
-  end function get_var
-
-  !> Read a scalar-named variable without stopping on a NetCDF failure.
-  module function get_var_err(nc, name, err) result(var)
-    !> Input argument(s): `nc`.
-    class(group_type), intent(in) :: nc
-    !> Input argument(s): `name`.
-    character(len=*), intent(in) :: name
-    !> Output argument(s): `err`.
-    type(error_type), intent(out) :: err
-    type(variable_type), target :: var
-  end function get_var_err
-
-  !> Read a contiguous Fortran-order hyperslab into a `variable_type`.
-  module function get_vara(nc, name, start, count, err) result(var)
-    !> High-level `netcdf_type` representing the open file.
-    class(group_type), intent(in) :: nc
-    !> Name of the variable to read.
-    character(len=*), intent(in) :: name
-    !> One-based start indices in the variable's Fortran dimension order.
-    integer, intent(in) :: start(:)
-    !> Number of elements to read along each Fortran-order dimension.
-    integer, intent(in) :: count(:)
-    !> Optional error result. When absent, failures stop the program.
-    type(error_type), intent(out), optional :: err
-    !> Materialized variable containing the selected data.
-    type(variable_type), target :: var
-  end function get_vara
+  end function get_variable
 
   !> Inquire a variable's metadata without reading its data buffer.
-  module impure elemental function inq_var(nc, name) result(var)
+  module impure elemental function inquire_variable(nc, name, err) result(var)
     !> High-level `netcdf_type` representing the open file.
     class(group_type), intent(in) :: nc
     !> Name of the variable to inquire.
     character(len=*), intent(in) :: name
+    !> Optional operation error. When absent, failures stop the program.
+    type(error_type), intent(out), optional :: err
     !> Variable object containing metadata (name, type, dims, atts, len).
     type(variable_type) :: var
-  end function inq_var
+  end function inquire_variable
 
-  !> Inquire a scalar-named variable without stopping on a NetCDF failure.
-  module function inq_var_err(nc, name, err) result(var)
-    !> Input argument(s): `nc`.
+  !> Define or resolve one dimension while serializing an in-memory model.
+  module function def_dim(nc, dim, err) result(new_dim)
+    !> Dataset or group that owns the dimension.
     class(group_type), intent(in) :: nc
-    !> Input argument(s): `name`.
-    character(len=*), intent(in) :: name
-    !> Output argument(s): `err`.
+    !> Dimension metadata to define or resolve.
+    type(dimension_type), intent(in) :: dim
+    !> Operation error.
     type(error_type), intent(out) :: err
-    type(variable_type) :: var
-  end function inq_var_err
-
-  !> Write a variable's data and metadata to a netCDF dataset.
-  module impure elemental subroutine put_var(nc, var)
-    !> High-level `netcdf_type` representing the open file.
-    class(group_type), intent(in) :: nc
-    !> Variable object containing metadata and a data buffer to write.
-    type(variable_type), target, intent(in) :: var
-  end subroutine put_var
-
-  !> Write a scalar variable without stopping on a NetCDF failure.
-  module subroutine put_var_err(nc, var, err)
-    !> Input argument(s): `nc`.
-    class(group_type), intent(in) :: nc
-    !> Input argument(s): `var`.
-    type(variable_type), target, intent(in) :: var
-    !> Output argument(s): `err`.
-    type(error_type), intent(out) :: err
-  end subroutine put_var_err
+    !> Dimension metadata with its NetCDF identifier.
+    type(dimension_type) :: new_dim
+  end function def_dim
 
   !> Define variable metadata without transferring its data buffer.
-  module function def_var_(nc, var, err) result(new_var)
+  module function def_var(nc, var, err) result(new_var)
     class(group_type), intent(in) :: nc
     type(variable_type), intent(in) :: var
     type(error_type), intent(out) :: err
     type(variable_type) :: new_var
-  end function def_var_
+  end function def_var
 
-  !> Serialize one in-memory group as an existing file root.
-  module subroutine serialize_grp_(root, grp, atts, err)
-    class(group_type), intent(in) :: root
-    type(group_type), intent(in) :: grp
-    type(attribute_type), intent(in), optional :: atts(:)
-    type(error_type), intent(out) :: err
-  end subroutine serialize_grp_
-
-  !> Serialize in-memory groups as direct children of an existing file root.
-  module subroutine serialize_grps_(root, grps, atts, err)
-    class(group_type), intent(in) :: root
-    type(group_type), target, intent(in) :: grps(:)
-    type(attribute_type), intent(in), optional :: atts(:)
-    type(error_type), intent(out) :: err
-  end subroutine serialize_grps_
-
-  !> Write `var` into an existing variable at a Fortran-order hyperslab.
-  module subroutine put_vara(nc, var, start, count, err)
-    !> Open dataset in append (`"a"`) or read/write mode.
+  !> Write one complete variable while serializing an in-memory model.
+  module subroutine put_var(nc, var, err)
+    !> Open dataset or group.
     class(group_type), intent(in) :: nc
-    !> Data buffer whose dimensions must equal `count`.
+    !> Variable whose metadata and data are written.
+    type(variable_type), target, intent(in) :: var
+    !> Operation error.
+    type(error_type), intent(out) :: err
+  end subroutine put_var
+
+  !> Write one Fortran-order hyperslab while serializing an in-memory model.
+  module subroutine put_vara(nc, var, start, count, err)
+    !> Open dataset or group.
+    class(group_type), intent(in) :: nc
+    !> Data buffer whose dimensions equal `count`.
     type(variable_type), target, intent(in) :: var
     !> One-based Fortran-order start indices.
     integer, intent(in) :: start(:)
     !> Fortran-order edge lengths to write.
     integer, intent(in) :: count(:)
-    !> Optional error result. When absent, failures stop the program.
-    type(error_type), intent(out), optional :: err
+    !> Operation error.
+    type(error_type), intent(out) :: err
   end subroutine put_vara
+
+  !> Write all attributes belonging to one variable during serialization.
+  module subroutine put_att_var(nc, var, err)
+    !> Open dataset or group.
+    class(group_type), intent(in) :: nc
+    !> Variable whose attributes are written.
+    type(variable_type), target, intent(in) :: var
+    !> Operation error.
+    type(error_type), intent(out) :: err
+  end subroutine put_att_var
+
+  !> Write all global attributes belonging to one group during serialization.
+  module subroutine put_att_grp(nc, err)
+    !> Open dataset or group whose global attributes are written.
+    class(group_type), target, intent(in) :: nc
+    !> Operation error.
+    type(error_type), intent(out) :: err
+  end subroutine put_att_grp
+
+  !> Serialize one in-memory group as an existing file root.
+  module subroutine serialize_grp(root, grp, atts, err)
+    class(group_type), intent(in) :: root
+    type(group_type), intent(in) :: grp
+    type(attribute_type), intent(in), optional :: atts(:)
+    type(error_type), intent(out) :: err
+  end subroutine serialize_grp
+
+  !> Serialize in-memory groups as direct children of an existing file root.
+  module subroutine serialize_grps(root, grps, atts, err)
+    class(group_type), intent(in) :: root
+    type(group_type), target, intent(in) :: grps(:)
+    type(attribute_type), intent(in), optional :: atts(:)
+    type(error_type), intent(out) :: err
+  end subroutine serialize_grps
 end interface
 
 end module nc4f_nc

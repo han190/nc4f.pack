@@ -20,7 +20,6 @@ get-started/first-program
 examples/create-small-dataset
 examples/read-inspect-compute-write
 examples/inspect-grouped-file-edit-metadata
-examples/hyperslabs-shallow-buffers-errors
 ```
 
 ```{toctree}

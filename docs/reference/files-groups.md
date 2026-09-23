@@ -21,11 +21,8 @@ call to_netcdf(filename, grps [, atts] [, err])
 `inquire_dimensions(nc [, var] [, err])` returns local group dimensions or
 the dimensions attached to `var`.
 
-`get_variable(nc, name [, start, count] [, err])` materializes values and
-metadata. The hyperslab form uses one-based `start` indices and Fortran-order
-edge lengths. `inquire_variable(nc, name [, err])` returns metadata only.
-`put_variable(nc, var [, start, count] [, err])` writes a materialized
-variable or hyperslab.
+`get_variable(nc, name [, err])` materializes values and metadata.
+`inquire_variable(nc, name [, err])` returns metadata only.
 
 ## Attributes
 
@@ -37,8 +34,6 @@ atts = get_attribute(nc [, err])
 att  = get_attribute(nc, var, name [, err])
 atts = get_attribute(nc, var [, err])
 ```
-
-`put_attribute(nc [, var] [, err])` writes `nc%atts` or `var%atts`.
 
 ## Groups
 

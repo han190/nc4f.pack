@@ -85,6 +85,54 @@ module subroutine character_variables(passed)
     & all(actual_values == values)
 end subroutine character_variables
 
+!> Execute elemental variable metadata and value reads with array arguments.
+module subroutine elemental_reads(passed)
+  !> Input/output argument(s): `passed`.
+  logical, intent(inout) :: passed
+  character(len=6), parameter :: names(2) = ["first ", "second"]
+  integer, parameter :: first_values(2) = [1, 2]
+  integer, parameter :: second_values(2) = [3, 4]
+  type(error_type) :: errs(2)
+  type(netcdf_type) :: nc
+  type(variable_type) :: actual(2), expected(2)
+  integer :: i
+
+  passed = .false.
+  expected(1) = datarray(names(1), first_values, ["x".dim.2])
+  expected(2) = datarray(names(2), second_values, ["x".dim.2])
+  call to_netcdf(TEST_RESULTS_DIR//"elemental-reads.nc", expected, err=errs(1))
+  if (errs(1)%code /= NC_NOERR) return
+
+  nc = open_netcdf(TEST_RESULTS_DIR//"elemental-reads.nc", "r", err=errs(1))
+  if (errs(1)%code /= NC_NOERR) return
+  actual = inquire_variable(nc, names, errs)
+  do i = 1, size(actual)
+    if (errs(i)%code /= NC_NOERR .or. actual(i)%name /= names(i) .or. &
+      & actual(i)%dtype /= expected(i)%dtype .or. &
+      & actual(i)%len /= expected(i)%len) then
+      call close_netcdf(nc)
+      return
+    end if
+  end do
+  actual = get_variable(nc, names, errs)
+  call close_netcdf(nc)
+  if (any(errs%code /= NC_NOERR)) return
+  passed = .true.
+  do i = 1, size(actual)
+    if (actual(i)%name /= expected(i)%name .or. &
+      & .not. all(actual(i)%dims == expected(i)%dims) .or. &
+      & .not. allocated(actual(i)%buffer) .or. &
+      & .not. allocated(expected(i)%buffer)) then
+      passed = .false.
+      return
+    end if
+    if (.not. all(actual(i)%buffer == expected(i)%buffer)) then
+      passed = .false.
+      return
+    end if
+  end do
+end subroutine elemental_reads
+
 !> Execute `buffer_edges`.
 module subroutine buffer_edges(passed)
   !> Input/output argument(s): `passed`.

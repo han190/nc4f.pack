@@ -1,7 +1,7 @@
-# Inspect a Grouped File and Edit Metadata
+# Inspect a Grouped File's Metadata
 
 Traverse a direct child group, materialize a recursive metadata description,
-inspect dimensions and attributes, then write updated attributes to the file.
+and inspect dimensions and attributes.
 
 ```fortran
 type(netcdf_type) :: nc
@@ -10,7 +10,7 @@ type(variable_type) :: temperature
 type(attribute_type) :: title, units
 type(dimension_type), allocatable :: dims(:), variable_dims(:)
 
-nc = open_netcdf("grouped.nc", "a")
+nc = open_netcdf("grouped.nc", "r")
 atmosphere = get_group(nc, "atmosphere")
 call inquire_group(atmosphere, inq_dims=.true., inq_atts=.true., &
   & inq_vars=.true., inq_subgrps=.true., recursive=.true.)
@@ -19,9 +19,5 @@ temperature = inquire_variable(atmosphere, "temperature")
 variable_dims = inquire_dimensions(atmosphere, temperature)
 title = get_attribute(nc, "title")
 units = get_attribute(atmosphere, temperature, "units")
-temperature%atts = ["long_name".att."Air temperature"]
-nc%atts = ["history".att."updated by nc4f"]
-call put_attribute(atmosphere, temperature)
-call put_attribute(nc)
 call close_netcdf(nc)
 ```

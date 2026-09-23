@@ -98,16 +98,6 @@ module subroutine error_handling(passed)
     return
   end if
 
-  var = get_variable(nc, "present", [2], [1], err)
-  if (.not. (.exists.err .and. err%code == NC_EEDGE)) then
-    call close_netcdf(nc)
-    return
-  end if
-  var = get_variable(nc, "present", [0], [1], err)
-  if (.not. ((err%code /= NC_NOERR) .and. err%code == NC_EINVALCOORDS)) then
-    call close_netcdf(nc)
-    return
-  end if
   call close_netcdf(nc, err)
   if ((err%code /= NC_NOERR)) return
 

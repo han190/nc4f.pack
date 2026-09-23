@@ -108,39 +108,8 @@ function inq_dims_(ncid, varid, err) result(dims)
   end do
 end function inq_dims_
 
-!> Define a dimension in the netCDF file if it does not already exist.
-module impure elemental function def_dim(nc, dim) result(new_dim)
-  !> High-level `netcdf_type` for the file.
-  class(group_type), intent(in) :: nc
-  !> `dimension_type` describing the desired dimension (name, len,
-  !> is_unlim).
-  type(dimension_type), intent(in) :: dim
-  !> The `dimension_type` of the existing or newly-created dimension
-  !> (including the assigned `id`). This routine is `impure` because it
-  !> may modify the underlying file state.
-  type(dimension_type) :: new_dim
-  type(error_type) :: err
-
-  new_dim = def_dim_(nc, dim, err)
-  if (handle_err(err)) return
-end function def_dim
-
-!> Define a dimension without stopping on a NetCDF failure.
-module function def_dim_err(nc, dim, err) result(new_dim)
-  !> Input argument(s): `nc`.
-  class(group_type), intent(in) :: nc
-  !> Input argument(s): `dim`.
-  type(dimension_type), intent(in) :: dim
-  !> Output argument(s): `err`.
-  type(error_type), intent(out) :: err
-  !> Return value: `new_dim`.
-  type(dimension_type) :: new_dim
-
-  new_dim = def_dim_(nc, dim, err)
-end function def_dim_err
-
 !> Define a dimension, preserving `NC_EBADDIM` as the expected create path.
-function def_dim_(nc, dim, err) result(new_dim)
+module function def_dim(nc, dim, err) result(new_dim)
   !> Input argument(s): `nc`.
   class(group_type), intent(in) :: nc
   !> Input argument(s): `dim`.
@@ -170,6 +139,6 @@ function def_dim_(nc, dim, err) result(new_dim)
   err = netcdf_err(stat, context)
   if (has_err(err)) return
   new_dim = dimension_type(dimid, dim%name, dim%len, dim%is_unlim)
-end function def_dim_
+end function def_dim
 
 end submodule nc4f_nc_dim

@@ -134,10 +134,10 @@ module subroutine to_netcdf_var(filename, vars, atts, err)
   if (.not. has_err(op_err)) then
     select rank (items => vars)
     rank (0)
-      call put_var_err(nc, items, op_err)
+      call put_var(nc, items, op_err)
     rank (1)
       do i = 1, size(items)
-        call put_var_err(nc, items(i), op_err)
+        call put_var(nc, items(i), op_err)
         if (has_err(op_err)) exit
       end do
     rank default
@@ -147,7 +147,7 @@ module subroutine to_netcdf_var(filename, vars, atts, err)
 
     if (.not. has_err(op_err) .and. present(atts)) then
       nc%atts = atts
-      call put_att_grp_err(nc, op_err)
+      call put_att_grp(nc, op_err)
     end if
     if (has_err(op_err)) then
       call close_netcdf_(nc, cleanup_err)
@@ -223,7 +223,7 @@ subroutine to_netcdf_grp_(filename, grp, atts, err)
 
   file_root%id = nc%id
   file_root%name = "/"
-  call serialize_grp_(file_root, grp, atts, err)
+  call serialize_grp(file_root, grp, atts, err)
   if (has_err(err)) then
     call close_netcdf_(nc, cleanup_err)
     return
@@ -251,7 +251,7 @@ subroutine to_netcdf_grps_(filename, grps, atts, err)
 
   file_root%id = nc%id
   file_root%name = "/"
-  call serialize_grps_(file_root, grps, atts, err)
+  call serialize_grps(file_root, grps, atts, err)
   if (has_err(err)) then
     call close_netcdf_(nc, cleanup_err)
     return

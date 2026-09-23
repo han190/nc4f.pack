@@ -292,7 +292,7 @@ module subroutine ecmwf_era40_read(passed)
     if ((err%code /= NC_NOERR)) exit era40_read
     longitude_var = get_variable(nc, "longitude", err)
     if ((err%code /= NC_NOERR)) exit era40_read
-    temperature_var = get_variable(nc, "p2t", [1, 1, 1], [4, 3, 2], err)
+    temperature_var = get_variable(nc, "p2t", err)
     if ((err%code /= NC_NOERR)) exit era40_read
     conventions_att = get_attribute(nc, "Conventions", err)
     if ((err%code /= NC_NOERR)) exit era40_read
@@ -316,7 +316,7 @@ module subroutine ecmwf_era40_read(passed)
 
     passed = size(nc%dims) == 3 .and. &
       & size(latitude) == 73 .and. size(longitude) == 144 .and. &
-      & all(shape(temperature) == [4, 3, 2]) .and. &
+      & all(int(shape(temperature), int64) == temperature_var%dims%len) .and. &
       & latitude_var%dims(1)%name == "latitude" .and. &
       & longitude_var%dims(1)%name == "longitude" .and. &
       & temperature_var%dims(1)%name == "longitude" .and. &
@@ -366,7 +366,7 @@ module subroutine sresa1b_ccsm3_read(passed)
     call inquire_group(nc, inq_dims=.true., inq_atts=.true., &
       & inq_vars=.true., inq_subgrps=.true., err=err)
     if (err%code /= NC_NOERR) exit ccsm3_read
-    tas = get_variable(nc, "tas", [1, 1, 1], [4, 3, 1], err)
+    tas = get_variable(nc, "tas", err)
     if (err%code /= NC_NOERR) exit ccsm3_read
     conventions_att = get_attribute(nc, "Conventions", err)
     if (err%code /= NC_NOERR) exit ccsm3_read
@@ -384,7 +384,7 @@ module subroutine sresa1b_ccsm3_read(passed)
       & has_dim(nc%dims, "lon", 256_int64) .and. &
       & has_dim(nc%dims, "plev", 17_int64) .and. &
       & has_dim(nc%dims, "time", 1_int64, .true.) .and. &
-      & all(shape(values) == [4, 3, 1]) .and. &
+      & all(int(shape(values), int64) == tas%dims%len) .and. &
       & all(values > 100.0_real32 .and. values < 400.0_real32) .and. &
       & tas%dims(1)%name == "lon" .and. tas%dims(2)%name == "lat" .and. &
       & tas%dims(3)%name == "time" .and. &
@@ -559,7 +559,7 @@ module subroutine cami_initial_read(passed)
     call inquire_group(nc, inq_dims=.true., inq_atts=.true., &
       & inq_vars=.true., inq_subgrps=.true., err=err)
     if (err%code /= NC_NOERR) exit cami_read
-    temperature = get_variable(nc, "T", [1, 1, 1, 1], [2, 3, 4, 1], err)
+    temperature = get_variable(nc, "T", err)
     if (err%code /= NC_NOERR) exit cami_read
     conventions_att = get_attribute(nc, "Conventions", err)
     if (err%code /= NC_NOERR) exit cami_read
@@ -578,7 +578,7 @@ module subroutine cami_initial_read(passed)
       & has_dim(nc%dims, "lev", 26_int64) .and. &
       & has_dim(nc%dims, "ilev", 27_int64) .and. &
       & has_dim(nc%dims, "time", 1_int64, .true.) .and. &
-      & all(shape(values) == [2, 3, 4, 1]) .and. &
+      & all(int(shape(values), int64) == temperature%dims%len) .and. &
       & all(values > 100.0_real64 .and. values < 400.0_real64) .and. &
       & temperature%dims(1)%name == "lon" .and. &
       & temperature%dims(2)%name == "lev" .and. &
@@ -622,7 +622,7 @@ module subroutine tos_o1_read(passed)
     call inquire_group(nc, inq_dims=.true., inq_atts=.true., &
       & inq_vars=.true., inq_subgrps=.true., err=err)
     if (err%code /= NC_NOERR) exit tos_read
-    tos = get_variable(nc, "tos", [1, 85, 1], [4, 3, 2], err)
+    tos = get_variable(nc, "tos", err)
     if (err%code /= NC_NOERR) exit tos_read
     conventions_att = get_attribute(nc, "Conventions", err)
     if (err%code /= NC_NOERR) exit tos_read
@@ -639,7 +639,7 @@ module subroutine tos_o1_read(passed)
       & has_dim(nc%dims, "lat", 170_int64) .and. &
       & has_dim(nc%dims, "lon", 180_int64) .and. &
       & has_dim(nc%dims, "time", 24_int64, .true.) .and. &
-      & all(shape(values) == [4, 3, 2]) .and. &
+      & all(int(shape(values), int64) == tos%dims%len) .and. &
       & tos%dims(1)%name == "lon" .and. tos%dims(2)%name == "lat" .and. &
       & tos%dims(3)%name == "time" .and. &
       & conventions == "CF-1.0" .and. units == "K"
@@ -680,7 +680,7 @@ module subroutine echam_spectral_read(passed)
     call inquire_group(nc, inq_dims=.true., inq_atts=.true., &
       & inq_vars=.true., inq_subgrps=.true., err=err)
     if (err%code /= NC_NOERR) exit echam_read
-    lsp = get_variable(nc, "lsp", [1, 1, 1], [2, 4, 1], err)
+    lsp = get_variable(nc, "lsp", err)
     if (err%code /= NC_NOERR) exit echam_read
     conventions_att = get_attribute(nc, "Conventions", err)
     if (err%code /= NC_NOERR) exit echam_read
@@ -699,7 +699,7 @@ module subroutine echam_spectral_read(passed)
       & has_dim(nc%dims, "lon", 192_int64) .and. &
       & has_dim(nc%dims, "spc", 2080_int64) .and. &
       & has_dim(nc%dims, "complex", 2_int64) .and. &
-      & all(shape(values) == [2, 4, 1]) .and. &
+      & all(int(shape(values), int64) == lsp%dims%len) .and. &
       & all(abs(values) < 20.0_real32) .and. &
       & lsp%dims(1)%name == "complex" .and. lsp%dims(2)%name == "spc" .and. &
       & lsp%dims(3)%name == "time" .and. &

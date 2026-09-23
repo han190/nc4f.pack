@@ -20,7 +20,6 @@ public :: &
   open_netcdf, close_netcdf, to_netcdf, &
   inquire_dimensions, inquire_variable, &
   inquire_subgroups, inquire_group, &
-  get_attribute, get_variable, get_group, &
-  put_attribute, put_variable
+  get_attribute, get_variable, get_group
 
 end module nc4f

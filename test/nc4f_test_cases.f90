@@ -5,9 +5,9 @@ use, intrinsic :: iso_fortran_env, only: int8, int16, int32, int64, real32, &
 use, non_intrinsic :: nc4f
 implicit none (type, external)
 
-public :: simple_wr, simple_rd, character_variables, buffer_edges
+public :: simple_wr, simple_rd, character_variables, elemental_reads, buffer_edges
 public :: creation_policy, error_handling
-public :: hyperslab_rd, hyperslab_wr, unlimited_wr, unlimited_dims
+public :: unlimited_wr, unlimited_dims
 public :: sum_vars_test, sfc_pres_temp_wr, &
   & sfc_pres_temp_rd, extensive_wr, extensive_rd
 public :: group_model, group_write
@@ -39,6 +39,11 @@ interface
     logical, intent(inout) :: passed
   end subroutine character_variables
 
+  module subroutine elemental_reads(passed)
+    !> Input/output argument(s): `passed`.
+    logical, intent(inout) :: passed
+  end subroutine elemental_reads
+
   module subroutine buffer_edges(passed)
     !> Input/output argument(s): `passed`.
     logical, intent(inout) :: passed
@@ -53,16 +58,6 @@ interface
     !> Input/output argument(s): `passed`.
     logical, intent(inout) :: passed
   end subroutine error_handling
-
-  module subroutine hyperslab_rd(passed)
-    !> Input/output argument(s): `passed`.
-    logical, intent(inout) :: passed
-  end subroutine hyperslab_rd
-
-  module subroutine hyperslab_wr(passed)
-    !> Input/output argument(s): `passed`.
-    logical, intent(inout) :: passed
-  end subroutine hyperslab_wr
 
   module subroutine unlimited_wr(passed)
     !> Input/output argument(s): `passed`.

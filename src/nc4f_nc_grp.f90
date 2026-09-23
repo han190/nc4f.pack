@@ -3,7 +3,7 @@ implicit none (type, external)
 contains
 
 !> Return a direct child group by name.
-module function get_grp(parent, name, err) result(group)
+module function get_group(parent, name, err) result(group)
   !> Input argument: `parent`.
   class(group_type), intent(in) :: parent
   !> Input argument: `name`.
@@ -20,10 +20,10 @@ module function get_grp(parent, name, err) result(group)
   else if (handle_err(op_err)) then
     return
   end if
-end function get_grp
+end function get_group
 
 !> Return direct child groups with IDs and names populated.
-module function inq_subgrps(parent, err) result(grps)
+module function inquire_subgroups(parent, err) result(grps)
   !> Input argument: `parent`.
   class(group_type), intent(in) :: parent
   !> Output argument: `err`.
@@ -38,10 +38,10 @@ module function inq_subgrps(parent, err) result(grps)
   else if (handle_err(op_err)) then
     return
   end if
-end function inq_subgrps
+end function inquire_subgroups
 
 !> Materialize selected metadata for a group.
-module recursive subroutine inq_grp(group, inq_dims, inq_atts, inq_vars, &
+module recursive subroutine inquire_group(group, inq_dims, inq_atts, inq_vars, &
   & inq_subgrps, recursive, err)
   class(group_type), intent(inout) :: group
   logical, intent(in), optional :: inq_dims, inq_atts, inq_vars, inq_subgrps
@@ -78,7 +78,7 @@ module recursive subroutine inq_grp(group, inq_dims, inq_atts, inq_vars, &
     end if
     if (.not. has_err(op_err) .and. recu) then
       do i = 1, size(group%grps)
-        call inq_grp(group%grps(i), inq_dims=inqd, &
+        call inquire_group(group%grps(i), inq_dims=inqd, &
           & inq_atts=inqa, inq_vars=inqv, &
           & inq_subgrps=.true., recursive=.true., err=op_err)
         if (has_err(op_err)) exit
@@ -91,10 +91,10 @@ module recursive subroutine inq_grp(group, inq_dims, inq_atts, inq_vars, &
   else if (handle_err(op_err)) then
     return
   end if
-end subroutine inq_grp
+end subroutine inquire_group
 
 !> Serialize one group as an existing file root.
-module subroutine serialize_grp_(root, grp, atts, err)
+module subroutine serialize_grp(root, grp, atts, err)
   !> Input argument: `root`.
   class(group_type), intent(in) :: root
   !> Input argument: `grp`.
@@ -111,10 +111,10 @@ module subroutine serialize_grp_(root, grp, atts, err)
     if (has_err(err)) return
   end if
   call write_grp_tree_data_(root, grp, err)
-end subroutine serialize_grp_
+end subroutine serialize_grp
 
 !> Serialize groups as direct children of an existing file root.
-module subroutine serialize_grps_(root, grps, atts, err)
+module subroutine serialize_grps(root, grps, atts, err)
   !> Input argument: `root`.
   class(group_type), intent(in) :: root
   !> Input argument: `grps`.
@@ -162,7 +162,7 @@ module subroutine serialize_grps_(root, grps, atts, err)
     call write_grp_tree_data_(child, source_child, err)
     if (has_err(err)) return
   end do
-end subroutine serialize_grps_
+end subroutine serialize_grps
 
 !> Define all metadata in a group tree before any data are transferred.
 recursive subroutine define_grp_tree_(target, source, err)
@@ -182,7 +182,7 @@ recursive subroutine define_grp_tree_(target, source, err)
   err = error_type()
   if (allocated(source%dims)) then
     do i = 1, size(source%dims)
-      defined_dim = def_dim_err(target, source%dims(i), err)
+      defined_dim = def_dim(target, source%dims(i), err)
       if (has_err(err)) return
     end do
   end if
@@ -196,9 +196,9 @@ recursive subroutine define_grp_tree_(target, source, err)
         err = error_type(NC_EINVAL, "[to_netcdf] Each variable must have a name.")
         return
       end if
-      defined_var = def_var_(target, source%vars(i), err)
+      defined_var = def_var(target, source%vars(i), err)
       if (has_err(err)) return
-      call put_att_var_err(target, defined_var, err)
+      call put_att_var(target, defined_var, err)
       if (has_err(err)) return
     end do
   end if
@@ -230,7 +230,7 @@ subroutine write_grp_atts_(target, atts, err)
 
   metadata%id = target%id
   metadata%atts = atts
-  call put_att_grp_err(metadata, err)
+  call put_att_grp(metadata, err)
 end subroutine write_grp_atts_
 
 !> Write all data buffers after the complete group tree has been defined.
@@ -258,7 +258,7 @@ recursive subroutine write_grp_tree_data_(target, source, err)
       do j = 1, ndims
         count(j) = int(source%vars(i)%dims(j)%len)
       end do
-      call put_variable(target, source%vars(i), start, count, err=err)
+      call put_vara(target, source%vars(i), start, count, err)
       if (has_err(err)) return
       deallocate (start, count)
     end do
@@ -368,7 +368,7 @@ function inq_vars_(group, err) result(vars)
     stat = nc_inq_varname(group%id, ids(i), name)
     err = netcdf_err(stat, "[inq_grp] Variable name.")
     if (has_err(err)) return
-    vars(i) = inq_var_err(group, c2fstr(name), err)
+    vars(i) = inquire_variable(group, c2fstr(name), err)
     if (has_err(err)) return
   end do
 end function inq_vars_
