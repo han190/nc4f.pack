@@ -3,14 +3,16 @@ submodule(nc4f_data_struct) nc4f_data_struct_att
 implicit none (type, external)
 contains
 
-!> Initialize an owning attribute from existing attribute metadata.
-module subroutine init_att_mold(att, mold)
+!> Initialize an owning attribute from a name and existing value metadata.
+module subroutine init_att_mold(att, name, mold)
   !> Input/output argument: `att`.
   type(attribute_type), intent(inout) :: att
+  !> Name for the new attribute.
+  character(len=*), intent(in) :: name
   !> Input argument: `mold`.
   type(attribute_type), intent(in) :: mold
 
-  call init_att(att, mold%name, mold%dtype, mold%len)
+  call init_att(att, name, mold%dtype, mold%len)
 end subroutine init_att_mold
 
 !> Return true when two attributes have identical metadata and byte values.

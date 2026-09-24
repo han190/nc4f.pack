@@ -148,13 +148,13 @@ module subroutine group_write(passed)
     call close_netcdf(nc)
     return
   end if
-  root_data = get_variable(nc, "root_data", err)
+  root_data = get_variable(nc, "root_data", err=err)
   if ((err%code /= NC_NOERR)) then
     call close_netcdf(nc)
     return
   end if
   call extract(root_data, root_values)
-  child_data = get_variable(child_on_disk, "child_data", err)
+  child_data = get_variable(child_on_disk, "child_data", err=err)
   if ((err%code /= NC_NOERR)) then
     call close_netcdf(nc)
     return

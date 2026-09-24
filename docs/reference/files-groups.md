@@ -21,7 +21,11 @@ call to_netcdf(filename, grps [, atts] [, err])
 `inquire_dimensions(nc [, var] [, err])` returns local group dimensions or
 the dimensions attached to `var`.
 
-`get_variable(nc, name [, err])` materializes values and metadata.
+`get_variable(nc, name [, start] [, count] [, stride] [, err])` materializes
+values and metadata. Hyperslab indices are one-based and in Fortran dimension
+order. Supplying `start` alone reads from each start index to the end;
+supplying `start` and `count` uses unit strides. A selected result's dimensions
+are its materialized `count` values.
 `inquire_variable(nc, name [, err])` returns metadata only.
 
 ## Attributes

@@ -9,10 +9,9 @@ type(variable_type) :: inputs(2), total, output
 real, pointer :: total_values(:), output_values(:)
 
 nc = open_netcdf("input.nc", "a")
-inputs = get_variable(nc, [character(len=2) :: "P", "PB"])
+inputs = [get_variable(nc, "P"), get_variable(nc, "PB")]
 total = sum(inputs)
-call initialize(output, mold=total)
-output%name = "mean_pressure"
+call initialize(output, "mean_pressure", mold=total)
 call extract(total, total_values)
 call extract(output, output_values)
 output_values = 0.5 * total_values

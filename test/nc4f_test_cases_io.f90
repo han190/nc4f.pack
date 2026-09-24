@@ -48,7 +48,7 @@ module subroutine unlimited_dims(passed)
     passed = .false.
     return
   end if
-  actual = get_variable(nc, "records", err)
+  actual = get_variable(nc, "records", err=err)
   call close_netcdf(nc)
   passed = err%code == NC_NOERR .and. all(actual%dims%is_unlim) .and. &
     & all(actual%dims == var%dims)

@@ -17,7 +17,8 @@ module subroutine data_model(passed)
     & leaf, restored_child
   type(group_type) :: child_grps(1), leaf_grps(1)
   type(netcdf_type) :: nc, nc_copy
-  type(variable_type) :: borrowed_var, owned_var, restored_var, sum_var, vars(1)
+  type(variable_type) :: borrowed_var, cloned_var, owned_var, restored_var, &
+    & sum_var, vars(1)
   type(error_type) :: err
   real(real32), allocatable, target :: values(:, :)
   real(real32), pointer :: extracted(:, :), sum_values(:)
@@ -69,10 +70,19 @@ module subroutine data_model(passed)
 
   dim = "time".dim. (0 .and. .true.)
   if (.not. dim%is_unlim .or. dim%len /= 0) return
-  call initialize(cloned_att, mold=atts(1))
-  if (cloned_att%name /= atts(1)%name .or. &
-    & cloned_att%dtype /= atts(1)%dtype) return
+  call initialize(cloned_att, "copied_units", mold=atts(1))
+  if (cloned_att%name /= "copied_units" .or. &
+    & cloned_att%dtype /= atts(1)%dtype .or. cloned_att%len /= atts(1)%len) return
   if (.not. allocated(cloned_att%buffer) .or. associated(cloned_att%ptr)) return
+  call initialize(cloned_var, "copied_temperature", vars(1), deep=.false.)
+  if (cloned_var%name /= "copied_temperature" .or. &
+    & cloned_var%dtype /= vars(1)%dtype .or. cloned_var%len /= vars(1)%len .or. &
+    & .not. all(cloned_var%dims == vars(1)%dims) .or. &
+    & allocated(cloned_var%atts) .or. allocated(cloned_var%buffer) .or. &
+    & associated(cloned_var%ptr)) return
+  call initialize(cloned_var, "copied_temperature", vars(1), atts=atts)
+  if (.not. allocated(cloned_var%atts) .or. &
+    & .not. all(cloned_var%atts == atts) .or. .not. allocated(cloned_var%buffer)) return
   if (.not. (owned_var == owned_var) .or. owned_var == borrowed_var) return
   if (size(owned_var) /= 4 .or. size(owned_var, 1) /= 2) return
   extents = shape(owned_var)
@@ -119,7 +129,7 @@ module subroutine data_model(passed)
   if (err%code /= NC_NOERR) return
   restored_child = get_group(nc, "child", err)
   if (err%code /= NC_NOERR) return
-  restored_var = get_variable(nc, "temperature", err)
+  restored_var = get_variable(nc, "temperature", err=err)
   if (err%code /= NC_NOERR) return
   call extract(restored_var, restored_values)
   if (size(nc%vars) /= 1 .or. size(nc%atts) /= 1 .or. &

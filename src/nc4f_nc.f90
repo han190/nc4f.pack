@@ -278,11 +278,17 @@ interface
   !> submodule_variable.f90
 
   !> Read a variable's data from a netCDF dataset into a `variable_type`.
-  module impure elemental function get_variable(nc, name, err) result(var)
+  module function get_variable(nc, name, start, count, stride, err) result(var)
     !> High-level `netcdf_type` representing the open file.
     class(group_type), intent(in) :: nc
     !> Name of the variable to read.
     character(len=*), intent(in) :: name
+    !> Optional one-based Fortran-order hyperslab start indices.
+    integer, intent(in), optional :: start(:)
+    !> Optional hyperslab lengths.
+    integer, intent(in), optional :: count(:)
+    !> Optional hyperslab strides.
+    integer, intent(in), optional :: stride(:)
     !> Optional operation error. When absent, failures stop the program.
     type(error_type), intent(out), optional :: err
     !> Variable object that will contain metadata and the data buffer.

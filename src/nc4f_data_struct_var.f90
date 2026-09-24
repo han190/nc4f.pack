@@ -3,18 +3,24 @@ submodule(nc4f_data_struct) nc4f_data_struct_var
 implicit none (type, external)
 contains
 
-!> Initialize an owning variable from existing variable metadata.
-module subroutine init_var_mold(var, mold)
+!> Initialize a variable from a name and existing shape/type metadata.
+module subroutine init_var_mold(var, name, mold, atts, deep)
   !> Input/output argument: `var`.
   type(variable_type), intent(inout) :: var
+  !> Name for the new variable.
+  character(len=*), intent(in) :: name
   !> Input argument: `mold`.
   type(variable_type), intent(in) :: mold
+  !> Optional attributes for the new variable.
+  type(attribute_type), intent(in), optional :: atts(:)
+  !> Whether to allocate an owning data buffer.
+  logical, intent(in), optional :: deep
 
-  if (allocated(mold%atts)) then
-    call init_var(var, mold%name, mold%dtype, &
-      & mold%len, mold%dims, atts=mold%atts)
+  if (present(atts)) then
+    call init_var(var, name, mold%dtype, mold%len, mold%dims, atts, deep)
   else
-    call init_var(var, mold%name, mold%dtype, mold%len, mold%dims)
+    if (allocated(var%atts)) deallocate (var%atts)
+    call init_var(var, name, mold%dtype, mold%len, mold%dims, deep=deep)
   end if
 end subroutine init_var_mold
 

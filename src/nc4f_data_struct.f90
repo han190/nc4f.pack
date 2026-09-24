@@ -210,14 +210,18 @@ interface
     logical, intent(in), optional :: deep
   end subroutine init_var
 
-  module subroutine init_att_mold(att, mold)
+  module subroutine init_att_mold(att, name, mold)
     type(attribute_type), intent(inout) :: att
+    character(len=*), intent(in) :: name
     type(attribute_type), intent(in) :: mold
   end subroutine init_att_mold
 
-  module subroutine init_var_mold(var, mold)
+  module subroutine init_var_mold(var, name, mold, atts, deep)
     type(variable_type), intent(inout) :: var
+    character(len=*), intent(in) :: name
     type(variable_type), intent(in) :: mold
+    type(attribute_type), intent(in), optional :: atts(:)
+    logical, intent(in), optional :: deep
   end subroutine init_var_mold
 
   module function new_dataset_empty(name, atts, deep) result(grp)

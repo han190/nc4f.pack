@@ -76,12 +76,12 @@ module subroutine error_handling(passed)
     call close_netcdf(nc)
     return
   end if
-  var = get_variable(nc, "missing", err)
+  var = get_variable(nc, "missing", err=err)
   if (.not. .exists.err .or. err%code /= NC_ENOTVAR) then
     call close_netcdf(nc)
     return
   end if
-  var = get_variable(nc, "present", err)
+  var = get_variable(nc, "present", err=err)
   if ((err%code /= NC_NOERR)) then
     call close_netcdf(nc)
     return
@@ -107,7 +107,7 @@ module subroutine error_handling(passed)
   if (err%code == NC_NOERR) return
 nc = open_netcdf(TEST_RESULTS_DIR//"failed-write-cleanup.nc", "a", err=err)
   if ((err%code /= NC_NOERR)) return
-  var = get_variable(nc, "present", err)
+  var = get_variable(nc, "present", err=err)
   call close_netcdf(nc)
   passed = err%code == NC_NOERR .and. var%name == "present"
 end subroutine error_handling

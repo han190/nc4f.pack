@@ -74,7 +74,7 @@ module subroutine character_variables(passed)
     passed = .false.
     return
   end if
-  actual = get_variable(nc, "letters", err)
+  actual = get_variable(nc, "letters", err=err)
   call close_netcdf(nc)
   if ((err%code /= NC_NOERR)) then
     passed = .false.
@@ -114,7 +114,9 @@ module subroutine elemental_reads(passed)
       return
     end if
   end do
-  actual = get_variable(nc, names, errs)
+  do i = 1, size(actual)
+    actual(i) = get_variable(nc, names(i), err=errs(i))
+  end do
   call close_netcdf(nc)
   if (any(errs%code /= NC_NOERR)) return
   passed = .true.
@@ -132,6 +134,57 @@ module subroutine elemental_reads(passed)
     end if
   end do
 end subroutine elemental_reads
+
+!> Execute strided variable reads and their argument validation.
+module subroutine hyperslab_reads(passed)
+  logical, intent(inout) :: passed
+  integer, parameter :: values(4, 5) = reshape([ &
+    & 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20], &
+    & [4, 5])
+  integer, pointer :: actual_values(:, :)
+  type(error_type) :: err
+  type(netcdf_type) :: nc
+  type(variable_type) :: actual, var
+
+  passed = .false.
+  var = datarray("data", values, ["x".dim.4, "y".dim.5])
+  call to_netcdf(TEST_RESULTS_DIR//"hyperslab-reads.nc", var, err=err)
+  if (err%code /= NC_NOERR) return
+  nc = open_netcdf(TEST_RESULTS_DIR//"hyperslab-reads.nc", "r", err=err)
+  if (err%code /= NC_NOERR) return
+
+  actual = get_variable(nc, "data", start=[2, 2], err=err)
+  if (err%code /= NC_NOERR .or. .not. all(actual%dims == ["x".dim.3, "y".dim.4])) then
+    call close_netcdf(nc)
+    return
+  end if
+  call extract(actual, actual_values)
+  if (.not. all(actual_values == values(2:4, 2:5))) then
+    call close_netcdf(nc)
+    return
+  end if
+
+  actual = get_variable(nc, "data", start=[2, 1], count=[2, 3], &
+    & stride=[2, 2], err=err)
+  if (err%code /= NC_NOERR .or. .not. all(actual%dims == ["x".dim.2, "y".dim.3])) then
+    call close_netcdf(nc)
+    return
+  end if
+  call extract(actual, actual_values)
+  if (.not. all(actual_values == values([2, 4], [1, 3, 5]))) then
+    call close_netcdf(nc)
+    return
+  end if
+
+  actual = get_variable(nc, "data", count=[1, 1], err=err)
+  if (err%code /= NC_EINVAL) then
+    call close_netcdf(nc)
+    return
+  end if
+  actual = get_variable(nc, "data", start=[4, 5], count=[2, 1], err=err)
+  call close_netcdf(nc)
+  passed = err%code == NC_EEDGE
+end subroutine hyperslab_reads
 
 !> Execute `buffer_edges`.
 module subroutine buffer_edges(passed)

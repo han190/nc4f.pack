@@ -77,7 +77,7 @@ module subroutine sfc_pres_temp_rd(passed)
 
   default_dims = ["longitude".dim.nlon, "latitude".dim.nlat]
   nc = open_netcdf(TEST_RESULTS_DIR//"sfc_pres_temp_wr.nc", "r")
-  var = get_variable(nc, "pressure", err)
+  var = get_variable(nc, "pressure", err=err)
   if ((err%code /= NC_NOERR)) then
     call close_netcdf(nc)
     passed = .false.
@@ -90,7 +90,7 @@ module subroutine sfc_pres_temp_rd(passed)
     return
   end if
 
-  var = get_variable(nc, "temperature", err)
+  var = get_variable(nc, "temperature", err=err)
   if ((err%code /= NC_NOERR)) then
     call close_netcdf(nc)
     passed = .false.
@@ -142,7 +142,10 @@ module subroutine extensive_rd(passed)
   expected_atts = extensive_attributes()
   nc = open_netcdf(TEST_RESULTS_DIR//"extensive.nc", "r")
   call inquire_group(nc)
-  actual = get_variable(nc, names)
+  allocate (actual(size(names)))
+  do i = 1, size(actual)
+    actual(i) = get_variable(nc, names(i))
+  end do
 
   passed = size(actual) == size(expected)
   if (passed) passed = all(actual == expected)
@@ -218,9 +221,9 @@ module subroutine nasa_cosp_read(passed)
       & inq_atts=.true., inq_vars=.true., inq_subgrps=.true., err=err)
     if ((err%code /= NC_NOERR)) exit nasa_read
 
-    latitude_var = get_variable(nc, "latitude", err)
+    latitude_var = get_variable(nc, "latitude", err=err)
     if ((err%code /= NC_NOERR)) exit nasa_read
-    longitude_var = get_variable(nc, "longitude", err)
+    longitude_var = get_variable(nc, "longitude", err=err)
     if ((err%code /= NC_NOERR)) exit nasa_read
     units = get_attribute(nc, latitude_var, "units", err)
     if ((err%code /= NC_NOERR)) exit nasa_read
@@ -288,11 +291,11 @@ module subroutine ecmwf_era40_read(passed)
   is_open = .true.
 
   era40_read: block
-    latitude_var = get_variable(nc, "latitude", err)
+    latitude_var = get_variable(nc, "latitude", err=err)
     if ((err%code /= NC_NOERR)) exit era40_read
-    longitude_var = get_variable(nc, "longitude", err)
+    longitude_var = get_variable(nc, "longitude", err=err)
     if ((err%code /= NC_NOERR)) exit era40_read
-    temperature_var = get_variable(nc, "p2t", err)
+    temperature_var = get_variable(nc, "p2t", err=err)
     if ((err%code /= NC_NOERR)) exit era40_read
     conventions_att = get_attribute(nc, "Conventions", err)
     if ((err%code /= NC_NOERR)) exit era40_read
@@ -366,7 +369,7 @@ module subroutine sresa1b_ccsm3_read(passed)
     call inquire_group(nc, inq_dims=.true., inq_atts=.true., &
       & inq_vars=.true., inq_subgrps=.true., err=err)
     if (err%code /= NC_NOERR) exit ccsm3_read
-    tas = get_variable(nc, "tas", err)
+    tas = get_variable(nc, "tas", err=err)
     if (err%code /= NC_NOERR) exit ccsm3_read
     conventions_att = get_attribute(nc, "Conventions", err)
     if (err%code /= NC_NOERR) exit ccsm3_read
@@ -559,7 +562,7 @@ module subroutine cami_initial_read(passed)
     call inquire_group(nc, inq_dims=.true., inq_atts=.true., &
       & inq_vars=.true., inq_subgrps=.true., err=err)
     if (err%code /= NC_NOERR) exit cami_read
-    temperature = get_variable(nc, "T", err)
+    temperature = get_variable(nc, "T", err=err)
     if (err%code /= NC_NOERR) exit cami_read
     conventions_att = get_attribute(nc, "Conventions", err)
     if (err%code /= NC_NOERR) exit cami_read
@@ -622,7 +625,7 @@ module subroutine tos_o1_read(passed)
     call inquire_group(nc, inq_dims=.true., inq_atts=.true., &
       & inq_vars=.true., inq_subgrps=.true., err=err)
     if (err%code /= NC_NOERR) exit tos_read
-    tos = get_variable(nc, "tos", err)
+    tos = get_variable(nc, "tos", err=err)
     if (err%code /= NC_NOERR) exit tos_read
     conventions_att = get_attribute(nc, "Conventions", err)
     if (err%code /= NC_NOERR) exit tos_read
@@ -680,7 +683,7 @@ module subroutine echam_spectral_read(passed)
     call inquire_group(nc, inq_dims=.true., inq_atts=.true., &
       & inq_vars=.true., inq_subgrps=.true., err=err)
     if (err%code /= NC_NOERR) exit echam_read
-    lsp = get_variable(nc, "lsp", err)
+    lsp = get_variable(nc, "lsp", err=err)
     if (err%code /= NC_NOERR) exit echam_read
     conventions_att = get_attribute(nc, "Conventions", err)
     if (err%code /= NC_NOERR) exit echam_read

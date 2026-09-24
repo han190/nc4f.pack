@@ -10,6 +10,7 @@ tests = [&
   & test_type("simple_rd", simple_rd), &
   & test_type("character_variables", character_variables), &
   & test_type("elemental_reads", elemental_reads), &
+  & test_type("hyperslab_reads", hyperslab_reads), &
   & test_type("creation_policy", creation_policy), &
   & test_type("error_handling", error_handling), &
   & test_type("unlimited_wr", unlimited_wr), &

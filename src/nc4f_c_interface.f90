@@ -703,6 +703,26 @@ interface
     integer(c_int) :: nc_get_var
   end function nc_get_var
 
+  !> Read a strided hyperslab of a variable.
+  function nc_get_vars(ncid, varid, startp, countp, stridep, ip) &
+    & bind(c, name="nc_get_vars")
+    import :: c_int, c_ptr
+    !> NetCDF or group ID, from a previous open or inquiry call.
+    integer(c_int), value :: ncid
+    !> Variable ID.
+    integer(c_int), value :: varid
+    !> Pointer to zero-based C-order start indices (`size_t *`).
+    type(c_ptr), value :: startp
+    !> Pointer to C-order edge lengths (`size_t *`).
+    type(c_ptr), value :: countp
+    !> Pointer to C-order strides (`ptrdiff_t *`).
+    type(c_ptr), value :: stridep
+    !> Pointer where the data will be copied.
+    type(c_ptr), value :: ip
+    !> NetCDF status code.
+    integer(c_int) :: nc_get_vars
+  end function nc_get_vars
+
   !> Define a new variable.
   function nc_def_var(ncid, name, xtype, ndims, dimidsp, varidp) &
     & bind(c, name="nc_def_var")

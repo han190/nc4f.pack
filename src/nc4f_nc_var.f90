@@ -3,18 +3,24 @@ implicit none (type, external)
 contains
 
 !> Read a variable's data from a netCDF dataset into a `variable_type`.
-module impure elemental function get_variable(nc, name, err) result(var)
+module function get_variable(nc, name, start, count, stride, err) result(var)
   !> Dataset or group containing the variable.
   class(group_type), intent(in) :: nc
   !> Name of the variable to read.
   character(len=*), intent(in) :: name
+  !> Optional one-based Fortran-order hyperslab start indices.
+  integer, intent(in), optional :: start(:)
+  !> Optional hyperslab lengths.
+  integer, intent(in), optional :: count(:)
+  !> Optional hyperslab strides.
+  integer, intent(in), optional :: stride(:)
   !> Optional operation error. When absent, failures stop the program.
   type(error_type), intent(out), optional :: err
   !> Materialized variable data and metadata.
   type(variable_type), target :: var
   type(error_type) :: op_err
 
-  var = get_var_(nc, name, op_err)
+  var = get_var_(nc, name, start, count, stride, op_err)
   if (present(err)) then
     err = op_err
   else if (handle_err(op_err)) then
@@ -23,33 +29,129 @@ module impure elemental function get_variable(nc, name, err) result(var)
 end function get_variable
 
 !> Scalar implementation shared by the fail-fast and error-aware overloads.
-function get_var_(nc, name, err) result(var)
+function get_var_(nc, name, start, count, stride, err) result(var)
   !> Input argument(s): `nc`.
   class(group_type), intent(in) :: nc
   !> Input argument(s): `name`.
   character(len=*), intent(in) :: name
+  integer, intent(in), optional :: start(:), count(:), stride(:)
   !> Output argument(s): `err`.
   type(error_type), intent(out) :: err
   !> Return value: `var`.
   type(variable_type), target :: var
-  type(c_ptr) :: cptr
+  type(c_ptr) :: cptr, startp, countp, stridep
+  integer(c_size_t), allocatable, target :: c_start(:), c_count(:)
+  integer(c_ptrdiff_t), allocatable, target :: c_stride(:)
   integer(c_int) :: stat
   character(len=MAX_CHAR_LEN) :: msg
+  integer, allocatable :: start_(:), count_(:), stride_(:)
+  integer :: i, j, ndims
+  integer(int64) :: f_start, f_count, f_stride
 
   err = error_type()
   var = inq_var_(nc, name, err)
   if (has_err(err)) return
 
-  zero_size_var: if (var%len == 0) then
-    call validate(var, context="[get_var]")
+  if (present(count) .and. .not. present(start) .or. &
+    & present(stride) .and. (.not. present(start) .or. .not. present(count))) then
+    err = error_type(NC_EINVAL, &
+      & "[get_variable] count requires start; stride requires start and count.")
     return
-  end if zero_size_var
+  end if
+
+  if (var%len == 0 .and. .not. present(start)) then
+    call validate(var, context="[get_variable]")
+    return
+  end if
+
+  ndims = size(var%dims)
+  if (present(start)) then
+    if (size(start) /= ndims) then
+      err = error_type(NC_EINVAL, &
+        & "[get_variable] start must have one entry per dimension.")
+      return
+    end if
+  end if
+  if (present(count)) then
+    if (size(count) /= ndims) then
+      err = error_type(NC_EINVAL, &
+        & "[get_variable] count must have one entry per dimension.")
+      return
+    end if
+  end if
+  if (present(stride)) then
+    if (size(stride) /= ndims) then
+      err = error_type(NC_EINVAL, &
+        & "[get_variable] stride must have one entry per dimension.")
+      return
+    end if
+  end if
+
+  allocate (start_(ndims), count_(ndims), stride_(ndims))
+  start_ = 1
+  stride_ = 1
+  do i = 1, ndims
+    count_(i) = int(var%dims(i)%len)
+  end do
+  if (present(start)) start_ = start
+  if (present(start) .and. .not. present(count)) then
+    do i = 1, ndims
+      count_(i) = int(var%dims(i)%len - int(start_(i), int64) + 1_int64)
+    end do
+  end if
+  if (present(count)) count_ = count
+  if (present(stride)) stride_ = stride
+
+  do i = 1, ndims
+    f_start = int(start_(i), int64)
+    f_count = int(count_(i), int64)
+    f_stride = int(stride_(i), int64)
+    if (f_start < 1) then
+      err = error_type(NC_EINVALCOORDS, &
+        & "[get_variable] start indices must be positive.")
+      return
+    end if
+    if (f_count < 1 .or. f_stride < 1) then
+      err = error_type(NC_EINVAL, &
+        & "[get_variable] count and stride entries must be positive.")
+      return
+    end if
+    if (f_start > var%dims(i)%len .or. &
+      & f_count - 1_int64 > (var%dims(i)%len - f_start) / f_stride) then
+      err = error_type(NC_EEDGE, &
+        & "[get_variable] Requested hyperslab exceeds a dimension bound.")
+      return
+    end if
+    var%dims(i)%len = f_count
+  end do
+  var%len = size(var)
+
+  if (var%len == 0) then
+    call validate(var, context="[get_variable]")
+    return
+  end if
 
   call initialize(var)
-  call validate(var, context="[get_var]")
+  call validate(var, context="[get_variable]")
+  allocate (c_start(ndims), c_count(ndims), c_stride(ndims))
+  do i = 1, ndims
+    j = ndims - i + 1
+    c_start(j) = int(start_(i) - 1, c_size_t)
+    c_count(j) = int(count_(i), c_size_t)
+    c_stride(j) = int(stride_(i), c_ptrdiff_t)
+  end do
+  if (ndims > 0) then
+    startp = c_loc(c_start(1))
+    countp = c_loc(c_count(1))
+    stridep = c_loc(c_stride(1))
+  else
+    startp = c_null_ptr
+    countp = c_null_ptr
+    stridep = c_null_ptr
+  end if
   cptr = buffer2cptr(var)
-  write (msg, "('[get_var] Invalid variable:', 1x, a)") name
-  stat = nc_get_var(nc%id, var%id, cptr)
+  write (msg, "('[get_variable] Invalid variable:', 1x, a)") name
+  stat = nc_get_vars(nc%id, var%id, startp, countp, stridep, cptr)
   err = netcdf_err(stat, msg)
 end function get_var_
 
