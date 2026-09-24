@@ -35,7 +35,8 @@ use, non_intrinsic :: nc4f
 ## Build from Make with fypp
 
 The Make build regenerates the constructor and extraction source files from
-the `fypp/` templates. Install `fypp` before building when you intend to edit
+the `fypp/` templates. Install [fypp](https://fypp.readthedocs.io/en/stable/fypp.html) 
+before building when you intend to edit
 or regenerate those templates.
 
 ```sh

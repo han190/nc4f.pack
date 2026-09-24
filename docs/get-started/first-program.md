@@ -1,6 +1,6 @@
 # A First Program
 
-All examples import the public `nc4f` façade:
+All examples can be imported from the model `nc4f`
 
 ```fortran
 use, non_intrinsic :: nc4f
@@ -13,14 +13,16 @@ Create a variable from a Fortran array, then write it as a new file:
 
 ```fortran
 program write_example
+
   use, non_intrinsic :: nc4f
   implicit none (type, external)
 
   real :: values(3) = [1.0, 2.0, 3.0]
-  type(variable_type) :: temperature
+  type(variable_type) :: temp
 
-  temperature = datarray("temperature", values, ["time".dim.3])
-  call to_netcdf("example.nc", temperature)
+  temp = datarray("temperature", values, ["time".dim.3])
+  call to_netcdf("example.nc", temp)
+
 end program write_example
 ```
 
@@ -31,17 +33,19 @@ file when it is no longer needed:
 
 ```fortran
 program read_example
+
   use, non_intrinsic :: nc4f
   implicit none (type, external)
 
   type(netcdf_type) :: nc
-  type(variable_type) :: temperature
+  type(variable_type) :: temp
   real, pointer :: values(:)
 
   nc = open_netcdf("example.nc", "r")
-  temperature = get_variable(nc, "temperature")
-  call extract(temperature, values)
+  temp = get_variable(nc, "temperature")
+  call extract(temp, values)
   call close_netcdf(nc)
+
 end program read_example
 ```
 
@@ -53,19 +57,22 @@ variables, so the two pressure terms can be materialized in one call.
 
 ```fortran
 program main
+
+  use, non_intrinsic: nc4f
+  implicit none (type, external)
+
   real, parameter :: R = 287.0, Cp = 1004.0 ! Gas constant and specific heat
   real, parameter :: theta0 = 300.0 ! Base potential temperature
-  real, parameter :: p0 = 1000 * 100.0 ! hPa -> Pa
+  real, parameter :: p0 = 1000 * 100.0 ! Base pressure
 
   type(netcdf_type) :: nc
   type(variable_type) :: inputs(2), output
-  !> A WRF output variable is usually 4-dimensional
   real, dimension(:, :, :, :), pointer :: p, theta, T
 
-  !> Open a WRF output file and extract variables.
+  !> Open a WRF output file and get variables.
   nc = open_netcdf("wrfout.nc", "r")
-  inputs = [sum(get_variable(nc, [character(len=2) :: "P", "PB"])), &
-    & get_variable(nc, "T")]
+  inputs(1) = sum(get_variable(nc, [character(len=2) :: "P", "PB"]))
+  inputs(2) = get_variable(nc, "T")
 
   !> Extract values of variable_type variables
   call extract(inputs(1), p)
@@ -81,5 +88,6 @@ program main
   !> Save the variable to a new file.
   call to_netcdf("output.nc", output)
   call close_netcdf(nc)
+
 end program main
 ```

@@ -159,28 +159,8 @@ module subroutine put_att_var(nc, var, err)
   type(variable_type), target, intent(in) :: var
   !> Output argument(s): `err`.
   type(error_type), intent(out) :: err
-  integer :: i
-  integer(c_int) :: stat
-  type(c_ptr) :: cptr
-  character(len=:), allocatable :: context
 
-  err = error_type()
-  if (.not. allocated(var%atts)) return
-  do i = 1, size(var%atts)
-    associate (att => var%atts(i))
-      call validate(att, context="[put_att_var]")
-      if (att%len == 0) then
-        cptr = c_null_ptr
-      else
-        cptr = buffer2cptr(att)
-      end if
-      context = "[put_att] Invalid attribute: "//att%name//"."
-      stat = nc_put_att(nc%id, var%id, f2cstr(att%name), &
-        & att%dtype, att%len, cptr)
-      err = netcdf_err(stat, context)
-      if (has_err(err)) return
-    end associate
-  end do
+  call put_atts_(nc%id, var%id, var%atts, "[put_att_var]", err)
 end subroutine put_att_var
 
 !> Scalar implementation shared by the fail-fast and error-aware overloads.
@@ -189,28 +169,44 @@ module subroutine put_att_grp(nc, err)
   class(group_type), target, intent(in) :: nc
   !> Output argument(s): `err`.
   type(error_type), intent(out) :: err
-  integer(int64) :: i
+
+  call put_atts_(nc%id, NC_GLOBAL, nc%atts, "[put_att_grp]", err)
+end subroutine put_att_grp
+
+!> Write an array of attributes to a variable or group using C identifiers.
+subroutine put_atts_(ncid, varid, atts, context, err)
+  !> C identifier for the dataset or group receiving the attributes.
+  integer(c_int), intent(in) :: ncid
+  !> C identifier for the variable, or `NC_GLOBAL` for group attributes.
+  integer(c_int), intent(in) :: varid
+  !> Attributes to write. An unallocated array represents no attributes.
+  type(attribute_type), target, intent(in), allocatable :: atts(:)
+  !> Context used if attribute validation fails.
+  character(len=*), intent(in) :: context
+  !> Completed result of this operation.
+  type(error_type), intent(out) :: err
+  integer :: i
   integer(c_int) :: stat
   type(c_ptr) :: cptr
-  character(len=:), allocatable :: context
 
   err = error_type()
-  if (.not. allocated(nc%atts)) return
-  do i = 1, size(nc%atts, kind=int64)
-    associate (att => nc%atts(i))
-      call validate(att, context="[put_att_grp]")
+  if (.not. allocated(atts)) return
+  do i = 1, size(atts)
+    associate (att => atts(i))
+      call validate(att, context=context)
       if (att%len == 0) then
         cptr = c_null_ptr
       else
         cptr = buffer2cptr(att)
       end if
-      context = "[put_att] Invalid attribute: "//att%name//"."
-      stat = nc_put_att(nc%id, NC_GLOBAL, f2cstr(att%name), &
+      stat = nc_put_att(ncid, varid, f2cstr(att%name), &
         & att%dtype, att%len, cptr)
-      err = netcdf_err(stat, context)
+      associate(msg => "[put_att] Invalid attribute: "//att%name//".")
+        err = netcdf_err(stat, msg)
+      end associate
       if (has_err(err)) return
     end associate
   end do
-end subroutine put_att_grp
+end subroutine put_atts_
 
 end submodule nc4f_nc_att

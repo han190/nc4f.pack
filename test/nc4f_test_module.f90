@@ -48,7 +48,8 @@ subroutine run_tests(tests)
       all_passed = .false.
     end if
   end do
-  if (.not. all_passed) error stop "[test] One or more tests failed."
+  if (.not. all_passed) error stop "[test] >>> One or more tests failed. <<<"
+  print "(a)", "[test] >>> All tests passed. <<<"
 end subroutine run_tests
 
 end module nc4f_test_module
