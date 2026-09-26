@@ -3,9 +3,9 @@ implicit none (type, external)
 contains
 
 !> Open or create a dataset and return a `netcdf_type` handle.
-module function open_netcdf(filename, mode, err) result(nc)
+module function open_netcdf(file, mode, err) result(nc)
   !> Path to the dataset file.
-  character(len=*), intent(in) :: filename
+  character(len=*), intent(in) :: file
   !> Mode to open the file: 'r' for read, 'w' to recreate, or 'a' for
   !> read/write access to an existing dataset.
   character(len=*), intent(in), optional :: mode
@@ -15,7 +15,7 @@ module function open_netcdf(filename, mode, err) result(nc)
   type(netcdf_type) :: nc
   type(error_type) :: op_err
 
-  nc = open_netcdf_(filename, mode, op_err)
+  nc = open_netcdf_(file, mode, op_err)
   if (present(err)) then
     err = op_err
   else if (handle_err(op_err)) then
@@ -24,9 +24,9 @@ module function open_netcdf(filename, mode, err) result(nc)
 end function open_netcdf
 
 !> Open or create a dataset and construct the operation result.
-function open_netcdf_(filename, mode, err) result(nc)
-  !> Input argument(s): `filename`.
-  character(len=*), intent(in) :: filename
+function open_netcdf_(file, mode, err) result(nc)
+  !> Input argument(s): `file`.
+  character(len=*), intent(in) :: file
   !> Input argument(s): `mode`.
   character(len=*), intent(in), optional :: mode
   !> Output argument(s): `err`.
@@ -47,27 +47,27 @@ function open_netcdf_(filename, mode, err) result(nc)
   select case (trim(open_mode))
   case ("r", "read")
 
-    nc%filename = clip(filename)
-    stat = nc_open(f2cstr(nc%filename), NC_NOWRITE, nc%id)
-    write (msg, "('[open_netcdf]', 1x, a)") nc%filename
+    nc%file = clip(file)
+    stat = nc_open(f2cstr(nc%file), NC_NOWRITE, nc%id)
+    write (msg, "('[open_netcdf]', 1x, a)") nc%file
     err = netcdf_err(stat, msg)
     if (has_err(err)) return
     nc%mode = NC_NOWRITE
 
   case ("w", "write", "replace", "overwrite")
 
-    nc%filename = clip(filename)
-    write (msg, "('[open_netcdf]', 1x, a)") nc%filename
-    stat = nc_create(f2cstr(nc%filename), ior(NC_NETCDF4, NC_CLOBBER), nc%id)
+    nc%file = clip(file)
+    write (msg, "('[open_netcdf]', 1x, a)") nc%file
+    stat = nc_create(f2cstr(nc%file), ior(NC_NETCDF4, NC_CLOBBER), nc%id)
     err = netcdf_err(stat, msg)
     if (has_err(err)) return
     nc%mode = NC_NETCDF4
 
   case ("a", "append", "rw", "readwrite")
 
-    nc%filename = clip(filename)
-    stat = nc_open(f2cstr(nc%filename), NC_WRITE, nc%id)
-    write (msg, "('[open_netcdf]', 1x, a)") nc%filename
+    nc%file = clip(file)
+    stat = nc_open(f2cstr(nc%file), NC_WRITE, nc%id)
+    write (msg, "('[open_netcdf]', 1x, a)") nc%file
     err = netcdf_err(stat, msg)
     if (has_err(err)) return
     nc%mode = NC_WRITE
@@ -116,9 +116,9 @@ subroutine close_netcdf_(nc, err)
 end subroutine close_netcdf_
 
 !> Create a netCDF file from one variable or a rank-one variable array.
-module subroutine to_netcdf_var(filename, vars, atts, err)
-  !> Output filename to create.
-  character(len=*), intent(in) :: filename
+module subroutine to_netcdf_var(file, vars, atts, err)
+  !> Output file to create.
+  character(len=*), intent(in) :: file
   !> Variable or array of variables to write into the file.
   type(variable_type), intent(in) :: vars(..)
   !> Optional array of global attributes to attach to the dataset.
@@ -130,7 +130,7 @@ module subroutine to_netcdf_var(filename, vars, atts, err)
   integer :: i
 
   op_err = error_type()
-  nc = open_netcdf_(filename, mode="w", err=op_err)
+  nc = open_netcdf_(file, mode="w", err=op_err)
   if (.not. has_err(op_err)) then
     select rank (items => vars)
     rank (0)
@@ -164,9 +164,9 @@ module subroutine to_netcdf_var(filename, vars, atts, err)
 end subroutine to_netcdf_var
 
 !> Create a NetCDF file from a root group or direct child groups.
-module subroutine to_netcdf_grp(filename, grp, atts, err)
-  !> Output filename to create.
-  character(len=*), intent(in) :: filename
+module subroutine to_netcdf_grp(file, grp, atts, err)
+  !> Output file to create.
+  character(len=*), intent(in) :: file
   !> Scalar root group or rank-one array of direct children.
   type(group_type), intent(in) :: grp(..)
   !> Optional additional global attributes for the file root.
@@ -178,7 +178,7 @@ module subroutine to_netcdf_grp(filename, grp, atts, err)
   type(netcdf_type) :: nc
 
   op_err = error_type()
-  nc = open_netcdf_(filename, mode="w", err=op_err)
+  nc = open_netcdf_(file, mode="w", err=op_err)
   if (.not. has_err(op_err)) then
     file_root%id = nc%id
     file_root%name = "/"

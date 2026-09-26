@@ -123,7 +123,7 @@ end type group_type
 
 !> An open NetCDF file: a root-group value plus file-specific state.
 type, extends(group_type) :: netcdf_type
-  character(len=:), allocatable :: filename
+  character(len=:), allocatable :: file
   integer(c_int) :: mode = NC_NOWRITE
 contains
   procedure, private :: write_frmt_grp => write_frmt_netcdf

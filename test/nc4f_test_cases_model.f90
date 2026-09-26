@@ -32,10 +32,10 @@ module subroutine data_model(passed)
   passed = .false.
   dim%name = "sample"
   dim%len = 3
-  nc%filename = "model.nc"
+  nc%file = "model.nc"
   nc_copy = nc
-  if (dim%len /= 3 .or. nc%filename /= "model.nc" .or. &
-    & nc_copy%filename /= "model.nc") return
+  if (dim%len /= 3 .or. nc%file /= "model.nc" .or. &
+    & nc_copy%file /= "model.nc") return
 
   atts(1) = "units".att."K"
   vars(1) = datarray("temperature", [273.0, 274.0], ["x".dim.2], atts=atts)

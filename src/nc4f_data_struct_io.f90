@@ -195,7 +195,7 @@ function render_netcdf(nc) result(text)
   character(len=:), allocatable :: name
 
   name = "unnamed"
-  if (allocated(nc%filename)) name = filename_stem(nc%filename)
+  if (allocated(nc%file)) name = filename_stem(nc%file)
   text = "netcdf "//name//" {"//new_line("a")
   text = text//render_grp_(nc, "", 0)
   text = text//"}"
@@ -358,26 +358,26 @@ subroutine append(buffer, used, fragment)
   used = needed
 end subroutine append
 
-!> Return the final path component of a filename without its final extension.
-function filename_stem(filename) result(stem)
-  !> Input argument: `filename`.
-  character(len=*), intent(in) :: filename
+!> Return the final path component of a file without its final extension.
+function filename_stem(file) result(stem)
+  !> Input argument: `file`.
+  character(len=*), intent(in) :: file
   !> Return value: `stem`.
   character(len=:), allocatable :: stem
   integer :: base, extension, filename_len
 
-  filename_len = len_trim(filename)
+  filename_len = len_trim(file)
   if (filename_len == 0) then
     stem = "unnamed"
     return
   end if
-  base = scan(filename(:filename_len), "/", back=.true.) + 1
+  base = scan(file(:filename_len), "/", back=.true.) + 1
   if (base > filename_len) then
     stem = "unnamed"
     return
   end if
 
-  stem = filename(base:filename_len)
+  stem = file(base:filename_len)
   extension = index(stem, ".", back=.true.)
   if (extension > 1) stem = stem(:extension - 1)
   if (len(stem) == 0) stem = "unnamed"

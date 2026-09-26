@@ -449,10 +449,10 @@ module subroutine sample_uddtio(passed)
 end subroutine sample_uddtio
 
 !> Render one externally produced NetCDF fixture and verify key output lines.
-function render_sample_uddtio_(filename, label, expected_dim, expected_var, &
+function render_sample_uddtio_(file, label, expected_dim, expected_var, &
   & expected_var_att, expected_att, expected_group) result(rendered)
-  !> Input argument: `filename`.
-  character(len=*), intent(in) :: filename
+  !> Input argument: `file`.
+  character(len=*), intent(in) :: file
   !> Input argument: `label`.
   character(len=*), intent(in) :: label
   !> Input argument: `expected_dim`.
@@ -476,7 +476,7 @@ function render_sample_uddtio_(filename, label, expected_dim, expected_var, &
   type(netcdf_type) :: nc
 
   rendered = .false.
-  nc = open_netcdf(filename, "r", err=err)
+  nc = open_netcdf(file, "r", err=err)
   if (.exists.err) return
   call inquire_group(nc, inq_dims=.true., inq_atts=.true., &
     & inq_vars=.true., inq_subgrps=.true., recursive=.true., err=err)
@@ -485,12 +485,12 @@ function render_sample_uddtio_(filename, label, expected_dim, expected_var, &
     return
   end if
 
-  base = scan(filename, "/", back=.true.) + 1
-  extension = index(filename(base:), ".", back=.true.)
+  base = scan(file, "/", back=.true.) + 1
+  extension = index(file(base:), ".", back=.true.)
   if (extension > 1) then
-    expected_header = "netcdf "//filename(base:base + extension - 2)//" {"
+    expected_header = "netcdf "//file(base:base + extension - 2)//" {"
   else
-    expected_header = "netcdf "//filename(base:)//" {"
+    expected_header = "netcdf "//file(base:)//" {"
   end if
 
   output_file = TEST_RESULTS_DIR//label//"_uddtio.txt"

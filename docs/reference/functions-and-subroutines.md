@@ -1,13 +1,12 @@
-# API Reference
+# Functions and Subroutines
 
 This page documents the public procedures re-exported by `nc4f`. Optional
 `err` arguments receive an `error_type`; when omitted, an operation failure
-follows the library's fail-fast policy. See [Error Handling](error-handling.md)
-for details.
+follows the library's fail-fast policy. See [Exposed NC
+Constants](exposed-nc-constants.md) for constants used with `error_type`.
 
-## Functions and subroutines
 
-### `CLOSE_NETCDF` -- Close a NetCDF File
+## `CLOSE_NETCDF` -- Close a NetCDF File
 
 | Synopsis |
 |:--|
@@ -35,11 +34,17 @@ for details.
 *
   -
     ```fortran
+    use, non_intrinsic :: nc4f
+    implicit none (type, external)
+    
+    type(netcdf_type) :: nc
+
+    nc = open_netcdf("input.nc")
     call close_netcdf(nc)
     ```
 :::
 
-### `DATARRAY` -- Construct a Variable
+## `DATARRAY` -- Construct a Variable
 
 | Synopsis |
 |:--|
@@ -70,12 +75,20 @@ for details.
 *
   -
     ```fortran
-    var = datarray("temperature", values, ["time".dim.3], &
+    use, non_intrinsic :: nc4f
+    implicit none (type, external)
+    
+    type(dimension_type) :: time
+    type(variable_type) :: var
+    real, target :: values(3) = [273.15, 274.15, 275.15]
+
+    time = "time" .dim. 3
+    var = datarray("temperature", values, [time], &
       & atts=["units".att."K"])
     ```
 :::
 
-### `DATASET` -- Construct a Group
+## `DATASET` -- Construct a Group
 
 | Synopsis |
 |:--|
@@ -106,11 +119,21 @@ for details.
 *
   -
     ```fortran
+    use, non_intrinsic :: nc4f
+    implicit none (type, external)
+    
+    type(dimension_type) :: point
+    type(variable_type) :: var
+    type(group_type) :: root
+    real, target :: values(1) = [273.15]
+
+    point = "point" .dim. 1
+    var = datarray("temperature", values, [point])
     root = dataset("/", [var], atts=["title".att."Example dataset"])
     ```
 :::
 
-### `EXTRACT` -- Access Model Data
+## `EXTRACT` -- Access Model Data
 
 | Synopsis |
 |:--|
@@ -139,13 +162,22 @@ for details.
 *
   -
     ```fortran
+    use, non_intrinsic :: nc4f
+    implicit none (type, external)
+    
+    type(dimension_type) :: point
+    type(variable_type) :: var
     real, pointer :: values(:)
+    real, target :: source(1) = [273.15]
+
+    point = "point" .dim. 1
+    var = datarray("temperature", source, [point])
     call extract(var, values)
     values = values + 273.15
     ```
 :::
 
-### `GET_ATTRIBUTE` -- Read Attributes
+## `GET_ATTRIBUTE` -- Read Attributes
 
 | Synopsis |
 |:--|
@@ -175,12 +207,23 @@ for details.
 *
   -
     ```fortran
+    use, non_intrinsic :: nc4f
+    implicit none (type, external)
+    
+    type(netcdf_type) :: nc
+    type(group_type) :: atmosphere
+    type(variable_type) :: temperature
+    type(attribute_type) :: title, units
+
+    nc = open_netcdf("input.nc")
+    atmosphere = get_group(nc, "atmosphere")
+    temperature = inquire_variable(atmosphere, "temperature")
     title = get_attribute(nc, "title")
     units = get_attribute(atmosphere, temperature, "units")
     ```
 :::
 
-### `GET_GROUP` -- Get a Child Group
+## `GET_GROUP` -- Get a Child Group
 
 | Synopsis |
 |:--|
@@ -209,11 +252,18 @@ for details.
 *
   -
     ```fortran
+    use, non_intrinsic :: nc4f
+    implicit none (type, external)
+    
+    type(netcdf_type) :: nc
+    type(group_type) :: atmosphere
+
+    nc = open_netcdf("input.nc")
     atmosphere = get_group(nc, "atmosphere")
     ```
 :::
 
-### `GET_VARIABLE` -- Read a Variable
+## `GET_VARIABLE` -- Read a Variable
 
 | Synopsis |
 |:--|
@@ -245,12 +295,19 @@ for details.
 *
   -
     ```fortran
+    use, non_intrinsic :: nc4f
+    implicit none (type, external)
+    
+    type(netcdf_type) :: nc
+    type(variable_type) :: pressure, slice
+
+    nc = open_netcdf("input.nc")
     pressure = get_variable(nc, "P")
     slice = get_variable(nc, "temperature", start=[1, 1], count=[12, 1])
     ```
 :::
 
-### `INITIALIZE` -- Allocate Model Storage
+## `INITIALIZE` -- Allocate Model Storage
 
 | Synopsis |
 |:--|
@@ -285,13 +342,19 @@ for details.
 *
   -
     ```fortran
+    use, non_intrinsic :: nc4f
+    implicit none (type, external)
+    
+    type(variable_type) :: total, output
+    real, pointer :: total_values(:), output_values(:)
+
     call initialize(output, "mean_pressure", mold=total)
     call extract(output, output_values)
     output_values = 0.5 * total_values
     ```
 :::
 
-### `INQUIRE_DIMENSIONS` -- Get Dimensions
+## `INQUIRE_DIMENSIONS` -- Get Dimensions
 
 | Synopsis |
 |:--|
@@ -320,12 +383,21 @@ for details.
 *
   -
     ```fortran
+    use, non_intrinsic :: nc4f
+    implicit none (type, external)
+    
+    type(netcdf_type) :: nc
+    type(variable_type) :: temperature
+    type(dimension_type), allocatable :: dims(:), variable_dims(:)
+
+    nc = open_netcdf("input.nc")
+    temperature = inquire_variable(nc, "temperature")
     dims = inquire_dimensions(nc)
     variable_dims = inquire_dimensions(nc, temperature)
     ```
 :::
 
-### `INQUIRE_GROUP` -- Materialize Group Metadata
+## `INQUIRE_GROUP` -- Materialize Group Metadata
 
 | Synopsis |
 |:--|
@@ -358,12 +430,17 @@ for details.
 *
   -
     ```fortran
+    use, non_intrinsic :: nc4f
+    implicit none (type, external)
+    
+    type(group_type) :: atmosphere
+
     call inquire_group(atmosphere, inq_dims=.true., inq_atts=.true., &
       & inq_vars=.true., inq_subgrps=.true., recursive=.true.)
     ```
 :::
 
-### `INQUIRE_SUBGROUPS` -- List Child Groups
+## `INQUIRE_SUBGROUPS` -- List Child Groups
 
 | Synopsis |
 |:--|
@@ -391,11 +468,18 @@ for details.
 *
   -
     ```fortran
+    use, non_intrinsic :: nc4f
+    implicit none (type, external)
+    
+    type(netcdf_type) :: nc
+    type(group_type), allocatable :: children(:)
+
+    nc = open_netcdf("input.nc")
     children = inquire_subgroups(nc)
     ```
 :::
 
-### `INQUIRE_VARIABLE` -- Read Variable Metadata
+## `INQUIRE_VARIABLE` -- Read Variable Metadata
 
 | Synopsis |
 |:--|
@@ -424,15 +508,21 @@ for details.
 *
   -
     ```fortran
+    use, non_intrinsic :: nc4f
+    implicit none (type, external)
+    
+    type(group_type) :: atmosphere
+    type(variable_type) :: temperature
+
     temperature = inquire_variable(atmosphere, "temperature")
     ```
 :::
 
-### `OPEN_NETCDF` -- Open a NetCDF File
+## `OPEN_NETCDF` -- Open a NetCDF File
 
 | Synopsis |
 |:--|
-| <span class="ind4">`NC = OPEN_NETCDF(FILENAME[, MODE, ERR])`</span> |
+| <span class="ind4">`NC = OPEN_NETCDF(FILE[, MODE, ERR])`</span> |
 
 | Class |
 |:--|
@@ -444,7 +534,7 @@ for details.
 
 | Arguments |
 |:--|
-| <span class="grid"><span>`FILENAME`</span><span>`character(len=*), INTENT(in)`</span></span><br><span class="ind8">Path of the dataset to open or create.</span> |
+| <span class="grid"><span>`FILE`</span><span>`character(len=*), INTENT(in)`</span></span><br><span class="ind8">Path of the dataset to open or create.</span> |
 | <span class="grid"><span>`MODE`</span><span>`character(len=*), OPTIONAL, INTENT(in)`</span></span><br><span class="ind8">Requested file access mode.</span> |
 | <span class="grid"><span>`ERR`</span><span>`type(error_type), OPTIONAL, INTENT(out)`</span></span><br><span class="ind8">Receives an operation error.</span> |
 
@@ -457,11 +547,16 @@ for details.
 *
   -
     ```fortran
+    use, non_intrinsic :: nc4f
+    implicit none (type, external)
+    
+    type(netcdf_type) :: nc
+
     nc = open_netcdf("input.nc", mode="r")
     ```
 :::
 
-### `SHAPE` -- Get Variable Extents
+## `SHAPE` -- Get Variable Extents
 
 | Synopsis |
 |:--|
@@ -488,11 +583,17 @@ for details.
 *
   -
     ```fortran
+    use, non_intrinsic :: nc4f
+    implicit none (type, external)
+    
+    type(variable_type) :: var
+    integer, allocatable :: extents(:)
+
     extents = shape(var)
     ```
 :::
 
-### `SIZE` -- Get Element Count
+## `SIZE` -- Get Element Count
 
 | Synopsis |
 |:--|
@@ -520,11 +621,18 @@ for details.
 *
   -
     ```fortran
+    use, non_intrinsic :: nc4f
+    implicit none (type, external)
+    
+    type(variable_type) :: var
+    integer(int64) :: elements
+
+    elements = size(var)
     print *, size(var), size(var, dim=1)
     ```
 :::
 
-### `SUM` -- Add Compatible Variables
+## `SUM` -- Add Compatible Variables
 
 | Synopsis |
 |:--|
@@ -551,15 +659,20 @@ for details.
 *
   -
     ```fortran
+    use, non_intrinsic :: nc4f
+    implicit none (type, external)
+    
+    type(variable_type) :: pressure, base_pressure, total
+
     total = sum([pressure, base_pressure])
     ```
 :::
 
-### `TO_NETCDF` -- Write a NetCDF File
+## `TO_NETCDF` -- Write a NetCDF File
 
 | Synopsis |
 |:--|
-| <span class="ind4">`CALL TO_NETCDF(FILENAME, VARS[, ATTS, ERR])`</span><br><span class="ind4">`CALL TO_NETCDF(FILENAME, GRP[, ATTS, ERR])`</span> |
+| <span class="ind4">`CALL TO_NETCDF(FILE, VARS[, ATTS, ERR])`</span><br><span class="ind4">`CALL TO_NETCDF(FILE, GRP[, ATTS, ERR])`</span> |
 
 | Class |
 |:--|
@@ -571,7 +684,7 @@ for details.
 
 | Arguments |
 |:--|
-| <span class="grid"><span>`FILENAME`</span><span>`character(len=*), INTENT(in)`</span></span><br><span class="ind8">Path of the output file.</span> |
+| <span class="grid"><span>`FILE`</span><span>`character(len=*), INTENT(in)`</span></span><br><span class="ind8">Path of the output file.</span> |
 | <span class="grid"><span>`VARS`</span><span>`type(variable_type), scalar or dimension(:), INTENT(in)`</span></span><br><span class="ind8">Variables to write.</span> |
 | <span class="grid"><span>`GRP`</span><span>`type(group_type), scalar or dimension(:), INTENT(in)`</span></span><br><span class="ind8">Group model to write.</span> |
 | <span class="grid"><span>`ATTS`</span><span>`type(attribute_type), DIMENSION(:), OPTIONAL, INTENT(in)`</span></span><br><span class="ind8">Root attributes when writing variables or groups.</span> |
@@ -586,7 +699,14 @@ for details.
 *
   -
     ```fortran
-    call to_netcdf("output.nc", root, atts=["title".att."Output"])
+    use, non_intrinsic :: nc4f
+    implicit none (type, external)
+    
+    type(group_type) :: root
+    type(attribute_type) :: title
+
+    title = "title" .att. "Output"
+    call to_netcdf("output.nc", root, atts=[title])
     ```
 :::
 

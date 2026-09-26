@@ -10,33 +10,33 @@ data_dir=$(dirname -- "$script_dir")/data
 
 download() {
   local url=$1
-  local filename=$2
+  local file=$2
   local expected_sha256=$3
-  local destination=$data_dir/$filename
+  local destination=$data_dir/$file
   local temporary=$destination.download
   local actual_sha256
 
   if [[ -f $destination ]]; then
     actual_sha256=$(shasum -a 256 "$destination" | awk '{print $1}')
     if [[ $actual_sha256 == "$expected_sha256" ]]; then
-      printf '[data] verified %s\n' "$filename"
+      printf '[data] verified %s\n' "$file"
       return
     fi
-    printf '[data] replacing %s with an expected version\n' "$filename"
+    printf '[data] replacing %s with an expected version\n' "$file"
   else
-    printf '[data] downloading %s\n' "$filename"
+    printf '[data] downloading %s\n' "$file"
   fi
 
   rm -f "$temporary"
   curl --fail --location --retry 3 --output "$temporary" "$url"
   actual_sha256=$(shasum -a 256 "$temporary" | awk '{print $1}')
   if [[ $actual_sha256 != "$expected_sha256" ]]; then
-    printf '[data] checksum mismatch for %s\n' "$filename" >&2
+    printf '[data] checksum mismatch for %s\n' "$file" >&2
     rm -f "$temporary"
     exit 1
   fi
   mv "$temporary" "$destination"
-  printf '[data] verified %s\n' "$filename"
+  printf '[data] verified %s\n' "$file"
 }
 
 mkdir -p "$data_dir"

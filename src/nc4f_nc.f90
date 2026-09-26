@@ -135,9 +135,9 @@ interface
   end function neq_att
 
   !> Open or create a dataset and return a `netcdf_type` handle.
-  module function open_netcdf(filename, mode, err) result(nc)
+  module function open_netcdf(file, mode, err) result(nc)
     !> Path to the dataset file.
-    character(len=*), intent(in) :: filename
+    character(len=*), intent(in) :: file
     !> Mode to open the file: 'r' for read, 'w' to recreate, or 'a' for
     !> read/write access to an existing dataset.
     character(len=*), intent(in), optional :: mode
@@ -156,9 +156,9 @@ interface
   end subroutine close_netcdf
 
   !> Create a netCDF file from one variable or a rank-one variable array.
-  module subroutine to_netcdf_var(filename, vars, atts, err)
-    !> Output filename to create.
-    character(len=*), intent(in) :: filename
+  module subroutine to_netcdf_var(file, vars, atts, err)
+    !> Output file to create.
+    character(len=*), intent(in) :: file
     !> Variable or array of variables to write into the file.
     type(variable_type), intent(in) :: vars(..)
     !> Optional array of global attributes to attach to the dataset.
@@ -168,9 +168,9 @@ interface
   end subroutine to_netcdf_var
 
   !> Create a netCDF file from one group or a rank-one group array.
-  module subroutine to_netcdf_grp(filename, grp, atts, err)
-    !> Output filename to create.
-    character(len=*), intent(in) :: filename
+  module subroutine to_netcdf_grp(file, grp, atts, err)
+    !> Output file to create.
+    character(len=*), intent(in) :: file
     !> A scalar is written as the root (its name is ignored); an array is
     !> written as direct children of an otherwise empty root.
     type(group_type), intent(in) :: grp(..)

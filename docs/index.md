@@ -14,20 +14,12 @@ get-started/first-program
 ```
 
 ```{toctree}
-:caption: Examples
-:maxdepth: 1
-
-examples/create-small-dataset
-examples/read-inspect-compute-write
-examples/inspect-grouped-file-edit-metadata
-```
-
-```{toctree}
-:caption: References
+:caption: API Reference
 :maxdepth: 1
 
 reference/types
-reference/API-reference
-reference/error-handling
-reference/compatibility
+reference/exposed-nc-constants
+reference/functions-and-subroutines
+reference/operators
+reference/derived-type-io
 ```

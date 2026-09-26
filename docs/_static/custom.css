@@ -1,3 +1,13 @@
+/* html[data-theme="light"],
+html[data-theme="dark"] {
+  --pst-color-link-hover: #198754;
+} */
+
+.bd-footer,
+footer.bd-footer-content {
+  border-top: 0;
+}
+
 .bd-content table {
   --bs-table-border-color: var(--pst-color-background);
   --pst-color-table-row-hover-bg: var(--pst-color-background);

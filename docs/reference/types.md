@@ -1,4 +1,4 @@
-# Data Types
+# Derived Types
 
 ## Basic Types
 
@@ -48,10 +48,10 @@ described on the NetCDF website. The basic types are:
       type(group_type), pointer :: grps(:)
     end type group_type
     ```
-  * _NetCDF type_: the root group that also contains metadata like filename and I/O mode;
+  * _NetCDF type_: the root group that also contains metadata like file and I/O mode;
     ```fortran
     type, extends(group_type) :: netcdf_type
-      character(len=:), allocatable :: filename
+      character(len=:), allocatable :: file
       integer(c_int) :: mode
     end type netcdf_type
     ```
@@ -163,7 +163,7 @@ var = datarray("dummy variable", values, [tme, lat, lon], &
 #### Construct a variable through `initialize`
 
 This library also provides `initialize` if you only know the skeleton of the data array but do not know the actual values that needs to be filled in yet.
-One can initialize a `variable_type` by explicitly providing all metadata required. Please refer to [API reference](API-reference.md) for more details.
+One can initialize a `variable_type` by explicitly providing all metadata required. Please refer to [Functions and Subroutines](functions-and-subroutines.md) for more details.
 
 ### Group and NetCDF type
 
