@@ -32,7 +32,6 @@ end interface inquire_dimensions
 interface to_netcdf
   module procedure :: to_netcdf_var
   module procedure :: to_netcdf_grp
-  module procedure :: to_netcdf_grps
 end interface to_netcdf
 
 !> Return whether an error result represents a failed operation.
@@ -168,33 +167,19 @@ interface
     type(error_type), intent(out), optional :: err
   end subroutine to_netcdf_var
 
-  !> Create a netCDF file whose root group has `grp`'s contents.
+  !> Create a netCDF file from one group or a rank-one group array.
   module subroutine to_netcdf_grp(filename, grp, atts, err)
     !> Output filename to create.
     character(len=*), intent(in) :: filename
-    !> In-memory group whose dimensions, attributes, variables, and child
-    !> groups are written as the file's root group. Its name is not written,
-    !> because a NetCDF file root is always named `/`.
-    type(group_type), intent(in) :: grp
-    !> Optional additional global attributes for the file root. Entries with
-    !> names already present in `grp%atts` replace those root attributes.
+    !> A scalar is written as the root (its name is ignored); an array is
+    !> written as direct children of an otherwise empty root.
+    type(group_type), intent(in) :: grp(..)
+    !> Optional root attributes. For a scalar, entries with names already
+    !> present in `grp%atts` replace those attributes.
     type(attribute_type), intent(in), optional :: atts(:)
     !> Optional error result. When absent, failures stop the program.
     type(error_type), intent(out), optional :: err
   end subroutine to_netcdf_grp
-
-  !> Create a netCDF file with `grps` as direct children of a new root group.
-  module subroutine to_netcdf_grps(filename, grps, atts, err)
-    !> Output filename to create.
-    character(len=*), intent(in) :: filename
-    !> In-memory groups to write below a newly created, otherwise empty root
-    !> group. No first-level group may be named `/`.
-    type(group_type), intent(in) :: grps(:)
-    !> Optional global attributes for the otherwise empty file root.
-    type(attribute_type), intent(in), optional :: atts(:)
-    !> Optional error result. When absent, failures stop the program.
-    type(error_type), intent(out), optional :: err
-  end subroutine to_netcdf_grps
 
   !> Inquire all dimensions for the top-level group of a netCDF file.
   module function inq_dims_grp(nc, err) result(dims)

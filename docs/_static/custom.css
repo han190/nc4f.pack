@@ -1,0 +1,74 @@
+.bd-content table {
+  --bs-table-border-color: var(--pst-color-background);
+  --pst-color-table-row-hover-bg: var(--pst-color-background);
+}
+
+.bd-content table,
+.bd-content table thead,
+.bd-content table tbody,
+.bd-content table tr,
+.bd-content table th,
+.bd-content table td {
+  background-color: var(--pst-color-background);
+  border-color: var(--pst-color-background);
+}
+
+.bd-content table.table thead tr {
+  border-bottom-color: var(--pst-color-background);
+}
+
+.bd-content table th,
+.bd-content table td {
+  line-height: 1.2;
+  padding-block: 0.1rem;
+}
+
+.bd-content .ind4 {
+  box-sizing: border-box;
+  display: inline-block;
+  margin-left: 4em;
+  vertical-align: top;
+  width: calc(100% - 4em);
+}
+
+.bd-content .ind8 {
+  box-sizing: border-box;
+  display: inline-block;
+  margin-left: 12em;
+  vertical-align: top;
+  width: calc(100% - 12em);
+}
+
+.bd-content .grid {
+  display: inline-grid;
+  grid-template-columns: 8em 30em;
+  column-gap: 0em;
+  margin-left: 4em;
+  vertical-align: baseline;
+}
+
+.bd-content .grid > span:nth-child(2) {
+  text-transform: uppercase;
+}
+
+.bd-content table.example-table .highlight-fortran {
+  margin-left: 4em;
+  width: calc(100% - 4em);
+}
+
+.bd-content .highlight,
+.bd-content .highlight pre {
+  background-color: transparent;
+}
+
+.bd-content code.literal {
+  background-color: transparent;
+  border: 0;
+  color: inherit;
+  padding-inline: 0;
+}
+
+/* .bd-content .vertical-space {
+  display: block;
+  height: 4px;
+} */

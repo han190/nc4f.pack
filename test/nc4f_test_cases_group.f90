@@ -111,7 +111,8 @@ module subroutine group_write(passed)
   type(group_type) :: child, child_on_disk, invalid, parent, parent_on_disk, &
     & root, sibling
   type(group_type), allocatable :: top_level(:)
-  type(group_type) :: parent_grps(1), root_grps(1), top_level_input(2)
+  type(group_type) :: parent_grps(1), root_grps(1), top_level_input(2), &
+    & invalid_rank(1, 1)
   type(netcdf_type) :: nc
   type(variable_type) :: child_data, child_var, root_data, root_var, sibling_var
 
@@ -209,6 +210,11 @@ module subroutine group_write(passed)
   call to_netcdf(TEST_RESULTS_DIR//"invalid-root-child.nc", &
     & top_level_input(:1), err=err)
   passed = (err%code /= NC_NOERR) .and. err%code == NC_EINVAL
+  if (.not. passed) return
+
+  invalid_rank(1, 1) = child
+  call to_netcdf(TEST_RESULTS_DIR//"invalid-group-rank.nc", invalid_rank, err=err)
+  passed = err%code == NC_EINVAL
 end subroutine group_write
 
 end submodule nc4f_test_cases_group

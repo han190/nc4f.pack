@@ -10,17 +10,29 @@ module subroutine init_var_mold(var, name, mold, atts, deep)
   !> Name for the new variable.
   character(len=*), intent(in) :: name
   !> Input argument: `mold`.
-  type(variable_type), intent(in) :: mold
+  type(variable_type), target, intent(in) :: mold
   !> Optional attributes for the new variable.
   type(attribute_type), intent(in), optional :: atts(:)
-  !> Whether to allocate an owning data buffer.
+  !> Whether to allocate an owning data buffer or borrow the mold's storage.
   logical, intent(in), optional :: deep
+  logical :: deep_copy
 
+  deep_copy = .true.
+  if (present(deep)) deep_copy = deep
   if (present(atts)) then
-    call init_var(var, name, mold%dtype, mold%len, mold%dims, atts, deep)
+    call init_var_(var, name, mold%dtype, mold%len, mold%dims, atts, deep_copy)
   else
     if (allocated(var%atts)) deallocate (var%atts)
-    call init_var(var, name, mold%dtype, mold%len, mold%dims, deep=deep)
+    call init_var_(var, name, mold%dtype, mold%len, mold%dims, deep=deep_copy)
+  end if
+  if (.not. deep_copy .and. mold%len > 0) then
+    if (allocated(mold%buffer)) then
+      var%ptr => mold%buffer
+    else if (associated(mold%ptr)) then
+      var%ptr => mold%ptr
+    else
+      error stop "[init_var_mold] Mold has no storage."
+    end if
   end if
 end subroutine init_var_mold
 

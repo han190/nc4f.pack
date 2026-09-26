@@ -28,7 +28,7 @@ module function new_var_${K}$_${R}$d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, ${D}$, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, ${D}$, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -61,7 +61,7 @@ module function new_var_char_${R}$d(name, values, dims, atts, deep) result(var)
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
   if (.not. deep_copy) error stop "[datarray] Shallow character buffers are unsupported."
-  call init_var(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts, deep=.true.)
+  call init_var_(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts, deep=.true.)
   if (size(values) > 0) var%buffer = transfer(values, 0_int8, size(var%buffer))
 end function new_var_char_${R}$d${NEWLINE(not (R == MAX_RANK))}$
 #: endfor

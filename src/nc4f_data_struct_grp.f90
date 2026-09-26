@@ -5,6 +5,16 @@ contains
 
 !> Initialize an owning attribute buffer.
 module subroutine init_att(att, name, dtype, len)
+  type(attribute_type), intent(inout) :: att
+  character(len=*), intent(in) :: name
+  integer(data_type), intent(in) :: dtype
+  integer(int64), intent(in) :: len
+
+  call init_att_(att, name, dtype, len, deep=.true.)
+end subroutine init_att
+
+!> Initialize attribute metadata and optionally allocate an owning buffer.
+module subroutine init_att_(att, name, dtype, len, deep)
   !> Input/output argument: `att`.
   type(attribute_type), intent(inout) :: att
   !> Input argument: `name`.
@@ -13,18 +23,35 @@ module subroutine init_att(att, name, dtype, len)
   integer(data_type), intent(in) :: dtype
   !> Input argument: `len`.
   integer(int64), intent(in) :: len
+  !> Whether to allocate an owning data buffer.
+  logical, intent(in), optional :: deep
+  logical :: deep_copy
 
   if (len < 0) error stop "[init_att] Negative attribute length."
+  deep_copy = .true.
+  if (present(deep)) deep_copy = deep
   if (allocated(att%buffer)) deallocate (att%buffer)
   nullify (att%ptr)
   att%name = trim(name)
   att%dtype = dtype
   att%len = len
-  allocate (att%buffer(buffer_size(dtype, len)))
-end subroutine init_att
+  if (deep_copy) allocate (att%buffer(buffer_size(dtype, len)))
+end subroutine init_att_
 
-!> Initialize variable metadata and, for a deep value, an owning buffer.
-module subroutine init_var(var, name, dtype, len, dims, atts, deep)
+!> Initialize variable metadata and an owning buffer.
+module subroutine init_var(var, name, dtype, len, dims, atts)
+  type(variable_type), intent(inout) :: var
+  character(len=*), intent(in) :: name
+  integer(data_type), intent(in) :: dtype
+  integer(int64), intent(in) :: len
+  type(dimension_type), intent(in) :: dims(:)
+  type(attribute_type), intent(in), optional :: atts(:)
+
+  call init_var_(var, name, dtype, len, dims, atts, deep=.true.)
+end subroutine init_var
+
+!> Initialize variable metadata and optionally allocate an owning buffer.
+module subroutine init_var_(var, name, dtype, len, dims, atts, deep)
   !> Input/output argument: `var`.
   type(variable_type), intent(inout) :: var
   !> Input argument: `name`.
@@ -54,7 +81,7 @@ module subroutine init_var(var, name, dtype, len, dims, atts, deep)
   var%len = len
   if (present(atts)) var%atts = atts
   if (deep_copy) allocate (var%buffer(buffer_size(dtype, len)))
-end subroutine init_var
+end subroutine init_var_
 
 !> Compute `new_dataset_empty`.
 module function new_dataset_empty(name, atts, deep) result(grp)

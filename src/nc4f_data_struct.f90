@@ -200,7 +200,24 @@ interface
     integer(int64), intent(in) :: len
   end subroutine init_att
 
-  module subroutine init_var(var, name, dtype, len, dims, atts, deep)
+  module subroutine init_var(var, name, dtype, len, dims, atts)
+    type(variable_type), intent(inout) :: var
+    character(len=*), intent(in) :: name
+    integer(data_type), intent(in) :: dtype
+    integer(int64), intent(in) :: len
+    type(dimension_type), intent(in) :: dims(:)
+    type(attribute_type), intent(in), optional :: atts(:)
+  end subroutine init_var
+
+  module subroutine init_att_(att, name, dtype, len, deep)
+    type(attribute_type), intent(inout) :: att
+    character(len=*), intent(in) :: name
+    integer(data_type), intent(in) :: dtype
+    integer(int64), intent(in) :: len
+    logical, intent(in), optional :: deep
+  end subroutine init_att_
+
+  module subroutine init_var_(var, name, dtype, len, dims, atts, deep)
     type(variable_type), intent(inout) :: var
     character(len=*), intent(in) :: name
     integer(data_type), intent(in) :: dtype
@@ -208,18 +225,19 @@ interface
     type(dimension_type), intent(in) :: dims(:)
     type(attribute_type), intent(in), optional :: atts(:)
     logical, intent(in), optional :: deep
-  end subroutine init_var
+  end subroutine init_var_
 
-  module subroutine init_att_mold(att, name, mold)
+  module subroutine init_att_mold(att, name, mold, deep)
     type(attribute_type), intent(inout) :: att
     character(len=*), intent(in) :: name
-    type(attribute_type), intent(in) :: mold
+    type(attribute_type), target, intent(in) :: mold
+    logical, intent(in), optional :: deep
   end subroutine init_att_mold
 
   module subroutine init_var_mold(var, name, mold, atts, deep)
     type(variable_type), intent(inout) :: var
     character(len=*), intent(in) :: name
-    type(variable_type), intent(in) :: mold
+    type(variable_type), target, intent(in) :: mold
     type(attribute_type), intent(in), optional :: atts(:)
     logical, intent(in), optional :: deep
   end subroutine init_var_mold

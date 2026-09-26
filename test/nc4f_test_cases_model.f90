@@ -2,7 +2,7 @@
 submodule(nc4f_test_cases) nc4f_test_cases_model
 
 use, intrinsic :: iso_c_binding, only: c_associated, c_loc
-use, intrinsic :: iso_fortran_env, only: int64, real32
+use, intrinsic :: iso_fortran_env, only: int8, int64, real32
 implicit none (type, external)
 
 contains
@@ -24,6 +24,7 @@ module subroutine data_model(passed)
   real(real32), pointer :: extracted(:, :), sum_values(:)
   real, pointer :: restored_values(:)
   integer(int64), allocatable :: extents(:)
+  integer(int8) :: original_byte
   character(len=256) :: iomsg, line
   integer :: iostat, unit
   logical :: netcdf_found
@@ -74,12 +75,22 @@ module subroutine data_model(passed)
   if (cloned_att%name /= "copied_units" .or. &
     & cloned_att%dtype /= atts(1)%dtype .or. cloned_att%len /= atts(1)%len) return
   if (.not. allocated(cloned_att%buffer) .or. associated(cloned_att%ptr)) return
+  call initialize(cloned_att, "borrowed_units", mold=atts(1), deep=.false.)
+  if (allocated(cloned_att%buffer) .or. .not. associated(cloned_att%ptr)) return
+  original_byte = atts(1)%buffer(1)
+  atts(1)%buffer(1) = 0_int8
+  if (cloned_att%ptr(1) /= 0_int8) return
+  atts(1)%buffer(1) = original_byte
   call initialize(cloned_var, "copied_temperature", vars(1), deep=.false.)
   if (cloned_var%name /= "copied_temperature" .or. &
     & cloned_var%dtype /= vars(1)%dtype .or. cloned_var%len /= vars(1)%len .or. &
     & .not. all(cloned_var%dims == vars(1)%dims) .or. &
     & allocated(cloned_var%atts) .or. allocated(cloned_var%buffer) .or. &
-    & associated(cloned_var%ptr)) return
+    & .not. associated(cloned_var%ptr)) return
+  original_byte = vars(1)%buffer(1)
+  vars(1)%buffer(1) = 0_int8
+  if (cloned_var%ptr(1) /= 0_int8) return
+  vars(1)%buffer(1) = original_byte
   call initialize(cloned_var, "copied_temperature", vars(1), atts=atts)
   if (.not. allocated(cloned_var%atts) .or. &
     & .not. all(cloned_var%atts == atts) .or. .not. allocated(cloned_var%buffer)) return

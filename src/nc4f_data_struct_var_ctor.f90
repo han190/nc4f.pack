@@ -25,7 +25,7 @@ module function new_var_int8_1d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -60,7 +60,7 @@ module function new_var_int8_2d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -95,7 +95,7 @@ module function new_var_int8_3d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -130,7 +130,7 @@ module function new_var_int8_4d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -165,7 +165,7 @@ module function new_var_int8_5d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -200,7 +200,7 @@ module function new_var_int8_6d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -235,7 +235,7 @@ module function new_var_int8_7d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -270,7 +270,7 @@ module function new_var_int8_8d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -305,7 +305,7 @@ module function new_var_int8_9d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -340,7 +340,7 @@ module function new_var_int8_10d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -375,7 +375,7 @@ module function new_var_int8_11d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -410,7 +410,7 @@ module function new_var_int8_12d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -445,7 +445,7 @@ module function new_var_int8_13d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -480,7 +480,7 @@ module function new_var_int8_14d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -515,7 +515,7 @@ module function new_var_int8_15d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, BYTE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -550,7 +550,7 @@ module function new_var_int16_1d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -585,7 +585,7 @@ module function new_var_int16_2d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -620,7 +620,7 @@ module function new_var_int16_3d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -655,7 +655,7 @@ module function new_var_int16_4d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -690,7 +690,7 @@ module function new_var_int16_5d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -725,7 +725,7 @@ module function new_var_int16_6d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -760,7 +760,7 @@ module function new_var_int16_7d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -795,7 +795,7 @@ module function new_var_int16_8d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -830,7 +830,7 @@ module function new_var_int16_9d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -865,7 +865,7 @@ module function new_var_int16_10d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -900,7 +900,7 @@ module function new_var_int16_11d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -935,7 +935,7 @@ module function new_var_int16_12d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -970,7 +970,7 @@ module function new_var_int16_13d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -1005,7 +1005,7 @@ module function new_var_int16_14d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -1040,7 +1040,7 @@ module function new_var_int16_15d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, SHORT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -1075,7 +1075,7 @@ module function new_var_int32_1d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -1110,7 +1110,7 @@ module function new_var_int32_2d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -1145,7 +1145,7 @@ module function new_var_int32_3d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -1180,7 +1180,7 @@ module function new_var_int32_4d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -1215,7 +1215,7 @@ module function new_var_int32_5d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -1250,7 +1250,7 @@ module function new_var_int32_6d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -1285,7 +1285,7 @@ module function new_var_int32_7d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -1320,7 +1320,7 @@ module function new_var_int32_8d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -1355,7 +1355,7 @@ module function new_var_int32_9d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -1390,7 +1390,7 @@ module function new_var_int32_10d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -1425,7 +1425,7 @@ module function new_var_int32_11d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -1460,7 +1460,7 @@ module function new_var_int32_12d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -1495,7 +1495,7 @@ module function new_var_int32_13d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -1530,7 +1530,7 @@ module function new_var_int32_14d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -1565,7 +1565,7 @@ module function new_var_int32_15d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, INT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -1600,7 +1600,7 @@ module function new_var_int64_1d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -1635,7 +1635,7 @@ module function new_var_int64_2d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -1670,7 +1670,7 @@ module function new_var_int64_3d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -1705,7 +1705,7 @@ module function new_var_int64_4d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -1740,7 +1740,7 @@ module function new_var_int64_5d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -1775,7 +1775,7 @@ module function new_var_int64_6d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -1810,7 +1810,7 @@ module function new_var_int64_7d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -1845,7 +1845,7 @@ module function new_var_int64_8d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -1880,7 +1880,7 @@ module function new_var_int64_9d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -1915,7 +1915,7 @@ module function new_var_int64_10d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -1950,7 +1950,7 @@ module function new_var_int64_11d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -1985,7 +1985,7 @@ module function new_var_int64_12d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -2020,7 +2020,7 @@ module function new_var_int64_13d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -2055,7 +2055,7 @@ module function new_var_int64_14d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -2090,7 +2090,7 @@ module function new_var_int64_15d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, INT64_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -2125,7 +2125,7 @@ module function new_var_real32_1d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -2160,7 +2160,7 @@ module function new_var_real32_2d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -2195,7 +2195,7 @@ module function new_var_real32_3d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -2230,7 +2230,7 @@ module function new_var_real32_4d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -2265,7 +2265,7 @@ module function new_var_real32_5d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -2300,7 +2300,7 @@ module function new_var_real32_6d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -2335,7 +2335,7 @@ module function new_var_real32_7d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -2370,7 +2370,7 @@ module function new_var_real32_8d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -2405,7 +2405,7 @@ module function new_var_real32_9d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -2440,7 +2440,7 @@ module function new_var_real32_10d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -2475,7 +2475,7 @@ module function new_var_real32_11d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -2510,7 +2510,7 @@ module function new_var_real32_12d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -2545,7 +2545,7 @@ module function new_var_real32_13d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -2580,7 +2580,7 @@ module function new_var_real32_14d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -2615,7 +2615,7 @@ module function new_var_real32_15d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, FLOAT_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -2650,7 +2650,7 @@ module function new_var_real64_1d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -2685,7 +2685,7 @@ module function new_var_real64_2d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -2720,7 +2720,7 @@ module function new_var_real64_3d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -2755,7 +2755,7 @@ module function new_var_real64_4d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -2790,7 +2790,7 @@ module function new_var_real64_5d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -2825,7 +2825,7 @@ module function new_var_real64_6d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -2860,7 +2860,7 @@ module function new_var_real64_7d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -2895,7 +2895,7 @@ module function new_var_real64_8d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -2930,7 +2930,7 @@ module function new_var_real64_9d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -2965,7 +2965,7 @@ module function new_var_real64_10d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -3000,7 +3000,7 @@ module function new_var_real64_11d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -3035,7 +3035,7 @@ module function new_var_real64_12d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -3070,7 +3070,7 @@ module function new_var_real64_13d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -3105,7 +3105,7 @@ module function new_var_real64_14d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -3140,7 +3140,7 @@ module function new_var_real64_15d(name, values, dims, atts, deep) result(var)
   if (.not. deep_copy .and. .not. is_contiguous(values)) then
     error stop "[datarray] Shallow values must be contiguous."
   end if
-  call init_var(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
+  call init_var_(var, name, DOUBLE_TYPE, size(values, kind=int64), dims, atts, deep_copy)
   if (size(values) > 0) then
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
@@ -3171,7 +3171,7 @@ module function new_var_char_1d(name, values, dims, atts, deep) result(var)
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
   if (.not. deep_copy) error stop "[datarray] Shallow character buffers are unsupported."
-  call init_var(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts, deep=.true.)
+  call init_var_(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts, deep=.true.)
   if (size(values) > 0) var%buffer = transfer(values, 0_int8, size(var%buffer))
 end function new_var_char_1d
 
@@ -3194,7 +3194,7 @@ module function new_var_char_2d(name, values, dims, atts, deep) result(var)
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
   if (.not. deep_copy) error stop "[datarray] Shallow character buffers are unsupported."
-  call init_var(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts, deep=.true.)
+  call init_var_(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts, deep=.true.)
   if (size(values) > 0) var%buffer = transfer(values, 0_int8, size(var%buffer))
 end function new_var_char_2d
 
@@ -3217,7 +3217,7 @@ module function new_var_char_3d(name, values, dims, atts, deep) result(var)
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
   if (.not. deep_copy) error stop "[datarray] Shallow character buffers are unsupported."
-  call init_var(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts, deep=.true.)
+  call init_var_(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts, deep=.true.)
   if (size(values) > 0) var%buffer = transfer(values, 0_int8, size(var%buffer))
 end function new_var_char_3d
 
@@ -3240,7 +3240,7 @@ module function new_var_char_4d(name, values, dims, atts, deep) result(var)
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
   if (.not. deep_copy) error stop "[datarray] Shallow character buffers are unsupported."
-  call init_var(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts, deep=.true.)
+  call init_var_(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts, deep=.true.)
   if (size(values) > 0) var%buffer = transfer(values, 0_int8, size(var%buffer))
 end function new_var_char_4d
 
@@ -3263,7 +3263,7 @@ module function new_var_char_5d(name, values, dims, atts, deep) result(var)
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
   if (.not. deep_copy) error stop "[datarray] Shallow character buffers are unsupported."
-  call init_var(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts, deep=.true.)
+  call init_var_(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts, deep=.true.)
   if (size(values) > 0) var%buffer = transfer(values, 0_int8, size(var%buffer))
 end function new_var_char_5d
 
@@ -3286,7 +3286,7 @@ module function new_var_char_6d(name, values, dims, atts, deep) result(var)
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
   if (.not. deep_copy) error stop "[datarray] Shallow character buffers are unsupported."
-  call init_var(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts, deep=.true.)
+  call init_var_(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts, deep=.true.)
   if (size(values) > 0) var%buffer = transfer(values, 0_int8, size(var%buffer))
 end function new_var_char_6d
 
@@ -3309,7 +3309,7 @@ module function new_var_char_7d(name, values, dims, atts, deep) result(var)
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
   if (.not. deep_copy) error stop "[datarray] Shallow character buffers are unsupported."
-  call init_var(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts, deep=.true.)
+  call init_var_(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts, deep=.true.)
   if (size(values) > 0) var%buffer = transfer(values, 0_int8, size(var%buffer))
 end function new_var_char_7d
 
@@ -3332,7 +3332,7 @@ module function new_var_char_8d(name, values, dims, atts, deep) result(var)
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
   if (.not. deep_copy) error stop "[datarray] Shallow character buffers are unsupported."
-  call init_var(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts, deep=.true.)
+  call init_var_(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts, deep=.true.)
   if (size(values) > 0) var%buffer = transfer(values, 0_int8, size(var%buffer))
 end function new_var_char_8d
 
@@ -3355,7 +3355,7 @@ module function new_var_char_9d(name, values, dims, atts, deep) result(var)
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
   if (.not. deep_copy) error stop "[datarray] Shallow character buffers are unsupported."
-  call init_var(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts, deep=.true.)
+  call init_var_(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts, deep=.true.)
   if (size(values) > 0) var%buffer = transfer(values, 0_int8, size(var%buffer))
 end function new_var_char_9d
 
@@ -3378,7 +3378,7 @@ module function new_var_char_10d(name, values, dims, atts, deep) result(var)
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
   if (.not. deep_copy) error stop "[datarray] Shallow character buffers are unsupported."
-  call init_var(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts, deep=.true.)
+  call init_var_(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts, deep=.true.)
   if (size(values) > 0) var%buffer = transfer(values, 0_int8, size(var%buffer))
 end function new_var_char_10d
 
@@ -3401,7 +3401,7 @@ module function new_var_char_11d(name, values, dims, atts, deep) result(var)
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
   if (.not. deep_copy) error stop "[datarray] Shallow character buffers are unsupported."
-  call init_var(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts, deep=.true.)
+  call init_var_(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts, deep=.true.)
   if (size(values) > 0) var%buffer = transfer(values, 0_int8, size(var%buffer))
 end function new_var_char_11d
 
@@ -3424,7 +3424,7 @@ module function new_var_char_12d(name, values, dims, atts, deep) result(var)
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
   if (.not. deep_copy) error stop "[datarray] Shallow character buffers are unsupported."
-  call init_var(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts, deep=.true.)
+  call init_var_(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts, deep=.true.)
   if (size(values) > 0) var%buffer = transfer(values, 0_int8, size(var%buffer))
 end function new_var_char_12d
 
@@ -3447,7 +3447,7 @@ module function new_var_char_13d(name, values, dims, atts, deep) result(var)
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
   if (.not. deep_copy) error stop "[datarray] Shallow character buffers are unsupported."
-  call init_var(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts, deep=.true.)
+  call init_var_(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts, deep=.true.)
   if (size(values) > 0) var%buffer = transfer(values, 0_int8, size(var%buffer))
 end function new_var_char_13d
 
@@ -3470,7 +3470,7 @@ module function new_var_char_14d(name, values, dims, atts, deep) result(var)
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
   if (.not. deep_copy) error stop "[datarray] Shallow character buffers are unsupported."
-  call init_var(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts, deep=.true.)
+  call init_var_(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts, deep=.true.)
   if (size(values) > 0) var%buffer = transfer(values, 0_int8, size(var%buffer))
 end function new_var_char_14d
 
@@ -3493,7 +3493,7 @@ module function new_var_char_15d(name, values, dims, atts, deep) result(var)
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
   if (.not. deep_copy) error stop "[datarray] Shallow character buffers are unsupported."
-  call init_var(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts, deep=.true.)
+  call init_var_(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts, deep=.true.)
   if (size(values) > 0) var%buffer = transfer(values, 0_int8, size(var%buffer))
 end function new_var_char_15d
 end submodule nc4f_data_struct_var_ctor

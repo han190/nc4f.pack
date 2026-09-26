@@ -163,100 +163,46 @@ module subroutine to_netcdf_var(filename, vars, atts, err)
   end if
 end subroutine to_netcdf_var
 
-!> Create a NetCDF file whose root group has the supplied group's contents.
+!> Create a NetCDF file from a root group or direct child groups.
 module subroutine to_netcdf_grp(filename, grp, atts, err)
   !> Output filename to create.
   character(len=*), intent(in) :: filename
-  !> In-memory group to serialize as the file root.
-  type(group_type), intent(in) :: grp
+  !> Scalar root group or rank-one array of direct children.
+  type(group_type), intent(in) :: grp(..)
   !> Optional additional global attributes for the file root.
   type(attribute_type), intent(in), optional :: atts(:)
   !> Optional error result. When absent, failures stop the program.
   type(error_type), intent(out), optional :: err
-  type(error_type) :: op_err
+  type(error_type) :: op_err, cleanup_err
+  type(group_type) :: file_root
+  type(netcdf_type) :: nc
 
-  call to_netcdf_grp_(filename, grp, atts, op_err)
+  op_err = error_type()
+  nc = open_netcdf_(filename, mode="w", err=op_err)
+  if (.not. has_err(op_err)) then
+    file_root%id = nc%id
+    file_root%name = "/"
+    select rank (items => grp)
+    rank (0)
+      call serialize_grp(file_root, items, atts, op_err)
+    rank (1)
+      call serialize_grps(file_root, items, atts, op_err)
+    rank default
+      op_err = error_type(NC_EINVAL, &
+        & "[to_netcdf_grp] Expected a scalar or rank-one group array.")
+    end select
+    if (has_err(op_err)) then
+      call close_netcdf_(nc, cleanup_err)
+    else
+      call close_netcdf_(nc, op_err)
+    end if
+  end if
+
   if (present(err)) then
     err = op_err
   else if (handle_err(op_err)) then
     return
   end if
 end subroutine to_netcdf_grp
-
-!> Create a NetCDF file with the supplied groups below a new root group.
-module subroutine to_netcdf_grps(filename, grps, atts, err)
-  !> Output filename to create.
-  character(len=*), intent(in) :: filename
-  !> In-memory groups to serialize as the root's direct children.
-  type(group_type), intent(in) :: grps(:)
-  !> Optional global attributes for the otherwise empty file root.
-  type(attribute_type), intent(in), optional :: atts(:)
-  !> Optional error result. When absent, failures stop the program.
-  type(error_type), intent(out), optional :: err
-  type(error_type) :: op_err
-
-  call to_netcdf_grps_(filename, grps, atts, op_err)
-  if (present(err)) then
-    err = op_err
-  else if (handle_err(op_err)) then
-    return
-  end if
-end subroutine to_netcdf_grps
-
-!> Error-returning implementation for a group treated as the file root.
-subroutine to_netcdf_grp_(filename, grp, atts, err)
-  !> Input argument: `filename`.
-  character(len=*), intent(in) :: filename
-  !> Input argument: `grp`.
-  type(group_type), intent(in) :: grp
-  !> Input argument: `atts`.
-  type(attribute_type), intent(in), optional :: atts(:)
-  !> Output argument: `err`.
-  type(error_type), intent(out) :: err
-  type(error_type) :: cleanup_err
-  type(group_type) :: file_root
-  type(netcdf_type) :: nc
-
-  err = error_type()
-  nc = open_netcdf_(filename, mode="w", err=err)
-  if (has_err(err)) return
-
-  file_root%id = nc%id
-  file_root%name = "/"
-  call serialize_grp(file_root, grp, atts, err)
-  if (has_err(err)) then
-    call close_netcdf_(nc, cleanup_err)
-    return
-  end if
-  call close_netcdf_(nc, err)
-end subroutine to_netcdf_grp_
-
-!> Error-returning implementation for direct child groups of a new root.
-subroutine to_netcdf_grps_(filename, grps, atts, err)
-  !> Input argument: `filename`.
-  character(len=*), intent(in) :: filename
-  !> Input argument: `grps`.
-  type(group_type), intent(in) :: grps(:)
-  !> Input argument: `atts`.
-  type(attribute_type), intent(in), optional :: atts(:)
-  !> Output argument: `err`.
-  type(error_type), intent(out) :: err
-  type(error_type) :: cleanup_err
-  type(group_type) :: file_root
-  type(netcdf_type) :: nc
-
-  err = error_type()
-  nc = open_netcdf_(filename, mode="w", err=err)
-  if (has_err(err)) return
-
-  file_root%id = nc%id
-  file_root%name = "/"
-  call serialize_grps(file_root, grps, atts, err)
-  if (has_err(err)) then
-    call close_netcdf_(nc, cleanup_err)
-    return
-  end if
-  call close_netcdf_(nc, err)
-end subroutine to_netcdf_grps_
 
 end submodule nc4f_nc_dataset

@@ -1,6 +1,6 @@
-# nc4f
+# NC4F
 
-`nc4f` is a modern Fortran interface to the NetCDF C library. It provides a
+`NC4F` is a modern Fortran interface to the NetCDF C library. It provides a
 small in-memory model for NetCDF dimensions, attributes, variables, groups,
 and open files. The library calls the NetCDF C API directly; the NetCDF
 Fortran library is not required.
@@ -27,10 +27,7 @@ examples/inspect-grouped-file-edit-metadata
 :maxdepth: 1
 
 reference/types
-reference/constants
-reference/data-construction-access
-reference/notation
-reference/files-groups
+reference/API-reference
 reference/error-handling
 reference/compatibility
 ```

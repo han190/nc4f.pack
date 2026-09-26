@@ -1,15 +1,67 @@
-# Data Types, Constructions and Extractions
+# Data Types
 
 ## Basic Types
 
 This library implements the [data structures](https://docs.unidata.ucar.edu/netcdf-c/4.10.0/netcdf_data_model.html)
-described on the NetCDF website. Its basic types include the following components:
-  * `dimension_type`: name, length, and if the dimension is unlimited;
-  * `attribute_type`: name and a 1D generic (integer, float, character, ...) array;
-  * `variable_type`: name, dimensions, attributes, and an ND generic (integer, float, character, ...) array;
-  * `group_type`: name, dimensions, attributes, variables and nested groups;
-  * `netcdf_type`: the root group that also contains metadata like filename and I/O mode;
-  * `error_type`: this is a library specific type for handling errors.
+described on the NetCDF website. The basic types are:
+  * _Dimension type_: name, length, and if the dimension is unlimited;
+    ```fortran
+    type :: dimension_type
+      integer(c_int) :: id
+      character(len=:), allocatable :: name
+      integer(int64) :: len
+      logical :: is_unlim
+    end type dimension_type
+    ```
+  * _Attribute type_: name and a 1D generic (integer, float, character, ...) array;
+    ```fortran
+    type :: attribute_type
+      integer(c_int) :: id
+      character(len=:), allocatable :: name
+      integer(data_type) :: dtype
+      integer(int64) :: len
+      integer(int8), allocatable :: buffer(:)
+      integer(int8), contiguous, pointer :: ptr(:)
+    end type attribute_type
+    ```
+  * _Variable type_: name, dimensions, attributes, and an ND generic (integer, float, character, ...) array;
+    ```fortran
+    type :: variable_type
+      integer(c_int) :: id
+      character(len=:), allocatable :: name
+      integer(data_type) :: dtype
+      integer(int64) :: len
+      type(dimension_type), allocatable :: dims(:)
+      type(attribute_type), allocatable :: atts(:)
+      integer(int8), allocatable :: buffer(:)
+      integer(int8), contiguous, pointer :: ptr(:)
+    end type variable_type
+    ```
+  * _Group type_: name, dimensions, attributes, variables and nested groups;
+    ```fortran
+    type :: group_type
+      integer(c_int) :: id
+      character(len=:), allocatable :: name
+      type(dimension_type), allocatable :: dims(:)
+      type(attribute_type), allocatable :: atts(:)
+      type(variable_type), allocatable :: vars(:)
+      type(group_type), pointer :: grps(:)
+    end type group_type
+    ```
+  * _NetCDF type_: the root group that also contains metadata like filename and I/O mode;
+    ```fortran
+    type, extends(group_type) :: netcdf_type
+      character(len=:), allocatable :: filename
+      integer(c_int) :: mode
+    end type netcdf_type
+    ```
+  * _Error type_: this is a library specific type for handling errors.
+    ```fortran
+    type error_type
+      integer(c_int) :: code
+      character(len=:), allocatable :: msg
+    end type error_type
+    ```
 
 ## Supported NetCDF Types
 
@@ -19,10 +71,10 @@ The currently supported and unsupported [NetCDF types](https://docs.unidata.ucar
 
 ## Constructions
 
-This library provides operators and generic functions that (hopefully) simplifies the 
+This library provides operators and generic functions that simplifies the 
 construction of these derived types. Let's go through them one by one.
 
-### `dimension_type`
+### Dimension type
 
 In NetCDF there are two kinds of dimensions: limited and unlimited. For
 limited dimensions we can construct them through `.dim.`,
@@ -44,10 +96,11 @@ type(dimension_type) :: time_unlim, time_slice
 time_unlim = "time_unlim" .dim. (24 .and. UNLIMITED)
 time_slice = "time_slice" .dim. (24 .and. LIMITED)
 ```
+Internally a `dimension_argument_type` is formed by `(24 .and. UNLIMITED)`, this type is then passed to construct the `dimension_type`.
 
-### `attribute_type`
+### Attribute type
 
-Attribute type variables are constructed through the operator `.att.`. The first argument has to be string and the second argument is generic.
+Attribute type variables are constructed through the operator `.att.`. The first argument has to be a string and the second argument is generic.
 
 ```fortran
 type(attribute_type), allocatable :: atts(:)
@@ -58,7 +111,9 @@ atts = ["units" .att. "Kelvin", &
         "stdv" .att. 5.23]
 ```
 
-### `variable_type`
+### Variable type
+
+#### Construct a variable through `datarray`
 
 The main constructor of `variable_type` is `datarray`. You will need at least a name, an array and a dimension array to form a data array.
 For example, let's say we would like to create a 3D geospatial variable 
@@ -97,28 +152,20 @@ var = datarray("dummy variable", values, [tme, lat, lon], deep=.false.)
 
 Then `var%ptr` is associated with `values` while `var%buffer` remains
 unallocated. This is efficient, but `values` must be a simply contiguous,
-named target and remain alive for as long as the variable is used; do not pass
-an expression, array constructor, or noncontiguous section. Also, you can
+named target and remain alive for as long as the variable is used. Also, you can
 attach attributes as well:
 
 ```fortran
 var = datarray("dummy variable", values, [tme, lat, lon], &
-  & atts=["units" .att. "K", "critical" .att. 273.15] deep=.false.)
+  & atts=["units".att."K", "critical".att.273.15], deep=.false.)
 ```
 
-### `group_type`
+#### Construct a variable through `initialize`
 
-Describes a NetCDF group. `dims`, `atts`, and `vars` are local collections;
-`grps` is a pointer-backed array of direct children. A child may use
-dimensions inherited from an ancestor without declaring them locally.
+This library also provides `initialize` if you only know the skeleton of the data array but do not know the actual values that needs to be filled in yet.
+One can initialize a `variable_type` by explicitly providing all metadata required. Please refer to [API reference](API-reference.md) for more details.
 
-### `netcdf_type`
+### Group and NetCDF type
 
-Extends `group_type` for an open file with the `filename` and `mode`
-components.
-
-```fortran
-type(netcdf_type) :: nc
-nc = open_netcdf("input.nc", "r")
-call close_netcdf(nc)
-```
+The group type is a nested structure, since by [design](https://docs.unidata.ucar.edu/netcdf-c/4.10.0/netcdf_data_model.html) a group may have a subgroup. 
+Every NetCDF4 file contains at least one group. This is sometimes referred to as the [root group](https://unidata.github.io/netcdf4-python/).

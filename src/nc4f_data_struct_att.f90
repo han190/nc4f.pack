@@ -3,16 +3,30 @@ submodule(nc4f_data_struct) nc4f_data_struct_att
 implicit none (type, external)
 contains
 
-!> Initialize an owning attribute from a name and existing value metadata.
-module subroutine init_att_mold(att, name, mold)
+!> Initialize an attribute from a name and existing value metadata.
+module subroutine init_att_mold(att, name, mold, deep)
   !> Input/output argument: `att`.
   type(attribute_type), intent(inout) :: att
   !> Name for the new attribute.
   character(len=*), intent(in) :: name
   !> Input argument: `mold`.
-  type(attribute_type), intent(in) :: mold
+  type(attribute_type), target, intent(in) :: mold
+  !> Whether to allocate an owning data buffer or borrow the mold's storage.
+  logical, intent(in), optional :: deep
+  logical :: deep_copy
 
-  call init_att(att, name, mold%dtype, mold%len)
+  deep_copy = .true.
+  if (present(deep)) deep_copy = deep
+  call init_att_(att, name, mold%dtype, mold%len, deep_copy)
+  if (.not. deep_copy .and. mold%len > 0) then
+    if (allocated(mold%buffer)) then
+      att%ptr => mold%buffer
+    else if (associated(mold%ptr)) then
+      att%ptr => mold%ptr
+    else
+      error stop "[init_att_mold] Mold has no storage."
+    end if
+  end if
 end subroutine init_att_mold
 
 !> Return true when two attributes have identical metadata and byte values.
