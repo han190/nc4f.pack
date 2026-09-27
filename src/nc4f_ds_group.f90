@@ -1,5 +1,5 @@
 !> Constructors and group composition for the direct data model.
-submodule(nc4f_data_struct) nc4f_data_struct_grp
+submodule(nc4f_ds) nc4f_ds_group
 implicit none (type, external)
 contains
 
@@ -277,4 +277,4 @@ pure module function buffer_size(dtype, len, context) result(nbytes)
   nbytes = int(len*item_bytes)
 end function buffer_size
 
-end submodule nc4f_data_struct_grp
+end submodule nc4f_ds_group

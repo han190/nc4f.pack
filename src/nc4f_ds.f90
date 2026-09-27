@@ -1,4 +1,4 @@
-module nc4f_data_struct
+module nc4f_ds
 
 use, intrinsic :: iso_fortran_env, only: &
   & int8, int16, int32, int64, real32, real64
@@ -129,9 +129,9 @@ contains
   procedure, private :: write_frmt_grp => write_frmt_netcdf
 end type netcdf_type
 
-include "nc4f_data_struct_att_ctor.inc"
-include "nc4f_data_struct_var_ctor.inc"
-include "nc4f_data_struct_extract.inc"
+include "nc4f_ds_attribute_constructor.inc"
+include "nc4f_ds_variable_constructor.inc"
+include "nc4f_ds_extract.inc"
 
 interface operator(.dim.)
   module procedure :: new_dim_len_int32
@@ -453,4 +453,4 @@ interface
   end function buffer_size
 end interface
 
-end module nc4f_data_struct
+end module nc4f_ds

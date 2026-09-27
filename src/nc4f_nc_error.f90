@@ -1,4 +1,4 @@
-submodule(nc4f_nc) nc4f_nc_err
+submodule(nc4f_nc) nc4f_nc_error
 implicit none (type, external)
 contains
 
@@ -81,4 +81,4 @@ function netcdf_msg(stat, context) result(msg)
   end if
 end function netcdf_msg
 
-end submodule nc4f_nc_err
+end submodule nc4f_nc_error

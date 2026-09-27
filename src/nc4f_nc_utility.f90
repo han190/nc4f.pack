@@ -1,4 +1,4 @@
-submodule(nc4f_nc) nc4f_nc_util
+submodule(nc4f_nc) nc4f_nc_utility
 implicit none (type, external)
 contains
 
@@ -61,4 +61,4 @@ module pure function f2cstr(fstr) result(cstr)
   cstr = trim(fstr)//c_null_char
 end function f2cstr
 
-end submodule nc4f_nc_util
+end submodule nc4f_nc_utility

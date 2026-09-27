@@ -34,71 +34,71 @@ endif
 LINK_FFLAGS := $(filter-out -J$(BUILD_DIR),$(FFLAGS))
 
 FYPP_INC = \
-	$(FYPP_DIR)/nc4f_data_struct_att_ctor_inc.fypp \
-	$(FYPP_DIR)/nc4f_data_struct_extract_inc.fypp \
-	$(FYPP_DIR)/nc4f_data_struct_var_ctor_inc.fypp
+	$(FYPP_DIR)/nc4f_ds_attribute_constructor_inc.fypp \
+	$(FYPP_DIR)/nc4f_ds_extract_inc.fypp \
+	$(FYPP_DIR)/nc4f_ds_variable_constructor_inc.fypp
 
 SRC_INC = \
-	$(SRC_DIR)/nc4f_data_struct_att_ctor.inc \
-	$(SRC_DIR)/nc4f_data_struct_extract.inc \
-	$(SRC_DIR)/nc4f_data_struct_var_ctor.inc
+	$(SRC_DIR)/nc4f_ds_attribute_constructor.inc \
+	$(SRC_DIR)/nc4f_ds_extract.inc \
+	$(SRC_DIR)/nc4f_ds_variable_constructor.inc
 
 FYPP_F90 = \
-	$(FYPP_DIR)/nc4f_data_struct_att_ctor.fypp \
-	$(FYPP_DIR)/nc4f_data_struct_extract.fypp \
-	$(FYPP_DIR)/nc4f_data_struct_var_ctor.fypp
+	$(FYPP_DIR)/nc4f_ds_attribute_constructor.fypp \
+	$(FYPP_DIR)/nc4f_ds_extract.fypp \
+	$(FYPP_DIR)/nc4f_ds_variable_constructor.fypp
 
 SRC_F90 = \
-	$(SRC_DIR)/nc4f_data_struct_att_ctor.f90 \
-	$(SRC_DIR)/nc4f_data_struct_extract.f90 \
-	$(SRC_DIR)/nc4f_data_struct_var_ctor.f90
+	$(SRC_DIR)/nc4f_ds_attribute_constructor.f90 \
+	$(SRC_DIR)/nc4f_ds_extract.f90 \
+	$(SRC_DIR)/nc4f_ds_variable_constructor.f90
 
 SRC = \
   $(SRC_DIR)/nc4f_c_interface.f90 \
-	$(SRC_DIR)/nc4f_data_struct.f90 \
-	$(SRC_DIR)/nc4f_data_struct_access.f90 \
-	$(SRC_DIR)/nc4f_data_struct_arith.f90 \
-	$(SRC_DIR)/nc4f_data_struct_att.f90 \
-	$(SRC_DIR)/nc4f_data_struct_att_ctor.f90 \
-	$(SRC_DIR)/nc4f_data_struct_clone.f90 \
-	$(SRC_DIR)/nc4f_data_struct_dim.f90 \
-	$(SRC_DIR)/nc4f_data_struct_extract.f90 \
-	$(SRC_DIR)/nc4f_data_struct_grp.f90 \
-	$(SRC_DIR)/nc4f_data_struct_io.f90 \
-	$(SRC_DIR)/nc4f_data_struct_var_ctor.f90 \
-	$(SRC_DIR)/nc4f_data_struct_var.f90 \
+	$(SRC_DIR)/nc4f_ds.f90 \
+	$(SRC_DIR)/nc4f_ds_access.f90 \
+	$(SRC_DIR)/nc4f_ds_arithmetic.f90 \
+	$(SRC_DIR)/nc4f_ds_attribute.f90 \
+	$(SRC_DIR)/nc4f_ds_attribute_constructor.f90 \
+	$(SRC_DIR)/nc4f_ds_clone.f90 \
+	$(SRC_DIR)/nc4f_ds_dimension.f90 \
+	$(SRC_DIR)/nc4f_ds_extract.f90 \
+	$(SRC_DIR)/nc4f_ds_group.f90 \
+	$(SRC_DIR)/nc4f_ds_io.f90 \
+	$(SRC_DIR)/nc4f_ds_variable_constructor.f90 \
+	$(SRC_DIR)/nc4f_ds_variable.f90 \
 	$(SRC_DIR)/nc4f_nc.f90 \
-	$(SRC_DIR)/nc4f_nc_att.f90 \
+	$(SRC_DIR)/nc4f_nc_attribute.f90 \
 	$(SRC_DIR)/nc4f_nc_dataset.f90 \
-	$(SRC_DIR)/nc4f_nc_dim.f90 \
-	$(SRC_DIR)/nc4f_nc_err.f90 \
-	$(SRC_DIR)/nc4f_nc_grp.f90 \
-	$(SRC_DIR)/nc4f_nc_util.f90 \
-	$(SRC_DIR)/nc4f_nc_var.f90 \
+	$(SRC_DIR)/nc4f_nc_dimension.f90 \
+	$(SRC_DIR)/nc4f_nc_error.f90 \
+	$(SRC_DIR)/nc4f_nc_group.f90 \
+	$(SRC_DIR)/nc4f_nc_utility.f90 \
+	$(SRC_DIR)/nc4f_nc_variable.f90 \
 	$(SRC_DIR)/nc4f.f90
 
 OBJ = \
 	$(BUILD_DIR)/nc4f_c_interface.o \
-	$(BUILD_DIR)/nc4f_data_struct.o \
-	$(BUILD_DIR)/nc4f_data_struct_access.o \
-	$(BUILD_DIR)/nc4f_data_struct_arith.o \
-	$(BUILD_DIR)/nc4f_data_struct_att.o \
-	$(BUILD_DIR)/nc4f_data_struct_att_ctor.o \
-	$(BUILD_DIR)/nc4f_data_struct_clone.o \
-	$(BUILD_DIR)/nc4f_data_struct_dim.o \
-	$(BUILD_DIR)/nc4f_data_struct_extract.o \
-	$(BUILD_DIR)/nc4f_data_struct_grp.o \
-	$(BUILD_DIR)/nc4f_data_struct_io.o \
-	$(BUILD_DIR)/nc4f_data_struct_var_ctor.o \
-	$(BUILD_DIR)/nc4f_data_struct_var.o \
+	$(BUILD_DIR)/nc4f_ds.o \
+	$(BUILD_DIR)/nc4f_ds_access.o \
+	$(BUILD_DIR)/nc4f_ds_arithmetic.o \
+	$(BUILD_DIR)/nc4f_ds_attribute.o \
+	$(BUILD_DIR)/nc4f_ds_attribute_constructor.o \
+	$(BUILD_DIR)/nc4f_ds_clone.o \
+	$(BUILD_DIR)/nc4f_ds_dimension.o \
+	$(BUILD_DIR)/nc4f_ds_extract.o \
+	$(BUILD_DIR)/nc4f_ds_group.o \
+	$(BUILD_DIR)/nc4f_ds_io.o \
+	$(BUILD_DIR)/nc4f_ds_variable_constructor.o \
+	$(BUILD_DIR)/nc4f_ds_variable.o \
 	$(BUILD_DIR)/nc4f_nc.o \
-	$(BUILD_DIR)/nc4f_nc_att.o \
+	$(BUILD_DIR)/nc4f_nc_attribute.o \
 	$(BUILD_DIR)/nc4f_nc_dataset.o \
-	$(BUILD_DIR)/nc4f_nc_dim.o \
-	$(BUILD_DIR)/nc4f_nc_err.o \
-	$(BUILD_DIR)/nc4f_nc_grp.o \
-	$(BUILD_DIR)/nc4f_nc_util.o \
-	$(BUILD_DIR)/nc4f_nc_var.o \
+	$(BUILD_DIR)/nc4f_nc_dimension.o \
+	$(BUILD_DIR)/nc4f_nc_error.o \
+	$(BUILD_DIR)/nc4f_nc_group.o \
+	$(BUILD_DIR)/nc4f_nc_utility.o \
+	$(BUILD_DIR)/nc4f_nc_variable.o \
 	$(BUILD_DIR)/nc4f.o
 
 TEST_FILES = \

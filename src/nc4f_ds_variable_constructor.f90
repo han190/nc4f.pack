@@ -1,4 +1,4 @@
-submodule(nc4f_data_struct) nc4f_data_struct_var_ctor
+submodule(nc4f_ds) nc4f_ds_variable_constructor
 implicit none (type, external)
 contains
 
@@ -3496,4 +3496,4 @@ module function new_var_char_15d(name, values, dims, atts, deep) result(var)
   call init_var_(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts, deep=.true.)
   if (size(values) > 0) var%buffer = transfer(values, 0_int8, size(var%buffer))
 end function new_var_char_15d
-end submodule nc4f_data_struct_var_ctor
+end submodule nc4f_ds_variable_constructor

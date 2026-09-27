@@ -1,5 +1,5 @@
 !> Shared validation for data-model storage and metadata.
-submodule(nc4f_data_struct) nc4f_data_struct_access
+submodule(nc4f_ds) nc4f_ds_access
 implicit none (type, external)
 contains
 
@@ -139,4 +139,4 @@ function buffer2cptr_(ilen, ibuffer, iptr) result(cptr)
   end if
 end function buffer2cptr_
 
-end submodule nc4f_data_struct_access
+end submodule nc4f_ds_access

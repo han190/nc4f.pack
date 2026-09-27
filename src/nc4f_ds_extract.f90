@@ -1,4 +1,4 @@
-submodule(nc4f_data_struct) nc4f_data_struct_extract
+submodule(nc4f_ds) nc4f_ds_extract
 implicit none (type, external)
 contains
 
@@ -2268,4 +2268,4 @@ pure function dtype2kind(dtype) result(kind_val)
   end select
 end function dtype2kind
 
-end submodule nc4f_data_struct_extract
+end submodule nc4f_ds_extract

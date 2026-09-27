@@ -1,4 +1,4 @@
-submodule(nc4f_nc) nc4f_nc_grp
+submodule(nc4f_nc) nc4f_nc_group
 implicit none (type, external)
 contains
 
@@ -384,4 +384,4 @@ pure logical function requested(default, flag)
   if (present(flag)) requested = flag
 end function requested
 
-end submodule nc4f_nc_grp
+end submodule nc4f_nc_group

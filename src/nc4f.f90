@@ -1,6 +1,6 @@
 module nc4f
 
-use, non_intrinsic :: nc4f_data_struct
+use, non_intrinsic :: nc4f_ds
 use, non_intrinsic :: nc4f_nc
 implicit none (type, external)
 

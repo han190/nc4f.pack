@@ -1,5 +1,5 @@
 !> Attribute construction and equality for the direct v2 data model.
-submodule(nc4f_data_struct) nc4f_data_struct_att
+submodule(nc4f_ds) nc4f_ds_attribute
 implicit none (type, external)
 contains
 
@@ -81,4 +81,4 @@ module elemental logical function neq_att(x, y) result(is_equal)
   is_equal = .not. eq_att(x, y)
 end function neq_att
 
-end submodule nc4f_data_struct_att
+end submodule nc4f_ds_attribute

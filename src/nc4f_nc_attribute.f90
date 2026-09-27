@@ -1,4 +1,4 @@
-submodule(nc4f_nc) nc4f_nc_att
+submodule(nc4f_nc) nc4f_nc_attribute
 implicit none (type, external)
 contains
 
@@ -209,4 +209,4 @@ subroutine put_atts_(ncid, varid, atts, context, err)
   end do
 end subroutine put_atts_
 
-end submodule nc4f_nc_att
+end submodule nc4f_nc_attribute

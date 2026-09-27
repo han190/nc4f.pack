@@ -1,5 +1,5 @@
 !> Deep-cloning helpers for the direct data model.
-submodule(nc4f_data_struct) nc4f_data_struct_clone
+submodule(nc4f_ds) nc4f_ds_clone
 implicit none(type, external)
 contains
 
@@ -95,4 +95,4 @@ subroutine clone_(obuffer, ibuffer, iptr)
   end if
 end subroutine clone_
 
-end submodule nc4f_data_struct_clone
+end submodule nc4f_ds_clone

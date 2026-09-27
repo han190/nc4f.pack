@@ -1,4 +1,4 @@
-submodule(nc4f_data_struct) nc4f_data_struct_dim
+submodule(nc4f_ds) nc4f_ds_dimension
 implicit none (type, external)
 contains
 
@@ -88,4 +88,4 @@ module elemental logical function neq_dim(x, y)
   neq_dim = .not. eq_dim(x, y)
 end function neq_dim
 
-end submodule nc4f_data_struct_dim
+end submodule nc4f_ds_dimension

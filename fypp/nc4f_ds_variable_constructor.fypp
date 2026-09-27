@@ -1,5 +1,5 @@
 #: include 'common.fypp'
-submodule(nc4f_data_struct) nc4f_data_struct_var_ctor
+submodule(nc4f_ds) nc4f_ds_variable_constructor
 implicit none (type, external)
 contains
 
@@ -65,4 +65,4 @@ module function new_var_char_${R}$d(name, values, dims, atts, deep) result(var)
   if (size(values) > 0) var%buffer = transfer(values, 0_int8, size(var%buffer))
 end function new_var_char_${R}$d${NEWLINE(not (R == MAX_RANK))}$
 #: endfor
-end submodule nc4f_data_struct_var_ctor
+end submodule nc4f_ds_variable_constructor

@@ -1,5 +1,5 @@
 !> ncdump-like formatted output for the direct v2 data model.
-submodule(nc4f_data_struct) nc4f_data_struct_io
+submodule(nc4f_ds) nc4f_ds_io
 implicit none (type, external)
 contains
 
@@ -721,4 +721,4 @@ subroutine type_name(dtype, name)
   end select
 end subroutine type_name
 
-end submodule nc4f_data_struct_io
+end submodule nc4f_ds_io

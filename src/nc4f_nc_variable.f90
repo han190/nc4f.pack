@@ -1,4 +1,4 @@
-submodule(nc4f_nc) nc4f_nc_var
+submodule(nc4f_nc) nc4f_nc_variable
 implicit none (type, external)
 contains
 
@@ -392,4 +392,4 @@ module function def_var(nc, var, err) result(new_var)
   if (allocated(var%atts)) new_var%atts = var%atts
 end function def_var
 
-end submodule nc4f_nc_var
+end submodule nc4f_nc_variable

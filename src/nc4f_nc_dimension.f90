@@ -1,4 +1,4 @@
-submodule(nc4f_nc) nc4f_nc_dim
+submodule(nc4f_nc) nc4f_nc_dimension
 implicit none (type, external)
 contains
 
@@ -141,4 +141,4 @@ module function def_dim(nc, dim, err) result(new_dim)
   new_dim = dimension_type(dimid, dim%name, dim%len, dim%is_unlim)
 end function def_dim
 
-end submodule nc4f_nc_dim
+end submodule nc4f_nc_dimension

@@ -1,5 +1,5 @@
 !> Variable construction, inquiry, and equality for the direct v2 data model.
-submodule(nc4f_data_struct) nc4f_data_struct_var
+submodule(nc4f_ds) nc4f_ds_variable
 implicit none (type, external)
 contains
 
@@ -161,4 +161,4 @@ module elemental logical function neq_var(x, y) result(is_equal)
   is_equal = .not. eq_var(x, y)
 end function neq_var
 
-end submodule nc4f_data_struct_var
+end submodule nc4f_ds_variable

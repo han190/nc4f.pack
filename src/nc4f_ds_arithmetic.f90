@@ -1,5 +1,5 @@
 !> Arithmetic on homogeneous variable collections.
-submodule(nc4f_data_struct) nc4f_data_struct_arith
+submodule(nc4f_ds) nc4f_ds_arithmetic
 implicit none (type, external)
 contains
 
@@ -104,4 +104,4 @@ module function sum_vars(vars) result(total)
   end select
 end function sum_vars
 
-end submodule nc4f_data_struct_arith
+end submodule nc4f_ds_arithmetic

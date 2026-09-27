@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: &
   & int8, int16, int32, int64, real32, real64
 use, intrinsic :: iso_c_binding
 use, non_intrinsic :: nc4f_c_interface
-use, non_intrinsic :: nc4f_data_struct
+use, non_intrinsic :: nc4f_ds
 implicit none (type, external)
 
 public :: &

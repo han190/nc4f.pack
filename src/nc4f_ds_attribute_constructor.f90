@@ -1,4 +1,4 @@
-submodule(nc4f_data_struct) nc4f_data_struct_att_ctor
+submodule(nc4f_ds) nc4f_ds_attribute_constructor
 implicit none (type, external)
 contains
 
@@ -139,4 +139,4 @@ module function new_att_character(name, value) result(att)
   if (len(value) > 0) att%buffer = transfer(value, 0_int8, size(att%buffer))
 end function new_att_character
 
-end submodule nc4f_data_struct_att_ctor
+end submodule nc4f_ds_attribute_constructor
