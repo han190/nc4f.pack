@@ -134,7 +134,7 @@ module subroutine group_write(passed)
   nc = open_netcdf(TEST_RESULTS_DIR//"group-root.nc", "r", err=err)
   if ((err%code /= NC_NOERR)) return
   call inquire_group(nc, inq_dims=.true., inq_atts=.true., &
-    & inq_vars=.true., inq_subgrps=.true., recursive=.true., err=err)
+    & inq_vars=.true., inq_grps=.true., recur=.true., err=err)
   if ((err%code /= NC_NOERR)) then
     call close_netcdf(nc)
     return
@@ -193,8 +193,8 @@ module subroutine group_write(passed)
     call close_netcdf(nc)
     return
   end if
-  call inquire_group(top_level(1), inq_subgrps=.true., &
-    & recursive=.true., err=err)
+  call inquire_group(top_level(1), inq_grps=.true., &
+    & recur=.true., err=err)
   if ((err%code /= NC_NOERR)) then
     call close_netcdf(nc)
     return

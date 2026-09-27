@@ -33,27 +33,28 @@ footer.bd-footer-content {
   padding-block: 0.1rem;
 }
 
-.bd-content .ind4 {
+.bd-content .ind3 {
   box-sizing: border-box;
   display: inline-block;
-  margin-left: 4em;
+  margin-left: 3em;
   vertical-align: top;
-  width: calc(100% - 4em);
+  width: calc(100% - 3em);
 }
 
-.bd-content .ind8 {
+.bd-content .ind6 {
   box-sizing: border-box;
   display: inline-block;
-  margin-left: 12em;
+  font-size: 0.9em;
+  margin-left: 10em;
   vertical-align: top;
-  width: calc(100% - 12em);
+  width: calc(100% - 10em);
 }
 
 .bd-content .grid {
   display: inline-grid;
-  grid-template-columns: 8em 30em;
+  grid-template-columns: 6em 30em;
   column-gap: 0em;
-  margin-left: 4em;
+  margin-left: 3em;
   vertical-align: baseline;
 }
 
@@ -62,8 +63,8 @@ footer.bd-footer-content {
 }
 
 .bd-content table.example-table .highlight-fortran {
-  margin-left: 4em;
-  width: calc(100% - 4em);
+  margin-left: 3em;
+  width: calc(100% - 3em);
 }
 
 .bd-content .highlight,

@@ -204,7 +204,7 @@ module subroutine nasa_cosp_read(passed)
     grps = inquire_subgroups(nc, err)
     if ((err%code /= NC_NOERR)) exit nasa_read
    call inquire_group(nc, inq_dims=.true., inq_atts=.true., &
-    & inq_vars=.true., inq_subgrps=.true., recursive=.true., err=err)
+    & inq_vars=.true., inq_grps=.true., recur=.true., err=err)
     if ((err%code /= NC_NOERR)) exit nasa_read
     open (newunit=file_unit, file=NETCDF_TYPE_RESULT_FILE, status="replace", &
       & action="write", iostat=iostat)
@@ -218,7 +218,7 @@ module subroutine nasa_cosp_read(passed)
     solar_zenith = get_group(nc, "Solar_Zenith", err)
     if ((err%code /= NC_NOERR)) exit nasa_read
     call inquire_group(solar_zenith, inq_dims=.true., &
-      & inq_atts=.true., inq_vars=.true., inq_subgrps=.true., err=err)
+      & inq_atts=.true., inq_vars=.true., inq_grps=.true., err=err)
     if ((err%code /= NC_NOERR)) exit nasa_read
 
     latitude_var = get_variable(nc, "latitude", err=err)
@@ -367,7 +367,7 @@ module subroutine sresa1b_ccsm3_read(passed)
     grps = inquire_subgroups(nc, err)
     if (err%code /= NC_NOERR) exit ccsm3_read
     call inquire_group(nc, inq_dims=.true., inq_atts=.true., &
-      & inq_vars=.true., inq_subgrps=.true., err=err)
+      & inq_vars=.true., inq_grps=.true., err=err)
     if (err%code /= NC_NOERR) exit ccsm3_read
     tas = get_variable(nc, "tas", err=err)
     if (err%code /= NC_NOERR) exit ccsm3_read
@@ -479,7 +479,7 @@ function render_sample_uddtio_(file, label, expected_dim, expected_var, &
   nc = open_netcdf(file, "r", err=err)
   if (.exists.err) return
   call inquire_group(nc, inq_dims=.true., inq_atts=.true., &
-    & inq_vars=.true., inq_subgrps=.true., recursive=.true., err=err)
+    & inq_vars=.true., inq_grps=.true., recur=.true., err=err)
   if (.exists.err) then
     call close_netcdf(nc)
     return
@@ -560,7 +560,7 @@ module subroutine cami_initial_read(passed)
     grps = inquire_subgroups(nc, err)
     if (err%code /= NC_NOERR) exit cami_read
     call inquire_group(nc, inq_dims=.true., inq_atts=.true., &
-      & inq_vars=.true., inq_subgrps=.true., err=err)
+      & inq_vars=.true., inq_grps=.true., err=err)
     if (err%code /= NC_NOERR) exit cami_read
     temperature = get_variable(nc, "T", err=err)
     if (err%code /= NC_NOERR) exit cami_read
@@ -623,7 +623,7 @@ module subroutine tos_o1_read(passed)
     grps = inquire_subgroups(nc, err)
     if (err%code /= NC_NOERR) exit tos_read
     call inquire_group(nc, inq_dims=.true., inq_atts=.true., &
-      & inq_vars=.true., inq_subgrps=.true., err=err)
+      & inq_vars=.true., inq_grps=.true., err=err)
     if (err%code /= NC_NOERR) exit tos_read
     tos = get_variable(nc, "tos", err=err)
     if (err%code /= NC_NOERR) exit tos_read
@@ -681,7 +681,7 @@ module subroutine echam_spectral_read(passed)
     grps = inquire_subgroups(nc, err)
     if (err%code /= NC_NOERR) exit echam_read
     call inquire_group(nc, inq_dims=.true., inq_atts=.true., &
-      & inq_vars=.true., inq_subgrps=.true., err=err)
+      & inq_vars=.true., inq_grps=.true., err=err)
     if (err%code /= NC_NOERR) exit echam_read
     lsp = get_variable(nc, "lsp", err=err)
     if (err%code /= NC_NOERR) exit echam_read

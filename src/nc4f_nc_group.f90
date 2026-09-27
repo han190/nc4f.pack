@@ -41,11 +41,11 @@ module function inquire_subgroups(parent, err) result(grps)
 end function inquire_subgroups
 
 !> Materialize selected metadata for a group.
-module recursive subroutine inquire_group(group, inq_dims, inq_atts, inq_vars, &
-  & inq_subgrps, recursive, err)
+module recursive subroutine inquire_group(group, &
+  & inq_dims, inq_atts, inq_vars, inq_grps, recur, err)
   class(group_type), intent(inout) :: group
-  logical, intent(in), optional :: inq_dims, inq_atts, inq_vars, inq_subgrps
-  logical, intent(in), optional :: recursive
+  logical, intent(in), optional :: inq_dims, inq_atts, inq_vars, inq_grps
+  logical, intent(in), optional :: recur
   type(error_type), intent(out), optional :: err
   type(error_type) :: op_err
   type(group_type), allocatable :: children(:)
@@ -55,8 +55,8 @@ module recursive subroutine inquire_group(group, inq_dims, inq_atts, inq_vars, &
   inqd = requested(.true., inq_dims)
   inqa = requested(.true., inq_atts)
   inqv = requested(.true., inq_vars)
-  recu = requested(.false., recursive)
-  inqg = requested(.true., inq_subgrps) .or. recu
+  recu = requested(.false., recur)
+  inqg = requested(.true., inq_grps) .or. recu
 
   op_err = error_type()
 
@@ -80,7 +80,7 @@ module recursive subroutine inquire_group(group, inq_dims, inq_atts, inq_vars, &
       do i = 1, size(group%grps)
         call inquire_group(group%grps(i), inq_dims=inqd, &
           & inq_atts=inqa, inq_vars=inqv, &
-          & inq_subgrps=.true., recursive=.true., err=op_err)
+          & inq_grps=.true., recur=.true., err=op_err)
         if (has_err(op_err)) exit
       end do
     end if
@@ -323,18 +323,18 @@ function inq_grps_(parent, err) result(grps)
 
   err = error_type()
   stat = nc_inq_grps(parent%id, ngroups, c_null_ptr)
-  err = netcdf_err(stat, "[inq_subgrps] Group count.")
+  err = netcdf_err(stat, "[inq_grps] Group count.")
   if (has_err(err)) return
   allocate (grps(ngroups), ids(ngroups))
   if (ngroups == 0) return
 
   stat = nc_inq_grps(parent%id, ngroups, c_loc(ids(1)))
-  err = netcdf_err(stat, "[inq_subgrps] Group identifiers.")
+  err = netcdf_err(stat, "[inq_grps] Group identifiers.")
   if (has_err(err)) return
   do i = 1, ngroups
     name = c_null_char
     stat = nc_inq_grpname(ids(i), name)
-    err = netcdf_err(stat, "[inq_subgrps] Group name.")
+    err = netcdf_err(stat, "[inq_grps] Group name.")
     if (has_err(err)) return
     grps(i)%id = ids(i)
     grps(i)%name = clip(c2fstr(name))

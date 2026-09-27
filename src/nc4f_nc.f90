@@ -63,10 +63,10 @@ interface
 
   !> Materialize selected metadata for a group.
   module recursive subroutine inquire_group(group, &
-    & inq_dims, inq_atts, inq_vars, inq_subgrps, recursive, err)
+    & inq_dims, inq_atts, inq_vars, inq_grps, recur, err)
     class(group_type), intent(inout) :: group
-    logical, intent(in), optional :: inq_dims, inq_atts, inq_vars, inq_subgrps
-    logical, intent(in), optional :: recursive
+    logical, intent(in), optional :: inq_dims, inq_atts, inq_vars, inq_grps
+    logical, intent(in), optional :: recur
     type(error_type), intent(out), optional :: err
   end subroutine inquire_group
 

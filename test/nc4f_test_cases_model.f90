@@ -136,7 +136,7 @@ module subroutine data_model(passed)
   nc = open_netcdf(TEST_RESULTS_DIR//"data_model.nc", err=err)
   if (err%code /= NC_NOERR) return
   call inquire_group(nc, inq_dims=.true., inq_atts=.true., &
-    & inq_vars=.true., inq_subgrps=.true., recursive=.true., err=err)
+    & inq_vars=.true., inq_grps=.true., recur=.true., err=err)
   if (err%code /= NC_NOERR) return
   restored_child = get_group(nc, "child", err)
   if (err%code /= NC_NOERR) return
