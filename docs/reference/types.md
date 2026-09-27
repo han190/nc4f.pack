@@ -1,67 +1,69 @@
 # Derived Types
 
-## Basic Types
-
 This library implements the [data structures](https://docs.unidata.ucar.edu/netcdf-c/4.10.0/netcdf_data_model.html)
-described on the NetCDF website. The basic types are:
-  * _Dimension type_: name, length, and if the dimension is unlimited;
-    ```fortran
-    type :: dimension_type
-      integer(c_int) :: id
-      character(len=:), allocatable :: name
-      integer(int64) :: len
-      logical :: is_unlim
-    end type dimension_type
-    ```
-  * _Attribute type_: name and a 1D generic (integer, float, character, ...) array;
-    ```fortran
-    type :: attribute_type
-      integer(c_int) :: id
-      character(len=:), allocatable :: name
-      integer(data_type) :: dtype
-      integer(int64) :: len
-      integer(int8), allocatable :: buffer(:)
-      integer(int8), contiguous, pointer :: ptr(:)
-    end type attribute_type
-    ```
-  * _Variable type_: name, dimensions, attributes, and an ND generic (integer, float, character, ...) array;
-    ```fortran
-    type :: variable_type
-      integer(c_int) :: id
-      character(len=:), allocatable :: name
-      integer(data_type) :: dtype
-      integer(int64) :: len
-      type(dimension_type), allocatable :: dims(:)
-      type(attribute_type), allocatable :: atts(:)
-      integer(int8), allocatable :: buffer(:)
-      integer(int8), contiguous, pointer :: ptr(:)
-    end type variable_type
-    ```
-  * _Group type_: name, dimensions, attributes, variables and nested groups;
-    ```fortran
-    type :: group_type
-      integer(c_int) :: id
-      character(len=:), allocatable :: name
-      type(dimension_type), allocatable :: dims(:)
-      type(attribute_type), allocatable :: atts(:)
-      type(variable_type), allocatable :: vars(:)
-      type(group_type), pointer :: grps(:)
-    end type group_type
-    ```
-  * _NetCDF type_: the root group that also contains metadata like file and I/O mode;
-    ```fortran
-    type, extends(group_type) :: netcdf_type
-      character(len=:), allocatable :: file
-      integer(c_int) :: mode
-    end type netcdf_type
-    ```
-  * _Error type_: this is a library specific type for handling errors.
-    ```fortran
-    type error_type
-      integer(c_int) :: code
-      character(len=:), allocatable :: msg
-    end type error_type
-    ```
+described by the NetCDF data model.
+
+## `DIMENSION_TYPE` -- NetCDF Dimension
+
+| Component |
+|:--|
+| <span class="grid"><span>`ID`</span><span>`integer(c_int)`</span></span><br><span class="ind6">NetCDF dimension identifier.</span> |
+| <span class="grid"><span>`NAME`</span><span>`character(len=:), allocatable`</span></span><br><span class="ind6">Dimension name.</span> |
+| <span class="grid"><span>`LEN`</span><span>`integer(int64)`</span></span><br><span class="ind6">Dimension length.</span> |
+| <span class="grid"><span>`IS_UNLIM`</span><span>`logical`</span></span><br><span class="ind6">Whether the dimension is unlimited.</span> |
+
+## `ATTRIBUTE_TYPE` -- NetCDF Attribute
+
+| Component |
+|:--|
+| <span class="grid"><span>`ID`</span><span>`integer(c_int)`</span></span><br><span class="ind6">NetCDF attribute identifier.</span> |
+| <span class="grid"><span>`NAME`</span><span>`character(len=:), allocatable`</span></span><br><span class="ind6">Attribute name.</span> |
+| <span class="grid"><span>`DTYPE`</span><span>`integer(data_type)`</span></span><br><span class="ind6">NetCDF external data type.</span> |
+| <span class="grid"><span>`LEN`</span><span>`integer(int64)`</span></span><br><span class="ind6">Number of stored values.</span> |
+| <span class="grid"><span>`BUFFER`</span><span>`integer(int8), allocatable`</span></span><br><span class="ind6">Owned byte storage for copied values.</span> |
+| <span class="grid"><span>`PTR`</span><span>`integer(int8), contiguous, pointer`</span></span><br><span class="ind6">Borrowed byte storage for contiguous caller-owned values.</span> |
+
+## `VARIABLE_TYPE` -- NetCDF Variable
+
+| Component |
+|:--|
+| <span class="grid"><span>`ID`</span><span>`integer(c_int)`</span></span><br><span class="ind6">NetCDF variable identifier.</span> |
+| <span class="grid"><span>`NAME`</span><span>`character(len=:), allocatable`</span></span><br><span class="ind6">Variable name.</span> |
+| <span class="grid"><span>`DTYPE`</span><span>`integer(data_type)`</span></span><br><span class="ind6">NetCDF external data type.</span> |
+| <span class="grid"><span>`LEN`</span><span>`integer(int64)`</span></span><br><span class="ind6">Total number of stored values.</span> |
+| <span class="grid"><span>`DIMS`</span><span>`type(dimension_type), allocatable`</span></span><br><span class="ind6">Dimensions in Fortran order.</span> |
+| <span class="grid"><span>`ATTS`</span><span>`type(attribute_type), allocatable`</span></span><br><span class="ind6">Attributes attached to the variable.</span> |
+| <span class="grid"><span>`BUFFER`</span><span>`integer(int8), allocatable`</span></span><br><span class="ind6">Owned byte storage for copied values.</span> |
+| <span class="grid"><span>`PTR`</span><span>`integer(int8), contiguous, pointer`</span></span><br><span class="ind6">Borrowed byte storage for contiguous caller-owned values.</span> |
+
+## `GROUP_TYPE` -- NetCDF Group
+
+| Component |
+|:--|
+| <span class="grid"><span>`ID`</span><span>`integer(c_int)`</span></span><br><span class="ind6">NetCDF group identifier.</span> |
+| <span class="grid"><span>`NAME`</span><span>`character(len=:), allocatable`</span></span><br><span class="ind6">Group name.</span> |
+| <span class="grid"><span>`DIMS`</span><span>`type(dimension_type), allocatable`</span></span><br><span class="ind6">Dimensions defined by the group.</span> |
+| <span class="grid"><span>`ATTS`</span><span>`type(attribute_type), allocatable`</span></span><br><span class="ind6">Attributes attached to the group.</span> |
+| <span class="grid"><span>`VARS`</span><span>`type(variable_type), allocatable`</span></span><br><span class="ind6">Variables defined by the group.</span> |
+| <span class="grid"><span>`GRPS`</span><span>`type(group_type), pointer`</span></span><br><span class="ind6">Child groups, shared through pointer association.</span> |
+
+## `NETCDF_TYPE` -- NetCDF Root Group
+
+| Extends |
+|:--|
+| <span class="ind3">`GROUP_TYPE`</span> |
+
+| Component |
+|:--|
+| <span class="grid"><span>`FILE`</span><span>`character(len=:), allocatable`</span></span><br><span class="ind6">Path of the open NetCDF file.</span> |
+| <span class="grid"><span>`MODE`</span><span>`integer(c_int)`</span></span><br><span class="ind6">NetCDF file access mode.</span> |
+
+## `ERROR_TYPE` -- Operation Error Result
+
+| Component |
+|:--|
+| <span class="grid"><span>`CODE`</span><span>`integer(c_int)`</span></span><br><span class="ind6">NetCDF status code; zero indicates success.</span> |
+| <span class="grid"><span>`MSG`</span><span>`character(len=:), allocatable`</span></span><br><span class="ind6">Diagnostic message for a failed operation.</span> |
 
 ## Supported NetCDF Types
 
@@ -69,7 +71,7 @@ The currently supported and unsupported [NetCDF types](https://docs.unidata.ucar
 - &#x2611; Supported: `CHAR`, `BYTE`, `SHORT`, `INT`, `INT64`, `FLOAT`, `DOUBLE`
 - &#x2612; Unsupported: `UNSIGNED BYTE`, `UNSIGNED SHORT`, `UNSIGNED INT`, `UNSIGNED INT64`, `STRING`
 
-## Constructions
+<!-- ## Constructions
 
 This library provides operators and generic functions that simplifies the 
 construction of these derived types. Let's go through them one by one.
@@ -103,7 +105,7 @@ Internally a `dimension_argument_type` is formed by `(24 .and. UNLIMITED)`, this
 Attribute type variables are constructed through the operator `.att.`. The first argument has to be a string and the second argument is generic.
 
 ```fortran
-type(attribute_type), allocatable :: atts(:)
+type(attribute_type), allocatable
 
 atts = ["units" .att. "Kelvin", &
         "description" .att. "Sea Surface Temperature", &
@@ -168,4 +170,4 @@ One can initialize a `variable_type` by explicitly providing all metadata requir
 ### Group and NetCDF type
 
 The group type is a nested structure, since by [design](https://docs.unidata.ucar.edu/netcdf-c/4.10.0/netcdf_data_model.html) a group may have a subgroup. 
-Every NetCDF4 file contains at least one group. This is sometimes referred to as the [root group](https://unidata.github.io/netcdf4-python/).
+Every NetCDF4 file contains at least one group. This is sometimes referred to as the [root group](https://unidata.github.io/netcdf4-python/). -->
