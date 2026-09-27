@@ -1,6 +1,6 @@
 # A First Program
 
-All examples can be imported from the model `nc4f`
+All APIs can be imported from the module `nc4f`
 
 ```fortran
 use, non_intrinsic :: nc4f

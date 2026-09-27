@@ -79,16 +79,39 @@ Constants](exposed-nc-constants.md) for constants used with `error_type`.
 *
   -
     ```fortran
-    use, non_intrinsic :: nc4f
-    implicit none (type, external)
-    
-    type(dimension_type) :: time
-    type(variable_type) :: var
-    real, target :: values(3) = [273.15, 274.15, 275.15]
+    program main
 
-    time = "time" .dim. 3
-    var = datarray("temperature", values, [time], &
-      & atts=["units".att."K"])
+      use, non_intrinsic :: nc4f
+      implicit none (type, external)
+
+      type(dimension_type) :: lon, lat, tme
+      type(variable_type) :: var
+      logical, parameter :: UNLIMITED = .true.
+      real, allocatable, target :: values(:, :, :)
+      integer :: nlon, nlat, ntme, i, j, k
+
+      nlon = 360
+      nlat = 181
+      ntme = 24
+
+      allocate (values(ntme, nlat, nlon))
+      do concurrent (i = 1:ntme, j = 1:nlat, k = 1:nlon)
+        values(i, j, k) = 0. !> Dummy values
+      end do
+
+      var = datarray("temperature", values,                 &
+        dims=["time" .dim. (ntme .and. UNLIMITED),          &
+              "latitude" .dim. nlat,                        &
+              "longitude" .dim. nlon],                      &
+        atts=["units" .att. "K",                            &
+              "description" .att. "Temperature in Kelvin",  &
+              "missing value" .att. -1],                    &
+        deep=.false.)
+
+      print *, var
+      call to_netcdf("var.nc", var)
+
+    end program main
     ```
 :::
 

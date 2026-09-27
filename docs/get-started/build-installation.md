@@ -1,21 +1,23 @@
 # Build and Installation
 
-`nc4f` requires a modern Fortran compiler, the NetCDF C headers and library,
-and `pkg-config`. The NetCDF Fortran library is not required.
+`NC4F` requires a modern Fortran compiler and the NetCDF C library. 
+The NetCDF Fortran library is not required. The tested Fortran compilers are:
+- gfortran >= 15
+- llvm flang >= 23
 
 ## Build and test with fpm
 
 From a checkout of this repository, build and run the test suite with:
 
 ```sh
-fpm test --profile debug --flag "$(pkg-config --cflags --libs netcdf)"
+fpm test --compiler gfortran --profile debug --flag "$(pkg-config --cflags --libs netcdf)"
 ```
 
 Generated NetCDF test artifacts are written to `build/test-results/`.
 
-## Use nc4f as an fpm dependency
+## Use NC4F as an fpm dependency
 
-Add `nc4f` to the consuming package's `fpm.toml`, then link the NetCDF C
+Add `NC4F` to the consuming package's `fpm.toml`, then link the NetCDF C
 library in that package:
 
 ```toml
