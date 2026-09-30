@@ -5,6 +5,8 @@ small in-memory model for NetCDF dimensions, attributes, variables, and groups.
 The library calls the NetCDF C API directly, thus the NetCDF Fortran library is
 not required.
 
+## What NC4F Can Do
+
 This repository is not intended to replace the NetCDF Fortran library or
 well-established wrappers such as
 [nc4fortran](https://github.com/geospace-code/nc4fortran) and
@@ -21,6 +23,16 @@ an [xarray](https://xarray.dev/)-like programming style in modern Fortran that:
 
 Additionally, this library implements user-defined derived-type I/O procedures
 that allow users to output NetCDF metadata in a format similar to `ncdump -h`.
+
+## What NC4F Cannot Do
+
+I began NC4F as a personal project, so NC4F is intentionally designed to focus on a small subset of the NetCDF data model. It does not currently support:
+
+- user-defined types, the NetCDF `STRING` type and unsigned primitive types described in [data model](https://docs.unidata.ucar.edu/netcdf-c/4.10.0/netcdf_data_model.html);
+- NetCDF-4 storage controls, including [chunking](https://docs.unidata.ucar.edu/nug/current/netcdf_perf_chunking.html), compression, shuffle/checksum filters, endianness, and custom fill values;
+- parallel, in-memory, or diskless I/O;
+- advanced variable access, such as mapped or multi-slab I/O and strided writes; or
+- metadata mutation operations, such as renaming or deleting dimensions, variables, groups, and attributes.
 
 Give it a try if you are interested!
 
@@ -67,7 +79,6 @@ Create a variable from a Fortran array, then write it as a new file:
 
 ```fortran
 program write_example
-
   use, non_intrinsic :: nc4f
   implicit none (type, external)
 
@@ -76,7 +87,6 @@ program write_example
 
   temp = datarray("temperature", values, ["time".dim.3])
   call to_netcdf("example.nc", temp)
-
 end program write_example
 ```
 
@@ -87,7 +97,6 @@ file when it is no longer needed:
 
 ```fortran
 program read_example
-
   use, non_intrinsic :: nc4f
   implicit none (type, external)
 
@@ -99,6 +108,5 @@ program read_example
   temp = get_variable(nc, "temperature")
   call extract(temp, values)
   call close_netcdf(nc)
-
 end program read_example
 ```
