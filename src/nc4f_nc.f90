@@ -69,7 +69,7 @@ interface
   end function inquire_subgroups
 
   !> Materialize selected metadata for a group.
-  module recursive subroutine inquire_group(group, &
+  recursive module subroutine inquire_group(group, &
     & inq_dims, inq_atts, inq_vars, inq_grps, recur, err)
     !> Dataset group to process.
     class(group_type), intent(inout) :: group
@@ -82,7 +82,7 @@ interface
   end subroutine inquire_group
 
   !> Read a global attribute by name and return it.
-  module impure elemental function get_att_grp(nc, name, err) result(att)
+  impure elemental module function get_att_grp(nc, name, err) result(att)
     !> High-level `netcdf_type` representing the open file.
     class(group_type), intent(in) :: nc
     !> Name of the global attribute to read.
@@ -130,7 +130,7 @@ interface
   end function get_atts_var
 
   !> Return true when two `attribute_type` values are identical.
-  module elemental logical function eq_att(x, y)
+  logical elemental module function eq_att(x, y)
     !> Left-hand attribute to compare.
     type(attribute_type), intent(in) :: x
     !> Right-hand attribute to compare.
@@ -138,7 +138,7 @@ interface
   end function eq_att
 
   !> Return true when two `attribute_type` values differ.
-  module elemental logical function neq_att(x, y)
+  logical elemental module function neq_att(x, y)
     !> Left-hand attribute to compare.
     type(attribute_type), intent(in) :: x
     !> Right-hand attribute to compare.
@@ -217,7 +217,7 @@ interface
   !> submodule_utility.f90
 
   !> Apply the library's fail-fast policy to a completed error result.
-  module impure logical function handle_err(err) result(has_failed)
+  logical impure module function handle_err(err) result(has_failed)
     !> Completed result of an nc4f operation.
     type(error_type), intent(in) :: err
   end function handle_err
@@ -233,13 +233,13 @@ interface
   end function netcdf_err
 
   !> Return true when `err` represents a failed operation.
-  module pure elemental logical function has_err(err) result(is_err)
+  logical elemental module function has_err(err) result(is_err)
     !> Completed result of an nc4f operation.
     type(error_type), intent(in) :: err
   end function has_err
 
   !> Trim left and right space of a character variable.
-  module pure function clip(string) result(clipped)
+  pure module function clip(string) result(clipped)
     !> The input string.
     character(len=*), intent(in) :: string
     !> The output string.
@@ -247,7 +247,7 @@ interface
   end function clip
 
   !> Convert a NUL-terminated C string to a Fortran allocatable string.
-  module pure function c2fstr(cstr) result(fstr)
+  pure module function c2fstr(cstr) result(fstr)
     !> C-style NUL-terminated string to convert.
     character(kind=c_char, len=*), intent(in) :: cstr
     !> Fortran allocatable result string.
@@ -255,7 +255,7 @@ interface
   end function c2fstr
 
   !> Convert a Fortran string to a NUL-terminated C string.
-  module pure function f2cstr(fstr) result(cstr)
+  pure module function f2cstr(fstr) result(cstr)
     !> Fortran string to convert.
     character(len=*), intent(in) :: fstr
     !> NUL-terminated C string result.
@@ -263,13 +263,13 @@ interface
   end function f2cstr
 
   !> Allocate a fresh byte buffer for an attribute read from a NetCDF file.
-  module subroutine initialize_att(att)
+  pure module subroutine initialize_att(att)
     !> Attribute to process.
     type(attribute_type), intent(inout) :: att
   end subroutine initialize_att
 
   !> Allocate a fresh byte buffer for a variable read from a NetCDF file.
-  module subroutine initialize_var(var)
+  pure module subroutine initialize_var(var)
     !> Variable to process.
     type(variable_type), intent(inout) :: var
   end subroutine initialize_var
@@ -295,7 +295,7 @@ interface
   end function get_variable
 
   !> Inquire a variable's metadata without reading its data buffer.
-  module impure elemental function inquire_variable(nc, name, err) result(var)
+  impure elemental module function inquire_variable(nc, name, err) result(var)
     !> High-level `netcdf_type` representing the open file.
     class(group_type), intent(in) :: nc
     !> Name of the variable to inquire.

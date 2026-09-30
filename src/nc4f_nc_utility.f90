@@ -3,7 +3,7 @@ implicit none (type, external)
 contains
 
 !> Allocate a fresh byte buffer for an attribute read from a NetCDF file.
-module subroutine initialize_att(att)
+pure module subroutine initialize_att(att)
   !> Attribute to process.
   type(attribute_type), intent(inout) :: att
   integer :: nbytes
@@ -15,7 +15,7 @@ module subroutine initialize_att(att)
 end subroutine initialize_att
 
 !> Allocate a fresh byte buffer for a variable read from a NetCDF file.
-module subroutine initialize_var(var)
+pure module subroutine initialize_var(var)
   !> Variable to process.
   type(variable_type), intent(inout) :: var
   integer :: nbytes
@@ -27,7 +27,7 @@ module subroutine initialize_var(var)
 end subroutine initialize_var
 
 !> Trim space from both ends of a character string.
-module pure function clip(string) result(clipped)
+pure module function clip(string) result(clipped)
   !> Data or metadata used by this operation.
   character(len=*), intent(in) :: string
   !> String with trailing blanks removed.
@@ -37,7 +37,7 @@ module pure function clip(string) result(clipped)
 end function clip
 
 !> Convert a NUL-terminated C string into a Fortran string.
-module pure function c2fstr(cstr) result(fstr)
+pure module function c2fstr(cstr) result(fstr)
   !> Data or metadata used by this operation.
   character(kind=c_char, len=*), intent(in) :: cstr
   !> Fortran string converted from C storage.
@@ -52,7 +52,7 @@ module pure function c2fstr(cstr) result(fstr)
 end function c2fstr
 
 !> Convert a Fortran string into a NUL-terminated C string.
-module pure function f2cstr(fstr) result(cstr)
+pure module function f2cstr(fstr) result(cstr)
   !> Data or metadata used by this operation.
   character(len=*), intent(in) :: fstr
   !> C-compatible string converted from Fortran text.

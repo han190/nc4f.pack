@@ -194,7 +194,7 @@ end interface dataset
 
 interface
   !> Initialize a dataset object.
-  module subroutine init_att(att, name, dtype, len)
+  elemental module subroutine init_att(att, name, dtype, len)
     !> Attribute to process.
     type(attribute_type), intent(inout) :: att
     !> Name used to identify the NetCDF object.
@@ -222,7 +222,7 @@ interface
   end subroutine init_var
 
   !> Initialize a dataset object.
-  module subroutine init_att_(att, name, dtype, len, deep)
+  elemental module subroutine init_att_(att, name, dtype, len, deep)
     !> Attribute to process.
     type(attribute_type), intent(inout) :: att
     !> Name used to identify the NetCDF object.
@@ -352,7 +352,7 @@ interface
   end subroutine new_dataset_
 
   !> Clone a dataset object and its data.
-  module impure elemental subroutine clone_att(src, dest)
+  impure elemental module subroutine clone_att(src, dest)
     !> Source object or group to read from.
     type(attribute_type), intent(in) :: src
     !> Destination object or group to update.
@@ -360,7 +360,7 @@ interface
   end subroutine clone_att
 
   !> Clone a dataset object and its data.
-  module impure elemental subroutine clone_var(src, dest)
+  impure elemental module subroutine clone_var(src, dest)
     !> Source object or group to read from.
     type(variable_type), intent(in) :: src
     !> Destination object or group to update.
@@ -368,7 +368,7 @@ interface
   end subroutine clone_var
 
   !> Clone a dataset object and its data.
-  module impure elemental subroutine clone_grp(src, dest)
+  impure elemental module subroutine clone_grp(src, dest)
     !> Source object or group to read from.
     type(group_type), intent(in) :: src
     !> Destination object or group to update.
@@ -376,7 +376,7 @@ interface
   end subroutine clone_grp
 
   !> Validate dataset buffer metadata before access.
-  module pure subroutine validate_att(att, dtype, context)
+  pure module subroutine validate_att(att, dtype, context)
     !> Attribute to process.
     type(attribute_type), intent(in) :: att
     !> Data or metadata used by this operation.
@@ -386,7 +386,7 @@ interface
   end subroutine validate_att
 
   !> Validate dataset buffer metadata before access.
-  module pure subroutine validate_var(var, dtype, rank, context)
+  pure module subroutine validate_var(var, dtype, rank, context)
     !> Variable to process.
     type(variable_type), intent(in) :: var
     !> Data or metadata used by this operation.
@@ -510,7 +510,7 @@ interface
   end subroutine write_frmt_err
 
   !> Construct a dataset object from the supplied metadata and data.
-  module elemental function new_dim_len_int32(name, len) result(dim)
+  elemental module function new_dim_len_int32(name, len) result(dim)
     !> Name used to identify the NetCDF object.
     character(len=*), intent(in) :: name
     !> Data or metadata used by this operation.
@@ -520,7 +520,7 @@ interface
   end function new_dim_len_int32
 
   !> Construct a dataset object from the supplied metadata and data.
-  module elemental function new_dim_len_int64(name, len) result(dim)
+  elemental module function new_dim_len_int64(name, len) result(dim)
     !> Name used to identify the NetCDF object.
     character(len=*), intent(in) :: name
     !> Data or metadata used by this operation.
@@ -530,7 +530,7 @@ interface
   end function new_dim_len_int64
 
   !> Construct a dataset object from the supplied metadata and data.
-  module elemental function new_dim_arg_int32(len, is_unlim) result(arg)
+  elemental module function new_dim_arg_int32(len, is_unlim) result(arg)
     !> Data or metadata used by this operation.
     integer(int32), intent(in) :: len
     !> Data or metadata used by this operation.
@@ -540,7 +540,7 @@ interface
   end function new_dim_arg_int32
 
   !> Construct a dataset object from the supplied metadata and data.
-  module elemental function new_dim_arg_int64(len, is_unlim) result(arg)
+  elemental module function new_dim_arg_int64(len, is_unlim) result(arg)
     !> Data or metadata used by this operation.
     integer(int64), intent(in) :: len
     !> Data or metadata used by this operation.
@@ -550,7 +550,7 @@ interface
   end function new_dim_arg_int64
 
   !> Construct a dataset object from the supplied metadata and data.
-  module elemental function new_dim_args(name, args) result(dim)
+  elemental module function new_dim_args(name, args) result(dim)
     !> Name used to identify the NetCDF object.
     character(len=*), intent(in) :: name
     !> Data or metadata used by this operation.
@@ -559,32 +559,32 @@ interface
     type(dimension_type) :: dim
   end function new_dim_args
 
-  module elemental logical function eq_dim(x, y)
+  logical elemental module function eq_dim(x, y)
     type(dimension_type), intent(in) :: x, y
   end function eq_dim
 
-  module elemental logical function neq_dim(x, y)
+  logical elemental module function neq_dim(x, y)
     type(dimension_type), intent(in) :: x, y
   end function neq_dim
 
-  module elemental logical function eq_att(x, y) result(is_equal)
+  logical elemental module function eq_att(x, y) result(is_equal)
     type(attribute_type), intent(in) :: x, y
   end function eq_att
 
-  module elemental logical function neq_att(x, y) result(is_equal)
+  logical elemental module function neq_att(x, y) result(is_equal)
     type(attribute_type), intent(in) :: x, y
   end function neq_att
 
-  module elemental logical function eq_var(x, y) result(is_equal)
+  logical elemental module function eq_var(x, y) result(is_equal)
     type(variable_type), intent(in) :: x, y
   end function eq_var
 
-  module elemental logical function neq_var(x, y) result(is_equal)
+  logical elemental module function neq_var(x, y) result(is_equal)
     type(variable_type), intent(in) :: x, y
   end function neq_var
 
   !> Query and return requested NetCDF metadata.
-  module pure function get_size(var, dim) result(n)
+  pure module function get_size(var, dim) result(n)
     !> Variable to process.
     type(variable_type), intent(in) :: var
     !> Dimension to process.
@@ -594,7 +594,7 @@ interface
   end function get_size
 
   !> Query and return requested NetCDF metadata.
-  module pure function get_shape(var) result(extents)
+  pure module function get_shape(var) result(extents)
     !> Variable to process.
     type(variable_type), intent(in) :: var
     !> Result produced by this operation.
@@ -610,7 +610,7 @@ interface
   end function sum_vars
 
   !> Perform the buffer_size operation.
-  module pure function buffer_size(dtype, len, context) result(nbytes)
+  pure module function buffer_size(dtype, len, context) result(nbytes)
     !> Data or metadata used by this operation.
     integer(data_type), intent(in) :: dtype
     !> Data or metadata used by this operation.

@@ -3,7 +3,7 @@ implicit none (type, external)
 contains
 
 !> Return true when `err` represents a failed operation.
-module pure elemental logical function has_err(err) result(is_err)
+logical elemental module function has_err(err) result(is_err)
   !> Completed result of an nc4f operation.
   type(error_type), intent(in) :: err
 
@@ -11,7 +11,7 @@ module pure elemental logical function has_err(err) result(is_err)
 end function has_err
 
 !> Apply nc4f's fail-fast policy to a completed error result.
-module impure logical function handle_err(err) result(has_failed)
+logical impure module function handle_err(err) result(has_failed)
   !> Completed result of an nc4f operation.
   type(error_type), intent(in) :: err
 

@@ -37,7 +37,7 @@ module subroutine init_var_mold(var, name, mold, atts, deep)
 end subroutine init_var_mold
 
 !> Return the element count of a variable or one of its dimensions.
-module pure function get_size(var, dim) result(n)
+pure module function get_size(var, dim) result(n)
   !> Variable to process.
   type(variable_type), intent(in) :: var
   !> Dimension to process.
@@ -73,7 +73,7 @@ module pure function get_size(var, dim) result(n)
 end function get_size
 
 !> Return variable dimension lengths in their stored Fortran order.
-module pure function get_shape(var) result(extents)
+pure module function get_shape(var) result(extents)
   !> Variable to process.
   type(variable_type), intent(in) :: var
   !> Result produced by this operation.
@@ -92,7 +92,7 @@ module pure function get_shape(var) result(extents)
 end function get_shape
 
 !> Return true when two variables have identical metadata and byte values.
-module elemental logical function eq_var(x, y) result(is_equal)
+logical elemental module function eq_var(x, y) result(is_equal)
   !> Dataset objects or values used by this operation.
   type(variable_type), intent(in) :: x, y
 
@@ -154,7 +154,7 @@ module elemental logical function eq_var(x, y) result(is_equal)
 end function eq_var
 
 !> Return true when two variables differ.
-module elemental logical function neq_var(x, y) result(is_equal)
+logical elemental module function neq_var(x, y) result(is_equal)
   !> Dataset objects or values used by this operation.
   type(variable_type), intent(in) :: x, y
 

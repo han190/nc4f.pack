@@ -331,7 +331,7 @@ function render_atts(grp, indent) result(text)
 end function render_atts
 
 !> Append a text fragment to a dynamically grown character buffer.
-subroutine append(buffer, used, fragment)
+pure subroutine append(buffer, used, fragment)
   !> Storage for the text accumulated so far.
   character, allocatable, intent(inout) :: buffer(:)
   !> Number of occupied characters in `buffer`.
@@ -359,7 +359,7 @@ subroutine append(buffer, used, fragment)
 end subroutine append
 
 !> Return the final path component of a file without its final extension.
-function filename_stem(file) result(stem)
+pure function filename_stem(file) result(stem)
   !> Path of the NetCDF file to read or write.
   character(len=*), intent(in) :: file
   !> Result produced by this operation.
@@ -384,7 +384,7 @@ function filename_stem(file) result(stem)
 end function filename_stem
 
 !> Compute `render_dim`.
-function render_dim(dim, indent) result(line)
+pure function render_dim(dim, indent) result(line)
   !> Dimension to process.
   type(dimension_type), intent(in) :: dim
   !> Data or metadata used by this operation.
@@ -482,7 +482,7 @@ function render_att_value(att) result(rendered)
 end function render_att_value
 
 !> Render a character attribute as a quoted string.
-function render_char_values(values) result(text)
+pure function render_char_values(values) result(text)
   !> Values used to populate the dataset object.
   character, intent(in) :: values(:)
   !> Result produced by this operation.
@@ -531,7 +531,7 @@ function render_char_values(values) result(text)
 end function render_char_values
 
 !> Render integer(kind=int8) attribute values.
-function render_int8_values(values) result(text)
+pure function render_int8_values(values) result(text)
   !> Values used to populate the dataset object.
   integer(int8), intent(in) :: values(:)
   !> Rendered NetCDF text.
@@ -548,7 +548,7 @@ function render_int8_values(values) result(text)
 end function render_int8_values
 
 !> Render integer(kind=int16) attribute values.
-function render_int16_values(values) result(text)
+pure function render_int16_values(values) result(text)
   !> Values used to populate the dataset object.
   integer(int16), intent(in) :: values(:)
   !> Rendered NetCDF text.
@@ -565,7 +565,7 @@ function render_int16_values(values) result(text)
 end function render_int16_values
 
 !> Render integer(kind=int32) attribute values.
-function render_int32_values(values) result(text)
+pure function render_int32_values(values) result(text)
   !> Values used to populate the dataset object.
   integer(int32), intent(in) :: values(:)
   !> Rendered NetCDF text.
@@ -582,7 +582,7 @@ function render_int32_values(values) result(text)
 end function render_int32_values
 
 !> Render integer(kind=int64) attribute values.
-function render_int64_values(values) result(text)
+pure function render_int64_values(values) result(text)
   !> Values used to populate the dataset object.
   integer(int64), intent(in) :: values(:)
   !> Rendered NetCDF text.
@@ -599,7 +599,7 @@ function render_int64_values(values) result(text)
 end function render_int64_values
 
 !> Render real(kind=real32) attribute values.
-function render_real32_values(values) result(text)
+pure function render_real32_values(values) result(text)
   !> Values used to populate the dataset object.
   real(real32), intent(in) :: values(:)
   !> Rendered NetCDF text.
@@ -616,7 +616,7 @@ function render_real32_values(values) result(text)
 end function render_real32_values
 
 !> Render real(kind=real64) attribute values.
-function render_real64_values(values) result(text)
+pure function render_real64_values(values) result(text)
   !> Values used to populate the dataset object.
   real(real64), intent(in) :: values(:)
   !> Rendered NetCDF text.
@@ -636,7 +636,7 @@ end function render_real64_values
 !>
 !> An integral finite value retains one digit after its decimal point. Any
 !> exponent suffix is retained without modification.
-function trim_trailing_zeros(text) result(trimmed)
+pure function trim_trailing_zeros(text) result(trimmed)
   !> Text to render or normalize.
   character(len=*), intent(in) :: text
   !> Result produced by this operation.
@@ -708,7 +708,7 @@ function render_var(var, indent) result(line)
 end function render_var
 
 !> Execute `type_name`.
-subroutine type_name(dtype, name)
+pure subroutine type_name(dtype, name)
   !> Dataset data type code to validate or translate.
   integer(data_type), intent(in) :: dtype
   !> Name used to identify the NetCDF object.

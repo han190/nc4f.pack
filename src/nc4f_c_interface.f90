@@ -74,7 +74,7 @@ integer(c_int), parameter :: NC_STRING = 12_c_int ! N/A
 
 interface
   !> Return the length of a NUL-terminated C string.
-  function c_strlen(str) bind(c, name="strlen") result(length)
+  pure function c_strlen(str) bind(c, name="strlen") result(length)
     import :: c_ptr, c_size_t
     !> Data or metadata used by this operation.
     type(c_ptr), value :: str

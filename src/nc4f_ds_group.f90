@@ -4,7 +4,7 @@ implicit none (type, external)
 contains
 
 !> Initialize an owning attribute buffer.
-module subroutine init_att(att, name, dtype, len)
+elemental module subroutine init_att(att, name, dtype, len)
   !> Attribute to process.
   type(attribute_type), intent(inout) :: att
   !> Name used to identify the NetCDF object.
@@ -18,7 +18,7 @@ module subroutine init_att(att, name, dtype, len)
 end subroutine init_att
 
 !> Initialize attribute metadata and optionally allocate an owning buffer.
-module subroutine init_att_(att, name, dtype, len, deep)
+elemental module subroutine init_att_(att, name, dtype, len, deep)
   !> Attribute to process.
   type(attribute_type), intent(inout) :: att
   !> Name used to identify the NetCDF object.

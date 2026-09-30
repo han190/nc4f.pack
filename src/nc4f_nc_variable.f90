@@ -157,7 +157,7 @@ function get_var_(nc, name, start, count, stride, err) result(var)
 end function get_var_
 
 !> Inquire a variable's metadata without reading its data buffer.
-module impure elemental function inquire_variable(nc, name, err) result(var)
+impure elemental module function inquire_variable(nc, name, err) result(var)
   !> Group containing the variable.
   class(group_type), intent(in) :: nc
   !> Name of the variable to inquire.

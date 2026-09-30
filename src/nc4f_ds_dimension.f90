@@ -3,7 +3,7 @@ implicit none (type, external)
 contains
 
 !> Construct unlimited-dimension arguments from a 32-bit length.
-module elemental function new_dim_arg_int32(len, is_unlim) result(arg)
+elemental module function new_dim_arg_int32(len, is_unlim) result(arg)
   !> Length of the dimension or attribute.
   integer(int32), intent(in) :: len
   !> Whether the dimension is unlimited.
@@ -16,7 +16,7 @@ module elemental function new_dim_arg_int32(len, is_unlim) result(arg)
 end function new_dim_arg_int32
 
 !> Construct unlimited-dimension arguments from a 64-bit length.
-module elemental function new_dim_arg_int64(len, is_unlim) result(arg)
+elemental module function new_dim_arg_int64(len, is_unlim) result(arg)
   !> Length of the dimension or attribute.
   integer(int64), intent(in) :: len
   !> Whether the dimension is unlimited.
@@ -29,7 +29,7 @@ module elemental function new_dim_arg_int64(len, is_unlim) result(arg)
 end function new_dim_arg_int64
 
 !> Construct a dimension from a 32-bit length.
-module elemental function new_dim_len_int32(name, len) result(dim)
+elemental module function new_dim_len_int32(name, len) result(dim)
   !> Name used to identify the NetCDF object.
   character(len=*), intent(in) :: name
   !> Length of the dimension or attribute.
@@ -42,7 +42,7 @@ module elemental function new_dim_len_int32(name, len) result(dim)
 end function new_dim_len_int32
 
 !> Construct a dimension from a 64-bit length.
-module elemental function new_dim_len_int64(name, len) result(dim)
+elemental module function new_dim_len_int64(name, len) result(dim)
   !> Name used to identify the NetCDF object.
   character(len=*), intent(in) :: name
   !> Length of the dimension or attribute.
@@ -55,7 +55,7 @@ module elemental function new_dim_len_int64(name, len) result(dim)
 end function new_dim_len_int64
 
 !> Construct a dimension with an explicit unlimited flag.
-module elemental function new_dim_args(name, args) result(dim)
+elemental module function new_dim_args(name, args) result(dim)
   !> Name used to identify the NetCDF object.
   character(len=*), intent(in) :: name
   !> Data or metadata used by this operation.
@@ -69,7 +69,7 @@ module elemental function new_dim_args(name, args) result(dim)
 end function new_dim_args
 
 !> Return true when two dimensions have identical metadata.
-module elemental logical function eq_dim(x, y)
+logical elemental module function eq_dim(x, y)
   !> Dataset objects or values used by this operation.
   type(dimension_type), intent(in) :: x, y
 
@@ -81,7 +81,7 @@ module elemental logical function eq_dim(x, y)
 end function eq_dim
 
 !> Return true when two dimensions have different metadata.
-module elemental logical function neq_dim(x, y)
+logical elemental module function neq_dim(x, y)
   !> Dataset objects or values used by this operation.
   type(dimension_type), intent(in) :: x, y
 

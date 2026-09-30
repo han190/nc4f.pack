@@ -5,7 +5,7 @@ contains
 
 #: for D, T, K in zip(dtypes, types, kinds)
 !> Create an `attribute_type` from an array of `${T}$` of kind `${K}$`.
-module function new_att_${K}$(name, values) result(att)
+pure module function new_att_${K}$(name, values) result(att)
   !> Name used to identify the NetCDF object.
   character(len=*), intent(in) :: name
   !> Values used to populate the attribute.
@@ -18,7 +18,7 @@ module function new_att_${K}$(name, values) result(att)
 end function new_att_${K}$
 
 !> Create a scalar `attribute_type` from a `${T}$` value.
-module function new_att_${K}$_scalar(name, value) result(att)
+elemental module function new_att_${K}$_scalar(name, value) result(att)
   !> Name used to identify the NetCDF object.
   character(len=*), intent(in) :: name
   !> Scalar value stored in the attribute.

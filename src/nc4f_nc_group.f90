@@ -41,7 +41,7 @@ module function inquire_subgroups(parent, err) result(grps)
 end function inquire_subgroups
 
 !> Materialize selected metadata for a group.
-module recursive subroutine inquire_group(group, &
+recursive module subroutine inquire_group(group, &
   & inq_dims, inq_atts, inq_vars, inq_grps, recur, err)
   !> Dataset group to process.
   class(group_type), intent(inout) :: group
@@ -378,7 +378,7 @@ function inq_vars_(group, err) result(vars)
 end function inq_vars_
 
 !> Return the value of an optional logical inquiry flag.
-pure logical function requested(default, flag)
+logical elemental function requested(default, flag)
   !> Data or metadata used by this operation.
   logical, intent(in) :: default
   !> Data or metadata used by this operation.

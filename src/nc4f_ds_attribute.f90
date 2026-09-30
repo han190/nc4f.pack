@@ -30,7 +30,7 @@ module subroutine init_att_mold(att, name, mold, deep)
 end subroutine init_att_mold
 
 !> Return true when two attributes have identical metadata and byte values.
-module elemental logical function eq_att(x, y) result(is_equal)
+logical elemental module function eq_att(x, y) result(is_equal)
   !> Dataset objects or values used by this operation.
   type(attribute_type), intent(in) :: x, y
 
@@ -74,7 +74,7 @@ module elemental logical function eq_att(x, y) result(is_equal)
 end function eq_att
 
 !> Return true when two attributes differ.
-module elemental logical function neq_att(x, y) result(is_equal)
+logical elemental module function neq_att(x, y) result(is_equal)
   !> Dataset objects or values used by this operation.
   type(attribute_type), intent(in) :: x, y
 

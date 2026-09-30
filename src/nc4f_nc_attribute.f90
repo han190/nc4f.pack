@@ -3,7 +3,7 @@ implicit none (type, external)
 contains
 
 !> Read a global attribute by name and return it.
-module impure elemental function get_att_grp(nc, name, err) result(att)
+impure elemental module function get_att_grp(nc, name, err) result(att)
   !> Dataset or group containing the global attribute.
   class(group_type), intent(in) :: nc
   !> Name of the global attribute to read.

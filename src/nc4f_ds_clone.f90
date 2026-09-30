@@ -4,7 +4,7 @@ implicit none(type, external)
 contains
 
 !> Execute `clone_grp`.
-module impure elemental subroutine clone_grp(src, dest)
+impure elemental module subroutine clone_grp(src, dest)
   !> Source object or group to read from.
   type(group_type), intent(in) :: src
   !> Destination object or group to update.
@@ -41,7 +41,7 @@ recursive subroutine clone_grp_(src, dest)
 end subroutine clone_grp_
 
 !> Execute `clone_var`.
-module impure elemental subroutine clone_var(src, dest)
+impure elemental module subroutine clone_var(src, dest)
   !> Source object or group to read from.
   type(variable_type), intent(in) :: src
   !> Destination object or group to update.
@@ -62,7 +62,7 @@ module impure elemental subroutine clone_var(src, dest)
 end subroutine clone_var
 
 !> Execute `clone_att`.
-module impure elemental subroutine clone_att(src, dest)
+impure elemental module subroutine clone_att(src, dest)
   !> Source object or group to read from.
   type(attribute_type), intent(in) :: src
   !> Destination object or group to update.
@@ -78,7 +78,7 @@ module impure elemental subroutine clone_att(src, dest)
 end subroutine clone_att
 
 !> Clone owned or borrowed bytes into an owned output buffer.
-subroutine clone_(obuffer, ibuffer, iptr)
+pure subroutine clone_(obuffer, ibuffer, iptr)
   !> Output owned byte buffer.
   integer(int8), allocatable, intent(out) :: obuffer(:)
   !> Input owned byte buffer.
