@@ -110,13 +110,13 @@ end function inq_dims_
 
 !> Define a dimension, preserving `NC_EBADDIM` as the expected create path.
 module function def_dim(nc, dim, err) result(new_dim)
-  !> Input argument(s): `nc`.
+  !> Open NetCDF dataset handle.
   class(group_type), intent(in) :: nc
-  !> Input argument(s): `dim`.
+  !> Dimension to process.
   type(dimension_type), intent(in) :: dim
-  !> Output argument(s): `err`.
+  !> Error object updated if the operation fails.
   type(error_type), intent(out) :: err
-  !> Return value: `new_dim`.
+  !> Result produced by this operation.
   type(dimension_type) :: new_dim
   integer(c_int) :: stat, dimid
   integer(c_size_t) :: len

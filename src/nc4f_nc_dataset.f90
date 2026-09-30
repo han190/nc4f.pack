@@ -25,13 +25,13 @@ end function open_netcdf
 
 !> Open or create a dataset and construct the operation result.
 function open_netcdf_(file, mode, err) result(nc)
-  !> Input argument(s): `file`.
+  !> Path of the NetCDF file to read or write.
   character(len=*), intent(in) :: file
-  !> Input argument(s): `mode`.
+  !> Data or metadata used by this operation.
   character(len=*), intent(in), optional :: mode
-  !> Output argument(s): `err`.
+  !> Error object updated if the operation fails.
   type(error_type), intent(out) :: err
-  !> Return value: `nc`.
+  !> Result produced by this operation.
   type(netcdf_type) :: nc
   character(len=MAX_CHAR_LEN) :: msg, open_mode
   integer(c_int) :: stat
@@ -85,7 +85,7 @@ end function open_netcdf_
 module subroutine close_netcdf(nc, err)
   !> `netcdf_type` representing the open dataset to close.
   type(netcdf_type), intent(inout) :: nc
-  !> Output argument(s): `err`.
+  !> Error object updated if the operation fails.
   type(error_type), intent(out), optional :: err
   type(error_type) :: op_err
 
@@ -99,9 +99,9 @@ end subroutine close_netcdf
 
 !> Close a dataset and construct the operation result.
 subroutine close_netcdf_(nc, err)
-  !> Input/output argument(s): `nc`.
+  !> Open NetCDF dataset handle.
   type(netcdf_type), intent(inout) :: nc
-  !> Output argument(s): `err`.
+  !> Error object updated if the operation fails.
   type(error_type), intent(out) :: err
   integer(c_int) :: stat
 

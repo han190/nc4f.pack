@@ -5,17 +5,17 @@ contains
 
 !> Execute `write_frmt_dim`.
 module subroutine write_frmt_dim(dim, unit, iotype, v_list, iostat, iomsg)
-  !> Input argument: `dim`.
+  !> Dimension to process.
   class(dimension_type), intent(in) :: dim
-  !> Input argument: `unit`.
+  !> Data or metadata used by this operation.
   integer, intent(in) :: unit
-  !> Input argument: `iotype`.
+  !> Data or metadata used by this operation.
   character(len=*), intent(in) :: iotype
-  !> Input argument: `v_list`.
+  !> Data or metadata used by this operation.
   integer, intent(in) :: v_list(:)
-  !> Output argument: `iostat`.
+  !> Data or metadata used by this operation.
   integer, intent(out) :: iostat
-  !> Input/output argument: `iomsg`.
+  !> Data or metadata used by this operation.
   character(len=*), intent(inout) :: iomsg
 
   associate (ignored_v_list => v_list)
@@ -35,17 +35,17 @@ end subroutine write_frmt_dim
 
 !> Execute `write_frmt_att`.
 module subroutine write_frmt_att(att, unit, iotype, v_list, iostat, iomsg)
-  !> Input argument: `att`.
+  !> Attribute to process.
   class(attribute_type), intent(in) :: att
-  !> Input argument: `unit`.
+  !> Data or metadata used by this operation.
   integer, intent(in) :: unit
-  !> Input argument: `iotype`.
+  !> Data or metadata used by this operation.
   character(len=*), intent(in) :: iotype
-  !> Input argument: `v_list`.
+  !> Data or metadata used by this operation.
   integer, intent(in) :: v_list(:)
-  !> Output argument: `iostat`.
+  !> Data or metadata used by this operation.
   integer, intent(out) :: iostat
-  !> Input/output argument: `iomsg`.
+  !> Data or metadata used by this operation.
   character(len=*), intent(inout) :: iomsg
   character(len=16) :: dtype
   character(len=:), allocatable :: value
@@ -62,17 +62,17 @@ end subroutine write_frmt_att
 
 !> Execute `write_frmt_var`.
 module subroutine write_frmt_var(var, unit, iotype, v_list, iostat, iomsg)
-  !> Input argument: `var`.
+  !> Variable to process.
   class(variable_type), intent(in) :: var
-  !> Input argument: `unit`.
+  !> Data or metadata used by this operation.
   integer, intent(in) :: unit
-  !> Input argument: `iotype`.
+  !> Data or metadata used by this operation.
   character(len=*), intent(in) :: iotype
-  !> Input argument: `v_list`.
+  !> Data or metadata used by this operation.
   integer, intent(in) :: v_list(:)
-  !> Output argument: `iostat`.
+  !> Data or metadata used by this operation.
   integer, intent(out) :: iostat
-  !> Input/output argument: `iomsg`.
+  !> Data or metadata used by this operation.
   character(len=*), intent(inout) :: iomsg
   character(len=:), allocatable :: text
 
@@ -86,17 +86,17 @@ end subroutine write_frmt_var
 
 !> Execute `write_frmt_grp`.
 module subroutine write_frmt_grp(grp, unit, iotype, v_list, iostat, iomsg)
-  !> Input argument: `grp`.
+  !> Data or metadata used by this operation.
   class(group_type), intent(in) :: grp
-  !> Input argument: `unit`.
+  !> Data or metadata used by this operation.
   integer, intent(in) :: unit
-  !> Input argument: `iotype`.
+  !> Data or metadata used by this operation.
   character(len=*), intent(in) :: iotype
-  !> Input argument: `v_list`.
+  !> Data or metadata used by this operation.
   integer, intent(in) :: v_list(:)
-  !> Output argument: `iostat`.
+  !> Data or metadata used by this operation.
   integer, intent(out) :: iostat
-  !> Input/output argument: `iomsg`.
+  !> Data or metadata used by this operation.
   character(len=*), intent(inout) :: iomsg
   character(len=:), allocatable :: text
 
@@ -110,17 +110,17 @@ end subroutine write_frmt_grp
 
 !> Execute `write_frmt_netcdf`.
 module subroutine write_frmt_netcdf(grp, unit, iotype, v_list, iostat, iomsg)
-  !> Input argument: `grp`.
+  !> Data or metadata used by this operation.
   class(netcdf_type), intent(in) :: grp
-  !> Input argument: `unit`.
+  !> Data or metadata used by this operation.
   integer, intent(in) :: unit
-  !> Input argument: `iotype`.
+  !> Data or metadata used by this operation.
   character(len=*), intent(in) :: iotype
-  !> Input argument: `v_list`.
+  !> Data or metadata used by this operation.
   integer, intent(in) :: v_list(:)
-  !> Output argument: `iostat`.
+  !> Data or metadata used by this operation.
   integer, intent(out) :: iostat
-  !> Input/output argument: `iomsg`.
+  !> Data or metadata used by this operation.
   character(len=*), intent(inout) :: iomsg
   character(len=:), allocatable :: text
 
@@ -134,17 +134,17 @@ end subroutine write_frmt_netcdf
 
 !> Write an operation result in formatted derived-type I/O.
 module subroutine write_frmt_err(err, unit, iotype, v_list, iostat, iomsg)
-  !> Input argument: `err`.
+  !> Error object updated if the operation fails.
   class(error_type), intent(in) :: err
-  !> Input argument: `unit`.
+  !> Data or metadata used by this operation.
   integer, intent(in) :: unit
-  !> Input argument: `iotype`.
+  !> Data or metadata used by this operation.
   character(len=*), intent(in) :: iotype
-  !> Input argument: `v_list`.
+  !> Data or metadata used by this operation.
   integer, intent(in) :: v_list(:)
-  !> Output argument: `iostat`.
+  !> Data or metadata used by this operation.
   integer, intent(out) :: iostat
-  !> Input/output argument: `iomsg`.
+  !> Data or metadata used by this operation.
   character(len=*), intent(inout) :: iomsg
 
   associate (ignored_v_list => v_list)
@@ -169,11 +169,11 @@ end subroutine write_frmt_err
 
 !> Compute `render_grp`.
 recursive function render_grp(grp, depth) result(text)
-  !> Input argument: `grp`.
+  !> Data or metadata used by this operation.
   class(group_type), intent(in) :: grp
-  !> Input argument: `depth`.
+  !> Data or metadata used by this operation.
   integer, intent(in) :: depth
-  !> Return value: `text`.
+  !> Result produced by this operation.
   character(len=:), allocatable :: text
   character(len=:), allocatable :: indent, name
 
@@ -188,9 +188,9 @@ end function render_grp
 
 !> Compute the ncdump-like representation of an open NetCDF dataset.
 function render_netcdf(nc) result(text)
-  !> Input argument: `nc`.
+  !> Open NetCDF dataset handle.
   type(netcdf_type), intent(in) :: nc
-  !> Return value: `text`.
+  !> Result produced by this operation.
   character(len=:), allocatable :: text
   character(len=:), allocatable :: name
 
@@ -203,13 +203,13 @@ end function render_netcdf
 
 !> Compute the contents of a group in ncdump-like formatted output.
 recursive function render_grp_(grp, indent, depth) result(text)
-  !> Input argument: `grp`.
+  !> Data or metadata used by this operation.
   class(group_type), intent(in) :: grp
-  !> Input argument: `indent`.
+  !> Data or metadata used by this operation.
   character(len=*), intent(in) :: indent
-  !> Input argument: `depth`.
+  !> Data or metadata used by this operation.
   integer, intent(in) :: depth
-  !> Return value: `text`.
+  !> Result produced by this operation.
   character(len=:), allocatable :: text
   character, allocatable :: buffer(:)
   integer :: i, used
@@ -239,11 +239,11 @@ end function render_grp_
 
 !> Compute the dimensions section of a group in ncdump-like formatted output.
 function render_dims(grp, indent) result(text)
-  !> Input argument: `grp`.
+  !> Data or metadata used by this operation.
   class(group_type), intent(in) :: grp
-  !> Input argument: `indent`.
+  !> Data or metadata used by this operation.
   character(len=*), intent(in) :: indent
-  !> Return value: `text`.
+  !> Result produced by this operation.
   character(len=:), allocatable :: text
   character, allocatable :: buffer(:)
   integer :: i, used
@@ -270,11 +270,11 @@ end function render_dims
 
 !> Compute the variables section of a group in ncdump-like formatted output.
 function render_vars(grp, indent) result(text)
-  !> Input argument: `grp`.
+  !> Data or metadata used by this operation.
   class(group_type), intent(in) :: grp
-  !> Input argument: `indent`.
+  !> Data or metadata used by this operation.
   character(len=*), intent(in) :: indent
-  !> Return value: `text`.
+  !> Result produced by this operation.
   character(len=:), allocatable :: text
   character, allocatable :: buffer(:)
   integer :: i, used
@@ -301,11 +301,11 @@ end function render_vars
 
 !> Compute the attributes section of a group in ncdump-like formatted output.
 function render_atts(grp, indent) result(text)
-  !> Input argument: `grp`.
+  !> Data or metadata used by this operation.
   class(group_type), intent(in) :: grp
-  !> Input argument: `indent`.
+  !> Data or metadata used by this operation.
   character(len=*), intent(in) :: indent
-  !> Return value: `text`.
+  !> Result produced by this operation.
   character(len=:), allocatable :: text
   character, allocatable :: buffer(:)
   integer :: i, used
@@ -360,9 +360,9 @@ end subroutine append
 
 !> Return the final path component of a file without its final extension.
 function filename_stem(file) result(stem)
-  !> Input argument: `file`.
+  !> Path of the NetCDF file to read or write.
   character(len=*), intent(in) :: file
-  !> Return value: `stem`.
+  !> Result produced by this operation.
   character(len=:), allocatable :: stem
   integer :: base, extension, filename_len
 
@@ -385,11 +385,11 @@ end function filename_stem
 
 !> Compute `render_dim`.
 function render_dim(dim, indent) result(line)
-  !> Input argument: `dim`.
+  !> Dimension to process.
   type(dimension_type), intent(in) :: dim
-  !> Input argument: `indent`.
+  !> Data or metadata used by this operation.
   character(len=*), intent(in) :: indent
-  !> Return value: `line`.
+  !> Result produced by this operation.
   character(len=:), allocatable :: line
   character(len=64) :: len_text
 
@@ -405,11 +405,11 @@ end function render_dim
 
 !> Compute `render_att`.
 function render_att(att, indent) result(line)
-  !> Input argument: `att`.
+  !> Attribute to process.
   type(attribute_type), intent(in) :: att
-  !> Input argument: `indent`.
+  !> Data or metadata used by this operation.
   character(len=*), intent(in) :: indent
-  !> Return value: `line`.
+  !> Result produced by this operation.
   character(len=:), allocatable :: line
   character(len=16) :: dtype
 
@@ -419,9 +419,9 @@ end function render_att
 
 !> Render an attribute buffer as an ncdump-like literal.
 function render_att_value(att) result(rendered)
-  !> Input argument: `att`.
+  !> Attribute to process.
   type(attribute_type), target, intent(in) :: att
-  !> Return value: `value`.
+  !> Rendered NetCDF text.
   character(len=:), allocatable :: rendered
   character, allocatable :: chars(:)
   integer(int8), allocatable :: int8_values(:)
@@ -483,9 +483,9 @@ end function render_att_value
 
 !> Render a character attribute as a quoted string.
 function render_char_values(values) result(text)
-  !> Input argument: `values`.
+  !> Values used to populate the dataset object.
   character, intent(in) :: values(:)
-  !> Return value: `text`.
+  !> Result produced by this operation.
   character(len=:), allocatable :: text
   integer :: i, last, position, text_len
 
@@ -504,6 +504,7 @@ function render_char_values(values) result(text)
     end select
   end do
 
+  !> Rendered NetCDF text.
   allocate (character(len=text_len) :: text)
   text(1:1) = '"'
   position = 2
@@ -531,7 +532,9 @@ end function render_char_values
 
 !> Render integer(kind=int8) attribute values.
 function render_int8_values(values) result(text)
+  !> Values used to populate the dataset object.
   integer(int8), intent(in) :: values(:)
+  !> Rendered NetCDF text.
   character(len=:), allocatable :: text
   character(len=64) :: item
   integer :: i
@@ -546,7 +549,9 @@ end function render_int8_values
 
 !> Render integer(kind=int16) attribute values.
 function render_int16_values(values) result(text)
+  !> Values used to populate the dataset object.
   integer(int16), intent(in) :: values(:)
+  !> Rendered NetCDF text.
   character(len=:), allocatable :: text
   character(len=64) :: item
   integer :: i
@@ -561,7 +566,9 @@ end function render_int16_values
 
 !> Render integer(kind=int32) attribute values.
 function render_int32_values(values) result(text)
+  !> Values used to populate the dataset object.
   integer(int32), intent(in) :: values(:)
+  !> Rendered NetCDF text.
   character(len=:), allocatable :: text
   character(len=64) :: item
   integer :: i
@@ -576,7 +583,9 @@ end function render_int32_values
 
 !> Render integer(kind=int64) attribute values.
 function render_int64_values(values) result(text)
+  !> Values used to populate the dataset object.
   integer(int64), intent(in) :: values(:)
+  !> Rendered NetCDF text.
   character(len=:), allocatable :: text
   character(len=64) :: item
   integer :: i
@@ -591,7 +600,9 @@ end function render_int64_values
 
 !> Render real(kind=real32) attribute values.
 function render_real32_values(values) result(text)
+  !> Values used to populate the dataset object.
   real(real32), intent(in) :: values(:)
+  !> Rendered NetCDF text.
   character(len=:), allocatable :: text
   character(len=64) :: item
   integer :: i
@@ -606,7 +617,9 @@ end function render_real32_values
 
 !> Render real(kind=real64) attribute values.
 function render_real64_values(values) result(text)
+  !> Values used to populate the dataset object.
   real(real64), intent(in) :: values(:)
+  !> Rendered NetCDF text.
   character(len=:), allocatable :: text
   character(len=64) :: item
   integer :: i
@@ -624,9 +637,9 @@ end function render_real64_values
 !> An integral finite value retains one digit after its decimal point. Any
 !> exponent suffix is retained without modification.
 function trim_trailing_zeros(text) result(trimmed)
-  !> Input argument: `text`.
+  !> Text to render or normalize.
   character(len=*), intent(in) :: text
-  !> Return value: `trimmed`.
+  !> Result produced by this operation.
   character(len=:), allocatable :: trimmed
   character(len=:), allocatable :: exponent, mantissa
   integer :: decimal_at, exponent_at, last
@@ -664,11 +677,11 @@ end function trim_trailing_zeros
 
 !> Compute `render_var`.
 function render_var(var, indent) result(line)
-  !> Input argument: `var`.
+  !> Variable to process.
   type(variable_type), intent(in) :: var
-  !> Input argument: `indent`.
+  !> Data or metadata used by this operation.
   character(len=*), intent(in) :: indent
-  !> Return value: `line`.
+  !> Result produced by this operation.
   character(len=:), allocatable :: line
   character(len=16) :: dtype
   character(len=:), allocatable :: dims
@@ -696,9 +709,9 @@ end function render_var
 
 !> Execute `type_name`.
 subroutine type_name(dtype, name)
-  !> Input argument: `dtype`.
+  !> Dataset data type code to validate or translate.
   integer(data_type), intent(in) :: dtype
-  !> Output argument: `name`.
+  !> Name used to identify the NetCDF object.
   character(len=*), intent(out) :: name
 
   select case (dtype)

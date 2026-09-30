@@ -5,11 +5,11 @@ contains
 
 !> Validate an attribute's metadata and active byte storage.
 pure module subroutine validate_att(att, dtype, context)
-  !> Input argument: `att`.
+  !> Attribute to process.
   type(attribute_type), intent(in) :: att
-  !> Input argument: `dtype`.
+  !> Dataset data type code to validate or translate.
   integer(data_type), intent(in), optional :: dtype
-  !> Input argument: `context`.
+  !> Context included in a validation or error message.
   character(len=*), intent(in) :: context
   integer(int64) :: ptr_size
 
@@ -21,13 +21,13 @@ end subroutine validate_att
 
 !> Validate a variable's metadata and active byte storage.
 pure module subroutine validate_var(var, dtype, rank, context)
-  !> Input argument: `var`.
+  !> Variable to process.
   type(variable_type), intent(in) :: var
-  !> Input argument: `dtype`.
+  !> Dataset data type code to validate or translate.
   integer(data_type), intent(in), optional :: dtype
-  !> Input argument: `rank`.
+  !> Expected number of variable dimensions.
   integer, intent(in), optional :: rank
-  !> Input argument: `context`.
+  !> Context included in a validation or error message.
   character(len=*), intent(in) :: context
   integer(int64) :: ptr_size
 
@@ -97,9 +97,9 @@ end subroutine validate_
 
 !> Return the C address of an attribute's active byte storage.
 module function buffer2cptr_att(att) result(cptr)
-  !> Input argument: `att`.
+  !> Attribute to process.
   type(attribute_type), target, intent(in) :: att
-  !> Return value: `cptr`.
+  !> C pointer to the requested byte buffer.
   type(c_ptr) :: cptr
 
   call validate(att, context="[buffer2cptr_att]")
@@ -108,9 +108,9 @@ end function buffer2cptr_att
 
 !> Return the C address of a variable's active byte storage.
 module function buffer2cptr_var(var) result(cptr)
-  !> Input argument: `var`.
+  !> Variable to process.
   type(variable_type), target, intent(in) :: var
-  !> Return value: `cptr`.
+  !> C pointer to the requested byte buffer.
   type(c_ptr) :: cptr
 
   call validate(var, context="[buffer2cptr_var]")

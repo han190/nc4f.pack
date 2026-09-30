@@ -6,8 +6,11 @@ contains
 #: for D, T, K in zip(dtypes, types, kinds)
 !> Create an `attribute_type` from an array of `${T}$` of kind `${K}$`.
 module function new_att_${K}$(name, values) result(att)
+  !> Name used to identify the NetCDF object.
   character(len=*), intent(in) :: name
+  !> Values used to populate the attribute.
   ${T}$(${K}$), intent(in) :: values(:)
+  !> Constructed attribute containing the supplied values.
   type(attribute_type) :: att
 
   call init_att(att, name, ${D}$, size(values, kind=int64))
@@ -16,8 +19,11 @@ end function new_att_${K}$
 
 !> Create a scalar `attribute_type` from a `${T}$` value.
 module function new_att_${K}$_scalar(name, value) result(att)
+  !> Name used to identify the NetCDF object.
   character(len=*), intent(in) :: name
+  !> Scalar value stored in the attribute.
   ${T}$(${K}$), intent(in) :: value
+  !> Constructed single-value attribute.
   type(attribute_type) :: att
   ${T}$(${K}$) :: tmp(1)
 
@@ -28,8 +34,11 @@ end function new_att_${K}$_scalar${NEWLINE()}$
 
 !> Create an `attribute_type` containing character data.
 module function new_att_character(name, value) result(att)
+  !> Name used to identify the NetCDF object.
   character(len=*), intent(in) :: name
+  !> Character data stored in the attribute.
   character(len=*), intent(in) :: value
+  !> Constructed attribute containing the character data.
   type(attribute_type) :: att
 
   call init_att(att, name, CHAR_TYPE, len(value, kind=int64))

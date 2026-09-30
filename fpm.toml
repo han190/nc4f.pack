@@ -17,6 +17,11 @@ library = true
 [library]
 source-dir = "src"
 
+[[example]]
+name = "mandelbrot"
+source-dir = "example"
+main = "mandelbrot.f90"
+
 [[test]]
 name = "test-suite"
 source-dir = "test"

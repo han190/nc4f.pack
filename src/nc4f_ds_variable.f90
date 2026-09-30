@@ -5,11 +5,11 @@ contains
 
 !> Initialize a variable from a name and existing shape/type metadata.
 module subroutine init_var_mold(var, name, mold, atts, deep)
-  !> Input/output argument: `var`.
+  !> Variable to process.
   type(variable_type), intent(inout) :: var
   !> Name for the new variable.
   character(len=*), intent(in) :: name
-  !> Input argument: `mold`.
+  !> Data or metadata used by this operation.
   type(variable_type), target, intent(in) :: mold
   !> Optional attributes for the new variable.
   type(attribute_type), intent(in), optional :: atts(:)
@@ -38,11 +38,11 @@ end subroutine init_var_mold
 
 !> Return the element count of a variable or one of its dimensions.
 module pure function get_size(var, dim) result(n)
-  !> Input argument: `var`.
+  !> Variable to process.
   type(variable_type), intent(in) :: var
-  !> Input argument: `dim`.
+  !> Dimension to process.
   integer, intent(in), optional :: dim
-  !> Return value: `n`.
+  !> Result produced by this operation.
   integer(int64) :: n
   integer :: dim_, i
 
@@ -74,9 +74,9 @@ end function get_size
 
 !> Return variable dimension lengths in their stored Fortran order.
 module pure function get_shape(var) result(extents)
-  !> Input argument: `var`.
+  !> Variable to process.
   type(variable_type), intent(in) :: var
-  !> Return value: `extents`.
+  !> Result produced by this operation.
   integer, allocatable :: extents(:)
   integer :: i
 
@@ -93,7 +93,7 @@ end function get_shape
 
 !> Return true when two variables have identical metadata and byte values.
 module elemental logical function eq_var(x, y) result(is_equal)
-  !> Input arguments: `x` and `y`.
+  !> Dataset objects or values used by this operation.
   type(variable_type), intent(in) :: x, y
 
   call validate(x, context="[eq_var]")
@@ -155,7 +155,7 @@ end function eq_var
 
 !> Return true when two variables differ.
 module elemental logical function neq_var(x, y) result(is_equal)
-  !> Input arguments: `x` and `y`.
+  !> Dataset objects or values used by this operation.
   type(variable_type), intent(in) :: x, y
 
   is_equal = .not. eq_var(x, y)

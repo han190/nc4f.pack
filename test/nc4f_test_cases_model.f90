@@ -9,7 +9,7 @@ contains
 
 !> Execute `data_model`.
 module subroutine data_model(passed)
-  !> Input/output argument: `passed`.
+  !> Whether the test case has passed.
   logical, intent(inout) :: passed
   type(attribute_type) :: atts(1), cloned_att
   type(dimension_type) :: dim

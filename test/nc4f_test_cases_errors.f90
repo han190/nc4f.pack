@@ -6,7 +6,7 @@ contains
 
 !> Execute `creation_policy`.
 module subroutine creation_policy(passed)
-  !> Input/output argument(s): `passed`.
+  !> Whether the test case has passed.
   logical, intent(inout) :: passed
   real, parameter :: values(1) = [42.0]
   type(error_type) :: err
@@ -40,7 +40,7 @@ end subroutine creation_policy
 
 !> Execute `error_handling`.
 module subroutine error_handling(passed)
-  !> Input/output argument(s): `passed`.
+  !> Whether the test case has passed.
   logical, intent(inout) :: passed
   real, parameter :: values(1) = [42.0]
   character(len=1024) :: stdout

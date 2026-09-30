@@ -5,9 +5,9 @@ contains
 
 !> Return the element-wise sum of compatible variables in `vars`.
 module function sum_vars(vars) result(total)
-  !> Input argument: `vars`.
+  !> Variables to process or add to the dataset.
   type(variable_type), intent(in) :: vars(:)
-  !> Return value: `total`.
+  !> Total number of data elements.
   type(variable_type) :: total
   integer :: i
   integer(int64) :: j

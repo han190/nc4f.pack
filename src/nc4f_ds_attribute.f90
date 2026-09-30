@@ -5,11 +5,11 @@ contains
 
 !> Initialize an attribute from a name and existing value metadata.
 module subroutine init_att_mold(att, name, mold, deep)
-  !> Input/output argument: `att`.
+  !> Attribute to process.
   type(attribute_type), intent(inout) :: att
   !> Name for the new attribute.
   character(len=*), intent(in) :: name
-  !> Input argument: `mold`.
+  !> Data or metadata used by this operation.
   type(attribute_type), target, intent(in) :: mold
   !> Whether to allocate an owning data buffer or borrow the mold's storage.
   logical, intent(in), optional :: deep
@@ -31,7 +31,7 @@ end subroutine init_att_mold
 
 !> Return true when two attributes have identical metadata and byte values.
 module elemental logical function eq_att(x, y) result(is_equal)
-  !> Input arguments: `x` and `y`.
+  !> Dataset objects or values used by this operation.
   type(attribute_type), intent(in) :: x, y
 
   call validate(x, context="[eq_att]")
@@ -75,7 +75,7 @@ end function eq_att
 
 !> Return true when two attributes differ.
 module elemental logical function neq_att(x, y) result(is_equal)
-  !> Input arguments: `x` and `y`.
+  !> Dataset objects or values used by this operation.
   type(attribute_type), intent(in) :: x, y
 
   is_equal = .not. eq_att(x, y)

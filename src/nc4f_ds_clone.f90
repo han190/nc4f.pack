@@ -5,9 +5,9 @@ contains
 
 !> Execute `clone_grp`.
 module impure elemental subroutine clone_grp(src, dest)
-  !> Input argument: `src`.
+  !> Source object or group to read from.
   type(group_type), intent(in) :: src
-  !> Output argument: `dest`.
+  !> Destination object or group to update.
   type(group_type), intent(out) :: dest
 
   call clone_grp_(src, dest)
@@ -15,9 +15,9 @@ end subroutine clone_grp
 
 !> Recursively clone a group tree.
 recursive subroutine clone_grp_(src, dest)
-  !> Input argument: `src`.
+  !> Source object or group to read from.
   type(group_type), intent(in) :: src
-  !> Output argument: `dest`.
+  !> Destination object or group to update.
   type(group_type), intent(out) :: dest
   integer :: i
 
@@ -42,9 +42,9 @@ end subroutine clone_grp_
 
 !> Execute `clone_var`.
 module impure elemental subroutine clone_var(src, dest)
-  !> Input argument: `src`.
+  !> Source object or group to read from.
   type(variable_type), intent(in) :: src
-  !> Output argument: `dest`.
+  !> Destination object or group to update.
   type(variable_type), intent(out) :: dest
 
   call validate(src, context="[clone_var]")
@@ -63,9 +63,9 @@ end subroutine clone_var
 
 !> Execute `clone_att`.
 module impure elemental subroutine clone_att(src, dest)
-  !> Input argument: `src`.
+  !> Source object or group to read from.
   type(attribute_type), intent(in) :: src
-  !> Output argument: `dest`.
+  !> Destination object or group to update.
   type(attribute_type), intent(out) :: dest
 
   call validate(src, context="[clone_att]")

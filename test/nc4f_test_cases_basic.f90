@@ -6,7 +6,7 @@ contains
 
 !> Execute `simple_wr`.
 module subroutine simple_wr(passed)
-  !> Input/output argument(s): `passed`.
+  !> Whether the test case has passed.
   logical, intent(inout) :: passed
   type(variable_type) :: var
   integer, parameter :: nx = 47, ny = 83
@@ -25,7 +25,7 @@ end subroutine simple_wr
 
 !> Execute `simple_rd`.
 module subroutine simple_rd(passed)
-  !> Input/output argument(s): `passed`.
+  !> Whether the test case has passed.
   logical, intent(inout) :: passed
   type(netcdf_type) :: nc
   type(variable_type) :: var
@@ -54,7 +54,7 @@ end subroutine simple_rd
 
 !> Execute `character_variables`.
 module subroutine character_variables(passed)
-  !> Input/output argument(s): `passed`.
+  !> Whether the test case has passed.
   logical, intent(inout) :: passed
   character, parameter :: values(2, 3) = &
     & reshape(["a", "b", "c", "d", "e", "f"], [2, 3])
@@ -87,7 +87,7 @@ end subroutine character_variables
 
 !> Execute elemental variable metadata and value reads with array arguments.
 module subroutine elemental_reads(passed)
-  !> Input/output argument(s): `passed`.
+  !> Whether the test case has passed.
   logical, intent(inout) :: passed
   character(len=6), parameter :: names(2) = ["first ", "second"]
   integer, parameter :: first_values(2) = [1, 2]
@@ -137,6 +137,7 @@ end subroutine elemental_reads
 
 !> Execute strided variable reads and their argument validation.
 module subroutine hyperslab_reads(passed)
+  !> Whether the test case has passed.
   logical, intent(inout) :: passed
   integer, parameter :: values(4, 5) = reshape([ &
     & 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20], &
@@ -188,7 +189,7 @@ end subroutine hyperslab_reads
 
 !> Execute `buffer_edges`.
 module subroutine buffer_edges(passed)
-  !> Input/output argument(s): `passed`.
+  !> Whether the test case has passed.
   logical, intent(inout) :: passed
   character(len=256) :: dim_name, att_name, var_name
   character(len=:), pointer :: text

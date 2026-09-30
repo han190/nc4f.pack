@@ -48,25 +48,36 @@ end interface initialize
 interface
   !> Return a direct child group by name.
   module function get_group(parent, name, err) result(group)
+    !> Data or metadata used by this operation.
     class(group_type), intent(in) :: parent
+    !> Name used to identify the NetCDF object.
     character(len=*), intent(in) :: name
+    !> Error object updated if the operation fails.
     type(error_type), intent(out), optional :: err
+    !> Retrieved or newly defined group.
     type(group_type) :: group
   end function get_group
 
   !> Return direct child groups with IDs and names populated.
   module function inquire_subgroups(parent, err) result(grps)
+    !> Data or metadata used by this operation.
     class(group_type), intent(in) :: parent
+    !> Error object updated if the operation fails.
     type(error_type), intent(out), optional :: err
+    !> Retrieved child groups.
     type(group_type), allocatable :: grps(:)
   end function inquire_subgroups
 
   !> Materialize selected metadata for a group.
   module recursive subroutine inquire_group(group, &
     & inq_dims, inq_atts, inq_vars, inq_grps, recur, err)
+    !> Dataset group to process.
     class(group_type), intent(inout) :: group
+    !> Data or metadata used by this operation.
     logical, intent(in), optional :: inq_dims, inq_atts, inq_vars, inq_grps
+    !> Data or metadata used by this operation.
     logical, intent(in), optional :: recur
+    !> Error object updated if the operation fails.
     type(error_type), intent(out), optional :: err
   end subroutine inquire_group
 
@@ -213,10 +224,11 @@ interface
 
   !> Construct an `error_type` from a NetCDF C status and optional context.
   module function netcdf_err(status, context) result(err)
-    !> Input argument(s): `status`.
+    !> Data or metadata used by this operation.
     integer(c_int), intent(in) :: status
-    !> Input argument(s): `context`.
+    !> Context included in a validation or error message.
     character(*), intent(in), optional :: context
+    !> Result produced by this operation.
     type(error_type) :: err
   end function netcdf_err
 
@@ -252,11 +264,13 @@ interface
 
   !> Allocate a fresh byte buffer for an attribute read from a NetCDF file.
   module subroutine initialize_att(att)
+    !> Attribute to process.
     type(attribute_type), intent(inout) :: att
   end subroutine initialize_att
 
   !> Allocate a fresh byte buffer for a variable read from a NetCDF file.
   module subroutine initialize_var(var)
+    !> Variable to process.
     type(variable_type), intent(inout) :: var
   end subroutine initialize_var
 
@@ -306,9 +320,13 @@ interface
 
   !> Define variable metadata without transferring its data buffer.
   module function def_var(nc, var, err) result(new_var)
+    !> Open NetCDF dataset handle.
     class(group_type), intent(in) :: nc
+    !> Variable to process.
     type(variable_type), intent(in) :: var
+    !> Error object updated if the operation fails.
     type(error_type), intent(out) :: err
+    !> Result produced by this operation.
     type(variable_type) :: new_var
   end function def_var
 
@@ -356,17 +374,25 @@ interface
 
   !> Serialize one in-memory group as an existing file root.
   module subroutine serialize_grp(root, grp, atts, err)
+    !> Data or metadata used by this operation.
     class(group_type), intent(in) :: root
+    !> Dataset group to process.
     type(group_type), intent(in) :: grp
+    !> Attributes to process or attach.
     type(attribute_type), intent(in), optional :: atts(:)
+    !> Error object updated if the operation fails.
     type(error_type), intent(out) :: err
   end subroutine serialize_grp
 
   !> Serialize in-memory groups as direct children of an existing file root.
   module subroutine serialize_grps(root, grps, atts, err)
+    !> Data or metadata used by this operation.
     class(group_type), intent(in) :: root
+    !> Data or metadata used by this operation.
     type(group_type), target, intent(in) :: grps(:)
+    !> Attributes to process or attach.
     type(attribute_type), intent(in), optional :: atts(:)
+    !> Error object updated if the operation fails.
     type(error_type), intent(out) :: err
   end subroutine serialize_grps
 end interface

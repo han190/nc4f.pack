@@ -13,8 +13,9 @@ type :: test_type
 end type test_type
 
 interface
+  !> Perform the test_proc operation.
   subroutine test_proc(passed)
-    !> Input/output argument(s): `passed`.
+    !> Whether the test case has passed.
     logical, intent(inout) :: passed
   end subroutine test_proc
 end interface
@@ -32,7 +33,7 @@ end subroutine setup_test_results
 
 !> Execute `run_tests`.
 subroutine run_tests(tests)
-  !> Input/output argument(s): `tests(:)`.
+  !> Data or metadata used by this operation.
   type(test_type), intent(inout) :: tests(:)
   integer :: i
   logical :: all_passed

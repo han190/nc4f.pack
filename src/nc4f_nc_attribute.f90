@@ -24,11 +24,11 @@ end function get_att_grp
 
 !> Return all global attributes for a dataset.
 module function get_atts_grp(nc, err) result(atts)
-  !> Input argument(s): `nc`.
+  !> Open NetCDF dataset handle.
   class(group_type), intent(in) :: nc
-  !> Output argument(s): `err`.
+  !> Error object updated if the operation fails.
   type(error_type), optional, intent(out) :: err
-  !> Return value: `atts`.
+  !> Retrieved attributes.
   type(attribute_type), allocatable :: atts(:)
   type(error_type) :: op_err
 
@@ -64,13 +64,13 @@ end function get_att_var
 
 !> Return all attributes attached to a variable.
 module function get_atts_var(nc, var, err) result(atts)
-  !> Input argument(s): `nc`.
+  !> Open NetCDF dataset handle.
   class(group_type), intent(in) :: nc
-  !> Input argument(s): `var`.
+  !> Variable to process.
   type(variable_type), intent(in) :: var
-  !> Output argument(s): `err`.
+  !> Error object updated if the operation fails.
   type(error_type), optional, intent(out) :: err
-  !> Return value: `atts`.
+  !> Retrieved attributes.
   type(attribute_type), allocatable :: atts(:)
   type(error_type) :: op_err
 
@@ -84,13 +84,13 @@ end function get_atts_var
 
 !> Helper that returns attributes for a C `ncid` and `varid`.
 function get_atts_(ncid, varid, err) result(atts)
-  !> Input argument(s): `ncid`.
+  !> Identifier of the open NetCDF file or group.
   integer(c_int), intent(in) :: ncid
-  !> Input argument(s): `varid`.
+  !> Identifier of the target NetCDF variable.
   integer(c_int), intent(in) :: varid
-  !> Output argument(s): `err`.
+  !> Error object updated if the operation fails.
   type(error_type), intent(out) :: err
-  !> Return value: `atts`.
+  !> Retrieved attributes.
   type(attribute_type), allocatable :: atts(:)
   integer(c_int) :: natts, i, stat
   character(kind=c_char, len=NC_MAX_NAME + 1) :: name
@@ -117,15 +117,15 @@ end function get_atts_
 
 !> Helper that reads a single attribute given C `ncid`, `varid`, and name.
 function get_att_(ncid, varid, name, err) result(att)
-  !> Input argument(s): `ncid`.
+  !> Identifier of the open NetCDF file or group.
   integer(c_int), intent(in) :: ncid
-  !> Input argument(s): `varid`.
+  !> Identifier of the target NetCDF variable.
   integer(c_int), intent(in) :: varid
-  !> Input argument(s): `name`.
+  !> Name used to identify the NetCDF object.
   character(len=*), intent(in) :: name
-  !> Output argument(s): `err`.
+  !> Error object updated if the operation fails.
   type(error_type), intent(out) :: err
-  !> Return value: `att`.
+  !> Retrieved or constructed attribute.
   type(attribute_type), target :: att
   integer(c_int) :: dtype, stat
   integer(c_size_t) :: len
@@ -153,11 +153,11 @@ end function get_att_
 
 !> Scalar implementation shared by the fail-fast and error-aware overloads.
 module subroutine put_att_var(nc, var, err)
-  !> Input argument(s): `nc`.
+  !> Open NetCDF dataset handle.
   class(group_type), intent(in) :: nc
-  !> Input argument(s): `var`.
+  !> Variable to process.
   type(variable_type), target, intent(in) :: var
-  !> Output argument(s): `err`.
+  !> Error object updated if the operation fails.
   type(error_type), intent(out) :: err
 
   call put_atts_(nc%id, var%id, var%atts, "[put_att_var]", err)
@@ -165,9 +165,9 @@ end subroutine put_att_var
 
 !> Scalar implementation shared by the fail-fast and error-aware overloads.
 module subroutine put_att_grp(nc, err)
-  !> Input argument(s): `nc`.
+  !> Open NetCDF dataset handle.
   class(group_type), target, intent(in) :: nc
-  !> Output argument(s): `err`.
+  !> Error object updated if the operation fails.
   type(error_type), intent(out) :: err
 
   call put_atts_(nc%id, NC_GLOBAL, nc%atts, "[put_att_grp]", err)

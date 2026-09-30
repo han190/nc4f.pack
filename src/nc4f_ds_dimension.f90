@@ -4,11 +4,11 @@ contains
 
 !> Construct unlimited-dimension arguments from a 32-bit length.
 module elemental function new_dim_arg_int32(len, is_unlim) result(arg)
-  !> Input argument: `len`.
+  !> Length of the dimension or attribute.
   integer(int32), intent(in) :: len
-  !> Input argument: `is_unlim`.
+  !> Whether the dimension is unlimited.
   logical, intent(in) :: is_unlim
-  !> Return value: `arg`.
+  !> Result produced by this operation.
   type(dimension_argument_type) :: arg
 
   arg%len = int(len, int64)
@@ -17,11 +17,11 @@ end function new_dim_arg_int32
 
 !> Construct unlimited-dimension arguments from a 64-bit length.
 module elemental function new_dim_arg_int64(len, is_unlim) result(arg)
-  !> Input argument: `len`.
+  !> Length of the dimension or attribute.
   integer(int64), intent(in) :: len
-  !> Input argument: `is_unlim`.
+  !> Whether the dimension is unlimited.
   logical, intent(in) :: is_unlim
-  !> Return value: `arg`.
+  !> Result produced by this operation.
   type(dimension_argument_type) :: arg
 
   arg%len = len
@@ -30,11 +30,11 @@ end function new_dim_arg_int64
 
 !> Construct a dimension from a 32-bit length.
 module elemental function new_dim_len_int32(name, len) result(dim)
-  !> Input argument: `name`.
+  !> Name used to identify the NetCDF object.
   character(len=*), intent(in) :: name
-  !> Input argument: `len`.
+  !> Length of the dimension or attribute.
   integer(int32), intent(in) :: len
-  !> Return value: `dim`.
+  !> Result produced by this operation.
   type(dimension_type) :: dim
 
   dim%name = trim(name)
@@ -43,11 +43,11 @@ end function new_dim_len_int32
 
 !> Construct a dimension from a 64-bit length.
 module elemental function new_dim_len_int64(name, len) result(dim)
-  !> Input argument: `name`.
+  !> Name used to identify the NetCDF object.
   character(len=*), intent(in) :: name
-  !> Input argument: `len`.
+  !> Length of the dimension or attribute.
   integer(int64), intent(in) :: len
-  !> Return value: `dim`.
+  !> Result produced by this operation.
   type(dimension_type) :: dim
 
   dim%name = trim(name)
@@ -56,11 +56,11 @@ end function new_dim_len_int64
 
 !> Construct a dimension with an explicit unlimited flag.
 module elemental function new_dim_args(name, args) result(dim)
-  !> Input argument: `name`.
+  !> Name used to identify the NetCDF object.
   character(len=*), intent(in) :: name
-  !> Input argument: `args`.
+  !> Data or metadata used by this operation.
   type(dimension_argument_type), intent(in) :: args
-  !> Return value: `dim`.
+  !> Result produced by this operation.
   type(dimension_type) :: dim
 
   dim%name = trim(name)
@@ -70,7 +70,7 @@ end function new_dim_args
 
 !> Return true when two dimensions have identical metadata.
 module elemental logical function eq_dim(x, y)
-  !> Input arguments: `x` and `y`.
+  !> Dataset objects or values used by this operation.
   type(dimension_type), intent(in) :: x, y
 
   eq_dim = x%len == y%len .and. x%is_unlim .eqv. y%is_unlim
@@ -82,7 +82,7 @@ end function eq_dim
 
 !> Return true when two dimensions have different metadata.
 module elemental logical function neq_dim(x, y)
-  !> Input arguments: `x` and `y`.
+  !> Dataset objects or values used by this operation.
   type(dimension_type), intent(in) :: x, y
 
   neq_dim = .not. eq_dim(x, y)

@@ -6,7 +6,7 @@ contains
 
 !> Execute `unlimited_wr`.
 module subroutine unlimited_wr(passed)
-  !> Input/output argument(s): `passed`.
+  !> Whether the test case has passed.
   logical, intent(inout) :: passed
   integer(int32), parameter :: values(2, 3) = reshape([ &
     & 1_int32, 2_int32, 3_int32, 4_int32, 5_int32, 6_int32], [2, 3])
@@ -28,7 +28,7 @@ end subroutine unlimited_wr
 
 !> Execute `unlimited_dims`.
 module subroutine unlimited_dims(passed)
-  !> Input/output argument(s): `passed`.
+  !> Whether the test case has passed.
   logical, intent(inout) :: passed
   integer(int32), parameter :: values(2, 3) = reshape([ &
     & 1_int32, 2_int32, 3_int32, 4_int32, 5_int32, 6_int32], [2, 3])

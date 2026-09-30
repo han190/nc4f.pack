@@ -6,7 +6,7 @@ contains
 
 !> Execute `sum_vars_test`.
 module subroutine sum_vars_test(passed)
-  !> Input/output argument(s): `passed`.
+  !> Whether the test case has passed.
   logical, intent(inout) :: passed
   real(real64), parameter :: a(2, 3) = reshape([ &
     & 1.0_real64, 2.0_real64, 3.0_real64, 4.0_real64, &
@@ -30,7 +30,7 @@ end subroutine sum_vars_test
 
 !> Execute `sfc_pres_temp_wr`.
 module subroutine sfc_pres_temp_wr(passed)
-  !> Input/output argument(s): `passed`.
+  !> Whether the test case has passed.
   logical, intent(inout) :: passed
   integer, parameter :: nlat = 181, nlon = 361
   real, parameter :: lat_max = 90.0, lon_max = 180.0
@@ -66,7 +66,7 @@ end subroutine sfc_pres_temp_wr
 
 !> Execute `sfc_pres_temp_rd`.
 module subroutine sfc_pres_temp_rd(passed)
-  !> Input/output argument(s): `passed`.
+  !> Whether the test case has passed.
   logical, intent(inout) :: passed
   type(netcdf_type) :: nc
   type(variable_type) :: var
@@ -111,7 +111,7 @@ end subroutine sfc_pres_temp_rd
 
 !> Execute `extensive_wr`.
 module subroutine extensive_wr(passed)
-  !> Input/output argument(s): `passed`.
+  !> Whether the test case has passed.
   logical, intent(inout) :: passed
   type(variable_type), allocatable :: vars(:)
   logical :: file_exists
@@ -127,7 +127,7 @@ end subroutine extensive_wr
 
 !> Execute `extensive_rd`.
 module subroutine extensive_rd(passed)
-  !> Input/output argument(s): `passed`.
+  !> Whether the test case has passed.
   logical, intent(inout) :: passed
   character(len=16), parameter :: names(7) = [character(len=16) :: &
     & "int8_rank1", "int16_rank2", "int32_rank3", "int64_rank4", &
@@ -177,7 +177,7 @@ end subroutine extensive_rd
 !> CLDPROP COSP NetCDF-4 sample file.  The file also contains nested groups;
 !> this test intentionally exercises the currently supported root group only.
 module subroutine nasa_cosp_read(passed)
-  !> Input/output argument(s): `passed`.
+  !> Whether the test case has passed.
   logical, intent(inout) :: passed
   character(*), parameter :: SAMPLE_FILE = &
     & "data/CLDPROPCOSP_M3_MODIS_Aqua.A2014032.011.2020112203433.nc"
@@ -267,7 +267,7 @@ end subroutine nasa_cosp_read
 !> Read coordinates, CF metadata, and packed data from Unidata's externally
 !> produced ECMWF ERA-40 sample file.
 module subroutine ecmwf_era40_read(passed)
-  !> Input/output argument(s): `passed`.
+  !> Whether the test case has passed.
   logical, intent(inout) :: passed
   character(*), parameter :: SAMPLE_FILE = "data/ECMWF_ERA-40_subset.nc"
   character(len=:), pointer :: conventions, longitude_units, temperature_units
@@ -344,7 +344,7 @@ end subroutine ecmwf_era40_read
 
 !> Read a CF climate-model file through the root-group API.
 module subroutine sresa1b_ccsm3_read(passed)
-  !> Input/output argument: `passed`.
+  !> Whether the test case has passed.
   logical, intent(inout) :: passed
   character(*), parameter :: SAMPLE_FILE = "data/sresa1b_ncar_ccsm3-example.nc"
   character(len=:), pointer :: conventions, units
@@ -405,7 +405,7 @@ end subroutine sresa1b_ccsm3_read
 
 !> Render every externally produced NetCDF fixture through NetCDF UDDTIO.
 module subroutine sample_uddtio(passed)
-  !> Input/output argument: `passed`.
+  !> Whether the test case has passed.
   logical, intent(inout) :: passed
   character(len=96), parameter :: files(6) = [character(len=96) :: &
     & "data/CLDPROPCOSP_M3_MODIS_Aqua.A2014032.011.2020112203433.nc", &
@@ -451,21 +451,21 @@ end subroutine sample_uddtio
 !> Render one externally produced NetCDF fixture and verify key output lines.
 function render_sample_uddtio_(file, label, expected_dim, expected_var, &
   & expected_var_att, expected_att, expected_group) result(rendered)
-  !> Input argument: `file`.
+  !> Path of the NetCDF file to read or write.
   character(len=*), intent(in) :: file
-  !> Input argument: `label`.
+  !> Data or metadata used by this operation.
   character(len=*), intent(in) :: label
-  !> Input argument: `expected_dim`.
+  !> Data or metadata used by this operation.
   character(len=*), intent(in) :: expected_dim
-  !> Input argument: `expected_var`.
+  !> Data or metadata used by this operation.
   character(len=*), intent(in) :: expected_var
-  !> Input argument: `expected_var_att`.
+  !> Data or metadata used by this operation.
   character(len=*), intent(in) :: expected_var_att
-  !> Input argument: `expected_att`.
+  !> Data or metadata used by this operation.
   character(len=*), intent(in) :: expected_att
-  !> Input argument: `expected_group`.
+  !> Data or metadata used by this operation.
   character(len=*), intent(in) :: expected_group
-  !> Return value: `rendered`.
+  !> Rendered NetCDF text.
   logical :: rendered
   character(len=256) :: line
   character(len=:), allocatable :: expected_header, output_file
@@ -536,7 +536,7 @@ end function render_sample_uddtio_
 
 !> Read CAM initial-condition data with a four-dimensional hyperslab.
 module subroutine cami_initial_read(passed)
-  !> Input/output argument: `passed`.
+  !> Whether the test case has passed.
   logical, intent(inout) :: passed
   character(*), parameter :: SAMPLE_FILE = &
     & "data/cami_0000-09-01_64x128_L26_c030918.nc"
@@ -600,7 +600,7 @@ end subroutine cami_initial_read
 
 !> Read an ocean file whose first latitude row contains missing values.
 module subroutine tos_o1_read(passed)
-  !> Input/output argument: `passed`.
+  !> Whether the test case has passed.
   logical, intent(inout) :: passed
   character(*), parameter :: SAMPLE_FILE = "data/tos_O1_2001-2002.nc"
   character(len=:), pointer :: conventions, units
@@ -658,7 +658,7 @@ end subroutine tos_o1_read
 
 !> Read a spectral-grid file with non-geographical dimensions.
 module subroutine echam_spectral_read(passed)
-  !> Input/output argument: `passed`.
+  !> Whether the test case has passed.
   logical, intent(inout) :: passed
   character(*), parameter :: SAMPLE_FILE = "data/test_echam_spectral.nc"
   character(len=:), pointer :: conventions, grid_type
@@ -720,13 +720,13 @@ end subroutine echam_spectral_read
 
 !> Return whether `dims` contains a dimension with the specified metadata.
 pure logical function has_dim(dims, name, len, is_unlim)
-  !> Input argument: `dims`.
+  !> Dimensions describing the variable shape.
   type(dimension_type), intent(in) :: dims(:)
-  !> Input argument: `name`.
+  !> Name used to identify the NetCDF object.
   character(len=*), intent(in) :: name
-  !> Input argument: `len`.
+  !> Length of the dimension or attribute.
   integer(int64), intent(in) :: len
-  !> Input argument: `is_unlim`.
+  !> Whether the dimension is unlimited.
   logical, intent(in), optional :: is_unlim
   integer :: i
 
@@ -745,7 +745,7 @@ end function has_dim
 !> Return whether `text` begins with `prefix`; trailing NULs are retained when
 !> an externally written `NC_CHAR` attribute includes them in its stored value.
 pure logical function starts_with(text, prefix)
-  !> Input arguments: `text` and `prefix`.
+  !> Dataset objects or values used by this operation.
   character(len=*), intent(in) :: text, prefix
 
   starts_with = len(text) >= len(prefix)
@@ -754,7 +754,7 @@ end function starts_with
 
 !> Compute `extensive_variables`.
 function extensive_variables() result(vars)
-  !> Return value: `vars`.
+  !> Retrieved variables.
   type(variable_type), allocatable :: vars(:)
   type(dimension_type) :: dims(7)
   integer(int8) :: int8_values(2)
@@ -804,7 +804,7 @@ end function extensive_variables
 
 !> Compute `extensive_attributes`.
 function extensive_attributes() result(atts)
-  !> Return value: `atts`.
+  !> Retrieved attributes.
   type(attribute_type), allocatable :: atts(:)
 
   atts = [ &

@@ -76,7 +76,9 @@ interface
   !> Return the length of a NUL-terminated C string.
   function c_strlen(str) bind(c, name="strlen") result(length)
     import :: c_ptr, c_size_t
+    !> Data or metadata used by this operation.
     type(c_ptr), value :: str
+    !> Result produced by this operation.
     integer(c_size_t) :: length
   end function c_strlen
 

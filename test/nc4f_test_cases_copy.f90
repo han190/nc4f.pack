@@ -9,7 +9,7 @@ contains
 
 !> Execute `copy_semantics`.
 module subroutine copy_semantics(passed)
-  !> Input/output argument: `passed`.
+  !> Whether the test case has passed.
   logical, intent(inout) :: passed
   type(attribute_type) :: copied_att, owned_att
   type(group_type) :: borrowed_group, child, deep_group, grandchild, shallow_group
@@ -115,6 +115,7 @@ contains
 
   !> Exercise a deep value after the constructor's source has left scope.
   subroutine check_scoped_owned_value(valid)
+    !> Data or metadata used by this operation.
     logical, intent(out) :: valid
     type(variable_type) :: scoped_var
     real(real32), pointer :: scoped_values(:)
@@ -129,6 +130,7 @@ contains
 
   !> Build an owned variable from local storage which ceases to exist on return.
   function new_scoped_owned_var() result(var)
+    !> Retrieved or constructed variable.
     type(variable_type) :: var
     real(real32), target :: local_values(2)
 

@@ -30,14 +30,15 @@ end function get_variable
 
 !> Scalar implementation shared by the fail-fast and error-aware overloads.
 function get_var_(nc, name, start, count, stride, err) result(var)
-  !> Input argument(s): `nc`.
+  !> Open NetCDF dataset handle.
   class(group_type), intent(in) :: nc
-  !> Input argument(s): `name`.
+  !> Name used to identify the NetCDF object.
   character(len=*), intent(in) :: name
+  !> Optional starting indices, extents, and strides for the requested hyperslab.
   integer, intent(in), optional :: start(:), count(:), stride(:)
-  !> Output argument(s): `err`.
+  !> Error object updated if the operation fails.
   type(error_type), intent(out) :: err
-  !> Return value: `var`.
+  !> Result produced by this operation.
   type(variable_type), target :: var
   type(c_ptr) :: cptr, startp, countp, stridep
   integer(c_size_t), allocatable, target :: c_start(:), c_count(:)
@@ -177,13 +178,13 @@ end function inquire_variable
 
 !> Scalar implementation shared by the fail-fast and error-aware overloads.
 function inq_var_(nc, name, err) result(var)
-  !> Input argument(s): `nc`.
+  !> Open NetCDF dataset handle.
   class(group_type), intent(in) :: nc
-  !> Input argument(s): `name`.
+  !> Name used to identify the NetCDF object.
   character(len=*), intent(in) :: name
-  !> Output argument(s): `err`.
+  !> Error object updated if the operation fails.
   type(error_type), intent(out) :: err
-  !> Return value: `var`.
+  !> Result produced by this operation.
   type(variable_type) :: var
   integer(c_int) :: stat
   character(len=MAX_CHAR_LEN) :: msg
@@ -209,9 +210,9 @@ function inq_vartype_(ncid, varid, err) result(vartype)
   integer(c_int), intent(in) :: ncid
   !> Variable identifier.
   integer(c_int), intent(in) :: varid
-  !> Output argument(s): `err`.
+  !> Error object updated if the operation fails.
   type(error_type), intent(out) :: err
-  !> Return value: `vartype`.
+  !> Result produced by this operation.
   integer(c_int) :: vartype
   integer(c_int) :: stat
   character(len=MAX_CHAR_LEN) :: msg, fmt
@@ -226,15 +227,15 @@ end function inq_vartype_
 
 !> Error-returning implementation of a Fortran-order hyperslab write.
 module subroutine put_vara(nc, var, start, count, err)
-  !> Input argument(s): `nc`.
+  !> Open NetCDF dataset handle.
   class(group_type), intent(in) :: nc
-  !> Input argument(s): `var`.
+  !> Variable to process.
   type(variable_type), target, intent(in) :: var
-  !> Input argument(s): `start(:)`.
+  !> Starting indices for the requested hyperslab.
   integer, intent(in) :: start(:)
-  !> Input argument(s): `count(:)`.
+  !> Element counts for the requested hyperslab.
   integer, intent(in) :: count(:)
-  !> Output argument(s): `err`.
+  !> Error object updated if the operation fails.
   type(error_type), intent(out) :: err
   type(variable_type) :: target
   integer(c_size_t), allocatable, target :: c_start(:), c_count(:)
@@ -315,11 +316,11 @@ end subroutine put_vara
 
 !> Scalar implementation shared by the fail-fast and error-aware overloads.
 module subroutine put_var(nc, var, err)
-  !> Input argument(s): `nc`.
+  !> Open NetCDF dataset handle.
   class(group_type), intent(in) :: nc
-  !> Input argument(s): `var`.
+  !> Variable to process.
   type(variable_type), target, intent(in) :: var
-  !> Output argument(s): `err`.
+  !> Error object updated if the operation fails.
   type(error_type), intent(out) :: err
   type(variable_type) :: tmp
   integer(c_size_t), allocatable, target :: c_start(:), c_count(:)
@@ -357,13 +358,13 @@ end subroutine put_var
 
 !> Define a variable in the netCDF file and return its `variable_type`.
 module function def_var(nc, var, err) result(new_var)
-  !> Input argument(s): `nc`.
+  !> Open NetCDF dataset handle.
   class(group_type), intent(in) :: nc
-  !> Input argument(s): `var`.
+  !> Variable to process.
   type(variable_type), intent(in) :: var
-  !> Output argument(s): `err`.
+  !> Error object updated if the operation fails.
   type(error_type), intent(out) :: err
-  !> Return value: `new_var`.
+  !> Result produced by this operation.
   type(variable_type) :: new_var
   integer(c_int) :: varid, stat
   integer(c_int), allocatable :: new_dimids(:)

@@ -193,215 +193,369 @@ interface dataset
 end interface dataset
 
 interface
+  !> Initialize a dataset object.
   module subroutine init_att(att, name, dtype, len)
+    !> Attribute to process.
     type(attribute_type), intent(inout) :: att
+    !> Name used to identify the NetCDF object.
     character(len=*), intent(in) :: name
+    !> Data or metadata used by this operation.
     integer(data_type), intent(in) :: dtype
+    !> Data or metadata used by this operation.
     integer(int64), intent(in) :: len
   end subroutine init_att
 
+  !> Initialize a dataset object.
   module subroutine init_var(var, name, dtype, len, dims, atts)
+    !> Variable to process.
     type(variable_type), intent(inout) :: var
+    !> Name used to identify the NetCDF object.
     character(len=*), intent(in) :: name
+    !> Data or metadata used by this operation.
     integer(data_type), intent(in) :: dtype
+    !> Data or metadata used by this operation.
     integer(int64), intent(in) :: len
+    !> Dimensions describing the variable shape.
     type(dimension_type), intent(in) :: dims(:)
+    !> Attributes to process or attach.
     type(attribute_type), intent(in), optional :: atts(:)
   end subroutine init_var
 
+  !> Initialize a dataset object.
   module subroutine init_att_(att, name, dtype, len, deep)
+    !> Attribute to process.
     type(attribute_type), intent(inout) :: att
+    !> Name used to identify the NetCDF object.
     character(len=*), intent(in) :: name
+    !> Data or metadata used by this operation.
     integer(data_type), intent(in) :: dtype
+    !> Data or metadata used by this operation.
     integer(int64), intent(in) :: len
+    !> Whether to make an owned deep copy of the data.
     logical, intent(in), optional :: deep
   end subroutine init_att_
 
+  !> Initialize a dataset object.
   module subroutine init_var_(var, name, dtype, len, dims, atts, deep)
+    !> Variable to process.
     type(variable_type), intent(inout) :: var
+    !> Name used to identify the NetCDF object.
     character(len=*), intent(in) :: name
+    !> Data or metadata used by this operation.
     integer(data_type), intent(in) :: dtype
+    !> Data or metadata used by this operation.
     integer(int64), intent(in) :: len
+    !> Dimensions describing the variable shape.
     type(dimension_type), intent(in) :: dims(:)
+    !> Attributes to process or attach.
     type(attribute_type), intent(in), optional :: atts(:)
+    !> Whether to make an owned deep copy of the data.
     logical, intent(in), optional :: deep
   end subroutine init_var_
 
+  !> Initialize a dataset object.
   module subroutine init_att_mold(att, name, mold, deep)
+    !> Attribute to process.
     type(attribute_type), intent(inout) :: att
+    !> Name used to identify the NetCDF object.
     character(len=*), intent(in) :: name
+    !> Data or metadata used by this operation.
     type(attribute_type), target, intent(in) :: mold
+    !> Whether to make an owned deep copy of the data.
     logical, intent(in), optional :: deep
   end subroutine init_att_mold
 
+  !> Initialize a dataset object.
   module subroutine init_var_mold(var, name, mold, atts, deep)
+    !> Variable to process.
     type(variable_type), intent(inout) :: var
+    !> Name used to identify the NetCDF object.
     character(len=*), intent(in) :: name
+    !> Data or metadata used by this operation.
     type(variable_type), target, intent(in) :: mold
+    !> Attributes to process or attach.
     type(attribute_type), intent(in), optional :: atts(:)
+    !> Whether to make an owned deep copy of the data.
     logical, intent(in), optional :: deep
   end subroutine init_var_mold
 
+  !> Construct a dataset object from the supplied metadata and data.
   module function new_dataset_empty(name, atts, deep) result(grp)
+    !> Name used to identify the NetCDF object.
     character(len=*), intent(in) :: name
+    !> Attributes to process or attach.
     type(attribute_type), intent(in), optional :: atts(:)
+    !> Whether to make an owned deep copy of the data.
     logical, intent(in), optional :: deep
+    !> Result produced by this operation.
     type(group_type) :: grp
   end function new_dataset_empty
 
+  !> Construct a dataset object from the supplied metadata and data.
   module function new_dataset_vars(name, vars, atts, deep) result(grp)
+    !> Name used to identify the NetCDF object.
     character(len=*), intent(in) :: name
+    !> Variables to process or add to the dataset.
     type(variable_type), intent(in) :: vars(:)
+    !> Attributes to process or attach.
     type(attribute_type), intent(in), optional :: atts(:)
+    !> Whether to make an owned deep copy of the data.
     logical, intent(in), optional :: deep
+    !> Result produced by this operation.
     type(group_type) :: grp
   end function new_dataset_vars
 
+  !> Construct a dataset object from the supplied metadata and data.
   module function new_dataset_grps(name, grps, atts, deep) result(grp)
+    !> Name used to identify the NetCDF object.
     character(len=*), intent(in) :: name
+    !> Data or metadata used by this operation.
     type(group_type), intent(in) :: grps(:)
+    !> Attributes to process or attach.
     type(attribute_type), intent(in), optional :: atts(:)
+    !> Whether to make an owned deep copy of the data.
     logical, intent(in), optional :: deep
+    !> Result produced by this operation.
     type(group_type) :: grp
   end function new_dataset_grps
 
+  !> Construct a dataset object from the supplied metadata and data.
   module function new_dataset_all(name, vars, grps, atts, deep) result(grp)
+    !> Name used to identify the NetCDF object.
     character(len=*), intent(in) :: name
+    !> Variables to process or add to the dataset.
     type(variable_type), intent(in) :: vars(:)
+    !> Data or metadata used by this operation.
     type(group_type), intent(in) :: grps(:)
+    !> Attributes to process or attach.
     type(attribute_type), intent(in), optional :: atts(:)
+    !> Whether to make an owned deep copy of the data.
     logical, intent(in), optional :: deep
+    !> Result produced by this operation.
     type(group_type) :: grp
   end function new_dataset_all
 
+  !> Construct a dataset object from the supplied metadata and data.
   module subroutine new_dataset_(grp, name, vars, grps, atts, deep)
+    !> Dataset group to process.
     type(group_type), intent(out) :: grp
+    !> Name used to identify the NetCDF object.
     character(len=*), intent(in) :: name
+    !> Variables to process or add to the dataset.
     type(variable_type), intent(in), optional :: vars(:)
+    !> Data or metadata used by this operation.
     type(group_type), intent(in), optional :: grps(:)
+    !> Attributes to process or attach.
     type(attribute_type), intent(in), optional :: atts(:)
+    !> Whether to make an owned deep copy of the data.
     logical, intent(in), optional :: deep
   end subroutine new_dataset_
 
+  !> Clone a dataset object and its data.
   module impure elemental subroutine clone_att(src, dest)
+    !> Source object or group to read from.
     type(attribute_type), intent(in) :: src
+    !> Destination object or group to update.
     type(attribute_type), intent(out) :: dest
   end subroutine clone_att
 
+  !> Clone a dataset object and its data.
   module impure elemental subroutine clone_var(src, dest)
+    !> Source object or group to read from.
     type(variable_type), intent(in) :: src
+    !> Destination object or group to update.
     type(variable_type), intent(out) :: dest
   end subroutine clone_var
 
+  !> Clone a dataset object and its data.
   module impure elemental subroutine clone_grp(src, dest)
+    !> Source object or group to read from.
     type(group_type), intent(in) :: src
+    !> Destination object or group to update.
     type(group_type), intent(out) :: dest
   end subroutine clone_grp
 
+  !> Validate dataset buffer metadata before access.
   module pure subroutine validate_att(att, dtype, context)
+    !> Attribute to process.
     type(attribute_type), intent(in) :: att
+    !> Data or metadata used by this operation.
     integer(data_type), intent(in), optional :: dtype
+    !> Data or metadata used by this operation.
     character(len=*), intent(in) :: context
   end subroutine validate_att
 
+  !> Validate dataset buffer metadata before access.
   module pure subroutine validate_var(var, dtype, rank, context)
+    !> Variable to process.
     type(variable_type), intent(in) :: var
+    !> Data or metadata used by this operation.
     integer(data_type), intent(in), optional :: dtype
+    !> Data or metadata used by this operation.
     integer, intent(in), optional :: rank
+    !> Data or metadata used by this operation.
     character(len=*), intent(in) :: context
   end subroutine validate_var
 
+  !> Perform the buffer2cptr_att operation.
   module function buffer2cptr_att(att) result(cptr)
+    !> Attribute to process.
     type(attribute_type), target, intent(in) :: att
+    !> Result produced by this operation.
     type(c_ptr) :: cptr
   end function buffer2cptr_att
 
+  !> Perform the buffer2cptr_var operation.
   module function buffer2cptr_var(var) result(cptr)
+    !> Variable to process.
     type(variable_type), target, intent(in) :: var
+    !> Result produced by this operation.
     type(c_ptr) :: cptr
   end function buffer2cptr_var
 
+  !> Write supplied data or metadata to a NetCDF object.
   module subroutine write_frmt_att(att, unit, iotype, v_list, iostat, iomsg)
+    !> Attribute to process.
     class(attribute_type), intent(in) :: att
+    !> Data or metadata used by this operation.
     integer, intent(in) :: unit
+    !> Data or metadata used by this operation.
     character(len=*), intent(in) :: iotype
+    !> Data or metadata used by this operation.
     integer, intent(in) :: v_list(:)
+    !> Data or metadata used by this operation.
     integer, intent(out) :: iostat
+    !> Data or metadata used by this operation.
     character(len=*), intent(inout) :: iomsg
   end subroutine write_frmt_att
 
+  !> Write supplied data or metadata to a NetCDF object.
   module subroutine write_frmt_dim(dim, unit, iotype, v_list, iostat, iomsg)
+    !> Dimension to process.
     class(dimension_type), intent(in) :: dim
+    !> Data or metadata used by this operation.
     integer, intent(in) :: unit
+    !> Data or metadata used by this operation.
     character(len=*), intent(in) :: iotype
+    !> Data or metadata used by this operation.
     integer, intent(in) :: v_list(:)
+    !> Data or metadata used by this operation.
     integer, intent(out) :: iostat
+    !> Data or metadata used by this operation.
     character(len=*), intent(inout) :: iomsg
   end subroutine write_frmt_dim
 
+  !> Write supplied data or metadata to a NetCDF object.
   module subroutine write_frmt_var(var, unit, iotype, v_list, iostat, iomsg)
+    !> Variable to process.
     class(variable_type), intent(in) :: var
+    !> Data or metadata used by this operation.
     integer, intent(in) :: unit
+    !> Data or metadata used by this operation.
     character(len=*), intent(in) :: iotype
+    !> Data or metadata used by this operation.
     integer, intent(in) :: v_list(:)
+    !> Data or metadata used by this operation.
     integer, intent(out) :: iostat
+    !> Data or metadata used by this operation.
     character(len=*), intent(inout) :: iomsg
   end subroutine write_frmt_var
 
+  !> Write supplied data or metadata to a NetCDF object.
   module subroutine write_frmt_grp(grp, unit, iotype, v_list, iostat, iomsg)
+    !> Dataset group to process.
     class(group_type), intent(in) :: grp
+    !> Data or metadata used by this operation.
     integer, intent(in) :: unit
+    !> Data or metadata used by this operation.
     character(len=*), intent(in) :: iotype
+    !> Data or metadata used by this operation.
     integer, intent(in) :: v_list(:)
+    !> Data or metadata used by this operation.
     integer, intent(out) :: iostat
+    !> Data or metadata used by this operation.
     character(len=*), intent(inout) :: iomsg
   end subroutine write_frmt_grp
 
+  !> Write supplied data or metadata to a NetCDF object.
   module subroutine write_frmt_netcdf(grp, unit, iotype, v_list, iostat, iomsg)
+    !> Dataset group to process.
     class(netcdf_type), intent(in) :: grp
+    !> Data or metadata used by this operation.
     integer, intent(in) :: unit
+    !> Data or metadata used by this operation.
     character(len=*), intent(in) :: iotype
+    !> Data or metadata used by this operation.
     integer, intent(in) :: v_list(:)
+    !> Data or metadata used by this operation.
     integer, intent(out) :: iostat
+    !> Data or metadata used by this operation.
     character(len=*), intent(inout) :: iomsg
   end subroutine write_frmt_netcdf
 
+  !> Write supplied data or metadata to a NetCDF object.
   module subroutine write_frmt_err(err, unit, iotype, v_list, iostat, iomsg)
+    !> Error object updated if the operation fails.
     class(error_type), intent(in) :: err
+    !> Data or metadata used by this operation.
     integer, intent(in) :: unit
+    !> Data or metadata used by this operation.
     character(len=*), intent(in) :: iotype
+    !> Data or metadata used by this operation.
     integer, intent(in) :: v_list(:)
+    !> Data or metadata used by this operation.
     integer, intent(out) :: iostat
+    !> Data or metadata used by this operation.
     character(len=*), intent(inout) :: iomsg
   end subroutine write_frmt_err
 
+  !> Construct a dataset object from the supplied metadata and data.
   module elemental function new_dim_len_int32(name, len) result(dim)
+    !> Name used to identify the NetCDF object.
     character(len=*), intent(in) :: name
+    !> Data or metadata used by this operation.
     integer(int32), intent(in) :: len
+    !> Result produced by this operation.
     type(dimension_type) :: dim
   end function new_dim_len_int32
 
+  !> Construct a dataset object from the supplied metadata and data.
   module elemental function new_dim_len_int64(name, len) result(dim)
+    !> Name used to identify the NetCDF object.
     character(len=*), intent(in) :: name
+    !> Data or metadata used by this operation.
     integer(int64), intent(in) :: len
+    !> Result produced by this operation.
     type(dimension_type) :: dim
   end function new_dim_len_int64
 
+  !> Construct a dataset object from the supplied metadata and data.
   module elemental function new_dim_arg_int32(len, is_unlim) result(arg)
+    !> Data or metadata used by this operation.
     integer(int32), intent(in) :: len
+    !> Data or metadata used by this operation.
     logical, intent(in) :: is_unlim
+    !> Result produced by this operation.
     type(dimension_argument_type) :: arg
   end function new_dim_arg_int32
 
+  !> Construct a dataset object from the supplied metadata and data.
   module elemental function new_dim_arg_int64(len, is_unlim) result(arg)
+    !> Data or metadata used by this operation.
     integer(int64), intent(in) :: len
+    !> Data or metadata used by this operation.
     logical, intent(in) :: is_unlim
+    !> Result produced by this operation.
     type(dimension_argument_type) :: arg
   end function new_dim_arg_int64
 
+  !> Construct a dataset object from the supplied metadata and data.
   module elemental function new_dim_args(name, args) result(dim)
+    !> Name used to identify the NetCDF object.
     character(len=*), intent(in) :: name
+    !> Data or metadata used by this operation.
     type(dimension_argument_type), intent(in) :: args
+    !> Result produced by this operation.
     type(dimension_type) :: dim
   end function new_dim_args
 
@@ -429,26 +583,41 @@ interface
     type(variable_type), intent(in) :: x, y
   end function neq_var
 
+  !> Query and return requested NetCDF metadata.
   module pure function get_size(var, dim) result(n)
+    !> Variable to process.
     type(variable_type), intent(in) :: var
+    !> Dimension to process.
     integer, intent(in), optional :: dim
+    !> Result produced by this operation.
     integer(int64) :: n
   end function get_size
 
+  !> Query and return requested NetCDF metadata.
   module pure function get_shape(var) result(extents)
+    !> Variable to process.
     type(variable_type), intent(in) :: var
+    !> Result produced by this operation.
     integer, allocatable :: extents(:)
   end function get_shape
 
+  !> Perform the sum_vars operation.
   module function sum_vars(vars) result(total)
+    !> Variables to process or add to the dataset.
     type(variable_type), intent(in) :: vars(:)
+    !> Result produced by this operation.
     type(variable_type) :: total
   end function sum_vars
 
+  !> Perform the buffer_size operation.
   module pure function buffer_size(dtype, len, context) result(nbytes)
+    !> Data or metadata used by this operation.
     integer(data_type), intent(in) :: dtype
+    !> Data or metadata used by this operation.
     integer(int64), intent(in) :: len
+    !> Data or metadata used by this operation.
     character(len=*), intent(in), optional :: context
+    !> Result produced by this operation.
     integer :: nbytes
   end function buffer_size
 end interface

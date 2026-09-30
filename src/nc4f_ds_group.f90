@@ -5,9 +5,13 @@ contains
 
 !> Initialize an owning attribute buffer.
 module subroutine init_att(att, name, dtype, len)
+  !> Attribute to process.
   type(attribute_type), intent(inout) :: att
+  !> Name used to identify the NetCDF object.
   character(len=*), intent(in) :: name
+  !> Data or metadata used by this operation.
   integer(data_type), intent(in) :: dtype
+  !> Data or metadata used by this operation.
   integer(int64), intent(in) :: len
 
   call init_att_(att, name, dtype, len, deep=.true.)
@@ -15,13 +19,13 @@ end subroutine init_att
 
 !> Initialize attribute metadata and optionally allocate an owning buffer.
 module subroutine init_att_(att, name, dtype, len, deep)
-  !> Input/output argument: `att`.
+  !> Attribute to process.
   type(attribute_type), intent(inout) :: att
-  !> Input argument: `name`.
+  !> Name used to identify the NetCDF object.
   character(len=*), intent(in) :: name
-  !> Input argument: `dtype`.
+  !> Dataset data type code to validate or translate.
   integer(data_type), intent(in) :: dtype
-  !> Input argument: `len`.
+  !> Length of the dimension or attribute.
   integer(int64), intent(in) :: len
   !> Whether to allocate an owning data buffer.
   logical, intent(in), optional :: deep
@@ -40,11 +44,17 @@ end subroutine init_att_
 
 !> Initialize variable metadata and an owning buffer.
 module subroutine init_var(var, name, dtype, len, dims, atts)
+  !> Variable to process.
   type(variable_type), intent(inout) :: var
+  !> Name used to identify the NetCDF object.
   character(len=*), intent(in) :: name
+  !> Data or metadata used by this operation.
   integer(data_type), intent(in) :: dtype
+  !> Data or metadata used by this operation.
   integer(int64), intent(in) :: len
+  !> Dimensions describing the variable shape.
   type(dimension_type), intent(in) :: dims(:)
+  !> Attributes to process or attach.
   type(attribute_type), intent(in), optional :: atts(:)
 
   call init_var_(var, name, dtype, len, dims, atts, deep=.true.)
@@ -52,19 +62,19 @@ end subroutine init_var
 
 !> Initialize variable metadata and optionally allocate an owning buffer.
 module subroutine init_var_(var, name, dtype, len, dims, atts, deep)
-  !> Input/output argument: `var`.
+  !> Variable to process.
   type(variable_type), intent(inout) :: var
-  !> Input argument: `name`.
+  !> Name used to identify the NetCDF object.
   character(len=*), intent(in) :: name
-  !> Input argument: `dtype`.
+  !> Dataset data type code to validate or translate.
   integer(data_type), intent(in) :: dtype
-  !> Input argument: `len`.
+  !> Length of the dimension or attribute.
   integer(int64), intent(in) :: len
-  !> Input argument: `dims`.
+  !> Dimensions describing the variable shape.
   type(dimension_type), intent(in) :: dims(:)
-  !> Input argument: `atts`.
+  !> Attributes to process or attach.
   type(attribute_type), intent(in), optional :: atts(:)
-  !> Input argument: `deep`.
+  !> Whether to make an owned deep copy of the data.
   logical, intent(in), optional :: deep
   logical :: deep_copy
 
@@ -85,77 +95,77 @@ end subroutine init_var_
 
 !> Compute `new_dataset_empty`.
 module function new_dataset_empty(name, atts, deep) result(grp)
-  !> Input argument: `name`.
+  !> Name used to identify the NetCDF object.
   character(len=*), intent(in) :: name
-  !> Input argument: `atts`.
+  !> Attributes to process or attach.
   type(attribute_type), intent(in), optional :: atts(:)
-  !> Input argument: `deep`.
+  !> Whether to make an owned deep copy of the data.
   logical, intent(in), optional :: deep
-  !> Return value: `grp`.
+  !> Result produced by this operation.
   type(group_type) :: grp
   call new_dataset_(grp, name, atts=atts, deep=deep)
 end function new_dataset_empty
 
 !> Compute `new_dataset_vars`.
 module function new_dataset_vars(name, vars, atts, deep) result(grp)
-  !> Input argument: `name`.
+  !> Name used to identify the NetCDF object.
   character(len=*), intent(in) :: name
-  !> Input argument: `vars`.
+  !> Variables to process or add to the dataset.
   type(variable_type), intent(in) :: vars(:)
-  !> Input argument: `atts`.
+  !> Attributes to process or attach.
   type(attribute_type), intent(in), optional :: atts(:)
-  !> Input argument: `deep`.
+  !> Whether to make an owned deep copy of the data.
   logical, intent(in), optional :: deep
-  !> Return value: `grp`.
+  !> Result produced by this operation.
   type(group_type) :: grp
   call new_dataset_(grp, name, vars=vars, atts=atts, deep=deep)
 end function new_dataset_vars
 
 !> Compute `new_dataset_grps`.
 module function new_dataset_grps(name, grps, atts, deep) result(grp)
-  !> Input argument: `name`.
+  !> Name used to identify the NetCDF object.
   character(len=*), intent(in) :: name
-  !> Input argument: `grps`.
+  !> Data or metadata used by this operation.
   type(group_type), intent(in) :: grps(:)
-  !> Input argument: `atts`.
+  !> Attributes to process or attach.
   type(attribute_type), intent(in), optional :: atts(:)
-  !> Input argument: `deep`.
+  !> Whether to make an owned deep copy of the data.
   logical, intent(in), optional :: deep
-  !> Return value: `grp`.
+  !> Result produced by this operation.
   type(group_type) :: grp
   call new_dataset_(grp, name, grps=grps, atts=atts, deep=deep)
 end function new_dataset_grps
 
 !> Compute `new_dataset_all`.
 module function new_dataset_all(name, vars, grps, atts, deep) result(grp)
-  !> Input argument: `name`.
+  !> Name used to identify the NetCDF object.
   character(len=*), intent(in) :: name
-  !> Input argument: `vars`.
+  !> Variables to process or add to the dataset.
   type(variable_type), intent(in) :: vars(:)
-  !> Input argument: `grps`.
+  !> Data or metadata used by this operation.
   type(group_type), intent(in) :: grps(:)
-  !> Input argument: `atts`.
+  !> Attributes to process or attach.
   type(attribute_type), intent(in), optional :: atts(:)
-  !> Input argument: `deep`.
+  !> Whether to make an owned deep copy of the data.
   logical, intent(in), optional :: deep
-  !> Return value: `grp`.
+  !> Result produced by this operation.
   type(group_type) :: grp
   call new_dataset_(grp, name, vars, grps, atts, deep)
 end function new_dataset_all
 
 !> Populate a group with intrinsic or explicit deep child copies.
 module subroutine new_dataset_(grp, name, vars, grps, atts, deep)
-  !> Output argument: `grp`.
+  !> Data or metadata used by this operation.
   type(group_type), intent(out) :: grp
-  !> Input argument: `name`.
+  !> Name used to identify the NetCDF object.
   character(len=*), intent(in) :: name
-  !> Input argument: `vars`.
+  !> Variables to process or add to the dataset.
   type(variable_type), intent(in), optional :: vars(:)
-  !> Input argument: `grps`.
+  !> Data or metadata used by this operation.
   type(group_type), intent(in), optional :: grps(:)
-  !> Input argument: `atts`.
+  !> Attributes to process or attach.
   type(attribute_type), intent(in), optional :: atts(:)
-  !> Input argument: `deep`.
+  !> Whether to make an owned deep copy of the data.
   logical, intent(in), optional :: deep
   logical :: deep_copy
 
@@ -193,9 +203,9 @@ end subroutine new_dataset_
 !>
 !> Dimensions sharing a name must have matching length and unlimited status.
 function collect_dims_(vars) result(dims)
-  !> Input argument: `vars`.
+  !> Variables to process or add to the dataset.
   type(variable_type), intent(in) :: vars(:)
-  !> Return value: `dims`.
+  !> Result produced by this operation.
   type(dimension_type), allocatable :: dims(:)
   type(dimension_type), allocatable :: collected(:)
   integer :: i, j, k, n, ndims
@@ -234,13 +244,13 @@ end function collect_dims_
 
 !> Compute `buffer_size`.
 pure module function buffer_size(dtype, len, context) result(nbytes)
-  !> Input argument: `dtype`.
+  !> Dataset data type code to validate or translate.
   integer(data_type), intent(in) :: dtype
-  !> Input argument: `len`.
+  !> Length of the dimension or attribute.
   integer(int64), intent(in) :: len
-  !> Input argument: `context`.
+  !> Context included in a validation or error message.
   character(len=*), intent(in), optional :: context
-  !> Return value: `nbytes`.
+  !> Result produced by this operation.
   integer :: nbytes
   integer(int64) :: item_bytes
 
