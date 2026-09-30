@@ -15,14 +15,43 @@ an [xarray](https://xarray.dev/)-like programming style in modern Fortran that:
 
 - provide constructors such as `DATARRAY` and `DATASET` to conveniently form
   the data structures required for NetCDF variables and groups, along with
-  dimensions and attributes;
+  dimensions and attributes. For example,
+  ```fortran
+  type(variable_type) :: da
+  real, allocatable :: values(:,:)
+  da = datarray("geospatial_data", values, ["lat".dim.721,"lon".dim.1440])
+  ```
 - output these data structures through the unified `TO_NETCDF` pipeline;
-- read NetCDF files with `OPEN_NETCDF` and `GET_VARIABLE`;
+  ```fortran
+  type(variable_type) :: da
+  call to_netcdf("output.nc", da)
+  ```
+- read NetCDF files with `OPEN_NETCDF` and `GET_VARIABLE`. For example,
+  ```fortran
+  type(netcdf_type) :: nc
+  type(variable_type) :: var
+  nc = open_netcdf("input.nc", "r")
+  var = get_variable(nc, "var_name")
+  ```
 - extract intrinsic Fortran data structures from these models through the
-  unified `EXTRACT` interface.
-
-Additionally, this library implements user-defined derived-type I/O procedures
-that allow users to output NetCDF metadata in a format similar to `ncdump -h`.
+  unified `EXTRACT` interface. For example,
+  ```fortran
+  type(variable_type) :: var
+  real, pointer :: vals(:)
+  call extract(var, vars)
+  ```
+- additionally, this library implements user-defined derived-type I/O procedures
+  that allow users to output NetCDF metadata in a format similar to `ncdump -h`.
+  For example,
+  ```fortran
+  type(variable_type) :: var
+  real, allocatable :: values(:,:)
+  da = datarray("geospatial_data", values, &
+    & ["lat".dim.721,"lon".dim.1440], atts=["coordinates".att."lat lon"])
+  print *, var
+  ! float geospatial_data(lat, lon) ;
+  !    char:coordinates = "lat lon" ;
+  ```
 
 ## What NC4F Cannot Do
 
@@ -65,13 +94,6 @@ link = ["netcdf"]
 ```
 
 ## Examples
-
-All examples can be imported from the model `nc4f`
-
-```fortran
-use, non_intrinsic :: nc4f
-implicit none (type, external)
-```
 
 ### Write a NetCDF file
 
