@@ -8,23 +8,24 @@ program mandelbrot_example
   real(real64), parameter :: REAL_MAX = 1.0
   real(real64), parameter :: IMAG_MIN = -1.5
   real(real64), parameter :: IMAG_MAX = 1.5
-  real(real64), parameter :: STEP = 0.005
+  real(real64), parameter :: STEP = 0.003
   integer, parameter :: NREAL = nint((REAL_MAX - REAL_MIN) / STEP) + 1
   integer, parameter :: NIMAG = nint((IMAG_MAX - IMAG_MIN) / STEP) + 1
 
   integer :: imag_idx, real_idx
-  real(real64), allocatable :: imag_axis(:), real_axis(:), values(:, :)
+  real(real64), allocatable :: imag_axis(:), real_axis(:)
+  integer, allocatable :: values(:, :)
   type(dimension_type) :: imag_dim, real_dim
   type(variable_type) :: vars(3)
+  complex(kind=real64) :: z
 
   real_axis = [(REAL_MIN + STEP * (real_idx - 1), real_idx = 1, NREAL)]
   imag_axis = [(IMAG_MIN + STEP * (imag_idx - 1), imag_idx = 1, NIMAG)]
 
   allocate (values(NREAL, NIMAG))
-  do concurrent (imag_idx = 1:NIMAG, real_idx = 1:NREAL)
-    associate (z => cmplx(real_axis(real_idx), imag_axis(imag_idx), kind=real64))
-      values(real_idx, imag_idx) = log10(real(mandelbrot(z), kind=real64))
-    end associate
+  do concurrent (imag_idx = 1:NIMAG, real_idx = 1:NREAL) local(z) shared(values)
+    z = cmplx(real_axis(real_idx), imag_axis(imag_idx), kind=real64)
+    values(real_idx, imag_idx) = int(mandelbrot(z))
   end do
 
   real_dim = "real".dim.size(real_axis)
