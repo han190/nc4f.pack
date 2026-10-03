@@ -27,6 +27,16 @@ name = "temperature"
 source-dir = "example"
 main = "temperature.f90"
 
+[[example]]
+name = "write-netcdf"
+source-dir = "example"
+main = "write_netcdf.f90"
+
+[[example]]
+name = "read-netcdf"
+source-dir = "example"
+main = "read_netcdf.f90"
+
 [[test]]
 name = "test-suite"
 source-dir = "test"

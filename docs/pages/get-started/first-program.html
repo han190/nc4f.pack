@@ -1,0 +1,717 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Examples &#8212; NC4F</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=4418a689" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3a28e95d" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'get-started/first-program';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Derived Types" href="../reference/types.html" />
+    <link rel="prev" title="Build and Installation" href="build-installation.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">NC4F</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Get Started</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="build-installation.html">Build and Installation</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Examples</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../reference/types.html">Derived Types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/exposed-nc-constants.html">Exposed NC Constants</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/functions-and-subroutines.html">Functions and Subroutines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/operators.html">Overloaded Operators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/derived-type-io.html">User-Defined Derived-Type I/O</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/han190/nc4f.pack" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/han190/nc4f.pack/issues/new?title=Issue%20on%20page%20%2Fget-started/first-program.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/get-started/first-program.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Examples</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#write-a-netcdf-file">Write a NetCDF file</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#read-a-netcdf-file">Read a NetCDF file</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#temperature-read-write">Temperature read/write</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mandelbrot-set">Mandelbrot set</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="examples">
+<h1>Examples<a class="headerlink" href="#examples" title="Link to this heading">#</a></h1>
+<p>The following runnable examples are available in the repository’s <code class="docutils literal notranslate"><span class="pre">example/</span></code>
+directory.</p>
+<section id="write-a-netcdf-file">
+<h2>Write a NetCDF file<a class="headerlink" href="#write-a-netcdf-file" title="Link to this heading">#</a></h2>
+<p>This example creates a one-dimensional temperature variable and writes it to
+<code class="docutils literal notranslate"><span class="pre">example.nc</span></code>.</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">program </span><span class="n">write_netcdf_example</span>
+<span class="w">  </span><span class="k">use</span><span class="p">,</span><span class="w"> </span><span class="k">non_intrinsic</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">nc4f</span>
+<span class="w">  </span><span class="k">implicit none</span><span class="w"> </span><span class="p">(</span><span class="k">type</span><span class="p">,</span><span class="w"> </span><span class="k">external</span><span class="p">)</span>
+
+<span class="w">  </span><span class="kt">real</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">values</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="mf">3.0</span><span class="p">]</span>
+<span class="w">  </span><span class="k">type</span><span class="p">(</span><span class="n">variable_type</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">temperature</span>
+
+<span class="w">  </span><span class="n">temperature</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">datarray</span><span class="p">(</span><span class="s2">"temperature"</span><span class="p">,</span><span class="w"> </span><span class="n">values</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="s2">"time"</span><span class="p">.</span><span class="nb">dim</span><span class="p">.</span><span class="mi">3</span><span class="p">])</span>
+<span class="w">  </span><span class="k">call </span><span class="n">to_netcdf</span><span class="p">(</span><span class="s2">"example.nc"</span><span class="p">,</span><span class="w"> </span><span class="n">temperature</span><span class="p">)</span>
+<span class="k">end program </span><span class="n">write_netcdf_example</span>
+</pre></div>
+</div>
+</section>
+<section id="read-a-netcdf-file">
+<h2>Read a NetCDF file<a class="headerlink" href="#read-a-netcdf-file" title="Link to this heading">#</a></h2>
+<p>After running the write example, this program opens <code class="docutils literal notranslate"><span class="pre">example.nc</span></code>, reads the
+temperature variable, and extracts its values into a Fortran pointer.</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">program </span><span class="n">read_netcdf_example</span>
+<span class="w">  </span><span class="k">use</span><span class="p">,</span><span class="w"> </span><span class="k">non_intrinsic</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">nc4f</span>
+<span class="w">  </span><span class="k">implicit none</span><span class="w"> </span><span class="p">(</span><span class="k">type</span><span class="p">,</span><span class="w"> </span><span class="k">external</span><span class="p">)</span>
+
+<span class="w">  </span><span class="k">type</span><span class="p">(</span><span class="n">netcdf_type</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">nc</span>
+<span class="w">  </span><span class="k">type</span><span class="p">(</span><span class="n">variable_type</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">temperature</span>
+<span class="w">  </span><span class="kt">real</span><span class="p">,</span><span class="w"> </span><span class="k">pointer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">values</span><span class="p">(:)</span>
+
+<span class="w">  </span><span class="n">nc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">open_netcdf</span><span class="p">(</span><span class="s2">"example.nc"</span><span class="p">,</span><span class="w"> </span><span class="s2">"r"</span><span class="p">)</span>
+<span class="w">  </span><span class="n">temperature</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_variable</span><span class="p">(</span><span class="n">nc</span><span class="p">,</span><span class="w"> </span><span class="s2">"temperature"</span><span class="p">)</span>
+<span class="w">  </span><span class="k">call </span><span class="n">extract</span><span class="p">(</span><span class="n">temperature</span><span class="p">,</span><span class="w"> </span><span class="n">values</span><span class="p">)</span>
+<span class="w">  </span><span class="k">call </span><span class="n">close_netcdf</span><span class="p">(</span><span class="n">nc</span><span class="p">)</span>
+
+<span class="w">  </span><span class="k">print</span><span class="w"> </span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="n">values</span>
+<span class="k">end program </span><span class="n">read_netcdf_example</span>
+</pre></div>
+</div>
+</section>
+<section id="temperature-read-write">
+<h2>Temperature read/write<a class="headerlink" href="#temperature-read-write" title="Link to this heading">#</a></h2>
+<p>This example writes station air temperatures with CF-style metadata, then
+reopens the file and extracts the values into a Fortran pointer.</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">program </span><span class="n">temperature_example</span>
+
+<span class="w">  </span><span class="k">use</span><span class="p">,</span><span class="w"> </span><span class="k">non_intrinsic</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">nc4f</span>
+<span class="w">  </span><span class="k">implicit none</span><span class="w"> </span><span class="p">(</span><span class="k">type</span><span class="p">,</span><span class="w"> </span><span class="k">external</span><span class="p">)</span>
+
+<span class="w">  </span><span class="kt">real</span><span class="p">,</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">temperature</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mi">28</span><span class="mf">9.4</span><span class="p">,</span><span class="w"> </span><span class="mi">29</span><span class="mf">0.1</span><span class="p">,</span><span class="w"> </span><span class="mi">28</span><span class="mf">8.7</span><span class="p">]</span>
+<span class="w">  </span><span class="kt">real</span><span class="p">,</span><span class="w"> </span><span class="k">pointer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">temperature_vals</span><span class="p">(:)</span>
+<span class="w">  </span><span class="k">type</span><span class="p">(</span><span class="n">netcdf_type</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">nc</span>
+<span class="w">  </span><span class="k">type</span><span class="p">(</span><span class="n">variable_type</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">temperature_write</span><span class="p">,</span><span class="w"> </span><span class="n">temperature_read</span>
+
+<span class="w">  </span><span class="n">temperature_write</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">datarray</span><span class="p">(</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">    </span><span class="p">&amp;</span><span class="w"> </span><span class="s2">"temperature"</span><span class="p">,</span><span class="w"> </span><span class="n">temperature</span><span class="p">,</span><span class="w"> </span><span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">"station"</span><span class="p">.</span><span class="nb">dim</span><span class="p">.</span><span class="mi">3</span><span class="p">],</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">    </span><span class="p">&amp;</span><span class="w"> </span><span class="n">atts</span><span class="o">=</span><span class="p">[</span><span class="s2">"units"</span><span class="p">.</span><span class="n">att</span><span class="p">.</span><span class="s2">"K"</span><span class="p">,</span><span class="w"> </span><span class="s2">"long_name"</span><span class="p">.</span><span class="n">att</span><span class="p">.</span><span class="s2">"Near-surface air temperature"</span><span class="p">])</span>
+<span class="w">  </span><span class="k">call </span><span class="n">to_netcdf</span><span class="p">(</span><span class="s2">"temperature.nc"</span><span class="p">,</span><span class="w"> </span><span class="n">temperature_write</span><span class="p">)</span>
+
+<span class="w">  </span><span class="n">nc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">open_netcdf</span><span class="p">(</span><span class="s2">"temperature.nc"</span><span class="p">,</span><span class="w"> </span><span class="s2">"r"</span><span class="p">)</span>
+<span class="w">  </span><span class="n">temperature_read</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_variable</span><span class="p">(</span><span class="n">nc</span><span class="p">,</span><span class="w"> </span><span class="s2">"temperature"</span><span class="p">)</span>
+<span class="w">  </span><span class="k">call </span><span class="n">close_netcdf</span><span class="p">(</span><span class="n">nc</span><span class="p">)</span>
+<span class="w">  </span><span class="k">call </span><span class="n">extract</span><span class="p">(</span><span class="n">temperature_read</span><span class="p">,</span><span class="w"> </span><span class="n">temperature_vals</span><span class="p">)</span>
+
+<span class="w">  </span><span class="k">print</span><span class="w"> </span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="n">temperature_read</span>
+<span class="w">  </span><span class="k">print</span><span class="w"> </span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="n">temperature_vals</span>
+
+<span class="k">end program </span><span class="n">temperature_example</span>
+</pre></div>
+</div>
+</section>
+<section id="mandelbrot-set">
+<h2>Mandelbrot set<a class="headerlink" href="#mandelbrot-set" title="Link to this heading">#</a></h2>
+<p>This example constructs a two-dimensional Mandelbrot iteration-count field and
+writes it, along with coordinate variables and metadata, to a NetCDF file.</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">program </span><span class="n">mandelbrot_example</span>
+
+<span class="w">  </span><span class="k">use</span><span class="p">,</span><span class="w"> </span><span class="k">intrinsic</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">iso_fortran_env</span><span class="p">,</span><span class="w"> </span><span class="k">only</span><span class="p">:</span><span class="w"> </span><span class="n">real64</span>
+<span class="w">  </span><span class="k">use</span><span class="p">,</span><span class="w"> </span><span class="k">non_intrinsic</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">nc4f</span>
+<span class="w">  </span><span class="k">implicit none</span><span class="w"> </span><span class="p">(</span><span class="k">type</span><span class="p">,</span><span class="w"> </span><span class="k">external</span><span class="p">)</span>
+
+<span class="w">  </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">REAL_MIN</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mf">2.0_real64</span>
+<span class="w">  </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">REAL_MAX</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0_real64</span>
+<span class="w">  </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">IMAG_MIN</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mf">1.5_real64</span>
+<span class="w">  </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">IMAG_MAX</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.5_real64</span>
+<span class="w">  </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">STEP</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.003_real64</span>
+
+<span class="w">  </span><span class="kt">integer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">m</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">j</span>
+<span class="w">  </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">axis_i</span><span class="p">(:),</span><span class="w"> </span><span class="n">axis_r</span><span class="p">(:)</span>
+<span class="w">  </span><span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">values</span><span class="p">(:,</span><span class="w"> </span><span class="p">:)</span>
+<span class="w">  </span><span class="k">type</span><span class="p">(</span><span class="n">dimension_type</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">imag_dim</span><span class="p">,</span><span class="w"> </span><span class="n">real_dim</span>
+<span class="w">  </span><span class="k">type</span><span class="p">(</span><span class="n">variable_type</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">vars</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="w">  </span><span class="n">axis_r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">arange</span><span class="p">(</span><span class="n">REAL_MIN</span><span class="p">,</span><span class="w"> </span><span class="n">REAL_MAX</span><span class="p">,</span><span class="w"> </span><span class="n">STEP</span><span class="p">)</span>
+<span class="w">  </span><span class="n">axis_i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">arange</span><span class="p">(</span><span class="n">IMAG_MIN</span><span class="p">,</span><span class="w"> </span><span class="n">IMAG_MAX</span><span class="p">,</span><span class="w"> </span><span class="n">STEP</span><span class="p">)</span>
+<span class="w">  </span><span class="n">m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">axis_r</span><span class="p">)</span>
+<span class="w">  </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">axis_i</span><span class="p">)</span>
+
+<span class="w">  </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">values</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">))</span>
+<span class="w">  </span><span class="k">do</span><span class="w"> </span><span class="k">concurrent</span><span class="w"> </span><span class="p">(</span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">:</span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">:</span><span class="n">m</span><span class="p">)</span><span class="w"> </span><span class="n">shared</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+<span class="w">    </span><span class="n">values</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mandelbrot</span><span class="p">(</span><span class="nb">cmplx</span><span class="p">(</span><span class="n">axis_r</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="w"> </span><span class="n">axis_i</span><span class="p">(</span><span class="n">j</span><span class="p">),</span><span class="w"> </span><span class="nb">kind</span><span class="o">=</span><span class="n">real64</span><span class="p">))</span>
+<span class="w">  </span><span class="k">end do</span>
+
+<span class="k">  </span><span class="n">real_dim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"real"</span><span class="p">.</span><span class="nb">dim</span><span class="p">.</span><span class="n">m</span>
+<span class="w">  </span><span class="n">imag_dim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"imaginary"</span><span class="p">.</span><span class="nb">dim</span><span class="p">.</span><span class="n">n</span>
+
+<span class="w">  </span><span class="n">vars</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">datarray</span><span class="p">(</span><span class="s2">"real"</span><span class="p">,</span><span class="w"> </span><span class="n">axis_r</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="n">real_dim</span><span class="p">],</span><span class="w"> </span><span class="n">atts</span><span class="o">=</span><span class="p">[</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">    </span><span class="p">&amp;</span><span class="w"> </span><span class="s2">"valid_min"</span><span class="p">.</span><span class="n">att</span><span class="p">.</span><span class="nb">minval</span><span class="p">(</span><span class="n">axis_r</span><span class="p">),</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">    </span><span class="p">&amp;</span><span class="w"> </span><span class="s2">"valid_max"</span><span class="p">.</span><span class="n">att</span><span class="p">.</span><span class="nb">maxval</span><span class="p">(</span><span class="n">axis_r</span><span class="p">),</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">    </span><span class="p">&amp;</span><span class="w"> </span><span class="s2">"long_name"</span><span class="p">.</span><span class="n">att</span><span class="p">.</span><span class="s2">"Real Axis"</span><span class="p">])</span>
+<span class="w">  </span><span class="n">vars</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">datarray</span><span class="p">(</span><span class="s2">"imaginary"</span><span class="p">,</span><span class="w"> </span><span class="n">axis_i</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="n">imag_dim</span><span class="p">],</span><span class="w"> </span><span class="n">atts</span><span class="o">=</span><span class="p">[</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">    </span><span class="p">&amp;</span><span class="w"> </span><span class="s2">"valid_min"</span><span class="p">.</span><span class="n">att</span><span class="p">.</span><span class="nb">minval</span><span class="p">(</span><span class="n">axis_i</span><span class="p">),</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">    </span><span class="p">&amp;</span><span class="w"> </span><span class="s2">"valid_max"</span><span class="p">.</span><span class="n">att</span><span class="p">.</span><span class="nb">maxval</span><span class="p">(</span><span class="n">axis_i</span><span class="p">),</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">    </span><span class="p">&amp;</span><span class="w"> </span><span class="s2">"long_name"</span><span class="p">.</span><span class="n">att</span><span class="p">.</span><span class="s2">"Imaginary Axis"</span><span class="p">])</span>
+<span class="w">  </span><span class="n">vars</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">datarray</span><span class="p">(</span><span class="s2">"count"</span><span class="p">,</span><span class="w"> </span><span class="n">values</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="n">imag_dim</span><span class="p">,</span><span class="w"> </span><span class="n">real_dim</span><span class="p">],</span><span class="w"> </span><span class="n">atts</span><span class="o">=</span><span class="p">[</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">    </span><span class="p">&amp;</span><span class="w"> </span><span class="s2">"coordinates"</span><span class="p">.</span><span class="n">att</span><span class="p">.</span><span class="s2">"real imaginary"</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">    </span><span class="p">&amp;</span><span class="w"> </span><span class="s2">"units"</span><span class="p">.</span><span class="n">att</span><span class="p">.</span><span class="s2">"dimensionless"</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">    </span><span class="p">&amp;</span><span class="w"> </span><span class="s2">"long_name"</span><span class="p">.</span><span class="n">att</span><span class="p">.</span><span class="s2">"Mandelbrot escape iteration count"</span><span class="p">])</span>
+
+<span class="w">  </span><span class="k">print</span><span class="w"> </span><span class="s2">"(dt)"</span><span class="p">,</span><span class="w"> </span><span class="n">vars</span>
+<span class="w">  </span><span class="k">call </span><span class="n">to_netcdf</span><span class="p">(</span><span class="s2">"mandelbrot.nc"</span><span class="p">,</span><span class="w"> </span><span class="n">vars</span><span class="p">,</span><span class="w"> </span><span class="n">atts</span><span class="o">=</span><span class="p">[</span><span class="s2">"title"</span><span class="p">.</span><span class="n">att</span><span class="p">.</span><span class="s2">"Mandelbrot Set"</span><span class="p">])</span>
+
+<span class="k">contains</span>
+
+<span class="w">  </span><span class="c">!&gt; Return evenly spaced values from `start` through `end`.</span>
+<span class="w">  </span><span class="k">pure function </span><span class="n">arange</span><span class="p">(</span><span class="n">start</span><span class="p">,</span><span class="w"> </span><span class="k">end</span><span class="p">,</span><span class="w"> </span><span class="n">step</span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+<span class="w">    </span><span class="c">!&gt; First value in the returned sequence.</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">start</span>
+<span class="w">    </span><span class="c">!&gt; Last value in the returned sequence.</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="k">end</span>
+<span class="w">    </span><span class="c">!&gt; Spacing between consecutive values.</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">step</span>
+<span class="w">    </span><span class="c">!&gt; Evenly spaced sequence including both endpoints.</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">arr</span><span class="p">(:)</span>
+<span class="w">    </span><span class="kt">integer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">i</span>
+
+<span class="w">    </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">nint</span><span class="p">((</span><span class="k">end</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">step</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">    </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">arr</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+
+<span class="w">    </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">n</span>
+<span class="w">      </span><span class="n">arr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">start</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">step</span><span class="o">*</span><span class="kt">real</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">real64</span><span class="p">)</span>
+<span class="w">    </span><span class="k">end do</span>
+<span class="k">    </span><span class="n">arr</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">end</span>
+<span class="k">  end function </span><span class="n">arange</span>
+
+<span class="w">  </span><span class="c">!&gt; Perform the mandelbrot operation.</span>
+<span class="w">  </span><span class="kt">integer </span><span class="k">recursive elemental function </span><span class="n">mandelbrot</span><span class="p">(</span><span class="n">z</span><span class="p">,</span><span class="w"> </span><span class="n">zp</span><span class="p">,</span><span class="w"> </span><span class="n">niter</span><span class="p">,</span><span class="w"> </span><span class="n">niter_max</span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+<span class="w">    </span><span class="c">!&gt; Complex point whose escape iteration count is calculated.</span>
+<span class="w">    </span><span class="kt">complex</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">z</span>
+<span class="w">    </span><span class="c">!&gt; Current orbit value for recursive calls.</span>
+<span class="w">    </span><span class="kt">complex</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">zp</span>
+<span class="w">    </span><span class="c">!&gt; Number of iterations already completed.</span>
+<span class="w">    </span><span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">niter</span>
+<span class="w">    </span><span class="c">!&gt; Maximum number of iterations before the point is considered bounded.</span>
+<span class="w">    </span><span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">niter_max</span>
+<span class="w">    </span><span class="kt">complex</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">a</span>
+<span class="w">    </span><span class="kt">integer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">n_max</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">zp</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">      </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">zp</span>
+<span class="w">    </span><span class="k">else</span>
+<span class="k">      </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">cmplx</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="nb">kind</span><span class="o">=</span><span class="n">real64</span><span class="p">)</span>
+<span class="w">    </span><span class="k">end if</span>
+
+<span class="k">    if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">niter</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">      </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">niter</span>
+<span class="w">    </span><span class="k">else</span>
+<span class="k">      </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">    </span><span class="k">end if</span>
+
+<span class="k">    if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">niter_max</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">      </span><span class="n">n_max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">niter_max</span>
+<span class="w">    </span><span class="k">else</span>
+<span class="k">      </span><span class="n">n_max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10000</span>
+<span class="w">    </span><span class="k">end if</span>
+
+<span class="k">    if</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">n_max</span><span class="w"> </span><span class="p">.</span><span class="nb">or</span><span class="p">.</span><span class="w"> </span><span class="nb">abs</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">2.0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">      </span><span class="n">val</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span>
+<span class="w">    </span><span class="k">else</span>
+<span class="k">      </span><span class="n">val</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mandelbrot</span><span class="p">(</span><span class="n">z</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">z</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">n_max</span><span class="p">)</span>
+<span class="w">    </span><span class="k">end if</span>
+<span class="k">  end function </span><span class="n">mandelbrot</span>
+
+<span class="k">end program </span><span class="n">mandelbrot_example</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="build-installation.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Build and Installation</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../reference/types.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Derived Types</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#write-a-netcdf-file">Write a NetCDF file</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#read-a-netcdf-file">Read a NetCDF file</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#temperature-read-write">Temperature read/write</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mandelbrot-set">Mandelbrot set</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Han Tang
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2019-2026, Han Tang.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
