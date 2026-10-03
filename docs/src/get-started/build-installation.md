@@ -59,7 +59,14 @@ site from the repository root:
 
 ```sh
 python -m pip install -r requirements-docs.txt
-python -m sphinx -b html docs build/sphinx
+python -m sphinx -b html -c docs docs/src docs/pages
 ```
 
-Open `build/sphinx/index.html` in a browser.
+Open `docs/pages/index.html` in a browser.
+
+## Publish with GitHub Pages
+
+The `Deploy documentation` workflow builds the Sphinx site from `docs/src` and
+deploys the generated `docs/pages` artifact whenever documentation changes are
+pushed to `main`. In the repository's **Settings → Pages**, select **GitHub
+Actions** as the publishing source.

@@ -1,0 +1,3 @@
+# Sphinx build output is deployed as a GitHub Pages artifact, not committed.
+*
+!.gitignore
