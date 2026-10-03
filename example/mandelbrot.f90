@@ -4,61 +4,87 @@ program mandelbrot_example
   use, non_intrinsic :: nc4f
   implicit none (type, external)
 
-  real(real64), parameter :: REAL_MIN = -2.0
-  real(real64), parameter :: REAL_MAX = 1.0
-  real(real64), parameter :: IMAG_MIN = -1.5
-  real(real64), parameter :: IMAG_MAX = 1.5
-  real(real64), parameter :: STEP = 0.003
-  integer, parameter :: NREAL = nint((REAL_MAX - REAL_MIN) / STEP) + 1
-  integer, parameter :: NIMAG = nint((IMAG_MAX - IMAG_MIN) / STEP) + 1
+  real(real64), parameter :: REAL_MIN = -2.0_real64
+  real(real64), parameter :: REAL_MAX = 1.0_real64
+  real(real64), parameter :: IMAG_MIN = -1.5_real64
+  real(real64), parameter :: IMAG_MAX = 1.5_real64
+  real(real64), parameter :: STEP = 0.003_real64
 
-  integer :: imag_idx, real_idx
-  real(real64), allocatable :: imag_axis(:), real_axis(:)
+  integer :: m, n, i, j
+  real(real64), allocatable :: axis_i(:), axis_r(:)
   integer, allocatable :: values(:, :)
   type(dimension_type) :: imag_dim, real_dim
   type(variable_type) :: vars(3)
-  complex(kind=real64) :: z
 
-  real_axis = [(REAL_MIN + STEP * (real_idx - 1), real_idx = 1, NREAL)]
-  imag_axis = [(IMAG_MIN + STEP * (imag_idx - 1), imag_idx = 1, NIMAG)]
+  axis_r = arange(REAL_MIN, REAL_MAX, STEP)
+  axis_i = arange(IMAG_MIN, IMAG_MAX, STEP)
+  m = size(axis_r)
+  n = size(axis_i)
 
-  allocate (values(NREAL, NIMAG))
-  do concurrent (imag_idx = 1:NIMAG, real_idx = 1:NREAL) local(z) shared(values)
-    z = cmplx(real_axis(real_idx), imag_axis(imag_idx), kind=real64)
-    values(real_idx, imag_idx) = int(mandelbrot(z))
+  allocate (values(m, n))
+  do concurrent (j = 1:n, i = 1:m) shared(values)
+    values(i, j) = mandelbrot(cmplx(axis_r(i), axis_i(j), kind=real64))
   end do
 
-  real_dim = "real".dim.size(real_axis)
-  imag_dim = "imaginary".dim.size(imag_axis)
+  real_dim = "real".dim.m
+  imag_dim = "imaginary".dim.n
 
-  vars(1) = datarray("real", real_axis, [real_dim])
-  vars(2) = datarray("imaginary", imag_axis, [imag_dim])
+  vars(1) = datarray("real", axis_r, [real_dim], atts=[ &
+    & "valid_min".att.minval(axis_r), &
+    & "valid_max".att.maxval(axis_r), &
+    & "long_name".att."Real Axis"])
+  vars(2) = datarray("imaginary", axis_i, [imag_dim], atts=[ &
+    & "valid_min".att.minval(axis_i), &
+    & "valid_max".att.maxval(axis_i), &
+    & "long_name".att."Imaginary Axis"])
   vars(3) = datarray("count", values, [imag_dim, real_dim], atts=[ &
-    & "long_name".att."Log10 of Mandelbrot escape iteration count", &
-    & "coordinates".att."real imaginary", "units".att."dimensionless"])
+    & "coordinates".att."real imaginary", &
+    & "units".att."dimensionless", &
+    & "long_name".att."Mandelbrot escape iteration count"])
+
+  print "(dt)", vars
   call to_netcdf("mandelbrot.nc", vars, atts=["title".att."Mandelbrot Set"])
 
 contains
 
+  !> Return evenly spaced values from `start` through `end`.
+  pure function arange(start, end, step) result(arr)
+    !> First value in the returned sequence.
+    real(real64), intent(in) :: start
+    !> Last value in the returned sequence.
+    real(real64), intent(in) :: end
+    !> Spacing between consecutive values.
+    real(real64), intent(in) :: step
+    !> Evenly spaced sequence including both endpoints.
+    real(real64), allocatable :: arr(:)
+    integer :: n, i
+
+    n = nint((end - start) / step) + 1
+    allocate (arr(n))
+
+    do i = 1, n
+      arr(i) = start + step*real(i - 1, real64)
+    end do
+    arr(n) = end
+  end function arange
+
   !> Perform the mandelbrot operation.
-  recursive elemental function mandelbrot(z, zp, niter, niter_max) result(val)
-    !> Data or metadata used by this operation.
+  integer recursive elemental function mandelbrot(z, zp, niter, niter_max) result(val)
+    !> Complex point whose escape iteration count is calculated.
     complex(kind=real64), intent(in) :: z
-    !> Data or metadata used by this operation.
+    !> Current orbit value for recursive calls.
     complex(kind=real64), intent(in), optional :: zp
-    !> Data or metadata used by this operation.
+    !> Number of iterations already completed.
     integer, intent(in), optional :: niter
-    !> Data or metadata used by this operation.
+    !> Maximum number of iterations before the point is considered bounded.
     integer, intent(in), optional :: niter_max
-    !> Result produced by this operation.
-    complex(kind=real64) :: val
     complex(kind=real64) :: a
     integer :: n, n_max
 
     if (present(zp)) then
       a = zp
     else
-      a = cmplx(0.0, 0.0)
+      a = cmplx(0.0, 0.0, kind=real64)
     end if
 
     if (present(niter)) then
@@ -74,7 +100,7 @@ contains
     end if
 
     if (n == n_max .or. abs(a) > 2.0) then
-      val = cmplx(real(n), 0.0)
+      val = n
     else
       val = mandelbrot(z, a * a + z, n + 1, n_max)
     end if

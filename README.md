@@ -8,42 +8,43 @@ not required.
 ## What NC4F Can Do
 
 The main purpose of this library is to experiment the feasibility of
-an [xarray](https://xarray.dev/)-like programming style in modern Fortran that:
+an [xarray](https://xarray.dev/)-like programming style in modern Fortran that write and read through some unified functions. For example:
 
-- provide constructors such as `DATARRAY` and `DATASET` to conveniently form
-  the data structures required for NetCDF variables and groups;
-  ```
-  type(variable_type) :: da
-  real, allocatable :: values(:,:)
-  da = datarray("temp", values, &
-    & dims=["latitude".dim.721,"longitude".dim.1440], &
-    & atts=["units".att."K","long_name".att."Temperature in Kelvin"])
-  ```
-- output these data structures through `TO_NETCDF`;
-  ```
-  type(variable_type) :: da
-  call to_netcdf("output.nc", da)
-  ```
-- read NetCDF files with `OPEN_NETCDF` and `GET_VARIABLE`;
-  ```
-  type(netcdf_type) :: nc
-  type(variable_type) :: var
-  nc = open_netcdf("input.nc", "r")
-  var = get_variable(nc, "var_name")
-  ```
-- extract intrinsic Fortran data structures from these models through `EXTRACT`;
-  ```
-  type(variable_type) :: var
-  real, pointer :: vals(:,:)
-  call extract(var, vars)
-  ```
-- additionally, this library implements user-defined derived-type I/O procedures
-  that allow users to output NetCDF metadata in a format similar to `ncdump -h`.
-  ```
-  type(netcdf_type) :: nc
-  nc = open_netcdf("input.nc", "r")
-  print *, nc
-  ```
+- Build a [NetCDF data model](https://docs.unidata.ucar.edu/netcdf-c/4.10.0/netcdf_data_model.html) with `DATARRAY` and `DATASET`;
+- Write a data model to a NetCDF file with `TO_NETCDF`;
+- Open a NetCDF file and retrieve variables with `OPEN_NETCDF` and `GET_VARIABLE`;
+- Extract intrinsic Fortran data from an attribute or variable with `EXTRACT`;
+
+## A First Program
+
+Here is a taste of how you can use this library:
+
+```fortran
+program main
+
+use, non_intrinsic :: nc4f
+implicit none (type, external)
+
+real, target :: temperature(3) = [289.4, 290.1, 288.7]
+real, pointer :: temperature_vals(:)
+type(netcdf_type) :: nc
+type(variable_type) :: temperature_write, temperature_read
+
+temperature_write = datarray( &
+  & "temperature", temperature, dims=["station".dim.3], &
+  & atts=["units".att."K", "long_name".att."Near-surface air temperature"])
+call to_netcdf("temperature.nc", temperature_write)
+
+nc = open_netcdf("temperature.nc", "r")
+temperature_read = get_variable(nc, "temperature")
+call close_netcdf(nc)
+call extract(temperature_read, temperature_vals)
+
+print *, temperature_read
+print *, temperature_vals
+
+end program main
+```
 
 ## What NC4F Cannot Do
 
@@ -86,44 +87,4 @@ nc4f = { git = "https://github.com/han190/nc4f.pack.git" }
 
 [build]
 link = ["netcdf"]
-```
-
-## Simple Examples
-
-### Write a NetCDF file
-
-Create a variable from a Fortran array, then write it as a new file:
-
-```fortran
-program main
-  use, non_intrinsic :: nc4f
-  implicit none (type, external)
-
-  real :: values(3) = [1.0, 2.0, 3.0]
-  type(variable_type) :: temp
-
-  temp = datarray("temperature", values, ["time".dim.3])
-  call to_netcdf("example.nc", temp)
-end program main
-```
-
-### Read a NetCDF file
-
-Open a file, materialize a variable, extract a typed pointer, and close the
-file when it is no longer needed:
-
-```fortran
-program main
-  use, non_intrinsic :: nc4f
-  implicit none (type, external)
-
-  type(netcdf_type) :: nc
-  type(variable_type) :: temp
-  real, pointer :: values(:)
-
-  nc = open_netcdf("example.nc", "r")
-  temp = get_variable(nc, "temperature")
-  call extract(temp, values)
-  call close_netcdf(nc)
-end program main
 ```

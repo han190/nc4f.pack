@@ -22,6 +22,11 @@ name = "mandelbrot"
 source-dir = "example"
 main = "mandelbrot.f90"
 
+[[example]]
+name = "temperature"
+source-dir = "example"
+main = "temperature.f90"
+
 [[test]]
 name = "test-suite"
 source-dir = "test"
