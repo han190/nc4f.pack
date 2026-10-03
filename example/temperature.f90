@@ -3,7 +3,7 @@ program temperature_example
   use, non_intrinsic :: nc4f
   implicit none (type, external)
 
-  real, target :: temperature(3) = [289.4, 290.1, 288.7]
+  real, parameter :: temperature(3) = [289.4, 290.1, 288.7]
   real, pointer :: temperature_vals(:)
   type(netcdf_type) :: nc
   type(variable_type) :: temperature_write, temperature_read
