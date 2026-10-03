@@ -8,7 +8,7 @@ not required.
 ## What NC4F Can Do
 
 The main purpose of this library is to experiment the feasibility of
-an [xarray](https://xarray.dev/)-like programming style in modern Fortran that write and read through some unified functions. For example:
+an [xarray](https://xarray.dev/)-like programming style in modern Fortran that write and read through some unified routines. For example:
 
 - Build a [NetCDF data model](https://docs.unidata.ucar.edu/netcdf-c/4.10.0/netcdf_data_model.html) with `DATARRAY` and `DATASET`;
 - Write a data model to a NetCDF file with `TO_NETCDF`;
@@ -19,29 +19,29 @@ an [xarray](https://xarray.dev/)-like programming style in modern Fortran that w
 
 Here is a taste of how you can use this library:
 
-```fortran
+```fortran-free-form
 program main
 
-use, non_intrinsic :: nc4f
-implicit none (type, external)
-
-real, parameter :: temperature(3) = [289.4, 290.1, 288.7]
-real, pointer :: temperature_vals(:)
-type(netcdf_type) :: nc
-type(variable_type) :: temperature_write, temperature_read
-
-temperature_write = datarray( &
-  & "temperature", temperature, dims=["station".dim.3], &
-  & atts=["units".att."K", "long_name".att."Near-surface air temperature"])
-call to_netcdf("temperature.nc", temperature_write)
-
-nc = open_netcdf("temperature.nc", "r")
-temperature_read = get_variable(nc, "temperature")
-call close_netcdf(nc)
-call extract(temperature_read, temperature_vals)
-
-print *, temperature_read
-print *, temperature_vals
+  use :: nc4f
+  implicit none
+  
+  real, parameter :: temperature(3) = [289.4, 290.1, 288.7]
+  real, pointer :: temperature_vals(:)
+  type(netcdf_type) :: nc
+  type(variable_type) :: temperature_write, temperature_read
+  
+  temperature_write = datarray( &
+    & "temperature", temperature, dims=["station".dim.3], &
+    & atts=["units".att."K", "long_name".att."Near-surface air temperature"])
+  call to_netcdf("temperature.nc", temperature_write)
+  
+  nc = open_netcdf("temperature.nc", "r")
+  temperature_read = get_variable(nc, "temperature")
+  call close_netcdf(nc)
+  call extract(temperature_read, temperature_vals)
+  
+  print *, temperature_read
+  print *, temperature_vals
 
 end program main
 ```
