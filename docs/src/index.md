@@ -109,3 +109,10 @@ reference/functions-and-subroutines
 reference/operators
 reference/derived-type-io
 ```
+
+```{toctree}
+:caption: Project
+:maxdepth: 1
+
+license
+```
