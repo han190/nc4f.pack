@@ -8,6 +8,37 @@ footer.bd-footer-content {
   border-top: 0;
 }
 
+/* The desktop header contains only a duplicate search control. */
+@media (min-width: 960px) {
+  .bd-header {
+    display: none;
+  }
+}
+
+.bd-header-article .sidebar-toggle.primary-toggle {
+  display: none;
+}
+
+/* Remove the separators between the primary sidebar, content, and page TOC. */
+.bd-sidebar-primary {
+  border-right: 0;
+}
+
+.bd-sidebar-secondary {
+  border-left: 0;
+}
+
+.sidebar-secondary-item {
+  border-left: 0;
+}
+
+/* Darken the primary-sidebar title and search controls. */
+html[data-theme="dark"] #pst-primary-sidebar .navbar-brand,
+html[data-theme="dark"] #pst-primary-sidebar .search-button-field {
+  background-color: #121212;
+  color: #f5f5f5;
+}
+
 .bd-content table {
   --bs-table-border-color: var(--pst-color-background);
   --pst-color-table-row-hover-bg: var(--pst-color-background);

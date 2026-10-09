@@ -37,7 +37,7 @@ program mandelbrot_example
     & "valid_min".att.minval(axis_i), &
     & "valid_max".att.maxval(axis_i), &
     & "long_name".att."Imaginary Axis"])
-  vars(3) = datarray("count", values, [imag_dim, real_dim], atts=[ &
+  vars(3) = datarray("count", values, [real_dim, imag_dim], atts=[ &
     & "coordinates".att."real imaginary", &
     & "units".att."dimensionless", &
     & "long_name".att."Mandelbrot escape iteration count"])
@@ -69,7 +69,8 @@ contains
   end function arange
 
   !> Perform the mandelbrot operation.
-  integer recursive elemental function mandelbrot(z, zp, niter, niter_max) result(val)
+  integer recursive elemental function mandelbrot( &
+    & z, zp, niter, niter_max) result(val)
     !> Complex point whose escape iteration count is calculated.
     complex(kind=real64), intent(in) :: z
     !> Current orbit value for recursive calls.
