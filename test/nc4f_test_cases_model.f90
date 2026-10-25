@@ -1,5 +1,5 @@
-!> Public data-model integration checks.
 submodule(nc4f_test_cases) nc4f_test_cases_model
+!! Public data-model integration checks.
 
 use, intrinsic :: iso_c_binding, only: c_associated, c_loc
 use, intrinsic :: iso_fortran_env, only: int8, int64, real32
@@ -7,10 +7,10 @@ implicit none (type, external)
 
 contains
 
-!> Execute `data_model`.
 module subroutine data_model(passed)
-  !> Whether the test case has passed.
+  !! Execute `data_model`.
   logical, intent(inout) :: passed
+  !! Whether the test case has passed.
   type(attribute_type) :: atts(1), cloned_att
   type(dimension_type) :: dim
   type(group_type) :: attrs_only, child, deep_grp, empty, group_only, grp, &

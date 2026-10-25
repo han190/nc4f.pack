@@ -15,94 +15,133 @@ interface operator(.att.)
 end interface operator(.att.)
 
 interface
-  !> Create an `attribute_type` from an array of `integer` of kind `int8`.
   pure module function new_att_int8(name, values) result(att)
+    !! Create an `attribute_type` from an array of `integer` of kind `int8`.
     character(len=*), intent(in) :: name
+    !! Attribute name.
     integer(int8), intent(in) :: values(:)
+    !! Attribute values.
     type(attribute_type) :: att
+    !! Returned Attribute.
   end function new_att_int8
 
-  !> Create a scalar `attribute_type` from a `integer` value.
   elemental module function new_att_int8_scalar(name, value) result(att)
+    !! Create a scalar `attribute_type` from a `integer` value.
     character(len=*), intent(in) :: name
+    !! Attribute name.
     integer(int8), intent(in) :: value
+    !! Attribute value.
     type(attribute_type) :: att
+    !! Returned Attribute.
   end function new_att_int8_scalar
 
-  !> Create an `attribute_type` from an array of `integer` of kind `int16`.
   pure module function new_att_int16(name, values) result(att)
+    !! Create an `attribute_type` from an array of `integer` of kind `int16`.
     character(len=*), intent(in) :: name
+    !! Attribute name.
     integer(int16), intent(in) :: values(:)
+    !! Attribute values.
     type(attribute_type) :: att
+    !! Returned Attribute.
   end function new_att_int16
 
-  !> Create a scalar `attribute_type` from a `integer` value.
   elemental module function new_att_int16_scalar(name, value) result(att)
+    !! Create a scalar `attribute_type` from a `integer` value.
     character(len=*), intent(in) :: name
+    !! Attribute name.
     integer(int16), intent(in) :: value
+    !! Attribute value.
     type(attribute_type) :: att
+    !! Returned Attribute.
   end function new_att_int16_scalar
 
-  !> Create an `attribute_type` from an array of `integer` of kind `int32`.
   pure module function new_att_int32(name, values) result(att)
+    !! Create an `attribute_type` from an array of `integer` of kind `int32`.
     character(len=*), intent(in) :: name
+    !! Attribute name.
     integer(int32), intent(in) :: values(:)
+    !! Attribute values.
     type(attribute_type) :: att
+    !! Returned Attribute.
   end function new_att_int32
 
-  !> Create a scalar `attribute_type` from a `integer` value.
   elemental module function new_att_int32_scalar(name, value) result(att)
+    !! Create a scalar `attribute_type` from a `integer` value.
     character(len=*), intent(in) :: name
+    !! Attribute name.
     integer(int32), intent(in) :: value
+    !! Attribute value.
     type(attribute_type) :: att
+    !! Returned Attribute.
   end function new_att_int32_scalar
 
-  !> Create an `attribute_type` from an array of `integer` of kind `int64`.
   pure module function new_att_int64(name, values) result(att)
+    !! Create an `attribute_type` from an array of `integer` of kind `int64`.
     character(len=*), intent(in) :: name
+    !! Attribute name.
     integer(int64), intent(in) :: values(:)
+    !! Attribute values.
     type(attribute_type) :: att
+    !! Returned Attribute.
   end function new_att_int64
 
-  !> Create a scalar `attribute_type` from a `integer` value.
   elemental module function new_att_int64_scalar(name, value) result(att)
+    !! Create a scalar `attribute_type` from a `integer` value.
     character(len=*), intent(in) :: name
+    !! Attribute name.
     integer(int64), intent(in) :: value
+    !! Attribute value.
     type(attribute_type) :: att
+    !! Returned Attribute.
   end function new_att_int64_scalar
 
-  !> Create an `attribute_type` from an array of `real` of kind `real32`.
   pure module function new_att_real32(name, values) result(att)
+    !! Create an `attribute_type` from an array of `real` of kind `real32`.
     character(len=*), intent(in) :: name
+    !! Attribute name.
     real(real32), intent(in) :: values(:)
+    !! Attribute values.
     type(attribute_type) :: att
+    !! Returned Attribute.
   end function new_att_real32
 
-  !> Create a scalar `attribute_type` from a `real` value.
   elemental module function new_att_real32_scalar(name, value) result(att)
+    !! Create a scalar `attribute_type` from a `real` value.
     character(len=*), intent(in) :: name
+    !! Attribute name.
     real(real32), intent(in) :: value
+    !! Attribute value.
     type(attribute_type) :: att
+    !! Returned Attribute.
   end function new_att_real32_scalar
 
-  !> Create an `attribute_type` from an array of `real` of kind `real64`.
   pure module function new_att_real64(name, values) result(att)
+    !! Create an `attribute_type` from an array of `real` of kind `real64`.
     character(len=*), intent(in) :: name
+    !! Attribute name.
     real(real64), intent(in) :: values(:)
+    !! Attribute values.
     type(attribute_type) :: att
+    !! Returned Attribute.
   end function new_att_real64
 
-  !> Create a scalar `attribute_type` from a `real` value.
   elemental module function new_att_real64_scalar(name, value) result(att)
+    !! Create a scalar `attribute_type` from a `real` value.
     character(len=*), intent(in) :: name
+    !! Attribute name.
     real(real64), intent(in) :: value
+    !! Attribute value.
     type(attribute_type) :: att
+    !! Returned Attribute.
   end function new_att_real64_scalar
 
-  !> Create an `attribute_type` containing character data.
   module function new_att_character(name, value) result(att)
+    !! Create an `attribute_type` containing character data.
     character(len=*), intent(in) :: name
+    !! Attribute name.
     character(len=*), intent(in) :: value
+    !! Attribute value (character).
     type(attribute_type), target :: att
+    !! Returned Attribute.
   end function new_att_character
 end interface

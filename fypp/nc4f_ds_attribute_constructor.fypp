@@ -4,27 +4,27 @@ implicit none (type, external)
 contains
 
 #: for D, T, K in zip(dtypes, types, kinds)
-!> Create an `attribute_type` from an array of `${T}$` of kind `${K}$`.
 pure module function new_att_${K}$(name, values) result(att)
-  !> Name used to identify the NetCDF object.
+  !! Create an `attribute_type` from an array of `${T}$` of kind `${K}$`.
   character(len=*), intent(in) :: name
-  !> Values used to populate the attribute.
+  !! Name used to identify the NetCDF object.
   ${T}$(${K}$), intent(in) :: values(:)
-  !> Constructed attribute containing the supplied values.
+  !! Values used to populate the attribute.
   type(attribute_type) :: att
+  !! Constructed attribute containing the supplied values.
 
   call init_att(att, name, ${D}$, size(values, kind=int64))
   if (size(values) > 0) att%buffer = transfer(values, 0_int8, size(att%buffer))
 end function new_att_${K}$
 
-!> Create a scalar `attribute_type` from a `${T}$` value.
 elemental module function new_att_${K}$_scalar(name, value) result(att)
-  !> Name used to identify the NetCDF object.
+  !! Create a scalar `attribute_type` from a `${T}$` value.
   character(len=*), intent(in) :: name
-  !> Scalar value stored in the attribute.
+  !! Name used to identify the NetCDF object.
   ${T}$(${K}$), intent(in) :: value
-  !> Constructed single-value attribute.
+  !! Scalar value stored in the attribute.
   type(attribute_type) :: att
+  !! Constructed single-value attribute.
   ${T}$(${K}$) :: tmp(1)
 
   tmp(1) = value
@@ -32,14 +32,14 @@ elemental module function new_att_${K}$_scalar(name, value) result(att)
 end function new_att_${K}$_scalar${NEWLINE()}$
 #: endfor
 
-!> Create an `attribute_type` containing character data.
 module function new_att_character(name, value) result(att)
-  !> Name used to identify the NetCDF object.
+  !! Create an `attribute_type` containing character data.
   character(len=*), intent(in) :: name
-  !> Character data stored in the attribute.
+  !! Name used to identify the NetCDF object.
   character(len=*), intent(in) :: value
-  !> Constructed attribute containing the character data.
+  !! Character data stored in the attribute.
   type(attribute_type) :: att
+  !! Constructed attribute containing the character data.
 
   call init_att(att, name, CHAR_TYPE, len(value, kind=int64))
   if (len(value) > 0) att%buffer = transfer(value, 0_int8, size(att%buffer))

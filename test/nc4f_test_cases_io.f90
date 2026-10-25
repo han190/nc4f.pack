@@ -4,10 +4,10 @@ implicit none (type, external)
 
 contains
 
-!> Execute `unlimited_wr`.
 module subroutine unlimited_wr(passed)
-  !> Whether the test case has passed.
+  !! Execute `unlimited_wr`.
   logical, intent(inout) :: passed
+  !! Whether the test case has passed.
   integer(int32), parameter :: values(2, 3) = reshape([ &
     & 1_int32, 2_int32, 3_int32, 4_int32, 5_int32, 6_int32], [2, 3])
   integer(int32), pointer :: actual_values(:, :)
@@ -26,10 +26,10 @@ module subroutine unlimited_wr(passed)
     & all(actual%dims == var%dims) .and. all(actual_values == values)
 end subroutine unlimited_wr
 
-!> Execute `unlimited_dims`.
 module subroutine unlimited_dims(passed)
-  !> Whether the test case has passed.
+  !! Execute `unlimited_dims`.
   logical, intent(inout) :: passed
+  !! Whether the test case has passed.
   integer(int32), parameter :: values(2, 3) = reshape([ &
     & 1_int32, 2_int32, 3_int32, 4_int32, 5_int32, 6_int32], [2, 3])
   type(error_type) :: err

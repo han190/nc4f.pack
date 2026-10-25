@@ -1,20 +1,20 @@
-!> Variable construction, inquiry, and equality for the direct v2 data model.
 submodule(nc4f_ds) nc4f_ds_variable
+!! Variable construction, inquiry, and equality for the direct v2 data model.
 implicit none (type, external)
 contains
 
-!> Initialize a variable from a name and existing shape/type metadata.
 module subroutine init_var_mold(var, name, mold, atts, deep)
-  !> Variable to process.
+  !! Initialize a variable from a name and existing shape/type metadata.
   type(variable_type), intent(inout) :: var
-  !> Name for the new variable.
+  !! Variable to process.
   character(len=*), intent(in) :: name
-  !> Data or metadata used by this operation.
+  !! Name for the new variable.
   type(variable_type), target, intent(in) :: mold
-  !> Optional attributes for the new variable.
+  !! Data or metadata used by this operation.
   type(attribute_type), intent(in), optional :: atts(:)
-  !> Whether to allocate an owning data buffer or borrow the mold's storage.
+  !! Optional attributes for the new variable.
   logical, intent(in), optional :: deep
+  !! Whether to allocate an owning data buffer or borrow the mold's storage.
   logical :: deep_copy
 
   deep_copy = .true.
@@ -36,14 +36,14 @@ module subroutine init_var_mold(var, name, mold, atts, deep)
   end if
 end subroutine init_var_mold
 
-!> Return the element count of a variable or one of its dimensions.
 pure module function get_size(var, dim) result(n)
-  !> Variable to process.
+  !! Return the element count of a variable or one of its dimensions.
   type(variable_type), intent(in) :: var
-  !> Dimension to process.
+  !! Variable to process.
   integer, intent(in), optional :: dim
-  !> Result produced by this operation.
+  !! Dimension to process.
   integer(int64) :: n
+  !! Result produced by this operation.
   integer :: dim_, i
 
   if (.not. allocated(var%dims)) error stop &
@@ -72,12 +72,12 @@ pure module function get_size(var, dim) result(n)
   end select
 end function get_size
 
-!> Return variable dimension lengths in their stored Fortran order.
 pure module function get_shape(var) result(extents)
-  !> Variable to process.
+  !! Return variable dimension lengths in their stored Fortran order.
   type(variable_type), intent(in) :: var
-  !> Result produced by this operation.
+  !! Variable to process.
   integer, allocatable :: extents(:)
+  !! Result produced by this operation.
   integer :: i
 
   if (.not. allocated(var%dims)) error stop &
@@ -91,10 +91,10 @@ pure module function get_shape(var) result(extents)
   end do
 end function get_shape
 
-!> Return true when two variables have identical metadata and byte values.
 logical elemental module function eq_var(x, y) result(is_equal)
-  !> Dataset objects or values used by this operation.
+  !! Return true when two variables have identical metadata and byte values.
   type(variable_type), intent(in) :: x, y
+  !! Dataset objects or values used by this operation.
 
   call validate(x, context="[eq_var]")
   call validate(y, context="[eq_var]")
@@ -153,10 +153,10 @@ logical elemental module function eq_var(x, y) result(is_equal)
   end if
 end function eq_var
 
-!> Return true when two variables differ.
 logical elemental module function neq_var(x, y) result(is_equal)
-  !> Dataset objects or values used by this operation.
+  !! Return true when two variables differ.
   type(variable_type), intent(in) :: x, y
+  !! Dataset objects or values used by this operation.
 
   is_equal = .not. eq_var(x, y)
 end function neq_var

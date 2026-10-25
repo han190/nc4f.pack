@@ -2,10 +2,10 @@ submodule(nc4f_nc) nc4f_nc_utility
 implicit none (type, external)
 contains
 
-!> Allocate a fresh byte buffer for an attribute read from a NetCDF file.
 pure module subroutine initialize_att(att)
-  !> Attribute to process.
+  !! Allocate a fresh byte buffer for an attribute read from a NetCDF file.
   type(attribute_type), intent(inout) :: att
+  !! Attribute to process.
   integer :: nbytes
 
   nbytes = buffer_size(att%dtype, att%len, "[initialize_att]")
@@ -14,10 +14,10 @@ pure module subroutine initialize_att(att)
   allocate (att%buffer(nbytes))
 end subroutine initialize_att
 
-!> Allocate a fresh byte buffer for a variable read from a NetCDF file.
 pure module subroutine initialize_var(var)
-  !> Variable to process.
+  !! Allocate a fresh byte buffer for a variable read from a NetCDF file.
   type(variable_type), intent(inout) :: var
+  !! Variable to process.
   integer :: nbytes
 
   nbytes = buffer_size(var%dtype, var%len, "[initialize_var]")
@@ -26,22 +26,22 @@ pure module subroutine initialize_var(var)
   allocate (var%buffer(nbytes))
 end subroutine initialize_var
 
-!> Trim space from both ends of a character string.
 pure module function clip(string) result(clipped)
-  !> Data or metadata used by this operation.
+  !! Trim space from both ends of a character string.
   character(len=*), intent(in) :: string
-  !> String with trailing blanks removed.
+  !! Data or metadata used by this operation.
   character(len=:), allocatable :: clipped
+  !! String with trailing blanks removed.
 
   clipped = trim(adjustl(string))
 end function clip
 
-!> Convert a NUL-terminated C string into a Fortran string.
 pure module function c2fstr(cstr) result(fstr)
-  !> Data or metadata used by this operation.
+  !! Convert a NUL-terminated C string into a Fortran string.
   character(kind=c_char, len=*), intent(in) :: cstr
-  !> Fortran string converted from C storage.
+  !! Data or metadata used by this operation.
   character(len=:), allocatable :: fstr
+  !! Fortran string converted from C storage.
   integer :: inull, str_len
 
   str_len = len(cstr)
@@ -51,12 +51,12 @@ pure module function c2fstr(cstr) result(fstr)
   fstr = cstr(1:str_len)
 end function c2fstr
 
-!> Convert a Fortran string into a NUL-terminated C string.
 pure module function f2cstr(fstr) result(cstr)
-  !> Data or metadata used by this operation.
+  !! Convert a Fortran string into a NUL-terminated C string.
   character(len=*), intent(in) :: fstr
-  !> C-compatible string converted from Fortran text.
+  !! Data or metadata used by this operation.
   character(kind=c_char, len=:), allocatable :: cstr
+  !! C-compatible string converted from Fortran text.
 
   cstr = trim(fstr)//c_null_char
 end function f2cstr

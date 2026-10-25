@@ -2,22 +2,22 @@ submodule(nc4f_nc) nc4f_nc_variable
 implicit none (type, external)
 contains
 
-!> Read a variable's data from a netCDF dataset into a `variable_type`.
 module function get_variable(nc, name, start, count, stride, err) result(var)
-  !> Dataset or group containing the variable.
+  !! Read a variable's data from a netCDF dataset into a `variable_type`.
   class(group_type), intent(in) :: nc
-  !> Name of the variable to read.
+  !! Dataset or group containing the variable.
   character(len=*), intent(in) :: name
-  !> Optional one-based Fortran-order hyperslab start indices.
+  !! Name of the variable to read.
   integer, intent(in), optional :: start(:)
-  !> Optional hyperslab lengths.
+  !! Optional one-based Fortran-order hyperslab start indices.
   integer, intent(in), optional :: count(:)
-  !> Optional hyperslab strides.
+  !! Optional hyperslab lengths.
   integer, intent(in), optional :: stride(:)
-  !> Optional operation error. When absent, failures stop the program.
+  !! Optional hyperslab strides.
   type(error_type), intent(out), optional :: err
-  !> Materialized variable data and metadata.
+  !! Optional operation error. When absent, failures stop the program.
   type(variable_type), target :: var
+  !! Materialized variable data and metadata.
   type(error_type) :: op_err
 
   var = get_var_(nc, name, start, count, stride, op_err)
@@ -28,18 +28,18 @@ module function get_variable(nc, name, start, count, stride, err) result(var)
   end if
 end function get_variable
 
-!> Scalar implementation shared by the fail-fast and error-aware overloads.
 function get_var_(nc, name, start, count, stride, err) result(var)
-  !> Open NetCDF dataset handle.
+  !! Scalar implementation shared by the fail-fast and error-aware overloads.
   class(group_type), intent(in) :: nc
-  !> Name used to identify the NetCDF object.
+  !! Open NetCDF dataset handle.
   character(len=*), intent(in) :: name
-  !> Optional starting indices, extents, and strides for the requested hyperslab.
+  !! Name used to identify the NetCDF object.
   integer, intent(in), optional :: start(:), count(:), stride(:)
-  !> Error object updated if the operation fails.
+  !! Optional starting indices, extents, and strides for the requested hyperslab.
   type(error_type), intent(out) :: err
-  !> Result produced by this operation.
+  !! Error object updated if the operation fails.
   type(variable_type), target :: var
+  !! Result produced by this operation.
   type(c_ptr) :: cptr, startp, countp, stridep
   integer(c_size_t), allocatable, target :: c_start(:), c_count(:)
   integer(c_ptrdiff_t), allocatable, target :: c_stride(:)
@@ -156,16 +156,16 @@ function get_var_(nc, name, start, count, stride, err) result(var)
   err = netcdf_err(stat, msg)
 end function get_var_
 
-!> Inquire a variable's metadata without reading its data buffer.
 impure elemental module function inquire_variable(nc, name, err) result(var)
-  !> Group containing the variable.
+  !! Inquire a variable's metadata without reading its data buffer.
   class(group_type), intent(in) :: nc
-  !> Name of the variable to inquire.
+  !! Group containing the variable.
   character(len=*), intent(in) :: name
-  !> Optional operation error. When absent, failures stop the program.
+  !! Name of the variable to inquire.
   type(error_type), intent(out), optional :: err
-  !> Variable metadata.
+  !! Optional operation error. When absent, failures stop the program.
   type(variable_type) :: var
+  !! Variable metadata.
   type(error_type) :: op_err
 
   var = inq_var_(nc, name, op_err)
@@ -176,16 +176,16 @@ impure elemental module function inquire_variable(nc, name, err) result(var)
   end if
 end function inquire_variable
 
-!> Scalar implementation shared by the fail-fast and error-aware overloads.
 function inq_var_(nc, name, err) result(var)
-  !> Open NetCDF dataset handle.
+  !! Scalar implementation shared by the fail-fast and error-aware overloads.
   class(group_type), intent(in) :: nc
-  !> Name used to identify the NetCDF object.
+  !! Open NetCDF dataset handle.
   character(len=*), intent(in) :: name
-  !> Error object updated if the operation fails.
+  !! Name used to identify the NetCDF object.
   type(error_type), intent(out) :: err
-  !> Result produced by this operation.
+  !! Error object updated if the operation fails.
   type(variable_type) :: var
+  !! Result produced by this operation.
   integer(c_int) :: stat
   character(len=MAX_CHAR_LEN) :: msg
 
@@ -204,16 +204,16 @@ function inq_var_(nc, name, err) result(var)
   var%len = size(var)
 end function inq_var_
 
-!> Inquire a variable's NetCDF type while allowing a status to propagate.
 function inq_vartype_(ncid, varid, err) result(vartype)
-  !> Dataset identifier.
+  !! Inquire a variable's NetCDF type while allowing a status to propagate.
   integer(c_int), intent(in) :: ncid
-  !> Variable identifier.
+  !! Dataset identifier.
   integer(c_int), intent(in) :: varid
-  !> Error object updated if the operation fails.
+  !! Variable identifier.
   type(error_type), intent(out) :: err
-  !> Result produced by this operation.
+  !! Error object updated if the operation fails.
   integer(c_int) :: vartype
+  !! Result produced by this operation.
   integer(c_int) :: stat
   character(len=MAX_CHAR_LEN) :: msg, fmt
 
@@ -225,18 +225,18 @@ function inq_vartype_(ncid, varid, err) result(vartype)
   err = netcdf_err(stat, msg)
 end function inq_vartype_
 
-!> Error-returning implementation of a Fortran-order hyperslab write.
 module subroutine put_vara(nc, var, start, count, err)
-  !> Open NetCDF dataset handle.
+  !! Error-returning implementation of a Fortran-order hyperslab write.
   class(group_type), intent(in) :: nc
-  !> Variable to process.
+  !! Open NetCDF dataset handle.
   type(variable_type), target, intent(in) :: var
-  !> Starting indices for the requested hyperslab.
+  !! Variable to process.
   integer, intent(in) :: start(:)
-  !> Element counts for the requested hyperslab.
+  !! Starting indices for the requested hyperslab.
   integer, intent(in) :: count(:)
-  !> Error object updated if the operation fails.
+  !! Element counts for the requested hyperslab.
   type(error_type), intent(out) :: err
+  !! Error object updated if the operation fails.
   type(variable_type) :: target
   integer(c_size_t), allocatable, target :: c_start(:), c_count(:)
   type(c_ptr) :: startp, countp
@@ -314,14 +314,14 @@ module subroutine put_vara(nc, var, start, count, err)
   err = netcdf_err(stat, msg)
 end subroutine put_vara
 
-!> Scalar implementation shared by the fail-fast and error-aware overloads.
 module subroutine put_var(nc, var, err)
-  !> Open NetCDF dataset handle.
+  !! Scalar implementation shared by the fail-fast and error-aware overloads.
   class(group_type), intent(in) :: nc
-  !> Variable to process.
+  !! Open NetCDF dataset handle.
   type(variable_type), target, intent(in) :: var
-  !> Error object updated if the operation fails.
+  !! Variable to process.
   type(error_type), intent(out) :: err
+  !! Error object updated if the operation fails.
   type(variable_type) :: tmp
   integer(c_size_t), allocatable, target :: c_start(:), c_count(:)
   type(c_ptr) :: startp, countp
@@ -356,16 +356,16 @@ module subroutine put_var(nc, var, err)
   err = netcdf_err(stat, "[put_var] Write variable data.")
 end subroutine put_var
 
-!> Define a variable in the netCDF file and return its `variable_type`.
 module function def_var(nc, var, err) result(new_var)
-  !> Open NetCDF dataset handle.
+  !! Define a variable in the netCDF file and return its `variable_type`.
   class(group_type), intent(in) :: nc
-  !> Variable to process.
+  !! Open NetCDF dataset handle.
   type(variable_type), intent(in) :: var
-  !> Error object updated if the operation fails.
+  !! Variable to process.
   type(error_type), intent(out) :: err
-  !> Result produced by this operation.
+  !! Error object updated if the operation fails.
   type(variable_type) :: new_var
+  !! Result produced by this operation.
   integer(c_int) :: varid, stat
   integer(c_int), allocatable :: new_dimids(:)
   type(dimension_type), allocatable :: new_dims(:)
@@ -379,8 +379,8 @@ module function def_var(nc, var, err) result(new_var)
     new_dims(i) = def_dim(nc, var%dims(i), err)
     if (has_err(err)) return
   end do
-  !> Reverse dimensions because this module calls the C API.
   do i = 1, n
+    !! Reverse dimensions because this module calls the C API.
     j = n - i + 1
     new_dimids(j) = new_dims(i)%id
   end do

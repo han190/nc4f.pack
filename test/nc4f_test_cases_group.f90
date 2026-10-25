@@ -4,10 +4,10 @@ use, intrinsic :: iso_fortran_env, only: real32, real64
 implicit none (type, external)
 contains
 
-!> Exercise recursive group construction and ncdump-like formatted output.
 module subroutine group_model(passed)
-  !> Whether the test case has passed.
+  !! Exercise recursive group construction and ncdump-like formatted output.
   logical, intent(inout) :: passed
+  !! Whether the test case has passed.
   character(len=256) :: line
   integer :: child_at, dims_at, file_unit, groups_at, iostat, line_number, &
     & root_at, vars_at, atts_at
@@ -101,10 +101,10 @@ module subroutine group_model(passed)
     & offset_found .and. compact_found
 end subroutine group_model
 
-!> Write recursive group descriptions through both group serialization APIs.
 module subroutine group_write(passed)
-  !> Whether the test case has passed.
+  !! Write recursive group descriptions through both group serialization APIs.
   logical, intent(inout) :: passed
+  !! Whether the test case has passed.
   real, pointer :: child_values(:), root_values(:)
   type(attribute_type) :: root_att
   type(error_type) :: err

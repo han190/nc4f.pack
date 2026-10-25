@@ -1,27 +1,27 @@
 #: mute
 
-#: set MAX_RANK = 15
-#: set ops = ['+', '-', '*', '/', '**']
-#: set op_names = ['add', 'sub', 'mul', 'div', 'pow']
-#: set kinds = ['int8', 'int16', 'int32', 'int64', 'real32', 'real64']
-#: set types = ['integer', 'integer', 'integer', 'integer', 'real', 'real']
-#: set dtypes = ['BYTE_TYPE', 'SHORT_TYPE', 'INT_TYPE', 'INT64_TYPE', 'FLOAT_TYPE', 'DOUBLE_TYPE']
+  #: set MAX_RANK = 15
+  #: set ops = ['+', '-', '*', '/', '**']
+  #: set op_names = ['add', 'sub', 'mul', 'div', 'pow']
+  #: set kinds = ['int8', 'int16', 'int32', 'int64', 'real32', 'real64']
+  #: set types = ['integer', 'integer', 'integer', 'integer', 'real', 'real']
+  #: set dtypes = ['BYTE_TYPE', 'SHORT_TYPE', 'INT_TYPE', 'INT64_TYPE', 'FLOAT_TYPE', 'DOUBLE_TYPE']
 
-#! Conditionally create a new line.
-#: def NEWLINE(cond=None)
-#: if cond is None or cond
-$: "\n"
-#: endif
-#: enddef
+  #! Conditionally create a new line.
+  #: def NEWLINE(cond=None)
+    #: if cond is None or cond
+      $: "\n"
+    #: endif
+  #: enddef
 
-#! Generate colons for array.
-#: def COLONS(R)
+  #! Generate colons for array.
+  #: def COLONS(R)
 :#{for _ in range(R - 1)}#, :#{endfor}#
-#: enddef
+  #: enddef
 
-#! Generate one-based first-element indices for an array.
-#: def ONES(R)
+  #! Generate one-based first-element indices for an array.
+  #: def ONES(R)
 ${', '.join(['1'] * R)}$
-#: enddef
+  #: enddef
 
 #: endmute

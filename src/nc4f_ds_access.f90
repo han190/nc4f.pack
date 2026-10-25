@@ -1,16 +1,16 @@
-!> Shared validation for data-model storage and metadata.
 submodule(nc4f_ds) nc4f_ds_access
+!! Shared validation for data-model storage and metadata.
 implicit none (type, external)
 contains
 
-!> Validate an attribute's metadata and active byte storage.
 pure module subroutine validate_att(att, dtype, context)
-  !> Attribute to process.
+  !! Validate an attribute's metadata and active byte storage.
   type(attribute_type), intent(in) :: att
-  !> Dataset data type code to validate or translate.
+  !! Attribute to process.
   integer(data_type), intent(in), optional :: dtype
-  !> Context included in a validation or error message.
+  !! Dataset data type code to validate or translate.
   character(len=*), intent(in) :: context
+  !! Context included in a validation or error message.
   integer(int64) :: ptr_size
 
   ptr_size = 0
@@ -19,16 +19,16 @@ pure module subroutine validate_att(att, dtype, context)
     & associated(att%ptr), ptr_size, dtype, context, "Attribute")
 end subroutine validate_att
 
-!> Validate a variable's metadata and active byte storage.
 pure module subroutine validate_var(var, dtype, rank, context)
-  !> Variable to process.
+  !! Validate a variable's metadata and active byte storage.
   type(variable_type), intent(in) :: var
-  !> Dataset data type code to validate or translate.
+  !! Variable to process.
   integer(data_type), intent(in), optional :: dtype
-  !> Expected number of variable dimensions.
+  !! Dataset data type code to validate or translate.
   integer, intent(in), optional :: rank
-  !> Context included in a validation or error message.
+  !! Expected number of variable dimensions.
   character(len=*), intent(in) :: context
+  !! Context included in a validation or error message.
   integer(int64) :: ptr_size
 
   if (.not. allocated(var%dims)) error stop &
@@ -48,25 +48,25 @@ pure module subroutine validate_var(var, dtype, rank, context)
     & associated(var%ptr), ptr_size, dtype, context, "Variable")
 end subroutine validate_var
 
-!> Validate common data-type, length, and byte-storage invariants.
 pure subroutine validate_(idtype, ilen, ibuffer, iassoc, &
   & ptr_size, dtype, context, type_context)
-  !> Stored NetCDF data type.
+  !! Validate common data-type, length, and byte-storage invariants.
   integer(data_type), intent(in) :: idtype
-  !> Stored element count.
+  !! Stored NetCDF data type.
   integer(int64), intent(in) :: ilen
-  !> Owned byte storage.
+  !! Stored element count.
   integer(int8), allocatable, intent(in) :: ibuffer(:)
-  !> Whether borrowed byte storage is associated.
+  !! Owned byte storage.
   logical, intent(in) :: iassoc
-  !> Capacity of borrowed byte storage in bytes.
+  !! Whether borrowed byte storage is associated.
   integer(int64), intent(in) :: ptr_size
-  !> Expected NetCDF data type.
+  !! Capacity of borrowed byte storage in bytes.
   integer(data_type), intent(in), optional :: dtype
-  !> Validation operation context.
+  !! Expected NetCDF data type.
   character(len=*), intent(in) :: context
-  !> Data-model type used in diagnostics.
+  !! Validation operation context.
   character(len=*), intent(in) :: type_context
+  !! Data-model type used in diagnostics.
   integer :: nbytes
 
   if (present(dtype)) then
@@ -95,38 +95,38 @@ pure subroutine validate_(idtype, ilen, ibuffer, iassoc, &
   end if
 end subroutine validate_
 
-!> Return the C address of an attribute's active byte storage.
 module function buffer2cptr_att(att) result(cptr)
-  !> Attribute to process.
+  !! Return the C address of an attribute's active byte storage.
   type(attribute_type), target, intent(in) :: att
-  !> C pointer to the requested byte buffer.
+  !! Attribute to process.
   type(c_ptr) :: cptr
+  !! C pointer to the requested byte buffer.
 
   call validate(att, context="[buffer2cptr_att]")
   cptr = buffer2cptr_(att%len, att%buffer, att%ptr)
 end function buffer2cptr_att
 
-!> Return the C address of a variable's active byte storage.
 module function buffer2cptr_var(var) result(cptr)
-  !> Variable to process.
+  !! Return the C address of a variable's active byte storage.
   type(variable_type), target, intent(in) :: var
-  !> C pointer to the requested byte buffer.
+  !! Variable to process.
   type(c_ptr) :: cptr
+  !! C pointer to the requested byte buffer.
 
   call validate(var, context="[buffer2cptr_var]")
   cptr = buffer2cptr_(var%len, var%buffer, var%ptr)
 end function buffer2cptr_var
 
-!> Return the C address of active owned or borrowed byte storage.
 function buffer2cptr_(ilen, ibuffer, iptr) result(cptr)
-  !> Number of stored elements.
+  !! Return the C address of active owned or borrowed byte storage.
   integer(int64), intent(in) :: ilen
-  !> Owned byte storage.
+  !! Number of stored elements.
   integer(int8), allocatable, target, intent(in) :: ibuffer(:)
-  !> Borrowed byte storage.
+  !! Owned byte storage.
   integer(int8), contiguous, pointer, intent(in) :: iptr(:)
-  !> C address of the active storage.
+  !! Borrowed byte storage.
   type(c_ptr) :: cptr
+  !! C address of the active storage.
 
   if (ilen == 0) then
     cptr = c_null_ptr

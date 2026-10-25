@@ -2,18 +2,18 @@ submodule(nc4f_nc) nc4f_nc_error
 implicit none (type, external)
 contains
 
-!> Return true when `err` represents a failed operation.
 logical elemental module function has_err(err) result(is_err)
-  !> Completed result of an nc4f operation.
+  !! Return true when `err` represents a failed operation.
   type(error_type), intent(in) :: err
+  !! Completed result of an nc4f operation.
 
   is_err = err%code /= NC_NOERR
 end function has_err
 
-!> Apply nc4f's fail-fast policy to a completed error result.
 logical impure module function handle_err(err) result(has_failed)
-  !> Completed result of an nc4f operation.
+  !! Apply nc4f's fail-fast policy to a completed error result.
   type(error_type), intent(in) :: err
+  !! Completed result of an nc4f operation.
 
   has_failed = has_err(err)
   if (.not. has_failed) return
@@ -25,14 +25,14 @@ logical impure module function handle_err(err) result(has_failed)
   end if
 end function handle_err
 
-!> Convert a NetCDF C status into nc4f's normal error result.
 module function netcdf_err(status, context) result(err)
-  !> Status code returned by a NetCDF C API call.
+  !! Convert a NetCDF C status into nc4f's normal error result.
   integer(c_int), intent(in) :: status
-  !> Optional nc4f operation context for the diagnostic.
+  !! Status code returned by a NetCDF C API call.
   character(len=*), intent(in), optional :: context
-  !> Constructed error result; success has code `NC_NOERR`.
+  !! Optional nc4f operation context for the diagnostic.
   type(error_type) :: err
+  !! Constructed error result; success has code `NC_NOERR`.
 
   if (status == NC_NOERR) then
     err = error_type()
@@ -45,14 +45,14 @@ module function netcdf_err(status, context) result(err)
   end if
 end function netcdf_err
 
-!> Return a Fortran diagnostic for a NetCDF C status.
 function netcdf_msg(stat, context) result(msg)
-  !> Status code returned by a NetCDF C API call.
+  !! Return a Fortran diagnostic for a NetCDF C status.
   integer(c_int), intent(in) :: stat
-  !> Optional nc4f operation context for the diagnostic.
+  !! Status code returned by a NetCDF C API call.
   character(len=*), intent(in), optional :: context
-  !> Allocatable diagnostic string.
+  !! Optional nc4f operation context for the diagnostic.
   character(len=:), allocatable :: msg
+  !! Allocatable diagnostic string.
   character(kind=c_char), pointer :: chars(:)
   type(c_ptr) :: cstr
   character(len=MAX_CHAR_LEN) :: stat_msg

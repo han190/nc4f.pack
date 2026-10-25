@@ -2,17 +2,17 @@ submodule(nc4f_nc) nc4f_nc_dataset
 implicit none (type, external)
 contains
 
-!> Open or create a dataset and return a `netcdf_type` handle.
 module function open_netcdf(file, mode, err) result(nc)
-  !> Path to the dataset file.
+  !! Open or create a dataset and return a `netcdf_type` handle.
   character(len=*), intent(in) :: file
-  !> Mode to open the file: 'r' for read, 'w' to recreate, or 'a' for
-  !> read/write access to an existing dataset.
+  !! Path to the dataset file.
   character(len=*), intent(in), optional :: mode
-  !> Optional error result. When absent, failures stop the program.
+  !! Mode to open the file: 'r' for read, 'w' to recreate, or 'a' for
+  !! read/write access to an existing dataset.
   type(error_type), intent(out), optional :: err
-  !> Returned `netcdf_type` describing the opened dataset.
+  !! Optional error result. When absent, failures stop the program.
   type(netcdf_type) :: nc
+  !! Returned `netcdf_type` describing the opened dataset.
   type(error_type) :: op_err
 
   nc = open_netcdf_(file, mode, op_err)
@@ -23,16 +23,16 @@ module function open_netcdf(file, mode, err) result(nc)
   end if
 end function open_netcdf
 
-!> Open or create a dataset and construct the operation result.
 function open_netcdf_(file, mode, err) result(nc)
-  !> Path of the NetCDF file to read or write.
+  !! Open or create a dataset and construct the operation result.
   character(len=*), intent(in) :: file
-  !> Data or metadata used by this operation.
+  !! Path of the NetCDF file to read or write.
   character(len=*), intent(in), optional :: mode
-  !> Error object updated if the operation fails.
+  !! Data or metadata used by this operation.
   type(error_type), intent(out) :: err
-  !> Result produced by this operation.
+  !! Error object updated if the operation fails.
   type(netcdf_type) :: nc
+  !! Result produced by this operation.
   character(len=MAX_CHAR_LEN) :: msg, open_mode
   integer(c_int) :: stat
 
@@ -81,12 +81,12 @@ function open_netcdf_(file, mode, err) result(nc)
   end select
 end function open_netcdf_
 
-!> Close a dataset and free associated allocatables.
 module subroutine close_netcdf(nc, err)
-  !> `netcdf_type` representing the open dataset to close.
+  !! Close a dataset and free associated allocatables.
   type(netcdf_type), intent(inout) :: nc
-  !> Error object updated if the operation fails.
+  !! `netcdf_type` representing the open dataset to close.
   type(error_type), intent(out), optional :: err
+  !! Error object updated if the operation fails.
   type(error_type) :: op_err
 
   call close_netcdf_(nc, op_err)
@@ -97,12 +97,12 @@ module subroutine close_netcdf(nc, err)
   end if
 end subroutine close_netcdf
 
-!> Close a dataset and construct the operation result.
 subroutine close_netcdf_(nc, err)
-  !> Open NetCDF dataset handle.
+  !! Close a dataset and construct the operation result.
   type(netcdf_type), intent(inout) :: nc
-  !> Error object updated if the operation fails.
+  !! Open NetCDF dataset handle.
   type(error_type), intent(out) :: err
+  !! Error object updated if the operation fails.
   integer(c_int) :: stat
 
   err = error_type()
@@ -115,16 +115,16 @@ subroutine close_netcdf_(nc, err)
   if (associated(nc%grps)) nullify (nc%grps)
 end subroutine close_netcdf_
 
-!> Create a netCDF file from one variable or a rank-one variable array.
 module subroutine to_netcdf_var(file, vars, atts, err)
-  !> Output file to create.
+  !! Create a netCDF file from one variable or a rank-one variable array.
   character(len=*), intent(in) :: file
-  !> Variable or array of variables to write into the file.
+  !! Output file to create.
   type(variable_type), intent(in) :: vars(..)
-  !> Optional array of global attributes to attach to the dataset.
+  !! Variable or array of variables to write into the file.
   type(attribute_type), intent(in), optional :: atts(:)
-  !> Optional error result. When absent, failures stop the program.
+  !! Optional array of global attributes to attach to the dataset.
   type(error_type), intent(out), optional :: err
+  !! Optional error result. When absent, failures stop the program.
   type(netcdf_type) :: nc
   type(error_type) :: op_err, cleanup_err
   integer :: i
@@ -163,16 +163,16 @@ module subroutine to_netcdf_var(file, vars, atts, err)
   end if
 end subroutine to_netcdf_var
 
-!> Create a NetCDF file from a root group or direct child groups.
 module subroutine to_netcdf_grp(file, grp, atts, err)
-  !> Output file to create.
+  !! Create a NetCDF file from a root group or direct child groups.
   character(len=*), intent(in) :: file
-  !> Scalar root group or rank-one array of direct children.
+  !! Output file to create.
   type(group_type), intent(in) :: grp(..)
-  !> Optional additional global attributes for the file root.
+  !! Scalar root group or rank-one array of direct children.
   type(attribute_type), intent(in), optional :: atts(:)
-  !> Optional error result. When absent, failures stop the program.
+  !! Optional additional global attributes for the file root.
   type(error_type), intent(out), optional :: err
+  !! Optional error result. When absent, failures stop the program.
   type(error_type) :: op_err, cleanup_err
   type(group_type) :: file_root
   type(netcdf_type) :: nc

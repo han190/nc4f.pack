@@ -1,14 +1,14 @@
-!> Arithmetic on homogeneous variable collections.
 submodule(nc4f_ds) nc4f_ds_arithmetic
+!! Arithmetic on homogeneous variable collections.
 implicit none (type, external)
 contains
 
-!> Return the element-wise sum of compatible variables in `vars`.
 module function sum_vars(vars) result(total)
-  !> Variables to process or add to the dataset.
+  !! Return the element-wise sum of compatible variables in `vars`.
   type(variable_type), intent(in) :: vars(:)
-  !> Total number of data elements.
+  !! Variables to process or add to the dataset.
   type(variable_type) :: total
+  !! Total number of data elements.
   integer :: i
   integer(int64) :: j
 
@@ -39,7 +39,7 @@ module function sum_vars(vars) result(total)
       call extract(total, total_values)
       do i = 2, size(vars)
         call extract(vars(i), values)
-        do concurrent (j = 1:total%len)
+        do concurrent (j=1:total%len)
           total_values(j) = total_values(j) + values(j)
         end do
       end do
@@ -50,7 +50,7 @@ module function sum_vars(vars) result(total)
       call extract(total, total_values)
       do i = 2, size(vars)
         call extract(vars(i), values)
-        do concurrent (j = 1:total%len)
+        do concurrent (j=1:total%len)
           total_values(j) = total_values(j) + values(j)
         end do
       end do
@@ -61,7 +61,7 @@ module function sum_vars(vars) result(total)
       call extract(total, total_values)
       do i = 2, size(vars)
         call extract(vars(i), values)
-        do concurrent (j = 1:total%len)
+        do concurrent (j=1:total%len)
           total_values(j) = total_values(j) + values(j)
         end do
       end do
@@ -72,7 +72,7 @@ module function sum_vars(vars) result(total)
       call extract(total, total_values)
       do i = 2, size(vars)
         call extract(vars(i), values)
-        do concurrent (j = 1:total%len)
+        do concurrent (j=1:total%len)
           total_values(j) = total_values(j) + values(j)
         end do
       end do
@@ -83,7 +83,7 @@ module function sum_vars(vars) result(total)
       call extract(total, total_values)
       do i = 2, size(vars)
         call extract(vars(i), values)
-        do concurrent (j = 1:total%len)
+        do concurrent (j=1:total%len)
           total_values(j) = total_values(j) + values(j)
         end do
       end do
@@ -94,7 +94,7 @@ module function sum_vars(vars) result(total)
       call extract(total, total_values)
       do i = 2, size(vars)
         call extract(vars(i), values)
-        do concurrent (j = 1:total%len)
+        do concurrent (j=1:total%len)
           total_values(j) = total_values(j) + values(j)
         end do
       end do

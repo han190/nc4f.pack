@@ -16,42 +16,42 @@ case ("--ownership-invalid-noncontiguous")
 case ("--ownership-invalid-character")
   call invalid_character_shallow_constructor()
 case default
-tests = [&
-  & test_type("simple_wr", simple_wr), &
-  & test_type("simple_rd", simple_rd), &
-  & test_type("character_variables", character_variables), &
-  & test_type("elemental_reads", elemental_reads), &
-  & test_type("hyperslab_reads", hyperslab_reads), &
-  & test_type("creation_policy", creation_policy), &
-  & test_type("error_handling", error_handling), &
-  & test_type("unlimited_wr", unlimited_wr), &
-  & test_type("unlimited_dims", unlimited_dims), &
-  & test_type("sum_vars", sum_vars_test), &
-  & test_type("sfc_pres_temp_wr", sfc_pres_temp_wr), &
-  & test_type("sfc_pres_temp_rd", sfc_pres_temp_rd), &
-  & test_type("buffer_edges", buffer_edges), &
-  & test_type("extensive_wr", extensive_wr), &
-  & test_type("extensive_rd", extensive_rd), &
-  & test_type("group_model", group_model), &
-  & test_type("group_write", group_write), &
-  & test_type("copy_semantics", copy_semantics), &
-  & test_type("data_model", data_model), &
-  & test_type("nasa_cosp_read", nasa_cosp_read), &
-  & test_type("ecmwf_era40_read", ecmwf_era40_read), &
-  & test_type("sresa1b_ccsm3_read", sresa1b_ccsm3_read), &
-  & test_type("sample_uddtio", sample_uddtio), &
-  & test_type("cami_initial_read", cami_initial_read), &
-  & test_type("tos_o1_read", tos_o1_read), &
-  & test_type("echam_spectral_read", echam_spectral_read)]
-call setup_test_results()
-call run_tests(tests)
+  tests = [&
+    & test_type("simple_wr", simple_wr), &
+    & test_type("simple_rd", simple_rd), &
+    & test_type("character_variables", character_variables), &
+    & test_type("elemental_reads", elemental_reads), &
+    & test_type("hyperslab_reads", hyperslab_reads), &
+    & test_type("creation_policy", creation_policy), &
+    & test_type("error_handling", error_handling), &
+    & test_type("unlimited_wr", unlimited_wr), &
+    & test_type("unlimited_dims", unlimited_dims), &
+    & test_type("sum_vars", sum_vars_test), &
+    & test_type("sfc_pres_temp_wr", sfc_pres_temp_wr), &
+    & test_type("sfc_pres_temp_rd", sfc_pres_temp_rd), &
+    & test_type("buffer_edges", buffer_edges), &
+    & test_type("extensive_wr", extensive_wr), &
+    & test_type("extensive_rd", extensive_rd), &
+    & test_type("group_model", group_model), &
+    & test_type("group_write", group_write), &
+    & test_type("copy_semantics", copy_semantics), &
+    & test_type("data_model", data_model), &
+    & test_type("nasa_cosp_read", nasa_cosp_read), &
+    & test_type("ecmwf_era40_read", ecmwf_era40_read), &
+    & test_type("sresa1b_ccsm3_read", sresa1b_ccsm3_read), &
+    & test_type("sample_uddtio", sample_uddtio), &
+    & test_type("cami_initial_read", cami_initial_read), &
+    & test_type("tos_o1_read", tos_o1_read), &
+    & test_type("echam_spectral_read", echam_spectral_read)]
+  call setup_test_results()
+  call run_tests(tests)
 
 end select
 
 contains
 
-!> Attempt shallow construction from a noncontiguous array section.
 subroutine invalid_noncontiguous_shallow_constructor()
+  !! Attempt shallow construction from a noncontiguous array section.
   real(real32), target :: values(3, 3)
   type(variable_type) :: var
 
@@ -61,8 +61,8 @@ subroutine invalid_noncontiguous_shallow_constructor()
   error stop "[ownership test] Noncontiguous shallow construction unexpectedly succeeded."
 end subroutine invalid_noncontiguous_shallow_constructor
 
-!> Attempt shallow construction from character storage.
 subroutine invalid_character_shallow_constructor()
+  !! Attempt shallow construction from character storage.
   character, target :: values(2) = ["a", "b"]
   type(variable_type) :: var
 

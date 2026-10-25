@@ -1,22 +1,22 @@
-!> ncdump-like formatted output for the direct v2 data model.
 submodule(nc4f_ds) nc4f_ds_io
+!! ncdump-like formatted output for the direct v2 data model.
 implicit none (type, external)
 contains
 
-!> Execute `write_frmt_dim`.
 module subroutine write_frmt_dim(dim, unit, iotype, v_list, iostat, iomsg)
-  !> Dimension to process.
+  !! Execute `write_frmt_dim`.
   class(dimension_type), intent(in) :: dim
-  !> Data or metadata used by this operation.
+  !! Dimension to process.
   integer, intent(in) :: unit
-  !> Data or metadata used by this operation.
+  !! Data or metadata used by this operation.
   character(len=*), intent(in) :: iotype
-  !> Data or metadata used by this operation.
+  !! Data or metadata used by this operation.
   integer, intent(in) :: v_list(:)
-  !> Data or metadata used by this operation.
+  !! Data or metadata used by this operation.
   integer, intent(out) :: iostat
-  !> Data or metadata used by this operation.
+  !! Data or metadata used by this operation.
   character(len=*), intent(inout) :: iomsg
+  !! Data or metadata used by this operation.
 
   associate (ignored_v_list => v_list)
   end associate
@@ -33,20 +33,20 @@ module subroutine write_frmt_dim(dim, unit, iotype, v_list, iostat, iomsg)
   end if
 end subroutine write_frmt_dim
 
-!> Execute `write_frmt_att`.
 module subroutine write_frmt_att(att, unit, iotype, v_list, iostat, iomsg)
-  !> Attribute to process.
+  !! Execute `write_frmt_att`.
   class(attribute_type), intent(in) :: att
-  !> Data or metadata used by this operation.
+  !! Attribute to process.
   integer, intent(in) :: unit
-  !> Data or metadata used by this operation.
+  !! Data or metadata used by this operation.
   character(len=*), intent(in) :: iotype
-  !> Data or metadata used by this operation.
+  !! Data or metadata used by this operation.
   integer, intent(in) :: v_list(:)
-  !> Data or metadata used by this operation.
+  !! Data or metadata used by this operation.
   integer, intent(out) :: iostat
-  !> Data or metadata used by this operation.
+  !! Data or metadata used by this operation.
   character(len=*), intent(inout) :: iomsg
+  !! Data or metadata used by this operation.
   character(len=16) :: dtype
   character(len=:), allocatable :: value
 
@@ -60,20 +60,20 @@ module subroutine write_frmt_att(att, unit, iotype, v_list, iostat, iomsg)
     & trim(dtype)//":"//att%name, value
 end subroutine write_frmt_att
 
-!> Execute `write_frmt_var`.
 module subroutine write_frmt_var(var, unit, iotype, v_list, iostat, iomsg)
-  !> Variable to process.
+  !! Execute `write_frmt_var`.
   class(variable_type), intent(in) :: var
-  !> Data or metadata used by this operation.
+  !! Variable to process.
   integer, intent(in) :: unit
-  !> Data or metadata used by this operation.
+  !! Data or metadata used by this operation.
   character(len=*), intent(in) :: iotype
-  !> Data or metadata used by this operation.
+  !! Data or metadata used by this operation.
   integer, intent(in) :: v_list(:)
-  !> Data or metadata used by this operation.
+  !! Data or metadata used by this operation.
   integer, intent(out) :: iostat
-  !> Data or metadata used by this operation.
+  !! Data or metadata used by this operation.
   character(len=*), intent(inout) :: iomsg
+  !! Data or metadata used by this operation.
   character(len=:), allocatable :: text
 
   associate (ignored_v_list => v_list)
@@ -84,20 +84,20 @@ module subroutine write_frmt_var(var, unit, iotype, v_list, iostat, iomsg)
   write (unit, "(a)", iostat=iostat, iomsg=iomsg) text
 end subroutine write_frmt_var
 
-!> Execute `write_frmt_grp`.
 module subroutine write_frmt_grp(grp, unit, iotype, v_list, iostat, iomsg)
-  !> Data or metadata used by this operation.
+  !! Execute `write_frmt_grp`.
   class(group_type), intent(in) :: grp
-  !> Data or metadata used by this operation.
+  !! Data or metadata used by this operation.
   integer, intent(in) :: unit
-  !> Data or metadata used by this operation.
+  !! Data or metadata used by this operation.
   character(len=*), intent(in) :: iotype
-  !> Data or metadata used by this operation.
+  !! Data or metadata used by this operation.
   integer, intent(in) :: v_list(:)
-  !> Data or metadata used by this operation.
+  !! Data or metadata used by this operation.
   integer, intent(out) :: iostat
-  !> Data or metadata used by this operation.
+  !! Data or metadata used by this operation.
   character(len=*), intent(inout) :: iomsg
+  !! Data or metadata used by this operation.
   character(len=:), allocatable :: text
 
   associate (ignored_v_list => v_list)
@@ -108,20 +108,20 @@ module subroutine write_frmt_grp(grp, unit, iotype, v_list, iostat, iomsg)
   write (unit, "(a)", iostat=iostat, iomsg=iomsg) text
 end subroutine write_frmt_grp
 
-!> Execute `write_frmt_netcdf`.
 module subroutine write_frmt_netcdf(grp, unit, iotype, v_list, iostat, iomsg)
-  !> Data or metadata used by this operation.
+  !! Execute `write_frmt_netcdf`.
   class(netcdf_type), intent(in) :: grp
-  !> Data or metadata used by this operation.
+  !! Data or metadata used by this operation.
   integer, intent(in) :: unit
-  !> Data or metadata used by this operation.
+  !! Data or metadata used by this operation.
   character(len=*), intent(in) :: iotype
-  !> Data or metadata used by this operation.
+  !! Data or metadata used by this operation.
   integer, intent(in) :: v_list(:)
-  !> Data or metadata used by this operation.
+  !! Data or metadata used by this operation.
   integer, intent(out) :: iostat
-  !> Data or metadata used by this operation.
+  !! Data or metadata used by this operation.
   character(len=*), intent(inout) :: iomsg
+  !! Data or metadata used by this operation.
   character(len=:), allocatable :: text
 
   associate (ignored_v_list => v_list)
@@ -132,20 +132,20 @@ module subroutine write_frmt_netcdf(grp, unit, iotype, v_list, iostat, iomsg)
   write (unit, "(a)", iostat=iostat, iomsg=iomsg) text
 end subroutine write_frmt_netcdf
 
-!> Write an operation result in formatted derived-type I/O.
 module subroutine write_frmt_err(err, unit, iotype, v_list, iostat, iomsg)
-  !> Error object updated if the operation fails.
+  !! Write an operation result in formatted derived-type I/O.
   class(error_type), intent(in) :: err
-  !> Data or metadata used by this operation.
+  !! Error object updated if the operation fails.
   integer, intent(in) :: unit
-  !> Data or metadata used by this operation.
+  !! Data or metadata used by this operation.
   character(len=*), intent(in) :: iotype
-  !> Data or metadata used by this operation.
+  !! Data or metadata used by this operation.
   integer, intent(in) :: v_list(:)
-  !> Data or metadata used by this operation.
+  !! Data or metadata used by this operation.
   integer, intent(out) :: iostat
-  !> Data or metadata used by this operation.
+  !! Data or metadata used by this operation.
   character(len=*), intent(inout) :: iomsg
+  !! Data or metadata used by this operation.
 
   associate (ignored_v_list => v_list)
   end associate
@@ -167,14 +167,14 @@ module subroutine write_frmt_err(err, unit, iotype, v_list, iostat, iomsg)
   end if
 end subroutine write_frmt_err
 
-!> Compute `render_grp`.
 recursive function render_grp(grp, depth) result(text)
-  !> Data or metadata used by this operation.
+  !! Compute `render_grp`.
   class(group_type), intent(in) :: grp
-  !> Data or metadata used by this operation.
+  !! Data or metadata used by this operation.
   integer, intent(in) :: depth
-  !> Result produced by this operation.
+  !! Data or metadata used by this operation.
   character(len=:), allocatable :: text
+  !! Result produced by this operation.
   character(len=:), allocatable :: indent, name
 
   indent = repeat(" ", 4*depth)
@@ -186,12 +186,12 @@ recursive function render_grp(grp, depth) result(text)
   text = text//indent//"}"
 end function render_grp
 
-!> Compute the ncdump-like representation of an open NetCDF dataset.
 function render_netcdf(nc) result(text)
-  !> Open NetCDF dataset handle.
+  !! Compute the ncdump-like representation of an open NetCDF dataset.
   type(netcdf_type), intent(in) :: nc
-  !> Result produced by this operation.
+  !! Open NetCDF dataset handle.
   character(len=:), allocatable :: text
+  !! Result produced by this operation.
   character(len=:), allocatable :: name
 
   name = "unnamed"
@@ -201,16 +201,16 @@ function render_netcdf(nc) result(text)
   text = text//"}"
 end function render_netcdf
 
-!> Compute the contents of a group in ncdump-like formatted output.
 recursive function render_grp_(grp, indent, depth) result(text)
-  !> Data or metadata used by this operation.
+  !! Compute the contents of a group in ncdump-like formatted output.
   class(group_type), intent(in) :: grp
-  !> Data or metadata used by this operation.
+  !! Data or metadata used by this operation.
   character(len=*), intent(in) :: indent
-  !> Data or metadata used by this operation.
+  !! Data or metadata used by this operation.
   integer, intent(in) :: depth
-  !> Result produced by this operation.
+  !! Data or metadata used by this operation.
   character(len=:), allocatable :: text
+  !! Result produced by this operation.
   character, allocatable :: buffer(:)
   integer :: i, used
   character, parameter :: nl = new_line("a")
@@ -237,14 +237,14 @@ recursive function render_grp_(grp, indent, depth) result(text)
   end if
 end function render_grp_
 
-!> Compute the dimensions section of a group in ncdump-like formatted output.
 function render_dims(grp, indent) result(text)
-  !> Data or metadata used by this operation.
+  !! Compute the dimensions section of a group in ncdump-like formatted output.
   class(group_type), intent(in) :: grp
-  !> Data or metadata used by this operation.
+  !! Data or metadata used by this operation.
   character(len=*), intent(in) :: indent
-  !> Result produced by this operation.
+  !! Data or metadata used by this operation.
   character(len=:), allocatable :: text
+  !! Result produced by this operation.
   character, allocatable :: buffer(:)
   integer :: i, used
   character(len=:), allocatable :: ind
@@ -268,14 +268,14 @@ function render_dims(grp, indent) result(text)
   end if
 end function render_dims
 
-!> Compute the variables section of a group in ncdump-like formatted output.
 function render_vars(grp, indent) result(text)
-  !> Data or metadata used by this operation.
+  !! Compute the variables section of a group in ncdump-like formatted output.
   class(group_type), intent(in) :: grp
-  !> Data or metadata used by this operation.
+  !! Data or metadata used by this operation.
   character(len=*), intent(in) :: indent
-  !> Result produced by this operation.
+  !! Data or metadata used by this operation.
   character(len=:), allocatable :: text
+  !! Result produced by this operation.
   character, allocatable :: buffer(:)
   integer :: i, used
   character(len=:), allocatable :: ind
@@ -299,14 +299,14 @@ function render_vars(grp, indent) result(text)
   end if
 end function render_vars
 
-!> Compute the attributes section of a group in ncdump-like formatted output.
 function render_atts(grp, indent) result(text)
-  !> Data or metadata used by this operation.
+  !! Compute the attributes section of a group in ncdump-like formatted output.
   class(group_type), intent(in) :: grp
-  !> Data or metadata used by this operation.
+  !! Data or metadata used by this operation.
   character(len=*), intent(in) :: indent
-  !> Result produced by this operation.
+  !! Data or metadata used by this operation.
   character(len=:), allocatable :: text
+  !! Result produced by this operation.
   character, allocatable :: buffer(:)
   integer :: i, used
   character(len=:), allocatable :: ind
@@ -330,14 +330,14 @@ function render_atts(grp, indent) result(text)
   end if
 end function render_atts
 
-!> Append a text fragment to a dynamically grown character buffer.
 pure subroutine append(buffer, used, fragment)
-  !> Storage for the text accumulated so far.
+  !! Append a text fragment to a dynamically grown character buffer.
   character, allocatable, intent(inout) :: buffer(:)
-  !> Number of occupied characters in `buffer`.
+  !! Storage for the text accumulated so far.
   integer, intent(inout) :: used
-  !> Text to append.
+  !! Number of occupied characters in `buffer`.
   character(len=*), intent(in) :: fragment
+  !! Text to append.
   character, allocatable :: expanded(:)
   integer :: capacity, i, needed
 
@@ -358,12 +358,12 @@ pure subroutine append(buffer, used, fragment)
   used = needed
 end subroutine append
 
-!> Return the final path component of a file without its final extension.
 pure function filename_stem(file) result(stem)
-  !> Path of the NetCDF file to read or write.
+  !! Return the final path component of a file without its final extension.
   character(len=*), intent(in) :: file
-  !> Result produced by this operation.
+  !! Path of the NetCDF file to read or write.
   character(len=:), allocatable :: stem
+  !! Result produced by this operation.
   integer :: base, extension, filename_len
 
   filename_len = len_trim(file)
@@ -383,14 +383,14 @@ pure function filename_stem(file) result(stem)
   if (len(stem) == 0) stem = "unnamed"
 end function filename_stem
 
-!> Compute `render_dim`.
 pure function render_dim(dim, indent) result(line)
-  !> Dimension to process.
+  !! Compute `render_dim`.
   type(dimension_type), intent(in) :: dim
-  !> Data or metadata used by this operation.
+  !! Dimension to process.
   character(len=*), intent(in) :: indent
-  !> Result produced by this operation.
+  !! Data or metadata used by this operation.
   character(len=:), allocatable :: line
+  !! Result produced by this operation.
   character(len=64) :: len_text
 
   write (len_text, "(i0)") dim%len
@@ -403,26 +403,26 @@ pure function render_dim(dim, indent) result(line)
   end if
 end function render_dim
 
-!> Compute `render_att`.
 function render_att(att, indent) result(line)
-  !> Attribute to process.
+  !! Compute `render_att`.
   type(attribute_type), intent(in) :: att
-  !> Data or metadata used by this operation.
+  !! Attribute to process.
   character(len=*), intent(in) :: indent
-  !> Result produced by this operation.
+  !! Data or metadata used by this operation.
   character(len=:), allocatable :: line
+  !! Result produced by this operation.
   character(len=16) :: dtype
 
   call type_name(att%dtype, dtype)
   line = indent//trim(dtype)//":"//att%name//" = "//render_att_value(att)//" ;"
 end function render_att
 
-!> Render an attribute buffer as an ncdump-like literal.
 function render_att_value(att) result(rendered)
-  !> Attribute to process.
+  !! Render an attribute buffer as an ncdump-like literal.
   type(attribute_type), target, intent(in) :: att
-  !> Rendered NetCDF text.
+  !! Attribute to process.
   character(len=:), allocatable :: rendered
+  !! Rendered NetCDF text.
   character, allocatable :: chars(:)
   integer(int8), allocatable :: int8_values(:)
   integer(int16), allocatable :: int16_values(:)
@@ -481,12 +481,12 @@ function render_att_value(att) result(rendered)
   end select
 end function render_att_value
 
-!> Render a character attribute as a quoted string.
 pure function render_char_values(values) result(text)
-  !> Values used to populate the dataset object.
+  !! Render a character attribute as a quoted string.
   character, intent(in) :: values(:)
-  !> Result produced by this operation.
+  !! Values used to populate the dataset object.
   character(len=:), allocatable :: text
+  !! Result produced by this operation.
   integer :: i, last, position, text_len
 
   last = size(values)
@@ -504,8 +504,8 @@ pure function render_char_values(values) result(text)
     end select
   end do
 
-  !> Rendered NetCDF text.
   allocate (character(len=text_len) :: text)
+  !! Rendered NetCDF text.
   text(1:1) = '"'
   position = 2
   do i = 1, last
@@ -530,12 +530,12 @@ pure function render_char_values(values) result(text)
   text(position:position) = '"'
 end function render_char_values
 
-!> Render integer(kind=int8) attribute values.
 pure function render_int8_values(values) result(text)
-  !> Values used to populate the dataset object.
+  !! Render integer(kind=int8) attribute values.
   integer(int8), intent(in) :: values(:)
-  !> Rendered NetCDF text.
+  !! Values used to populate the dataset object.
   character(len=:), allocatable :: text
+  !! Rendered NetCDF text.
   character(len=64) :: item
   integer :: i
 
@@ -547,12 +547,12 @@ pure function render_int8_values(values) result(text)
   end do
 end function render_int8_values
 
-!> Render integer(kind=int16) attribute values.
 pure function render_int16_values(values) result(text)
-  !> Values used to populate the dataset object.
+  !! Render integer(kind=int16) attribute values.
   integer(int16), intent(in) :: values(:)
-  !> Rendered NetCDF text.
+  !! Values used to populate the dataset object.
   character(len=:), allocatable :: text
+  !! Rendered NetCDF text.
   character(len=64) :: item
   integer :: i
 
@@ -564,12 +564,12 @@ pure function render_int16_values(values) result(text)
   end do
 end function render_int16_values
 
-!> Render integer(kind=int32) attribute values.
 pure function render_int32_values(values) result(text)
-  !> Values used to populate the dataset object.
+  !! Render integer(kind=int32) attribute values.
   integer(int32), intent(in) :: values(:)
-  !> Rendered NetCDF text.
+  !! Values used to populate the dataset object.
   character(len=:), allocatable :: text
+  !! Rendered NetCDF text.
   character(len=64) :: item
   integer :: i
 
@@ -581,12 +581,12 @@ pure function render_int32_values(values) result(text)
   end do
 end function render_int32_values
 
-!> Render integer(kind=int64) attribute values.
 pure function render_int64_values(values) result(text)
-  !> Values used to populate the dataset object.
+  !! Render integer(kind=int64) attribute values.
   integer(int64), intent(in) :: values(:)
-  !> Rendered NetCDF text.
+  !! Values used to populate the dataset object.
   character(len=:), allocatable :: text
+  !! Rendered NetCDF text.
   character(len=64) :: item
   integer :: i
 
@@ -598,12 +598,12 @@ pure function render_int64_values(values) result(text)
   end do
 end function render_int64_values
 
-!> Render real(kind=real32) attribute values.
 pure function render_real32_values(values) result(text)
-  !> Values used to populate the dataset object.
+  !! Render real(kind=real32) attribute values.
   real(real32), intent(in) :: values(:)
-  !> Rendered NetCDF text.
+  !! Values used to populate the dataset object.
   character(len=:), allocatable :: text
+  !! Rendered NetCDF text.
   character(len=64) :: item
   integer :: i
 
@@ -615,12 +615,12 @@ pure function render_real32_values(values) result(text)
   end do
 end function render_real32_values
 
-!> Render real(kind=real64) attribute values.
 pure function render_real64_values(values) result(text)
-  !> Values used to populate the dataset object.
+  !! Render real(kind=real64) attribute values.
   real(real64), intent(in) :: values(:)
-  !> Rendered NetCDF text.
+  !! Values used to populate the dataset object.
   character(len=:), allocatable :: text
+  !! Rendered NetCDF text.
   character(len=64) :: item
   integer :: i
 
@@ -632,15 +632,15 @@ pure function render_real64_values(values) result(text)
   end do
 end function render_real64_values
 
-!> Remove redundant fractional zeroes from a formatted real literal.
-!>
-!> An integral finite value retains one digit after its decimal point. Any
-!> exponent suffix is retained without modification.
 pure function trim_trailing_zeros(text) result(trimmed)
-  !> Text to render or normalize.
+  !! Remove redundant fractional zeroes from a formatted real literal.
+  !!
+  !! An integral finite value retains one digit after its decimal point. Any
+  !! exponent suffix is retained without modification.
   character(len=*), intent(in) :: text
-  !> Result produced by this operation.
+  !! Text to render or normalize.
   character(len=:), allocatable :: trimmed
+  !! Result produced by this operation.
   character(len=:), allocatable :: exponent, mantissa
   integer :: decimal_at, exponent_at, last
 
@@ -675,14 +675,14 @@ pure function trim_trailing_zeros(text) result(trimmed)
   trimmed = mantissa//exponent
 end function trim_trailing_zeros
 
-!> Compute `render_var`.
 function render_var(var, indent) result(line)
-  !> Variable to process.
+  !! Compute `render_var`.
   type(variable_type), intent(in) :: var
-  !> Data or metadata used by this operation.
+  !! Variable to process.
   character(len=*), intent(in) :: indent
-  !> Result produced by this operation.
+  !! Data or metadata used by this operation.
   character(len=:), allocatable :: line
+  !! Result produced by this operation.
   character(len=16) :: dtype
   character(len=:), allocatable :: dims
   integer :: i
@@ -707,12 +707,12 @@ function render_var(var, indent) result(line)
   end if
 end function render_var
 
-!> Execute `type_name`.
 pure subroutine type_name(dtype, name)
-  !> Dataset data type code to validate or translate.
+  !! Execute `type_name`.
   integer(data_type), intent(in) :: dtype
-  !> Name used to identify the NetCDF object.
+  !! Dataset data type code to validate or translate.
   character(len=*), intent(out) :: name
+  !! Name used to identify the NetCDF object.
 
   select case (dtype)
   case (BYTE_TYPE)

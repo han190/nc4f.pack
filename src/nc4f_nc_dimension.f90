@@ -2,14 +2,14 @@ submodule(nc4f_nc) nc4f_nc_dimension
 implicit none (type, external)
 contains
 
-!> Inquire all dimensions for the top-level group of a netCDF file.
 module function inq_dims_grp(nc, err) result(dims)
-  !> High-level `netcdf_type` representing the open file.
+  !! Inquire all dimensions for the top-level group of a netCDF file.
   class(group_type), intent(in) :: nc
-  !> Optional error result. When absent, failures stop the program.
+  !! High-level `netcdf_type` representing the open file.
   type(error_type), intent(out), optional :: err
-  !> Allocatable array of `dimension_type` in Fortran order.
+  !! Optional error result. When absent, failures stop the program.
   type(dimension_type), allocatable :: dims(:)
+  !! Allocatable array of `dimension_type` in Fortran order.
   type(error_type) :: op_err
 
   dims = inq_dims_(nc%id, err=op_err)
@@ -20,16 +20,16 @@ module function inq_dims_grp(nc, err) result(dims)
   end if
 end function inq_dims_grp
 
-!> Inquire the dimensions attached to a variable.
 module function inq_dims_var(nc, var, err) result(dims)
-  !> High-level `netcdf_type` for the file.
+  !! Inquire the dimensions attached to a variable.
   class(group_type), intent(in) :: nc
-  !> `variable_type` describing the variable.
+  !! High-level `netcdf_type` for the file.
   type(variable_type), intent(in) :: var
-  !> Optional error result. When absent, failures stop the program.
+  !! `variable_type` describing the variable.
   type(error_type), intent(out), optional :: err
-  !> Allocatable array of `dimension_type` for that variable.
+  !! Optional error result. When absent, failures stop the program.
   type(dimension_type), allocatable :: dims(:)
+  !! Allocatable array of `dimension_type` for that variable.
   type(error_type) :: op_err
 
   dims = inq_dims_(nc%id, var%id, op_err)
@@ -40,19 +40,19 @@ module function inq_dims_var(nc, var, err) result(dims)
   end if
 end function inq_dims_var
 
-!> Low-level helper to inquire dimensions from a netCDF `ncid` or an
-!> optional `varid`.
 function inq_dims_(ncid, varid, err) result(dims)
-  !> C `ncid` for the dataset or group.
+  !! Low-level helper to inquire dimensions from a netCDF `ncid` or an
+  !! optional `varid`.
   integer(c_int), intent(in) :: ncid
-  !> Optional C `varid` for a variable. If present, return that
-  !> variable's dimensions.
+  !! C `ncid` for the dataset or group.
   integer(c_int), optional, intent(in) :: varid
-  !> Completed result of this operation.
+  !! Optional C `varid` for a variable. If present, return that
+  !! variable's dimensions.
   type(error_type), intent(out) :: err
-  !> Allocatable array of `dimension_type` in Fortran ordering
-  !> (reversed relative to the C API ordering).
+  !! Completed result of this operation.
   type(dimension_type), allocatable :: dims(:)
+  !! Allocatable array of `dimension_type` in Fortran ordering
+  !! (reversed relative to the C API ordering).
   integer(c_int), allocatable, target :: dimids(:), unlimdimids(:)
   character(len=NC_MAX_NAME + 1, kind=c_char) :: dim_name
   integer(c_int) :: i, j, nunlim, ndims, stat
@@ -92,9 +92,9 @@ function inq_dims_(ncid, varid, err) result(dims)
 
   allocate (dims(ndims))
 
-  !> Since this module uses the C API, the dimension order is reversed
-  !> when read into a Fortran program.
   do i = 1, ndims
+    !! Since this module uses the C API, the dimension order is reversed
+    !! when read into a Fortran program.
     j = ndims - i + 1
     dims(j)%id = dimids(i)
     stat = nc_inq_dimname(ncid, dimids(i), dim_name)
@@ -108,16 +108,16 @@ function inq_dims_(ncid, varid, err) result(dims)
   end do
 end function inq_dims_
 
-!> Define a dimension, preserving `NC_EBADDIM` as the expected create path.
 module function def_dim(nc, dim, err) result(new_dim)
-  !> Open NetCDF dataset handle.
+  !! Define a dimension, preserving `NC_EBADDIM` as the expected create path.
   class(group_type), intent(in) :: nc
-  !> Dimension to process.
+  !! Open NetCDF dataset handle.
   type(dimension_type), intent(in) :: dim
-  !> Error object updated if the operation fails.
+  !! Dimension to process.
   type(error_type), intent(out) :: err
-  !> Result produced by this operation.
+  !! Error object updated if the operation fails.
   type(dimension_type) :: new_dim
+  !! Result produced by this operation.
   integer(c_int) :: stat, dimid
   integer(c_size_t) :: len
   character(len=:), allocatable :: context

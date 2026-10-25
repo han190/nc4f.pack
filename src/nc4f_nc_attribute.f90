@@ -2,16 +2,16 @@ submodule(nc4f_nc) nc4f_nc_attribute
 implicit none (type, external)
 contains
 
-!> Read a global attribute by name and return it.
 impure elemental module function get_att_grp(nc, name, err) result(att)
-  !> Dataset or group containing the global attribute.
+  !! Read a global attribute by name and return it.
   class(group_type), intent(in) :: nc
-  !> Name of the global attribute to read.
+  !! Dataset or group containing the global attribute.
   character(len=*), intent(in) :: name
-  !> Optional operation error. When absent, failures stop the program.
+  !! Name of the global attribute to read.
   type(error_type), intent(out), optional :: err
-  !> Returned attribute object.
+  !! Optional operation error. When absent, failures stop the program.
   type(attribute_type) :: att
+  !! Returned attribute object.
   type(error_type) :: op_err
 
   att = get_att_(nc%id, NC_GLOBAL, clip(name), op_err)
@@ -22,14 +22,14 @@ impure elemental module function get_att_grp(nc, name, err) result(att)
   end if
 end function get_att_grp
 
-!> Return all global attributes for a dataset.
 module function get_atts_grp(nc, err) result(atts)
-  !> Open NetCDF dataset handle.
+  !! Return all global attributes for a dataset.
   class(group_type), intent(in) :: nc
-  !> Error object updated if the operation fails.
+  !! Open NetCDF dataset handle.
   type(error_type), optional, intent(out) :: err
-  !> Retrieved attributes.
+  !! Error object updated if the operation fails.
   type(attribute_type), allocatable :: atts(:)
+  !! Retrieved attributes.
   type(error_type) :: op_err
 
   atts = get_atts_(nc%id, NC_GLOBAL, op_err)
@@ -40,18 +40,18 @@ module function get_atts_grp(nc, err) result(atts)
   end if
 end function get_atts_grp
 
-!> Read a named attribute attached to a variable and return it.
 module function get_att_var(nc, var, name, err) result(att)
-  !> Dataset or group containing the variable.
+  !! Read a named attribute attached to a variable and return it.
   class(group_type), intent(in) :: nc
-  !> Variable whose attribute is read.
+  !! Dataset or group containing the variable.
   type(variable_type), intent(in) :: var
-  !> Name of the attribute to read.
+  !! Variable whose attribute is read.
   character(len=*), intent(in) :: name
-  !> Optional operation error. When absent, failures stop the program.
+  !! Name of the attribute to read.
   type(error_type), intent(out), optional :: err
-  !> Returned attribute object.
+  !! Optional operation error. When absent, failures stop the program.
   type(attribute_type) :: att
+  !! Returned attribute object.
   type(error_type) :: op_err
 
   att = get_att_(nc%id, var%id, name, op_err)
@@ -62,16 +62,16 @@ module function get_att_var(nc, var, name, err) result(att)
   end if
 end function get_att_var
 
-!> Return all attributes attached to a variable.
 module function get_atts_var(nc, var, err) result(atts)
-  !> Open NetCDF dataset handle.
+  !! Return all attributes attached to a variable.
   class(group_type), intent(in) :: nc
-  !> Variable to process.
+  !! Open NetCDF dataset handle.
   type(variable_type), intent(in) :: var
-  !> Error object updated if the operation fails.
+  !! Variable to process.
   type(error_type), optional, intent(out) :: err
-  !> Retrieved attributes.
+  !! Error object updated if the operation fails.
   type(attribute_type), allocatable :: atts(:)
+  !! Retrieved attributes.
   type(error_type) :: op_err
 
   atts = get_atts_(nc%id, var%id, op_err)
@@ -82,16 +82,16 @@ module function get_atts_var(nc, var, err) result(atts)
   end if
 end function get_atts_var
 
-!> Helper that returns attributes for a C `ncid` and `varid`.
 function get_atts_(ncid, varid, err) result(atts)
-  !> Identifier of the open NetCDF file or group.
+  !! Helper that returns attributes for a C `ncid` and `varid`.
   integer(c_int), intent(in) :: ncid
-  !> Identifier of the target NetCDF variable.
+  !! Identifier of the open NetCDF file or group.
   integer(c_int), intent(in) :: varid
-  !> Error object updated if the operation fails.
+  !! Identifier of the target NetCDF variable.
   type(error_type), intent(out) :: err
-  !> Retrieved attributes.
+  !! Error object updated if the operation fails.
   type(attribute_type), allocatable :: atts(:)
+  !! Retrieved attributes.
   integer(c_int) :: natts, i, stat
   character(kind=c_char, len=NC_MAX_NAME + 1) :: name
 
@@ -105,8 +105,8 @@ function get_atts_(ncid, varid, err) result(atts)
   if (has_err(err)) return
 
   allocate (atts(natts))
-  !> For the NetCDF C library, attribute IDs start from 0.
   do i = 0, natts - 1
+    !! For the NetCDF C library, attribute IDs start from 0.
     stat = nc_inq_attname(ncid, varid, i, name)
     err = netcdf_err(stat, "[get_atts] Attribute name.")
     if (has_err(err)) return
@@ -115,18 +115,18 @@ function get_atts_(ncid, varid, err) result(atts)
   end do
 end function get_atts_
 
-!> Helper that reads a single attribute given C `ncid`, `varid`, and name.
 function get_att_(ncid, varid, name, err) result(att)
-  !> Identifier of the open NetCDF file or group.
+  !! Helper that reads a single attribute given C `ncid`, `varid`, and name.
   integer(c_int), intent(in) :: ncid
-  !> Identifier of the target NetCDF variable.
+  !! Identifier of the open NetCDF file or group.
   integer(c_int), intent(in) :: varid
-  !> Name used to identify the NetCDF object.
+  !! Identifier of the target NetCDF variable.
   character(len=*), intent(in) :: name
-  !> Error object updated if the operation fails.
+  !! Name used to identify the NetCDF object.
   type(error_type), intent(out) :: err
-  !> Retrieved or constructed attribute.
+  !! Error object updated if the operation fails.
   type(attribute_type), target :: att
+  !! Retrieved or constructed attribute.
   integer(c_int) :: dtype, stat
   integer(c_size_t) :: len
   character(len=:), allocatable :: context
@@ -151,40 +151,40 @@ function get_att_(ncid, varid, name, err) result(att)
   err = netcdf_err(stat, context)
 end function get_att_
 
-!> Scalar implementation shared by the fail-fast and error-aware overloads.
 module subroutine put_att_var(nc, var, err)
-  !> Open NetCDF dataset handle.
+  !! Scalar implementation shared by the fail-fast and error-aware overloads.
   class(group_type), intent(in) :: nc
-  !> Variable to process.
+  !! Open NetCDF dataset handle.
   type(variable_type), target, intent(in) :: var
-  !> Error object updated if the operation fails.
+  !! Variable to process.
   type(error_type), intent(out) :: err
+  !! Error object updated if the operation fails.
 
   call put_atts_(nc%id, var%id, var%atts, "[put_att_var]", err)
 end subroutine put_att_var
 
-!> Scalar implementation shared by the fail-fast and error-aware overloads.
 module subroutine put_att_grp(nc, err)
-  !> Open NetCDF dataset handle.
+  !! Scalar implementation shared by the fail-fast and error-aware overloads.
   class(group_type), target, intent(in) :: nc
-  !> Error object updated if the operation fails.
+  !! Open NetCDF dataset handle.
   type(error_type), intent(out) :: err
+  !! Error object updated if the operation fails.
 
   call put_atts_(nc%id, NC_GLOBAL, nc%atts, "[put_att_grp]", err)
 end subroutine put_att_grp
 
-!> Write an array of attributes to a variable or group using C identifiers.
 subroutine put_atts_(ncid, varid, atts, context, err)
-  !> C identifier for the dataset or group receiving the attributes.
+  !! Write an array of attributes to a variable or group using C identifiers.
   integer(c_int), intent(in) :: ncid
-  !> C identifier for the variable, or `NC_GLOBAL` for group attributes.
+  !! C identifier for the dataset or group receiving the attributes.
   integer(c_int), intent(in) :: varid
-  !> Attributes to write. An unallocated array represents no attributes.
+  !! C identifier for the variable, or `NC_GLOBAL` for group attributes.
   type(attribute_type), target, intent(in), allocatable :: atts(:)
-  !> Context used if attribute validation fails.
+  !! Attributes to write. An unallocated array represents no attributes.
   character(len=*), intent(in) :: context
-  !> Completed result of this operation.
+  !! Context used if attribute validation fails.
   type(error_type), intent(out) :: err
+  !! Completed result of this operation.
   integer :: i
   integer(c_int) :: stat
   type(c_ptr) :: cptr

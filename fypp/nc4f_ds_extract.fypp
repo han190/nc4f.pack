@@ -4,71 +4,71 @@ implicit none (type, external)
 contains
 
 #: for D, T, K in zip(dtypes + ['CHAR_TYPE'], types + ['char'], kinds + ['char'])
-#: for R in ('vector', 'scalar')
-!> Extract attribute data of kind `${K}$` as a `${R}$` from `att`.
+  #: for R in ('vector', 'scalar')
 module subroutine extract_att_${K}$_${R}$(att, ptr)
-  !> Source attribute to extract from.
+  !! Extract attribute data of kind `${K}$` as a `${R}$` from `att`.
   type(attribute_type), target, intent(in) :: att
-  #: if K == 'char' and R == 'scalar'
-  !> Output scalar string (allocated by caller via pointer assignment).
+  !! Source attribute to extract from.
+      #: if K == 'char' and R == 'scalar'
   character(len=:), pointer, intent(out) :: ptr
-  #: elif K == 'char' and R == 'vector'
-  !> Output vector of characters.
+  !! Output scalar string (allocated by caller via pointer assignment).
+      #: elif K == 'char' and R == 'vector'
   character, pointer, intent(out) :: ptr(:)
-  #: elif R == 'vector'
-  !> Output vector of `${T}$` of kind `${K}$`.
+  !! Output vector of characters.
+      #: elif R == 'vector'
   ${T}$(${K}$), pointer, intent(out) :: ptr(:)
-  #: elif R == 'scalar'
-  !> Output scalar `${T}$` of kind `${K}$`.
+  !! Output vector of `${T}$` of kind `${K}$`.
+      #: elif R == 'scalar'
   ${T}$(${K}$), pointer, intent(out) :: ptr
-  #: endif
-  #: if (K == 'char' and R == 'scalar')
-  !> Temporary vector of characters used for scalar extraction.
+  !! Output scalar `${T}$` of kind `${K}$`.
+      #: endif
+      #: if (K == 'char' and R == 'scalar')
   character, pointer :: ptrs(:)
-  !> Loop index for copying characters.
+  !! Temporary vector of characters used for scalar extraction.
   integer :: i
-  #: else
-  !> C pointer used to map the attribute buffer into the Fortran pointer.
+  !! Loop index for copying characters.
+      #: else
   type(c_ptr) :: cptr
-  #: endif
+  !! C pointer used to map the attribute buffer into the Fortran pointer.
+      #: endif
 
   call validate(att, ${D}$, "[extract_att_${K}$_${R}$]")
-  #: if R == 'scalar' and T != 'char'
+      #: if R == 'scalar' and T != 'char'
   if (att%len /= 1) error stop &
     & "[extract_att_${K}$_scalar] Not a scalar."
-  #: endif
-  #: if K == 'char' and R == 'scalar'
+      #: endif
+      #: if K == 'char' and R == 'scalar'
   allocate (character(len=att%len) :: ptr)
   if (att%len == 0) return
   call extract_att_char_vector(att, ptrs)
   do i = 1, size(ptrs)
     ptr(i:i) = ptrs(i)
   end do
-  #: elif R == 'vector'
+      #: elif R == 'vector'
   if (att%len == 0) then
     nullify (ptr)
     return
   end if
   cptr = buffer2cptr(att)
   call c_f_pointer(cptr, ptr, [att%len])
-  #: elif R == 'scalar'
+      #: elif R == 'scalar'
   cptr = buffer2cptr(att)
   call c_f_pointer(cptr, ptr)
-  #: endif
+      #: endif
 end subroutine extract_att_${K}$_${R}$${NEWLINE(not (K == 'char' and R == 'scalar'))}$
-#: endfor
+  #: endfor
 #: endfor
 
 #: for D, T, K in zip(dtypes, types, kinds)
-#: for R in range(1, MAX_RANK+1)
-!> Extract variable data of kind `${K}$` and rank ${R}$ into `ptr`.
+  #: for R in range(1, MAX_RANK+1)
 module subroutine extract_var_${K}$_${R}$d(var, ptr)
-  !> Source variable whose buffer will be mapped.
+  !! Extract variable data of kind `${K}$` and rank ${R}$ into `ptr`.
   type(variable_type), target, intent(in) :: var
-  !> Output pointer with matching element kind and rank.
+  !! Source variable whose buffer will be mapped.
   ${T}$(${K}$), pointer, intent(out) :: ptr(${COLONS(R)}$)
-  !> C pointer used to map the variable buffer into the Fortran pointer.
+  !! Output pointer with matching element kind and rank.
   type(c_ptr) :: cptr
+  !! C pointer used to map the variable buffer into the Fortran pointer.
 
   call validate(var, ${D}$, ${R}$, "[extract_var_${K}$_${R}$d]")
   if (var%len == 0) then
@@ -77,24 +77,24 @@ module subroutine extract_var_${K}$_${R}$d(var, ptr)
   end if
 
   cptr = buffer2cptr(var)
-  #: if R == 1
+      #: if R == 1
   call c_f_pointer(cptr, ptr, [var%len])
-  #: else
+      #: else
   call c_f_pointer(cptr, ptr, shape(var))
-  #: endif
+      #: endif
 end subroutine extract_var_${K}$_${R}$d${NEWLINE(not (K == 'real64' and R == MAX_RANK))}$
-#: endfor
+  #: endfor
 #: endfor
 
 #: for R in range(1, MAX_RANK+1)
-!> Extract character variable data of rank ${R}$ into `ptr`.
 module subroutine extract_var_char_${R}$d(var, ptr)
-  !> Source variable whose buffer will be mapped.
+  !! Extract character variable data of rank ${R}$ into `ptr`.
   type(variable_type), target, intent(in) :: var
-  !> Output pointer with matching rank.
+  !! Source variable whose buffer will be mapped.
   character, pointer, intent(out) :: ptr(${COLONS(R)}$)
-  !> C pointer used to map the variable buffer into the Fortran pointer.
+  !! Output pointer with matching rank.
   type(c_ptr) :: cptr
+  !! C pointer used to map the variable buffer into the Fortran pointer.
 
   call validate(var, CHAR_TYPE, ${R}$, "[extract_var_char_${R}$d]")
   if (var%len == 0) then
@@ -103,20 +103,20 @@ module subroutine extract_var_char_${R}$d(var, ptr)
   end if
 
   cptr = buffer2cptr(var)
-  #: if R == 1
+    #: if R == 1
   call c_f_pointer(cptr, ptr, [var%len])
-  #: else
+    #: else
   call c_f_pointer(cptr, ptr, shape(var))
-  #: endif
+    #: endif
 end subroutine extract_var_char_${R}$d${NEWLINE(not (R == MAX_RANK))}$
 #: endfor
 
-!> Map a netCDF integer type code to a Fortran `kind` value.
 pure function dtype2kind(dtype) result(kind_val)
-  !> NetCDF integer type code (NC_* constant) to map.
+  !! Map a netCDF integer type code to a Fortran `kind` value.
   integer(data_type), intent(in) :: dtype
-  !> Returned Fortran `kind` corresponding to the netCDF type.
+  !! NetCDF integer type code (NC_* constant) to map.
   integer :: kind_val
+  !! Returned Fortran `kind` corresponding to the netCDF type.
 
   select case (dtype)
   case (NAT_TYPE)

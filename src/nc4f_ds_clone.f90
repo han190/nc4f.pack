@@ -1,24 +1,24 @@
-!> Deep-cloning helpers for the direct data model.
 submodule(nc4f_ds) nc4f_ds_clone
+!! Deep-cloning helpers for the direct data model.
 implicit none(type, external)
 contains
 
-!> Execute `clone_grp`.
 impure elemental module subroutine clone_grp(src, dest)
-  !> Source object or group to read from.
+  !! Execute `clone_grp`.
   type(group_type), intent(in) :: src
-  !> Destination object or group to update.
+  !! Source object or group to read from.
   type(group_type), intent(out) :: dest
+  !! Destination object or group to update.
 
   call clone_grp_(src, dest)
 end subroutine clone_grp
 
-!> Recursively clone a group tree.
 recursive subroutine clone_grp_(src, dest)
-  !> Source object or group to read from.
+  !! Recursively clone a group tree.
   type(group_type), intent(in) :: src
-  !> Destination object or group to update.
+  !! Source object or group to read from.
   type(group_type), intent(out) :: dest
+  !! Destination object or group to update.
   integer :: i
 
   dest%id = src%id
@@ -40,12 +40,12 @@ recursive subroutine clone_grp_(src, dest)
   end if
 end subroutine clone_grp_
 
-!> Execute `clone_var`.
 impure elemental module subroutine clone_var(src, dest)
-  !> Source object or group to read from.
+  !! Execute `clone_var`.
   type(variable_type), intent(in) :: src
-  !> Destination object or group to update.
+  !! Source object or group to read from.
   type(variable_type), intent(out) :: dest
+  !! Destination object or group to update.
 
   call validate(src, context="[clone_var]")
   dest%id = src%id
@@ -61,12 +61,12 @@ impure elemental module subroutine clone_var(src, dest)
   end if
 end subroutine clone_var
 
-!> Execute `clone_att`.
 impure elemental module subroutine clone_att(src, dest)
-  !> Source object or group to read from.
+  !! Execute `clone_att`.
   type(attribute_type), intent(in) :: src
-  !> Destination object or group to update.
+  !! Source object or group to read from.
   type(attribute_type), intent(out) :: dest
+  !! Destination object or group to update.
 
   call validate(src, context="[clone_att]")
   dest%id = src%id
@@ -77,14 +77,14 @@ impure elemental module subroutine clone_att(src, dest)
   call clone_(dest%buffer, src%buffer, src%ptr)
 end subroutine clone_att
 
-!> Clone owned or borrowed bytes into an owned output buffer.
 pure subroutine clone_(obuffer, ibuffer, iptr)
-  !> Output owned byte buffer.
+  !! Clone owned or borrowed bytes into an owned output buffer.
   integer(int8), allocatable, intent(out) :: obuffer(:)
-  !> Input owned byte buffer.
+  !! Output owned byte buffer.
   integer(int8), allocatable, intent(in) :: ibuffer(:)
-  !> Input borrowed byte buffer.
+  !! Input owned byte buffer.
   integer(int8), contiguous, pointer, intent(in) :: iptr(:)
+  !! Input borrowed byte buffer.
 
   if (allocated(ibuffer)) then
     allocate (obuffer(size(ibuffer)))

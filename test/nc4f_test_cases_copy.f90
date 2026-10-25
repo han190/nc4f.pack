@@ -1,5 +1,5 @@
-!> Tests for explicit deep and shallow construction semantics.
 submodule(nc4f_test_cases) nc4f_test_cases_copy
+!! Tests for explicit deep and shallow construction semantics.
 
 use, intrinsic :: iso_c_binding, only: c_associated, c_loc
 use, intrinsic :: iso_fortran_env, only: real32
@@ -7,10 +7,10 @@ implicit none (type, external)
 
 contains
 
-!> Execute `copy_semantics`.
 module subroutine copy_semantics(passed)
-  !> Whether the test case has passed.
+  !! Execute `copy_semantics`.
   logical, intent(inout) :: passed
+  !! Whether the test case has passed.
   type(attribute_type) :: copied_att, empty_att, owned_att, source_att
   type(group_type) :: borrowed_group, child, deep_group, empty_group, grandchild, &
     & shallow_group, unlimited_group
@@ -145,10 +145,10 @@ module subroutine copy_semantics(passed)
 
 contains
 
-  !> Exercise a deep value after the constructor's source has left scope.
   subroutine check_scoped_owned_value(valid)
-    !> Data or metadata used by this operation.
+    !! Exercise a deep value after the constructor's source has left scope.
     logical, intent(out) :: valid
+    !! Data or metadata used by this operation.
     type(variable_type) :: scoped_var
     real(real32), pointer :: scoped_values(:)
 
@@ -160,20 +160,20 @@ contains
       & epsilon(1.0_real32))
   end subroutine check_scoped_owned_value
 
-  !> Build an owned variable from local storage which ceases to exist on return.
   function new_scoped_owned_var() result(var)
-    !> Retrieved or constructed variable.
+    !! Build an owned variable from local storage which ceases to exist on return.
     type(variable_type) :: var
+    !! Retrieved or constructed variable.
     real(real32), target :: local_values(2)
 
     local_values = [5.0_real32, 6.0_real32]
     var = datarray("scoped", local_values, ["x".dim.2], deep=.true.)
   end function new_scoped_owned_var
 
-  !> Confirm that invalid shallow constructors terminate in child processes.
   subroutine check_invalid_shallow_inputs(valid)
-    !> Whether both invalid shallow-construction probes terminated as expected.
+    !! Confirm that invalid shallow constructors terminate in child processes.
     logical, intent(out) :: valid
+    !! Whether both invalid shallow-construction probes terminated as expected.
     character(len=1024) :: executable
     integer :: char_status, command_status, noncontiguous_status
 

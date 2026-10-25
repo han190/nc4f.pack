@@ -49,3 +49,18 @@ line-length = 120
 [extra.release]
 channel = "beta"
 tag = "0.1.0-beta.1"
+
+[extra.fformat]
+indent = 2
+base-indent = 0
+indent-units = false
+indent-procedures = true
+indent-fypp = false
+continuation = "indent"
+
+[extra.fformat.spaces]
+assignment = "add"    # x = 1
+
+[extra.fformat.files]
+extensions = ["f90", "inc", "fypp"]
+# keyword-args = "add"  # call foo(x = 1)

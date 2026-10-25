@@ -4,17 +4,17 @@ implicit none (type, external)
 
 contains
 
-!> Execute `simple_wr`.
 module subroutine simple_wr(passed)
-  !> Whether the test case has passed.
+  !! Execute `simple_wr`.
   logical, intent(inout) :: passed
+  !! Whether the test case has passed.
   type(variable_type) :: var
   integer, parameter :: nx = 47, ny = 83
   real :: values(nx, ny)
   integer :: x, y
   character(len=1024) :: stdout
 
-  do concurrent(y=1:ny, x=1:nx)
+  do concurrent (y=1:ny, x=1:nx)
     values(x, y) = sqrt((x - 0.5*nx)**2 + (y - 0.5*ny)**2)
   end do
   var = datarray("data", values, ["x".dim.nx, "y".dim.ny])
@@ -23,10 +23,10 @@ module subroutine simple_wr(passed)
   passed = index(stdout, "float data(x, y)") > 0
 end subroutine simple_wr
 
-!> Execute `simple_rd`.
 module subroutine simple_rd(passed)
-  !> Whether the test case has passed.
+  !! Execute `simple_rd`.
   logical, intent(inout) :: passed
+  !! Whether the test case has passed.
   type(netcdf_type) :: nc
   type(variable_type) :: var
   integer, parameter :: nx = 47, ny = 83
@@ -47,15 +47,15 @@ module subroutine simple_rd(passed)
   end if
   write (stdout, "(dt)") var
   passed = var%name == "data" .and. &
-         & all(var%dims == ["x".dim.nx, "y".dim.ny]) .and. &
-         & index(stdout, "float data(x, y)") > 0
+    & all(var%dims == ["x".dim.nx, "y".dim.ny]) .and. &
+    & index(stdout, "float data(x, y)") > 0
   call close_netcdf(nc)
 end subroutine simple_rd
 
-!> Execute `character_variables`.
 module subroutine character_variables(passed)
-  !> Whether the test case has passed.
+  !! Execute `character_variables`.
   logical, intent(inout) :: passed
+  !! Whether the test case has passed.
   character, parameter :: values(2, 3) = &
     & reshape(["a", "b", "c", "d", "e", "f"], [2, 3])
   character, pointer :: actual_values(:, :)
@@ -85,10 +85,10 @@ module subroutine character_variables(passed)
     & all(actual_values == values)
 end subroutine character_variables
 
-!> Execute elemental variable metadata and value reads with array arguments.
 module subroutine elemental_reads(passed)
-  !> Whether the test case has passed.
+  !! Execute elemental variable metadata and value reads with array arguments.
   logical, intent(inout) :: passed
+  !! Whether the test case has passed.
   character(len=6), parameter :: names(2) = ["first ", "second"]
   integer, parameter :: first_values(2) = [1, 2]
   integer, parameter :: second_values(2) = [3, 4]
@@ -135,10 +135,10 @@ module subroutine elemental_reads(passed)
   end do
 end subroutine elemental_reads
 
-!> Execute strided variable reads and their argument validation.
 module subroutine hyperslab_reads(passed)
-  !> Whether the test case has passed.
+  !! Execute strided variable reads and their argument validation.
   logical, intent(inout) :: passed
+  !! Whether the test case has passed.
   integer, parameter :: values(4, 5) = reshape([ &
     & 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20], &
     & [4, 5])
@@ -187,10 +187,10 @@ module subroutine hyperslab_reads(passed)
   passed = err%code == NC_EEDGE
 end subroutine hyperslab_reads
 
-!> Execute `buffer_edges`.
 module subroutine buffer_edges(passed)
-  !> Whether the test case has passed.
+  !! Execute `buffer_edges`.
   logical, intent(inout) :: passed
+  !! Whether the test case has passed.
   character(len=256) :: dim_name, att_name, var_name
   character(len=:), pointer :: text
   real, parameter :: values(2) = [1.0, 2.0]

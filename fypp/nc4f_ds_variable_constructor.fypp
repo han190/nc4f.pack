@@ -4,23 +4,23 @@ implicit none (type, external)
 contains
 
 #: for D, T, K in zip(dtypes, types, kinds)
-#: for R in range(1, MAX_RANK+1)
-!> Construct a `variable_type` of rank ${R}$ and kind ${K}$ from an array.
+  #: for R in range(1, MAX_RANK+1)
 module function new_var_${K}$_${R}$d(name, values, dims, atts, deep) result(var)
-  !> Name of the variable to create (will be trimmed).
+  !! Construct a `variable_type` of rank ${R}$ and kind ${K}$ from an array.
   character(len=*), intent(in) :: name
-  !> Array of values to populate the variable's data buffer.
-  !> The array has rank ${R}$ and element type `${T}$` of kind `${K}$`.
+  !! Name of the variable to create (will be trimmed).
   ${T}$(${K}$), target, intent(in) :: values(${COLONS(R)}$)
-  !> Dimensions describing the variable's shape, ordered in Fortran order.
+  !! Array of values to populate the variable's data buffer.
+  !! The array has rank ${R}$ and element type `${T}$` of kind `${K}$`.
   type(dimension_type), intent(in) :: dims(:)
-  !> Optional list of attributes to attach to the variable.
+  !! Dimensions describing the variable's shape, ordered in Fortran order.
   type(attribute_type), intent(in), optional :: atts(:)
-  !> When true (default), copy values into owned storage.  When false,
-  !> retain a borrowed view of this contiguous target array.
+  !! Optional list of attributes to attach to the variable.
   logical, intent(in), optional :: deep
-  !> Resulting `variable_type` initialized with metadata and buffer.
+  !! When true (default), copy values into owned storage.  When false,
+  !! retain a borrowed view of this contiguous target array.
   type(variable_type) :: var
+  !! Resulting `variable_type` initialized with metadata and buffer.
   type(c_ptr) :: cptr
   logical :: deep_copy
   deep_copy = .true.
@@ -39,24 +39,24 @@ module function new_var_${K}$_${R}$d(name, values, dims, atts, deep) result(var)
     end if
   end if
 end function new_var_${K}$_${R}$d${NEWLINE()}$
-#: endfor
+  #: endfor
 #: endfor
 #: for R in range(1, MAX_RANK+1)
-!> Construct a `variable_type` of rank ${R}$ from a character array.
 module function new_var_char_${R}$d(name, values, dims, atts, deep) result(var)
-  !> Name of the variable to create (will be trimmed).
+  !! Construct a `variable_type` of rank ${R}$ from a character array.
   character(len=*), intent(in) :: name
-  !> Single-character values to populate the variable's data buffer.
+  !! Name of the variable to create (will be trimmed).
   character, target, intent(in) :: values(${COLONS(R)}$)
-  !> Dimensions describing the variable's shape, ordered in Fortran order.
+  !! Single-character values to populate the variable's data buffer.
   type(dimension_type), intent(in) :: dims(:)
-  !> Optional list of attributes to attach to the variable.
+  !! Dimensions describing the variable's shape, ordered in Fortran order.
   type(attribute_type), intent(in), optional :: atts(:)
-  !> When true (default), copy values into owned storage.  When false,
-  !> retain a borrowed view of this contiguous target array.
+  !! Optional list of attributes to attach to the variable.
   logical, intent(in), optional :: deep
-  !> Resulting `variable_type` initialized with metadata and buffer.
+  !! When true (default), copy values into owned storage.  When false,
+  !! retain a borrowed view of this contiguous target array.
   type(variable_type) :: var
+  !! Resulting `variable_type` initialized with metadata and buffer.
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep

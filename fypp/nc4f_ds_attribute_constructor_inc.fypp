@@ -9,25 +9,34 @@ end interface operator(.att.)
 
 interface
   #: for T, K in zip(types, kinds)
-  !> Create an `attribute_type` from an array of `${T}$` of kind `${K}$`.
   pure module function new_att_${K}$(name, values) result(att)
+    !! Create an `attribute_type` from an array of `${T}$` of kind `${K}$`.
     character(len=*), intent(in) :: name
+    !! Attribute name.
     ${T}$(${K}$), intent(in) :: values(:)
+    !! Attribute values.
     type(attribute_type) :: att
+    !! Returned Attribute.
   end function new_att_${K}$
 
-  !> Create a scalar `attribute_type` from a `${T}$` value.
   elemental module function new_att_${K}$_scalar(name, value) result(att)
+    !! Create a scalar `attribute_type` from a `${T}$` value.
     character(len=*), intent(in) :: name
+    !! Attribute name.
     ${T}$(${K}$), intent(in) :: value
+    !! Attribute value.
     type(attribute_type) :: att
+    !! Returned Attribute.
   end function new_att_${K}$_scalar${NEWLINE(not (K == 'real64'))}$
   #: endfor
 
-  !> Create an `attribute_type` containing character data.
   module function new_att_character(name, value) result(att)
+    !! Create an `attribute_type` containing character data.
     character(len=*), intent(in) :: name
+    !! Attribute name.
     character(len=*), intent(in) :: value
+    !! Attribute value (character).
     type(attribute_type), target :: att
+    !! Returned Attribute.
   end function new_att_character
 end interface

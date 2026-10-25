@@ -4,10 +4,10 @@ implicit none (type, external)
 
 contains
 
-!> Execute `sum_vars_test`.
 module subroutine sum_vars_test(passed)
-  !> Whether the test case has passed.
+  !! Execute `sum_vars_test`.
   logical, intent(inout) :: passed
+  !! Whether the test case has passed.
   real(real64), parameter :: a(2, 3) = reshape([ &
     & 1.0_real64, 2.0_real64, 3.0_real64, 4.0_real64, &
     & 5.0_real64, 6.0_real64], [2, 3])
@@ -28,10 +28,10 @@ module subroutine sum_vars_test(passed)
     & all(result%dims == vars(1)%dims)
 end subroutine sum_vars_test
 
-!> Execute `sfc_pres_temp_wr`.
 module subroutine sfc_pres_temp_wr(passed)
-  !> Whether the test case has passed.
+  !! Execute `sfc_pres_temp_wr`.
   logical, intent(inout) :: passed
+  !! Whether the test case has passed.
   integer, parameter :: nlat = 181, nlon = 361
   real, parameter :: lat_max = 90.0, lon_max = 180.0
   real, allocatable :: pres(:, :), temp(:, :)
@@ -40,7 +40,7 @@ module subroutine sfc_pres_temp_wr(passed)
   type(variable_type) :: vars(4)
 
   allocate (pres(nlon, nlat), temp(nlon, nlat))
-  do concurrent(ilon=1:nlon, ilat=1:nlat)
+  do concurrent (ilon=1:nlon, ilat=1:nlat)
     lats(ilat) = lat_max - ilat + 1
     lons(ilon) = merge(ilon - lon_max*2 + 1, real(ilon), ilon > lon_max)
     pres(ilon, ilat) = 900.0 + 0.5*ilat - 0.5*ilon
@@ -64,10 +64,10 @@ module subroutine sfc_pres_temp_wr(passed)
   passed = .true.
 end subroutine sfc_pres_temp_wr
 
-!> Execute `sfc_pres_temp_rd`.
 module subroutine sfc_pres_temp_rd(passed)
-  !> Whether the test case has passed.
+  !! Execute `sfc_pres_temp_rd`.
   logical, intent(inout) :: passed
+  !! Whether the test case has passed.
   type(netcdf_type) :: nc
   type(variable_type) :: var
   type(error_type) :: err
@@ -109,10 +109,10 @@ module subroutine sfc_pres_temp_rd(passed)
   call close_netcdf(nc)
 end subroutine sfc_pres_temp_rd
 
-!> Execute `extensive_wr`.
 module subroutine extensive_wr(passed)
-  !> Whether the test case has passed.
+  !! Execute `extensive_wr`.
   logical, intent(inout) :: passed
+  !! Whether the test case has passed.
   type(variable_type), allocatable :: vars(:)
   logical :: file_exists
   integer(int64) :: file_size
@@ -125,10 +125,10 @@ module subroutine extensive_wr(passed)
   if (passed) passed = file_size > 0
 end subroutine extensive_wr
 
-!> Execute `extensive_rd`.
 module subroutine extensive_rd(passed)
-  !> Whether the test case has passed.
+  !! Execute `extensive_rd`.
   logical, intent(inout) :: passed
+  !! Whether the test case has passed.
   character(len=16), parameter :: names(7) = [character(len=16) :: &
     & "int8_rank1", "int16_rank2", "int32_rank3", "int64_rank4", &
     & "real32_rank5", "real64_rank6", "real32_rank7"]
@@ -173,12 +173,12 @@ module subroutine extensive_rd(passed)
   call close_netcdf(nc)
 end subroutine extensive_rd
 
-!> Read root-level data and metadata from NASA's externally produced
-!> CLDPROP COSP NetCDF-4 sample file.  The file also contains nested groups;
-!> this test intentionally exercises the currently supported root group only.
 module subroutine nasa_cosp_read(passed)
-  !> Whether the test case has passed.
+  !! Read root-level data and metadata from NASA's externally produced
+  !! CLDPROP COSP NetCDF-4 sample file.  The file also contains nested groups;
+  !! this test intentionally exercises the currently supported root group only.
   logical, intent(inout) :: passed
+  !! Whether the test case has passed.
   character(*), parameter :: SAMPLE_FILE = &
     & "data/CLDPROPCOSP_M3_MODIS_Aqua.A2014032.011.2020112203433.nc"
   character(len=:), pointer :: yaml
@@ -203,8 +203,8 @@ module subroutine nasa_cosp_read(passed)
   nasa_read: block
     grps = inquire_subgroups(nc, err)
     if ((err%code /= NC_NOERR)) exit nasa_read
-   call inquire_group(nc, inq_dims=.true., inq_atts=.true., &
-    & inq_vars=.true., inq_grps=.true., recur=.true., err=err)
+    call inquire_group(nc, inq_dims=.true., inq_atts=.true., &
+      & inq_vars=.true., inq_grps=.true., recur=.true., err=err)
     if ((err%code /= NC_NOERR)) exit nasa_read
     open (newunit=file_unit, file=NETCDF_TYPE_RESULT_FILE, status="replace", &
       & action="write", iostat=iostat)
@@ -264,11 +264,11 @@ module subroutine nasa_cosp_read(passed)
   end if
 end subroutine nasa_cosp_read
 
-!> Read coordinates, CF metadata, and packed data from Unidata's externally
-!> produced ECMWF ERA-40 sample file.
 module subroutine ecmwf_era40_read(passed)
-  !> Whether the test case has passed.
+  !! Read coordinates, CF metadata, and packed data from Unidata's externally
+  !! produced ECMWF ERA-40 sample file.
   logical, intent(inout) :: passed
+  !! Whether the test case has passed.
   character(*), parameter :: SAMPLE_FILE = "data/ECMWF_ERA-40_subset.nc"
   character(len=:), pointer :: conventions, longitude_units, temperature_units
   integer(int16), pointer :: temperature(:, :, :)
@@ -342,10 +342,10 @@ module subroutine ecmwf_era40_read(passed)
   end if
 end subroutine ecmwf_era40_read
 
-!> Read a CF climate-model file through the root-group API.
 module subroutine sresa1b_ccsm3_read(passed)
-  !> Whether the test case has passed.
+  !! Read a CF climate-model file through the root-group API.
   logical, intent(inout) :: passed
+  !! Whether the test case has passed.
   character(*), parameter :: SAMPLE_FILE = "data/sresa1b_ncar_ccsm3-example.nc"
   character(len=:), pointer :: conventions, units
   real(real32), pointer :: values(:, :, :)
@@ -403,10 +403,10 @@ module subroutine sresa1b_ccsm3_read(passed)
   end if
 end subroutine sresa1b_ccsm3_read
 
-!> Render every externally produced NetCDF fixture through NetCDF UDDTIO.
 module subroutine sample_uddtio(passed)
-  !> Whether the test case has passed.
+  !! Render every externally produced NetCDF fixture through NetCDF UDDTIO.
   logical, intent(inout) :: passed
+  !! Whether the test case has passed.
   character(len=96), parameter :: files(6) = [character(len=96) :: &
     & "data/CLDPROPCOSP_M3_MODIS_Aqua.A2014032.011.2020112203433.nc", &
     & "data/ECMWF_ERA-40_subset.nc", &
@@ -448,25 +448,25 @@ module subroutine sample_uddtio(passed)
   passed = .true.
 end subroutine sample_uddtio
 
-!> Render one externally produced NetCDF fixture and verify key output lines.
 function render_sample_uddtio_(file, label, expected_dim, expected_var, &
   & expected_var_att, expected_att, expected_group) result(rendered)
-  !> Path of the NetCDF file to read or write.
+  !! Render one externally produced NetCDF fixture and verify key output lines.
   character(len=*), intent(in) :: file
-  !> Data or metadata used by this operation.
+  !! Path of the NetCDF file to read or write.
   character(len=*), intent(in) :: label
-  !> Data or metadata used by this operation.
+  !! Data or metadata used by this operation.
   character(len=*), intent(in) :: expected_dim
-  !> Data or metadata used by this operation.
+  !! Data or metadata used by this operation.
   character(len=*), intent(in) :: expected_var
-  !> Data or metadata used by this operation.
+  !! Data or metadata used by this operation.
   character(len=*), intent(in) :: expected_var_att
-  !> Data or metadata used by this operation.
+  !! Data or metadata used by this operation.
   character(len=*), intent(in) :: expected_att
-  !> Data or metadata used by this operation.
+  !! Data or metadata used by this operation.
   character(len=*), intent(in) :: expected_group
-  !> Rendered NetCDF text.
+  !! Data or metadata used by this operation.
   logical :: rendered
+  !! Rendered NetCDF text.
   character(len=256) :: line
   character(len=:), allocatable :: expected_header, output_file
   integer :: base, extension, file_unit, iostat
@@ -534,10 +534,10 @@ function render_sample_uddtio_(file, label, expected_dim, expected_var, &
     & attribute_found .and. child_group_found
 end function render_sample_uddtio_
 
-!> Read CAM initial-condition data with a four-dimensional hyperslab.
 module subroutine cami_initial_read(passed)
-  !> Whether the test case has passed.
+  !! Read CAM initial-condition data with a four-dimensional hyperslab.
   logical, intent(inout) :: passed
+  !! Whether the test case has passed.
   character(*), parameter :: SAMPLE_FILE = &
     & "data/cami_0000-09-01_64x128_L26_c030918.nc"
   character(len=:), pointer :: conventions, units
@@ -598,10 +598,10 @@ module subroutine cami_initial_read(passed)
   end if
 end subroutine cami_initial_read
 
-!> Read an ocean file whose first latitude row contains missing values.
 module subroutine tos_o1_read(passed)
-  !> Whether the test case has passed.
+  !! Read an ocean file whose first latitude row contains missing values.
   logical, intent(inout) :: passed
+  !! Whether the test case has passed.
   character(*), parameter :: SAMPLE_FILE = "data/tos_O1_2001-2002.nc"
   character(len=:), pointer :: conventions, units
   real(real32), pointer :: values(:, :, :)
@@ -656,10 +656,10 @@ module subroutine tos_o1_read(passed)
   end if
 end subroutine tos_o1_read
 
-!> Read a spectral-grid file with non-geographical dimensions.
 module subroutine echam_spectral_read(passed)
-  !> Whether the test case has passed.
+  !! Read a spectral-grid file with non-geographical dimensions.
   logical, intent(inout) :: passed
+  !! Whether the test case has passed.
   character(*), parameter :: SAMPLE_FILE = "data/test_echam_spectral.nc"
   character(len=:), pointer :: conventions, grid_type
   real(real32), pointer :: values(:, :, :)
@@ -718,16 +718,16 @@ module subroutine echam_spectral_read(passed)
   end if
 end subroutine echam_spectral_read
 
-!> Return whether `dims` contains a dimension with the specified metadata.
 pure logical function has_dim(dims, name, len, is_unlim)
-  !> Dimensions describing the variable shape.
+  !! Return whether `dims` contains a dimension with the specified metadata.
   type(dimension_type), intent(in) :: dims(:)
-  !> Name used to identify the NetCDF object.
+  !! Dimensions describing the variable shape.
   character(len=*), intent(in) :: name
-  !> Length of the dimension or attribute.
+  !! Name used to identify the NetCDF object.
   integer(int64), intent(in) :: len
-  !> Whether the dimension is unlimited.
+  !! Length of the dimension or attribute.
   logical, intent(in), optional :: is_unlim
+  !! Whether the dimension is unlimited.
   integer :: i
 
   has_dim = .false.
@@ -742,20 +742,20 @@ pure logical function has_dim(dims, name, len, is_unlim)
   end do
 end function has_dim
 
-!> Return whether `text` begins with `prefix`; trailing NULs are retained when
-!> an externally written `NC_CHAR` attribute includes them in its stored value.
 pure logical function starts_with(text, prefix)
-  !> Dataset objects or values used by this operation.
+  !! Return whether `text` begins with `prefix`; trailing NULs are retained when
+  !! an externally written `NC_CHAR` attribute includes them in its stored value.
   character(len=*), intent(in) :: text, prefix
+  !! Dataset objects or values used by this operation.
 
   starts_with = len(text) >= len(prefix)
   if (starts_with) starts_with = text(:len(prefix)) == prefix
 end function starts_with
 
-!> Compute `extensive_variables`.
 function extensive_variables() result(vars)
-  !> Retrieved variables.
+  !! Compute `extensive_variables`.
   type(variable_type), allocatable :: vars(:)
+  !! Retrieved variables.
   type(dimension_type) :: dims(7)
   integer(int8) :: int8_values(2)
   integer(int16) :: int16_values(2, 2)
@@ -787,25 +787,25 @@ function extensive_variables() result(vars)
 
   vars = [ &
     & datarray("int8_rank1", int8_values, dims(:1), &
-    &   ["marker".att. (-7_int8)]), &
+    & ["marker".att. (-7_int8)]), &
     & datarray("int16_rank2", int16_values, dims(:2), &
-    &   ["marker".att. (-15_int16)]), &
+    & ["marker".att. (-15_int16)]), &
     & datarray("int32_rank3", int32_values, dims(:3), &
-    &   ["marker".att.350_int32]), &
+    & ["marker".att.350_int32]), &
     & datarray("int64_rank4", int64_values, dims(:4), &
-    &   ["marker".att.7500_int64]), &
+    & ["marker".att.7500_int64]), &
     & datarray("real32_rank5", real32_values_5d, dims(:5), &
-    &   ["marker".att.1.25_real32]), &
+    & ["marker".att.1.25_real32]), &
     & datarray("real64_rank6", real64_values_6d, dims(:6), &
-    &   ["marker".att.2.5_real64]), &
+    & ["marker".att.2.5_real64]), &
     & datarray("real32_rank7", real32_values_7d, dims, &
-    &   ["description".att."rank-seven variable"])]
+    & ["description".att."rank-seven variable"])]
 end function extensive_variables
 
-!> Compute `extensive_attributes`.
 function extensive_attributes() result(atts)
-  !> Retrieved attributes.
+  !! Compute `extensive_attributes`.
   type(attribute_type), allocatable :: atts(:)
+  !! Retrieved attributes.
 
   atts = [ &
     & "title".att."nc4f extensive round trip", &

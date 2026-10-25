@@ -4,10 +4,10 @@ implicit none (type, external)
 
 contains
 
-!> Execute `creation_policy`.
 module subroutine creation_policy(passed)
-  !> Whether the test case has passed.
+  !! Execute `creation_policy`.
   logical, intent(inout) :: passed
+  !! Whether the test case has passed.
   real, parameter :: values(1) = [42.0]
   type(error_type) :: err
   type(netcdf_type) :: nc
@@ -38,10 +38,10 @@ module subroutine creation_policy(passed)
   passed = err%code == NC_NOERR
 end subroutine creation_policy
 
-!> Execute `error_handling`.
 module subroutine error_handling(passed)
-  !> Whether the test case has passed.
+  !! Execute `error_handling`.
   logical, intent(inout) :: passed
+  !! Whether the test case has passed.
   real, parameter :: values(1) = [42.0]
   character(len=1024) :: stdout
   integer :: iostat
@@ -105,7 +105,7 @@ module subroutine error_handling(passed)
   vars = [present, invalid]
   call to_netcdf(TEST_RESULTS_DIR//"failed-write-cleanup.nc", vars, err=err)
   if (err%code == NC_NOERR) return
-nc = open_netcdf(TEST_RESULTS_DIR//"failed-write-cleanup.nc", "a", err=err)
+  nc = open_netcdf(TEST_RESULTS_DIR//"failed-write-cleanup.nc", "a", err=err)
   if ((err%code /= NC_NOERR)) return
   var = get_variable(nc, "present", err=err)
   call close_netcdf(nc)

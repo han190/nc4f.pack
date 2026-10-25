@@ -1,18 +1,18 @@
-!> Attribute construction and equality for the direct v2 data model.
 submodule(nc4f_ds) nc4f_ds_attribute
+!! Attribute construction and equality for the direct v2 data model.
 implicit none (type, external)
 contains
 
-!> Initialize an attribute from a name and existing value metadata.
 module subroutine init_att_mold(att, name, mold, deep)
-  !> Attribute to process.
+  !! Initialize an attribute from a name and existing value metadata.
   type(attribute_type), intent(inout) :: att
-  !> Name for the new attribute.
+  !! Attribute to process.
   character(len=*), intent(in) :: name
-  !> Data or metadata used by this operation.
+  !! Name for the new attribute.
   type(attribute_type), target, intent(in) :: mold
-  !> Whether to allocate an owning data buffer or borrow the mold's storage.
+  !! Data or metadata used by this operation.
   logical, intent(in), optional :: deep
+  !! Whether to allocate an owning data buffer or borrow the mold's storage.
   logical :: deep_copy
 
   deep_copy = .true.
@@ -29,10 +29,10 @@ module subroutine init_att_mold(att, name, mold, deep)
   end if
 end subroutine init_att_mold
 
-!> Return true when two attributes have identical metadata and byte values.
 logical elemental module function eq_att(x, y) result(is_equal)
-  !> Dataset objects or values used by this operation.
+  !! Return true when two attributes have identical metadata and byte values.
   type(attribute_type), intent(in) :: x, y
+  !! Dataset objects or values used by this operation.
 
   call validate(x, context="[eq_att]")
   call validate(y, context="[eq_att]")
@@ -73,10 +73,10 @@ logical elemental module function eq_att(x, y) result(is_equal)
   end if
 end function eq_att
 
-!> Return true when two attributes differ.
 logical elemental module function neq_att(x, y) result(is_equal)
-  !> Dataset objects or values used by this operation.
+  !! Return true when two attributes differ.
   type(attribute_type), intent(in) :: x, y
+  !! Dataset objects or values used by this operation.
 
   is_equal = .not. eq_att(x, y)
 end function neq_att
