@@ -30,7 +30,7 @@ module function new_var_int8_1d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1))
+      cptr = c_loc(values(1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(BYTE_TYPE, size(values, kind=int64))])
     end if
@@ -65,7 +65,7 @@ module function new_var_int8_2d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1))
+      cptr = c_loc(values(1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(BYTE_TYPE, size(values, kind=int64))])
     end if
@@ -100,7 +100,7 @@ module function new_var_int8_3d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1))
+      cptr = c_loc(values(1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(BYTE_TYPE, size(values, kind=int64))])
     end if
@@ -135,7 +135,7 @@ module function new_var_int8_4d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(BYTE_TYPE, size(values, kind=int64))])
     end if
@@ -170,7 +170,7 @@ module function new_var_int8_5d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(BYTE_TYPE, size(values, kind=int64))])
     end if
@@ -205,7 +205,7 @@ module function new_var_int8_6d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(BYTE_TYPE, size(values, kind=int64))])
     end if
@@ -240,7 +240,7 @@ module function new_var_int8_7d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(BYTE_TYPE, size(values, kind=int64))])
     end if
@@ -275,7 +275,7 @@ module function new_var_int8_8d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(BYTE_TYPE, size(values, kind=int64))])
     end if
@@ -310,7 +310,7 @@ module function new_var_int8_9d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(BYTE_TYPE, size(values, kind=int64))])
     end if
@@ -345,7 +345,7 @@ module function new_var_int8_10d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(BYTE_TYPE, size(values, kind=int64))])
     end if
@@ -380,7 +380,7 @@ module function new_var_int8_11d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(BYTE_TYPE, size(values, kind=int64))])
     end if
@@ -415,7 +415,7 @@ module function new_var_int8_12d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(BYTE_TYPE, size(values, kind=int64))])
     end if
@@ -450,7 +450,7 @@ module function new_var_int8_13d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(BYTE_TYPE, size(values, kind=int64))])
     end if
@@ -485,7 +485,7 @@ module function new_var_int8_14d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(BYTE_TYPE, size(values, kind=int64))])
     end if
@@ -520,7 +520,7 @@ module function new_var_int8_15d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(BYTE_TYPE, size(values, kind=int64))])
     end if
@@ -555,7 +555,7 @@ module function new_var_int16_1d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1))
+      cptr = c_loc(values(1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(SHORT_TYPE, size(values, kind=int64))])
     end if
@@ -590,7 +590,7 @@ module function new_var_int16_2d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1))
+      cptr = c_loc(values(1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(SHORT_TYPE, size(values, kind=int64))])
     end if
@@ -625,7 +625,7 @@ module function new_var_int16_3d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1))
+      cptr = c_loc(values(1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(SHORT_TYPE, size(values, kind=int64))])
     end if
@@ -660,7 +660,7 @@ module function new_var_int16_4d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(SHORT_TYPE, size(values, kind=int64))])
     end if
@@ -695,7 +695,7 @@ module function new_var_int16_5d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(SHORT_TYPE, size(values, kind=int64))])
     end if
@@ -730,7 +730,7 @@ module function new_var_int16_6d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(SHORT_TYPE, size(values, kind=int64))])
     end if
@@ -765,7 +765,7 @@ module function new_var_int16_7d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(SHORT_TYPE, size(values, kind=int64))])
     end if
@@ -800,7 +800,7 @@ module function new_var_int16_8d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(SHORT_TYPE, size(values, kind=int64))])
     end if
@@ -835,7 +835,7 @@ module function new_var_int16_9d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(SHORT_TYPE, size(values, kind=int64))])
     end if
@@ -870,7 +870,7 @@ module function new_var_int16_10d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(SHORT_TYPE, size(values, kind=int64))])
     end if
@@ -905,7 +905,7 @@ module function new_var_int16_11d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(SHORT_TYPE, size(values, kind=int64))])
     end if
@@ -940,7 +940,7 @@ module function new_var_int16_12d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(SHORT_TYPE, size(values, kind=int64))])
     end if
@@ -975,7 +975,7 @@ module function new_var_int16_13d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(SHORT_TYPE, size(values, kind=int64))])
     end if
@@ -1010,7 +1010,7 @@ module function new_var_int16_14d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(SHORT_TYPE, size(values, kind=int64))])
     end if
@@ -1045,7 +1045,7 @@ module function new_var_int16_15d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(SHORT_TYPE, size(values, kind=int64))])
     end if
@@ -1080,7 +1080,7 @@ module function new_var_int32_1d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1))
+      cptr = c_loc(values(1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT_TYPE, size(values, kind=int64))])
     end if
@@ -1115,7 +1115,7 @@ module function new_var_int32_2d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1))
+      cptr = c_loc(values(1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT_TYPE, size(values, kind=int64))])
     end if
@@ -1150,7 +1150,7 @@ module function new_var_int32_3d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1))
+      cptr = c_loc(values(1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT_TYPE, size(values, kind=int64))])
     end if
@@ -1185,7 +1185,7 @@ module function new_var_int32_4d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT_TYPE, size(values, kind=int64))])
     end if
@@ -1220,7 +1220,7 @@ module function new_var_int32_5d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT_TYPE, size(values, kind=int64))])
     end if
@@ -1255,7 +1255,7 @@ module function new_var_int32_6d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT_TYPE, size(values, kind=int64))])
     end if
@@ -1290,7 +1290,7 @@ module function new_var_int32_7d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT_TYPE, size(values, kind=int64))])
     end if
@@ -1325,7 +1325,7 @@ module function new_var_int32_8d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT_TYPE, size(values, kind=int64))])
     end if
@@ -1360,7 +1360,7 @@ module function new_var_int32_9d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT_TYPE, size(values, kind=int64))])
     end if
@@ -1395,7 +1395,7 @@ module function new_var_int32_10d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT_TYPE, size(values, kind=int64))])
     end if
@@ -1430,7 +1430,7 @@ module function new_var_int32_11d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT_TYPE, size(values, kind=int64))])
     end if
@@ -1465,7 +1465,7 @@ module function new_var_int32_12d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT_TYPE, size(values, kind=int64))])
     end if
@@ -1500,7 +1500,7 @@ module function new_var_int32_13d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT_TYPE, size(values, kind=int64))])
     end if
@@ -1535,7 +1535,7 @@ module function new_var_int32_14d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT_TYPE, size(values, kind=int64))])
     end if
@@ -1570,7 +1570,7 @@ module function new_var_int32_15d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT_TYPE, size(values, kind=int64))])
     end if
@@ -1605,7 +1605,7 @@ module function new_var_int64_1d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1))
+      cptr = c_loc(values(1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT64_TYPE, size(values, kind=int64))])
     end if
@@ -1640,7 +1640,7 @@ module function new_var_int64_2d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1))
+      cptr = c_loc(values(1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT64_TYPE, size(values, kind=int64))])
     end if
@@ -1675,7 +1675,7 @@ module function new_var_int64_3d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1))
+      cptr = c_loc(values(1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT64_TYPE, size(values, kind=int64))])
     end if
@@ -1710,7 +1710,7 @@ module function new_var_int64_4d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT64_TYPE, size(values, kind=int64))])
     end if
@@ -1745,7 +1745,7 @@ module function new_var_int64_5d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT64_TYPE, size(values, kind=int64))])
     end if
@@ -1780,7 +1780,7 @@ module function new_var_int64_6d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT64_TYPE, size(values, kind=int64))])
     end if
@@ -1815,7 +1815,7 @@ module function new_var_int64_7d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT64_TYPE, size(values, kind=int64))])
     end if
@@ -1850,7 +1850,7 @@ module function new_var_int64_8d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT64_TYPE, size(values, kind=int64))])
     end if
@@ -1885,7 +1885,7 @@ module function new_var_int64_9d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT64_TYPE, size(values, kind=int64))])
     end if
@@ -1920,7 +1920,7 @@ module function new_var_int64_10d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT64_TYPE, size(values, kind=int64))])
     end if
@@ -1955,7 +1955,7 @@ module function new_var_int64_11d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT64_TYPE, size(values, kind=int64))])
     end if
@@ -1990,7 +1990,7 @@ module function new_var_int64_12d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT64_TYPE, size(values, kind=int64))])
     end if
@@ -2025,7 +2025,7 @@ module function new_var_int64_13d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT64_TYPE, size(values, kind=int64))])
     end if
@@ -2060,7 +2060,7 @@ module function new_var_int64_14d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT64_TYPE, size(values, kind=int64))])
     end if
@@ -2095,7 +2095,7 @@ module function new_var_int64_15d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(INT64_TYPE, size(values, kind=int64))])
     end if
@@ -2130,7 +2130,7 @@ module function new_var_real32_1d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1))
+      cptr = c_loc(values(1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(FLOAT_TYPE, size(values, kind=int64))])
     end if
@@ -2165,7 +2165,7 @@ module function new_var_real32_2d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1))
+      cptr = c_loc(values(1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(FLOAT_TYPE, size(values, kind=int64))])
     end if
@@ -2200,7 +2200,7 @@ module function new_var_real32_3d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1))
+      cptr = c_loc(values(1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(FLOAT_TYPE, size(values, kind=int64))])
     end if
@@ -2235,7 +2235,7 @@ module function new_var_real32_4d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(FLOAT_TYPE, size(values, kind=int64))])
     end if
@@ -2270,7 +2270,7 @@ module function new_var_real32_5d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(FLOAT_TYPE, size(values, kind=int64))])
     end if
@@ -2305,7 +2305,7 @@ module function new_var_real32_6d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(FLOAT_TYPE, size(values, kind=int64))])
     end if
@@ -2340,7 +2340,7 @@ module function new_var_real32_7d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(FLOAT_TYPE, size(values, kind=int64))])
     end if
@@ -2375,7 +2375,7 @@ module function new_var_real32_8d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(FLOAT_TYPE, size(values, kind=int64))])
     end if
@@ -2410,7 +2410,7 @@ module function new_var_real32_9d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(FLOAT_TYPE, size(values, kind=int64))])
     end if
@@ -2445,7 +2445,7 @@ module function new_var_real32_10d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(FLOAT_TYPE, size(values, kind=int64))])
     end if
@@ -2480,7 +2480,7 @@ module function new_var_real32_11d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(FLOAT_TYPE, size(values, kind=int64))])
     end if
@@ -2515,7 +2515,7 @@ module function new_var_real32_12d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(FLOAT_TYPE, size(values, kind=int64))])
     end if
@@ -2550,7 +2550,7 @@ module function new_var_real32_13d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(FLOAT_TYPE, size(values, kind=int64))])
     end if
@@ -2585,7 +2585,7 @@ module function new_var_real32_14d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(FLOAT_TYPE, size(values, kind=int64))])
     end if
@@ -2620,7 +2620,7 @@ module function new_var_real32_15d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(FLOAT_TYPE, size(values, kind=int64))])
     end if
@@ -2655,7 +2655,7 @@ module function new_var_real64_1d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1))
+      cptr = c_loc(values(1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(DOUBLE_TYPE, size(values, kind=int64))])
     end if
@@ -2690,7 +2690,7 @@ module function new_var_real64_2d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1))
+      cptr = c_loc(values(1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(DOUBLE_TYPE, size(values, kind=int64))])
     end if
@@ -2725,7 +2725,7 @@ module function new_var_real64_3d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1))
+      cptr = c_loc(values(1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(DOUBLE_TYPE, size(values, kind=int64))])
     end if
@@ -2760,7 +2760,7 @@ module function new_var_real64_4d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(DOUBLE_TYPE, size(values, kind=int64))])
     end if
@@ -2795,7 +2795,7 @@ module function new_var_real64_5d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(DOUBLE_TYPE, size(values, kind=int64))])
     end if
@@ -2830,7 +2830,7 @@ module function new_var_real64_6d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(DOUBLE_TYPE, size(values, kind=int64))])
     end if
@@ -2865,7 +2865,7 @@ module function new_var_real64_7d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(DOUBLE_TYPE, size(values, kind=int64))])
     end if
@@ -2900,7 +2900,7 @@ module function new_var_real64_8d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(DOUBLE_TYPE, size(values, kind=int64))])
     end if
@@ -2935,7 +2935,7 @@ module function new_var_real64_9d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(DOUBLE_TYPE, size(values, kind=int64))])
     end if
@@ -2970,7 +2970,7 @@ module function new_var_real64_10d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(DOUBLE_TYPE, size(values, kind=int64))])
     end if
@@ -3005,7 +3005,7 @@ module function new_var_real64_11d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(DOUBLE_TYPE, size(values, kind=int64))])
     end if
@@ -3040,7 +3040,7 @@ module function new_var_real64_12d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(DOUBLE_TYPE, size(values, kind=int64))])
     end if
@@ -3075,7 +3075,7 @@ module function new_var_real64_13d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(DOUBLE_TYPE, size(values, kind=int64))])
     end if
@@ -3110,7 +3110,7 @@ module function new_var_real64_14d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(DOUBLE_TYPE, size(values, kind=int64))])
     end if
@@ -3145,7 +3145,7 @@ module function new_var_real64_15d(name, values, dims, atts, deep) result(var)
     if (deep_copy) then
       var%buffer = transfer(values, 0_int8, size(var%buffer))
     else
-      cptr = c_loc(values(    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+      cptr = c_loc(values(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
       call c_f_pointer(cptr, var%ptr, &
         & [buffer_size(DOUBLE_TYPE, size(values, kind=int64))])
     end if

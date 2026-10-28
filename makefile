@@ -33,25 +33,15 @@ endif
 
 LINK_FFLAGS := $(filter-out -J$(BUILD_DIR),$(FFLAGS))
 
-FYPP_INC = \
-	$(FYPP_DIR)/nc4f_ds_attribute_constructor_inc.fypp \
-	$(FYPP_DIR)/nc4f_ds_extract_inc.fypp \
-	$(FYPP_DIR)/nc4f_ds_variable_constructor_inc.fypp
+FYPP_INC := $(wildcard $(FYPP_DIR)/*_inc.fypp)
+SRC_INC := $(patsubst $(FYPP_DIR)/%_inc.fypp,$(SRC_DIR)/%.inc,$(FYPP_INC))
 
-SRC_INC = \
-	$(SRC_DIR)/nc4f_ds_attribute_constructor.inc \
-	$(SRC_DIR)/nc4f_ds_extract.inc \
-	$(SRC_DIR)/nc4f_ds_variable_constructor.inc
+# Hand-maintained C interface fragments (not generated or removed by clean).
+C_INTERFACE_INC = $(wildcard $(SRC_DIR)/nc4f_c_interface_*.inc)
 
-FYPP_F90 = \
-	$(FYPP_DIR)/nc4f_ds_attribute_constructor.fypp \
-	$(FYPP_DIR)/nc4f_ds_extract.fypp \
-	$(FYPP_DIR)/nc4f_ds_variable_constructor.fypp
-
-SRC_F90 = \
-	$(SRC_DIR)/nc4f_ds_attribute_constructor.f90 \
-	$(SRC_DIR)/nc4f_ds_extract.f90 \
-	$(SRC_DIR)/nc4f_ds_variable_constructor.f90
+# common.fypp is a shared helper, not a standalone source template.
+FYPP_F90 := $(filter-out $(FYPP_INC) $(FYPP_DIR)/common.fypp,$(wildcard $(FYPP_DIR)/*.fypp))
+SRC_F90 := $(patsubst $(FYPP_DIR)/%.fypp,$(SRC_DIR)/%.f90,$(FYPP_F90))
 
 SRC = \
   $(SRC_DIR)/nc4f_c_interface.f90 \
@@ -77,31 +67,10 @@ SRC = \
 	$(SRC_DIR)/nc4f_nc_variable.f90 \
 	$(SRC_DIR)/nc4f.f90
 
-OBJ = \
-	$(BUILD_DIR)/nc4f_c_interface.o \
-	$(BUILD_DIR)/nc4f_ds.o \
-	$(BUILD_DIR)/nc4f_ds_access.o \
-	$(BUILD_DIR)/nc4f_ds_arithmetic.o \
-	$(BUILD_DIR)/nc4f_ds_attribute.o \
-	$(BUILD_DIR)/nc4f_ds_attribute_constructor.o \
-	$(BUILD_DIR)/nc4f_ds_clone.o \
-	$(BUILD_DIR)/nc4f_ds_dimension.o \
-	$(BUILD_DIR)/nc4f_ds_extract.o \
-	$(BUILD_DIR)/nc4f_ds_group.o \
-	$(BUILD_DIR)/nc4f_ds_io.o \
-	$(BUILD_DIR)/nc4f_ds_variable_constructor.o \
-	$(BUILD_DIR)/nc4f_ds_variable.o \
-	$(BUILD_DIR)/nc4f_nc.o \
-	$(BUILD_DIR)/nc4f_nc_attribute.o \
-	$(BUILD_DIR)/nc4f_nc_dataset.o \
-	$(BUILD_DIR)/nc4f_nc_dimension.o \
-	$(BUILD_DIR)/nc4f_nc_error.o \
-	$(BUILD_DIR)/nc4f_nc_group.o \
-	$(BUILD_DIR)/nc4f_nc_utility.o \
-	$(BUILD_DIR)/nc4f_nc_variable.o \
-	$(BUILD_DIR)/nc4f.o
+OBJ := $(patsubst $(SRC_DIR)/%.f90,$(BUILD_DIR)/%.o,$(SRC))
 
 TEST_FILES = \
+	nc4f_test_c_bindings.f90 \
 	nc4f_test_cases.f90 \
 	nc4f_test_cases_basic.f90 \
 	nc4f_test_cases_errors.f90 \
@@ -137,11 +106,16 @@ $(BUILD_DIR)/%.o: $(TEST_DIR)/%.f90
 
 create_static_link:
 	@printf "\r\033[2K[link] create static library: $(LIB)\n"
+	@$(RM) $(LIB)
 	@$(AR) rcs $(LIB) $(OBJ)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.f90
 	@printf "\r\033[2K[compile] $<"
 	@$(FC) -c $(FFLAGS) $< -o $@
+
+$(BUILD_DIR)/nc4f_c_interface.o: $(C_INTERFACE_INC)
+$(BUILD_DIR)/nc4f_test_c_bindings.o: $(BUILD_DIR)/nc4f_c_interface.o
+$(BUILD_DIR)/nc4f_test.o: $(BUILD_DIR)/nc4f_test_c_bindings.o
 
 $(SRC_DIR)/%.inc: $(FYPP_DIR)/%_inc.fypp
 	@printf "\r\033[2K[preproc] $<"

@@ -4,6 +4,7 @@ use, intrinsic :: iso_fortran_env, only: real32
 use, non_intrinsic :: nc4f
 use, non_intrinsic :: nc4f_test_module
 use, non_intrinsic :: nc4f_test_cases
+use, non_intrinsic :: nc4f_test_c_bindings
 implicit none (type, external)
 
 character(len=128) :: command
@@ -17,6 +18,12 @@ case ("--ownership-invalid-character")
   call invalid_character_shallow_constructor()
 case default
   tests = [&
+    & test_type("c_bindings_storage", c_bindings_storage), &
+    & test_type("c_bindings_formats", c_bindings_formats), &
+    & test_type("c_bindings_strings", c_bindings_strings), &
+    & test_type("c_bindings_user_types", c_bindings_user_types), &
+    & test_type("c_bindings_memory_mapped", c_bindings_memory_mapped), &
+    & test_type("c_bindings_legacy_aux", c_bindings_legacy_aux), &
     & test_type("simple_wr", simple_wr), &
     & test_type("simple_rd", simple_rd), &
     & test_type("character_variables", character_variables), &
