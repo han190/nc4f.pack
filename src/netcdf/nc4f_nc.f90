@@ -8,10 +8,10 @@ use, non_intrinsic :: nc4f_ds
 implicit none (type, external)
 
 public :: &
-    open_netcdf, close_netcdf, to_netcdf, &
-    inquire_dimensions, inquire_variable, &
-    get_attribute, get_variable, &
-    get_group, inquire_subgroups, inquire_group, operator(.exists.)
+  & open_netcdf, close_netcdf, to_netcdf, &
+  & inquire_dimensions, inquire_variable, &
+  & get_attribute, get_variable, &
+  & get_group, inquire_subgroups, inquire_group, operator(.exists.)
 private
 
 integer, parameter :: MAX_CHAR_LEN = 1024

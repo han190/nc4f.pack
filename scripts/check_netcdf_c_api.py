@@ -14,7 +14,7 @@ import subprocess
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = ROOT / "src"
+SOURCE = ROOT / "src" / "c_interface"
 
 
 def pkg_config(*args):
