@@ -79,18 +79,21 @@ end select
 contains
 
 subroutine invalid_model_grp_rename()
+  !! Trigger a group-renaming model error without ERR to test error termination.
   type(group_type) :: grp
   call rename_group(grp, "bad/name")
   stop 0
 end subroutine invalid_model_grp_rename
 
 subroutine invalid_file_grp_rename()
+  !! Trigger a group-renaming file error without ERR to test error termination.
   type(group_type) :: parent
   call rename_group(parent, "old", "new", update_file=.true.)
   stop 0
 end subroutine invalid_file_grp_rename
 
 subroutine invalid_model_var_rename()
+  !! Trigger a variable-renaming model error without ERR to test error termination.
   type(variable_type) :: var
 
   call rename_variable(var, "bad/name")
@@ -98,6 +101,7 @@ subroutine invalid_model_var_rename()
 end subroutine invalid_model_var_rename
 
 subroutine invalid_file_var_rename()
+  !! Trigger a variable-renaming file error without ERR to test error termination.
   type(group_type) :: grp
 
   call rename_variable(grp, "old", "new", update_file=.true.)
@@ -105,6 +109,7 @@ subroutine invalid_file_var_rename()
 end subroutine invalid_file_var_rename
 
 subroutine invalid_model_rename()
+  !! Trigger a attribute-renaming model error without ERR to test error termination.
   type(attribute_type) :: att
 
   att = "old".att.1
@@ -113,6 +118,7 @@ subroutine invalid_model_rename()
 end subroutine invalid_model_rename
 
 subroutine invalid_file_rename()
+  !! Trigger a attribute-renaming file error without ERR to test error termination.
   type(group_type) :: grp
 
   call rename_attribute(grp, "old", "new", update_file=.true.)

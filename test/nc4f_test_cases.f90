@@ -28,193 +28,214 @@ character(*), parameter :: NETCDF_TYPE_RESULT_FILE = &
 
 interface
   module subroutine rename_grp_model(passed)
+    !! Test in-memory group renaming and preservation of model contents.
     logical, intent(inout) :: passed
+    !! Set true when all checks in this test succeed.
   end subroutine rename_grp_model
 
   module subroutine rename_grp_file(passed)
+    !! Test persistent group renaming and synchronization of supplied caches.
     logical, intent(inout) :: passed
+    !! Set true when all checks in this test succeed.
   end subroutine rename_grp_file
 
   module subroutine rename_grp_errors(passed)
+    !! Test group-renaming failures, unchanged state, and fail-fast behavior.
     logical, intent(inout) :: passed
+    !! Set true when all checks in this test succeed.
   end subroutine rename_grp_errors
 
   module subroutine rename_var_model(passed)
+    !! Test in-memory variable renaming and preservation of model contents.
     logical, intent(inout) :: passed
+    !! Set true when all checks in this test succeed.
   end subroutine rename_var_model
 
   module subroutine rename_var_file(passed)
+    !! Test persistent variable renaming and synchronization of supplied caches.
     logical, intent(inout) :: passed
+    !! Set true when all checks in this test succeed.
   end subroutine rename_var_file
 
   module subroutine rename_var_errors(passed)
+    !! Test variable-renaming failures, unchanged state, and fail-fast behavior.
     logical, intent(inout) :: passed
+    !! Set true when all checks in this test succeed.
   end subroutine rename_var_errors
 
   module subroutine rename_att_model(passed)
+    !! Test in-memory attribute renaming and preservation of model contents.
     logical, intent(inout) :: passed
+    !! Set true when all checks in this test succeed.
   end subroutine rename_att_model
 
   module subroutine rename_att_file(passed)
+    !! Test persistent attribute renaming and synchronization of supplied caches.
     logical, intent(inout) :: passed
+    !! Set true when all checks in this test succeed.
   end subroutine rename_att_file
 
   module subroutine rename_att_errors(passed)
+    !! Test attribute-renaming failures, unchanged state, and fail-fast behavior.
     logical, intent(inout) :: passed
+    !! Set true when all checks in this test succeed.
   end subroutine rename_att_errors
 
   module subroutine simple_wr(passed)
-    !! Perform the simple_wr operation.
+    !! Write a small numeric variable and its metadata to a NetCDF file.
     logical, intent(inout) :: passed
     !! Whether the test case has passed.
   end subroutine simple_wr
 
   module subroutine simple_rd(passed)
-    !! Perform the simple_rd operation.
+    !! Read and verify the variable written by the simple NetCDF example.
     logical, intent(inout) :: passed
     !! Whether the test case has passed.
   end subroutine simple_rd
 
   module subroutine character_variables(passed)
-    !! Perform the character_variables operation.
+    !! Test construction, serialization, and extraction of character variables.
     logical, intent(inout) :: passed
     !! Whether the test case has passed.
   end subroutine character_variables
 
   module subroutine elemental_reads(passed)
-    !! Perform the elemental_reads operation.
+    !! Execute elemental variable metadata and value reads with array arguments.
     logical, intent(inout) :: passed
     !! Whether the test case has passed.
   end subroutine elemental_reads
 
   module subroutine hyperslab_reads(passed)
-    !! Perform the hyperslab_reads operation.
+    !! Execute strided variable reads and their argument validation.
     logical, intent(inout) :: passed
     !! Whether the test case has passed.
   end subroutine hyperslab_reads
 
   module subroutine buffer_edges(passed)
-    !! Perform the buffer_edges operation.
+    !! Test empty attributes and long object names through file round trips.
     logical, intent(inout) :: passed
     !! Whether the test case has passed.
   end subroutine buffer_edges
 
   module subroutine creation_policy(passed)
-    !! Perform the creation_policy operation.
+    !! Test file creation and reopening in append and overwrite modes.
     logical, intent(inout) :: passed
     !! Whether the test case has passed.
   end subroutine creation_policy
 
   module subroutine error_handling(passed)
-    !! Perform the error_handling operation.
+    !! Test returned error codes, diagnostic messages, and successful recovery.
     logical, intent(inout) :: passed
     !! Whether the test case has passed.
   end subroutine error_handling
 
   module subroutine unlimited_wr(passed)
-    !! Perform the unlimited_wr operation.
+    !! Round-trip a variable whose record dimension is unlimited.
     logical, intent(inout) :: passed
     !! Whether the test case has passed.
   end subroutine unlimited_wr
 
   module subroutine unlimited_dims(passed)
-    !! Perform the unlimited_dims operation.
+    !! Verify that dimension inquiries retain unlimited-dimension metadata.
     logical, intent(inout) :: passed
     !! Whether the test case has passed.
   end subroutine unlimited_dims
 
   module subroutine sum_vars_test(passed)
-    !! Perform the sum_vars_test operation.
+    !! Verify element-wise summation of compatible variable objects.
     logical, intent(inout) :: passed
     !! Whether the test case has passed.
   end subroutine sum_vars_test
 
   module subroutine sfc_pres_temp_wr(passed)
-    !! Perform the sfc_pres_temp_wr operation.
+    !! Write the surface pressure and temperature example with dimensions and units.
     logical, intent(inout) :: passed
     !! Whether the test case has passed.
   end subroutine sfc_pres_temp_wr
 
   module subroutine sfc_pres_temp_rd(passed)
-    !! Perform the sfc_pres_temp_rd operation.
+    !! Read and verify the surface pressure and temperature example file.
     logical, intent(inout) :: passed
     !! Whether the test case has passed.
   end subroutine sfc_pres_temp_rd
 
   module subroutine extensive_wr(passed)
-    !! Perform the extensive_wr operation.
+    !! Write the mixed-type, mixed-rank round-trip fixture to NetCDF.
     logical, intent(inout) :: passed
     !! Whether the test case has passed.
   end subroutine extensive_wr
 
   module subroutine extensive_rd(passed)
-    !! Perform the extensive_rd operation.
+    !! Verify types, shapes, attributes, and values in the extensive round-trip file.
     logical, intent(inout) :: passed
     !! Whether the test case has passed.
   end subroutine extensive_rd
 
   module subroutine group_model(passed)
-    !! Perform the group_model operation.
+    !! Exercise recursive group construction and ncdump-like formatted output.
     logical, intent(inout) :: passed
     !! Whether the test case has passed.
   end subroutine group_model
 
   module subroutine group_write(passed)
-    !! Perform the group_write operation.
+    !! Write recursive group descriptions through both group serialization APIs.
     logical, intent(inout) :: passed
     !! Whether the test case has passed.
   end subroutine group_write
 
   module subroutine nasa_cosp_read(passed)
-    !! Perform the nasa_cosp_read operation.
+    !! Read root-level data and metadata from NASA's externally produced
+    !! CLDPROP COSP NetCDF-4 sample file.  The file also contains nested groups;
+    !! this test intentionally exercises the currently supported root group only.
     logical, intent(inout) :: passed
     !! Whether the test case has passed.
   end subroutine nasa_cosp_read
 
   module subroutine ecmwf_era40_read(passed)
-    !! Perform the ecmwf_era40_read operation.
+    !! Read coordinates, CF metadata, and packed data from Unidata's externally
+    !! produced ECMWF ERA-40 sample file.
     logical, intent(inout) :: passed
     !! Whether the test case has passed.
   end subroutine ecmwf_era40_read
 
   module subroutine sresa1b_ccsm3_read(passed)
-    !! Perform the sresa1b_ccsm3_read operation.
+    !! Read a CF climate-model file through the root-group API.
     logical, intent(inout) :: passed
     !! Whether the test case has passed.
   end subroutine sresa1b_ccsm3_read
 
   module subroutine sample_uddtio(passed)
-    !! Perform the sample_uddtio operation.
+    !! Render every externally produced NetCDF fixture through NetCDF UDDTIO.
     logical, intent(inout) :: passed
     !! Whether the test case has passed.
   end subroutine sample_uddtio
 
   module subroutine cami_initial_read(passed)
-    !! Perform the cami_initial_read operation.
+    !! Read CAM initial-condition data with a four-dimensional hyperslab.
     logical, intent(inout) :: passed
     !! Whether the test case has passed.
   end subroutine cami_initial_read
 
   module subroutine tos_o1_read(passed)
-    !! Perform the tos_o1_read operation.
+    !! Read an ocean file whose first latitude row contains missing values.
     logical, intent(inout) :: passed
     !! Whether the test case has passed.
   end subroutine tos_o1_read
 
   module subroutine echam_spectral_read(passed)
-    !! Perform the echam_spectral_read operation.
+    !! Read a spectral-grid file with non-geographical dimensions.
     logical, intent(inout) :: passed
     !! Whether the test case has passed.
   end subroutine echam_spectral_read
 
   module subroutine copy_semantics(passed)
-    !! Perform the copy_semantics operation.
+    !! Test owned buffers, borrowed views, and deep versus shallow group copies.
     logical, intent(inout) :: passed
     !! Whether the test case has passed.
   end subroutine copy_semantics
 
   module subroutine data_model(passed)
-    !! Perform the data_model operation.
+    !! Test data-model metadata, validation, equality, and formatted output.
     logical, intent(inout) :: passed
     !! Whether the test case has passed.
   end subroutine data_model

@@ -4,19 +4,19 @@ implicit none (type, external)
 contains
 
 module subroutine write_frmt_dim(dim, unit, iotype, v_list, iostat, iomsg)
-  !! Execute `write_frmt_dim`.
+  !! Write a formatted dimension representation to a Fortran I/O unit.
   class(dimension_type), intent(in) :: dim
   !! Dimension to process.
   integer, intent(in) :: unit
-  !! Data or metadata used by this operation.
+  !! Fortran output unit supplied by the invoking formatted WRITE.
   character(len=*), intent(in) :: iotype
-  !! Data or metadata used by this operation.
+  !! Requested defined-I/O mode; LISTDIRECTED and DT are supported.
   integer, intent(in) :: v_list(:)
-  !! Data or metadata used by this operation.
+  !! Integer DT edit-descriptor parameters; currently ignored.
   integer, intent(out) :: iostat
-  !! Data or metadata used by this operation.
+  !! Receives zero on success or a nonzero I/O status on failure.
   character(len=*), intent(inout) :: iomsg
-  !! Data or metadata used by this operation.
+  !! Receives the diagnostic message if the underlying WRITE fails.
 
   associate (ignored_v_list => v_list)
   end associate
@@ -34,19 +34,19 @@ module subroutine write_frmt_dim(dim, unit, iotype, v_list, iostat, iomsg)
 end subroutine write_frmt_dim
 
 module subroutine write_frmt_att(att, unit, iotype, v_list, iostat, iomsg)
-  !! Execute `write_frmt_att`.
+  !! Write a formatted attribute representation to a Fortran I/O unit.
   class(attribute_type), intent(in) :: att
   !! Attribute to process.
   integer, intent(in) :: unit
-  !! Data or metadata used by this operation.
+  !! Fortran output unit supplied by the invoking formatted WRITE.
   character(len=*), intent(in) :: iotype
-  !! Data or metadata used by this operation.
+  !! Requested defined-I/O mode; LISTDIRECTED and DT are supported.
   integer, intent(in) :: v_list(:)
-  !! Data or metadata used by this operation.
+  !! Integer DT edit-descriptor parameters; currently ignored.
   integer, intent(out) :: iostat
-  !! Data or metadata used by this operation.
+  !! Receives zero on success or a nonzero I/O status on failure.
   character(len=*), intent(inout) :: iomsg
-  !! Data or metadata used by this operation.
+  !! Receives the diagnostic message if the underlying WRITE fails.
   character(len=16) :: dtype
   character(len=:), allocatable :: value
 
@@ -61,19 +61,19 @@ module subroutine write_frmt_att(att, unit, iotype, v_list, iostat, iomsg)
 end subroutine write_frmt_att
 
 module subroutine write_frmt_var(var, unit, iotype, v_list, iostat, iomsg)
-  !! Execute `write_frmt_var`.
+  !! Write a formatted variable representation to a Fortran I/O unit.
   class(variable_type), intent(in) :: var
   !! Variable to process.
   integer, intent(in) :: unit
-  !! Data or metadata used by this operation.
+  !! Fortran output unit supplied by the invoking formatted WRITE.
   character(len=*), intent(in) :: iotype
-  !! Data or metadata used by this operation.
+  !! Requested defined-I/O mode; LISTDIRECTED and DT are supported.
   integer, intent(in) :: v_list(:)
-  !! Data or metadata used by this operation.
+  !! Integer DT edit-descriptor parameters; currently ignored.
   integer, intent(out) :: iostat
-  !! Data or metadata used by this operation.
+  !! Receives zero on success or a nonzero I/O status on failure.
   character(len=*), intent(inout) :: iomsg
-  !! Data or metadata used by this operation.
+  !! Receives the diagnostic message if the underlying WRITE fails.
   character(len=:), allocatable :: text
 
   associate (ignored_v_list => v_list)
@@ -85,19 +85,19 @@ module subroutine write_frmt_var(var, unit, iotype, v_list, iostat, iomsg)
 end subroutine write_frmt_var
 
 module subroutine write_frmt_grp(grp, unit, iotype, v_list, iostat, iomsg)
-  !! Execute `write_frmt_grp`.
+  !! Write a formatted group representation to a Fortran I/O unit.
   class(group_type), intent(in) :: grp
-  !! Data or metadata used by this operation.
+  !! Group or root dataset whose metadata is formatted.
   integer, intent(in) :: unit
-  !! Data or metadata used by this operation.
+  !! Fortran output unit supplied by the invoking formatted WRITE.
   character(len=*), intent(in) :: iotype
-  !! Data or metadata used by this operation.
+  !! Requested defined-I/O mode; LISTDIRECTED and DT are supported.
   integer, intent(in) :: v_list(:)
-  !! Data or metadata used by this operation.
+  !! Integer DT edit-descriptor parameters; currently ignored.
   integer, intent(out) :: iostat
-  !! Data or metadata used by this operation.
+  !! Receives zero on success or a nonzero I/O status on failure.
   character(len=*), intent(inout) :: iomsg
-  !! Data or metadata used by this operation.
+  !! Receives the diagnostic message if the underlying WRITE fails.
   character(len=:), allocatable :: text
 
   associate (ignored_v_list => v_list)
@@ -109,19 +109,19 @@ module subroutine write_frmt_grp(grp, unit, iotype, v_list, iostat, iomsg)
 end subroutine write_frmt_grp
 
 module subroutine write_frmt_netcdf(grp, unit, iotype, v_list, iostat, iomsg)
-  !! Execute `write_frmt_netcdf`.
+  !! Write a formatted dataset representation to a Fortran I/O unit.
   class(netcdf_type), intent(in) :: grp
-  !! Data or metadata used by this operation.
+  !! Group or root dataset whose metadata is formatted.
   integer, intent(in) :: unit
-  !! Data or metadata used by this operation.
+  !! Fortran output unit supplied by the invoking formatted WRITE.
   character(len=*), intent(in) :: iotype
-  !! Data or metadata used by this operation.
+  !! Requested defined-I/O mode; LISTDIRECTED and DT are supported.
   integer, intent(in) :: v_list(:)
-  !! Data or metadata used by this operation.
+  !! Integer DT edit-descriptor parameters; currently ignored.
   integer, intent(out) :: iostat
-  !! Data or metadata used by this operation.
+  !! Receives zero on success or a nonzero I/O status on failure.
   character(len=*), intent(inout) :: iomsg
-  !! Data or metadata used by this operation.
+  !! Receives the diagnostic message if the underlying WRITE fails.
   character(len=:), allocatable :: text
 
   associate (ignored_v_list => v_list)
@@ -133,19 +133,19 @@ module subroutine write_frmt_netcdf(grp, unit, iotype, v_list, iostat, iomsg)
 end subroutine write_frmt_netcdf
 
 module subroutine write_frmt_err(err, unit, iotype, v_list, iostat, iomsg)
-  !! Write an operation result in formatted derived-type I/O.
+  !! Write a formatted error result representation to a Fortran I/O unit.
   class(error_type), intent(in) :: err
   !! Error object updated if the operation fails.
   integer, intent(in) :: unit
-  !! Data or metadata used by this operation.
+  !! Fortran output unit supplied by the invoking formatted WRITE.
   character(len=*), intent(in) :: iotype
-  !! Data or metadata used by this operation.
+  !! Requested defined-I/O mode; LISTDIRECTED and DT are supported.
   integer, intent(in) :: v_list(:)
-  !! Data or metadata used by this operation.
+  !! Integer DT edit-descriptor parameters; currently ignored.
   integer, intent(out) :: iostat
-  !! Data or metadata used by this operation.
+  !! Receives zero on success or a nonzero I/O status on failure.
   character(len=*), intent(inout) :: iomsg
-  !! Data or metadata used by this operation.
+  !! Receives the diagnostic message if the underlying WRITE fails.
 
   associate (ignored_v_list => v_list)
   end associate
@@ -168,11 +168,11 @@ module subroutine write_frmt_err(err, unit, iotype, v_list, iostat, iomsg)
 end subroutine write_frmt_err
 
 recursive function render_grp(grp, depth) result(text)
-  !! Compute `render_grp`.
+  !! Render a group and its descendants as indented ncdump-like text.
   class(group_type), intent(in) :: grp
-  !! Data or metadata used by this operation.
+  !! Group or root dataset whose metadata is formatted.
   integer, intent(in) :: depth
-  !! Data or metadata used by this operation.
+  !! Nesting depth used to indent the rendered group.
   character(len=:), allocatable :: text
   !! Result produced by this operation.
   character(len=:), allocatable :: indent, name
@@ -204,11 +204,11 @@ end function render_netcdf
 recursive function render_grp_(grp, indent, depth) result(text)
   !! Compute the contents of a group in ncdump-like formatted output.
   class(group_type), intent(in) :: grp
-  !! Data or metadata used by this operation.
+  !! Group or root dataset whose metadata is formatted.
   character(len=*), intent(in) :: indent
-  !! Data or metadata used by this operation.
+  !! Indentation prefix for the rendered declarations.
   integer, intent(in) :: depth
-  !! Data or metadata used by this operation.
+  !! Nesting depth used to indent the rendered group.
   character(len=:), allocatable :: text
   !! Result produced by this operation.
   character, allocatable :: buffer(:)
@@ -240,9 +240,9 @@ end function render_grp_
 pure function render_dims(grp, indent) result(text)
   !! Compute the dimensions section of a group in ncdump-like formatted output.
   class(group_type), intent(in) :: grp
-  !! Data or metadata used by this operation.
+  !! Group or root dataset whose metadata is formatted.
   character(len=*), intent(in) :: indent
-  !! Data or metadata used by this operation.
+  !! Indentation prefix for the rendered declarations.
   character(len=:), allocatable :: text
   !! Result produced by this operation.
   character, allocatable :: buffer(:)
@@ -271,9 +271,9 @@ end function render_dims
 function render_vars(grp, indent) result(text)
   !! Compute the variables section of a group in ncdump-like formatted output.
   class(group_type), intent(in) :: grp
-  !! Data or metadata used by this operation.
+  !! Group or root dataset whose metadata is formatted.
   character(len=*), intent(in) :: indent
-  !! Data or metadata used by this operation.
+  !! Indentation prefix for the rendered declarations.
   character(len=:), allocatable :: text
   !! Result produced by this operation.
   character, allocatable :: buffer(:)
@@ -302,9 +302,9 @@ end function render_vars
 function render_atts(grp, indent) result(text)
   !! Compute the attributes section of a group in ncdump-like formatted output.
   class(group_type), intent(in) :: grp
-  !! Data or metadata used by this operation.
+  !! Group or root dataset whose metadata is formatted.
   character(len=*), intent(in) :: indent
-  !! Data or metadata used by this operation.
+  !! Indentation prefix for the rendered declarations.
   character(len=:), allocatable :: text
   !! Result produced by this operation.
   character, allocatable :: buffer(:)
@@ -384,11 +384,11 @@ pure function filename_stem(file) result(stem)
 end function filename_stem
 
 pure function render_dim(dim, indent) result(line)
-  !! Compute `render_dim`.
+  !! Render a dimension length or unlimited marker as an indented declaration.
   type(dimension_type), intent(in) :: dim
   !! Dimension to process.
   character(len=*), intent(in) :: indent
-  !! Data or metadata used by this operation.
+  !! Indentation prefix for the rendered declarations.
   character(len=:), allocatable :: line
   !! Result produced by this operation.
   character(len=64) :: len_text
@@ -404,11 +404,11 @@ pure function render_dim(dim, indent) result(line)
 end function render_dim
 
 function render_att(att, indent) result(line)
-  !! Compute `render_att`.
+  !! Render an attribute name, type, and value as an indented declaration.
   type(attribute_type), intent(in) :: att
   !! Attribute to process.
   character(len=*), intent(in) :: indent
-  !! Data or metadata used by this operation.
+  !! Indentation prefix for the rendered declarations.
   character(len=:), allocatable :: line
   !! Result produced by this operation.
   character(len=16) :: dtype
@@ -676,11 +676,11 @@ pure function trim_trailing_zeros(text) result(trimmed)
 end function trim_trailing_zeros
 
 function render_var(var, indent) result(line)
-  !! Compute `render_var`.
+  !! Render a variable declaration and its attributes as indented text.
   type(variable_type), intent(in) :: var
   !! Variable to process.
   character(len=*), intent(in) :: indent
-  !! Data or metadata used by this operation.
+  !! Indentation prefix for the rendered declarations.
   character(len=:), allocatable :: line
   !! Result produced by this operation.
   character(len=16) :: dtype
@@ -708,7 +708,7 @@ function render_var(var, indent) result(line)
 end function render_var
 
 pure subroutine type_name(dtype, name)
-  !! Execute `type_name`.
+  !! Map a supported NetCDF type code to its printable CDL type name.
   integer(data_type), intent(in) :: dtype
   !! Dataset data type code to validate or translate.
   character(len=*), intent(out) :: name

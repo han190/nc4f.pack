@@ -48,7 +48,7 @@ interface
     type(attribute_type), intent(in), optional :: atts(:)
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
-    !! Copy values into owned storage when true (default); otherwise borrow.
+    !! Must be true (the default); borrowed character storage is unsupported.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_char_${R}$d${NEWLINE(not (R == MAX_RANK))}$

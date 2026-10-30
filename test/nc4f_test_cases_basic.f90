@@ -5,7 +5,7 @@ implicit none (type, external)
 contains
 
 module subroutine simple_wr(passed)
-  !! Execute `simple_wr`.
+  !! Write a small numeric variable and its metadata to a NetCDF file.
   logical, intent(inout) :: passed
   !! Whether the test case has passed.
   type(variable_type) :: var
@@ -24,7 +24,7 @@ module subroutine simple_wr(passed)
 end subroutine simple_wr
 
 module subroutine simple_rd(passed)
-  !! Execute `simple_rd`.
+  !! Read and verify the variable written by the simple NetCDF example.
   logical, intent(inout) :: passed
   !! Whether the test case has passed.
   type(netcdf_type) :: nc
@@ -53,7 +53,7 @@ module subroutine simple_rd(passed)
 end subroutine simple_rd
 
 module subroutine character_variables(passed)
-  !! Execute `character_variables`.
+  !! Test construction, serialization, and extraction of character variables.
   logical, intent(inout) :: passed
   !! Whether the test case has passed.
   character, parameter :: values(2, 3) = &
@@ -188,7 +188,7 @@ module subroutine hyperslab_reads(passed)
 end subroutine hyperslab_reads
 
 module subroutine buffer_edges(passed)
-  !! Execute `buffer_edges`.
+  !! Test empty attributes and long object names through file round trips.
   logical, intent(inout) :: passed
   !! Whether the test case has passed.
   character(len=256) :: dim_name, att_name, var_name

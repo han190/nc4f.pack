@@ -6,7 +6,9 @@ implicit none (type, external)
 contains
 
 module subroutine rename_att_model(passed)
+  !! Test in-memory attribute renaming and preservation of model contents.
   logical, intent(inout) :: passed
+  !! Set true when all checks in this test succeed.
   type(attribute_type), target :: att, borrowed
   type(attribute_type) :: before
   type(variable_type), target :: var
@@ -71,9 +73,13 @@ end subroutine rename_att_model
 pure subroutine rename_pure_model(att, var, grp, err)
   !! Compile-time regression: the generic exposed by nc4f must retain purity.
   type(attribute_type), intent(inout) :: att
+  !! Attribute whose local name is changed.
   type(variable_type), intent(inout) :: var
+  !! Variable whose matching attribute is renamed; its data and own name are preserved.
   class(group_type), intent(inout) :: grp
+  !! Group whose global attribute is renamed by the pure-call test.
   type(error_type), intent(out) :: err
+  !! Receives the operation status and diagnostic message.
 
   call rename_attribute(att, "pure_att")
   call rename_attribute(var, "long_name", "pure_var", err)
@@ -82,7 +88,9 @@ pure subroutine rename_pure_model(att, var, grp, err)
 end subroutine rename_pure_model
 
 module subroutine rename_att_file(passed)
+  !! Test persistent attribute renaming and synchronization of supplied caches.
   logical, intent(inout) :: passed
+  !! Set true when all checks in this test succeed.
   character(*), parameter :: file = TEST_RESULTS_DIR//"rename-attributes.nc"
   type(variable_type), target :: var
   type(variable_type) :: unloaded, snapshot
@@ -164,7 +172,9 @@ module subroutine rename_att_file(passed)
 end subroutine rename_att_file
 
 module subroutine rename_att_errors(passed)
+  !! Test attribute-renaming failures, unchanged state, and fail-fast behavior.
   logical, intent(inout) :: passed
+  !! Set true when all checks in this test succeed.
   character(*), parameter :: file = TEST_RESULTS_DIR//"rename-errors.nc"
   character(len=NC_MAX_NAME + 1) :: invalid(9)
   character(len=1024) :: executable, command
@@ -256,7 +266,9 @@ module subroutine rename_att_errors(passed)
 end subroutine rename_att_errors
 
 module subroutine rename_var_model(passed)
+  !! Test in-memory variable renaming and preservation of model contents.
   logical, intent(inout) :: passed
+  !! Set true when all checks in this test succeed.
   type(variable_type), target :: var, borrowed
   type(variable_type) :: before, other
   type(group_type) :: grp, children(1), bounded
@@ -318,16 +330,22 @@ module subroutine rename_var_model(passed)
 end subroutine rename_var_model
 
 pure subroutine rename_var_pure(var, grp, err)
+  !! Exercise both model variable-renaming overloads from a pure caller.
   type(variable_type), intent(inout) :: var
+  !! Variable whose local name is changed; its metadata and storage are preserved.
   class(group_type), intent(inout) :: grp
+  !! Group whose direct variable collection contains the name to change.
   type(error_type), intent(out) :: err
+  !! Receives the operation status and diagnostic message.
 
   call rename_variable(var, "pure_var")
   call rename_variable(grp, "grouped", "pure_grp_var", err)
 end subroutine rename_var_pure
 
 module subroutine rename_var_file(passed)
+  !! Test persistent variable renaming and synchronization of supplied caches.
   logical, intent(inout) :: passed
+  !! Set true when all checks in this test succeed.
   character(*), parameter :: file = TEST_RESULTS_DIR//"rename-variables.nc"
   type(variable_type), target :: var
   type(variable_type) :: original, other, snapshot
@@ -399,7 +417,9 @@ module subroutine rename_var_file(passed)
 end subroutine rename_var_file
 
 module subroutine rename_var_errors(passed)
+  !! Test variable-renaming failures, unchanged state, and fail-fast behavior.
   logical, intent(inout) :: passed
+  !! Set true when all checks in this test succeed.
   character(*), parameter :: file = TEST_RESULTS_DIR//"rename-variable-errors.nc"
   character(len=NC_MAX_NAME + 1) :: invalid(12)
   character(len=1024) :: executable, command
@@ -501,8 +521,11 @@ module subroutine rename_var_errors(passed)
 end subroutine rename_var_errors
 
 pure subroutine chk_rename(condition, context)
+  !! Terminate a renaming test when an assertion fails.
   logical, intent(in) :: condition
+  !! Condition that must be true for the assertion to succeed.
   character(len=*), intent(in) :: context
+  !! Label included in a failed assertion message.
 
   if (.not. condition) error stop "[rename test] "//context
 end subroutine chk_rename

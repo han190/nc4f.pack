@@ -4,7 +4,7 @@ implicit none(type, external)
 contains
 
 impure elemental module subroutine clone_grp(src, dest)
-  !! Execute `clone_grp`.
+  !! Deep-copy a group and its complete descendant tree.
   type(group_type), intent(in) :: src
   !! Source object or group to read from.
   type(group_type), intent(out) :: dest
@@ -41,7 +41,7 @@ recursive subroutine clone_grp_(src, dest)
 end subroutine clone_grp_
 
 impure elemental module subroutine clone_var(src, dest)
-  !! Execute `clone_var`.
+  !! Deep-copy a variable, its attributes, and active bytes into owned storage.
   type(variable_type), intent(in) :: src
   !! Source object or group to read from.
   type(variable_type), intent(out) :: dest
@@ -62,7 +62,7 @@ impure elemental module subroutine clone_var(src, dest)
 end subroutine clone_var
 
 impure elemental module subroutine clone_att(src, dest)
-  !! Execute `clone_att`.
+  !! Deep-copy attribute metadata and active bytes into owned destination storage.
   type(attribute_type), intent(in) :: src
   !! Source object or group to read from.
   type(attribute_type), intent(out) :: dest

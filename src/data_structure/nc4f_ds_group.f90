@@ -6,8 +6,11 @@ contains
 pure module subroutine rename_grp_grp(grp, new_name, err)
   !! Rename an independent non-root group without changing its child tree.
   class(group_type), intent(inout) :: grp
+  !! Non-root group whose local name is changed.
   character(len=*), intent(in) :: new_name
+  !! Replacement local name; trailing Fortran blank padding is removed.
   type(error_type), intent(out), optional :: err
+  !! Receives the status and diagnostic; failures stop execution when omitted.
   type(error_type) :: op_err
   character(len=:), allocatable :: name
 
@@ -32,8 +35,12 @@ end subroutine rename_grp_grp
 pure module subroutine rename_grp_par(parent, old_name, new_name, err)
   !! Rename one direct child; aliases to parent%grps observe the same change.
   class(group_type), intent(inout) :: parent
+  !! Parent whose matching direct child is renamed in memory.
   character(len=*), intent(in) :: old_name, new_name
+  !! old_name: Existing local name to locate.
+  !! new_name: Replacement local name; trailing Fortran blank padding is removed.
   type(error_type), intent(out), optional :: err
+  !! Receives the status and diagnostic; failures stop execution when omitted.
   type(error_type) :: op_err
 
   call chk_nc_name(old_name, op_err, "[rename_group]")
@@ -51,8 +58,12 @@ end subroutine rename_grp_par
 pure subroutine rename_grps_(grps, old_name, new_name, err)
   !! Assumed-shape indexing also supports pointer arrays with nonunit lower bounds.
   type(group_type), intent(inout) :: grps(:)
+  !! Direct child collection whose matching entry is renamed.
   character(len=*), intent(in) :: old_name, new_name
+  !! old_name: Existing local name to locate.
+  !! new_name: Replacement local name; trailing Fortran blank padding is removed.
   type(error_type), intent(out) :: err
+  !! Receives the operation status and diagnostic message.
   integer :: i, pos
 
   err = error_type()
@@ -89,9 +100,9 @@ elemental module subroutine init_att(att, name, dtype, len)
   character(len=*), intent(in) :: name
   !! Name used to identify the NetCDF object.
   integer(data_type), intent(in) :: dtype
-  !! Data or metadata used by this operation.
+  !! NetCDF data-type code used to determine the stored element representation.
   integer(int64), intent(in) :: len
-  !! Data or metadata used by this operation.
+  !! Number of stored data elements.
 
   call init_att_(att, name, dtype, len, deep=.true.)
 end subroutine init_att
@@ -128,9 +139,9 @@ module subroutine init_var(var, name, dtype, len, dims, atts)
   character(len=*), intent(in) :: name
   !! Name used to identify the NetCDF object.
   integer(data_type), intent(in) :: dtype
-  !! Data or metadata used by this operation.
+  !! NetCDF data-type code used to determine the stored element representation.
   integer(int64), intent(in) :: len
-  !! Data or metadata used by this operation.
+  !! Number of stored data elements.
   type(dimension_type), intent(in) :: dims(:)
   !! Dimensions describing the variable shape.
   type(attribute_type), intent(in), optional :: atts(:)
@@ -173,7 +184,7 @@ module subroutine init_var_(var, name, dtype, len, dims, atts, deep)
 end subroutine init_var_
 
 module function new_dataset_empty(name, atts, deep) result(grp)
-  !! Compute `new_dataset_empty`.
+  !! Construct a named group with optional attributes and no child collections.
   character(len=*), intent(in) :: name
   !! Name used to identify the NetCDF object.
   type(attribute_type), intent(in), optional :: atts(:)
@@ -186,7 +197,7 @@ module function new_dataset_empty(name, atts, deep) result(grp)
 end function new_dataset_empty
 
 module function new_dataset_vars(name, vars, atts, deep) result(grp)
-  !! Compute `new_dataset_vars`.
+  !! Construct a named group from variables and optional attributes.
   character(len=*), intent(in) :: name
   !! Name used to identify the NetCDF object.
   type(variable_type), intent(in) :: vars(:)
@@ -201,11 +212,11 @@ module function new_dataset_vars(name, vars, atts, deep) result(grp)
 end function new_dataset_vars
 
 module function new_dataset_grps(name, grps, atts, deep) result(grp)
-  !! Compute `new_dataset_grps`.
+  !! Construct a named group from child groups and optional attributes.
   character(len=*), intent(in) :: name
   !! Name used to identify the NetCDF object.
   type(group_type), intent(in) :: grps(:)
-  !! Data or metadata used by this operation.
+  !! Child groups to include in the constructed group.
   type(attribute_type), intent(in), optional :: atts(:)
   !! Attributes to process or attach.
   logical, intent(in), optional :: deep
@@ -216,13 +227,13 @@ module function new_dataset_grps(name, grps, atts, deep) result(grp)
 end function new_dataset_grps
 
 module function new_dataset_all(name, vars, grps, atts, deep) result(grp)
-  !! Compute `new_dataset_all`.
+  !! Construct a named group from variables, child groups, and optional attributes.
   character(len=*), intent(in) :: name
   !! Name used to identify the NetCDF object.
   type(variable_type), intent(in) :: vars(:)
   !! Variables to process or add to the dataset.
   type(group_type), intent(in) :: grps(:)
-  !! Data or metadata used by this operation.
+  !! Child groups to include in the constructed group.
   type(attribute_type), intent(in), optional :: atts(:)
   !! Attributes to process or attach.
   logical, intent(in), optional :: deep
@@ -235,13 +246,13 @@ end function new_dataset_all
 module subroutine new_dataset_(grp, name, vars, grps, atts, deep)
   !! Populate a group with intrinsic or explicit deep child copies.
   type(group_type), intent(out) :: grp
-  !! Data or metadata used by this operation.
+  !! Receives the constructed group and its child collections.
   character(len=*), intent(in) :: name
   !! Name used to identify the NetCDF object.
   type(variable_type), intent(in), optional :: vars(:)
   !! Variables to process or add to the dataset.
   type(group_type), intent(in), optional :: grps(:)
-  !! Data or metadata used by this operation.
+  !! Child groups to include in the constructed group.
   type(attribute_type), intent(in), optional :: atts(:)
   !! Attributes to process or attach.
   logical, intent(in), optional :: deep
@@ -322,7 +333,7 @@ pure function collect_dims_(vars) result(dims)
 end function collect_dims_
 
 pure module function buffer_size(dtype, len, context) result(nbytes)
-  !! Compute `buffer_size`.
+  !! Compute the byte count for a NetCDF type and element count, checking overflow.
   integer(data_type), intent(in) :: dtype
   !! Dataset data type code to validate or translate.
   integer(int64), intent(in) :: len

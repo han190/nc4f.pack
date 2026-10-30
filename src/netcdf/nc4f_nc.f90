@@ -63,62 +63,93 @@ interface
   module subroutine rename_grp_nc_grp(parent, grp, new_name, update_file, err)
     !! Rename the supplied child, optionally updating its name in an open file.
     class(group_type), intent(in) :: parent
+    !! Open parent group used to locate the supplied child for a file update.
     class(group_type), intent(inout) :: grp
+    !! Non-root group whose local name is changed.
     character(len=*), intent(in) :: new_name
+    !! Replacement local name; trailing Fortran blank padding is removed.
     logical, intent(in), optional :: update_file
+    !! Whether to update the open NetCDF file as well as the model (default false).
     type(error_type), intent(out), optional :: err
+    !! Receives the status and diagnostic; failures stop execution when omitted.
   end subroutine rename_grp_nc_grp
 
   module subroutine rename_grp_nc_par(parent, old_name, new_name, update_file, err)
     !! Rename a direct child by name; update a matching cached child if present.
     class(group_type), intent(inout) :: parent
+    !! Parent providing the file context and any cached direct children to update.
     character(len=*), intent(in) :: old_name, new_name
+    !! old_name: Existing local name to locate.
+    !! new_name: Replacement local name; trailing Fortran blank padding is removed.
     logical, intent(in) :: update_file
+    !! Whether to update the open NetCDF file as well as the model.
     type(error_type), intent(out), optional :: err
+    !! Receives the status and diagnostic; failures stop execution when omitted.
   end subroutine rename_grp_nc_par
 
   module subroutine rename_var_nc_var(grp, var, new_name, update_file, err)
     !! Rename the supplied variable, optionally updating its name in the file.
     !! grp%vars and other copies are not synchronized; the old name selects the target.
     class(group_type), intent(in) :: grp
+    !! Open group containing the supplied variable when a file update is requested.
     type(variable_type), intent(inout) :: var
+    !! Variable whose local name is changed; its metadata and storage are preserved.
     character(len=*), intent(in) :: new_name
+    !! Replacement local name; trailing Fortran blank padding is removed.
     logical, intent(in), optional :: update_file
+    !! Whether to update the open NetCDF file as well as the model (default false).
     type(error_type), intent(out), optional :: err
+    !! Receives the status and diagnostic; failures stop execution when omitted.
   end subroutine rename_var_nc_var
 
   module subroutine rename_var_nc_grp(grp, old_name, new_name, update_file, err)
     !! Rename a file variable and its matching grp%vars entry, if loaded.
     !! update_file is required to distinguish this from the model-only overload.
     class(group_type), intent(inout) :: grp
+    !! Group whose direct variable collection contains the name to change.
     character(len=*), intent(in) :: old_name, new_name
+    !! old_name: Existing local name to locate.
+    !! new_name: Replacement local name; trailing Fortran blank padding is removed.
     logical, intent(in) :: update_file
+    !! Whether to update the open NetCDF file as well as the model.
     type(error_type), intent(out), optional :: err
+    !! Receives the status and diagnostic; failures stop execution when omitted.
   end subroutine rename_var_nc_grp
 
   module subroutine rename_att_nc_var(grp, var, old_name, new_name, update_file, err)
     !! Rename a variable attribute; optionally update the file and supplied cache.
     !! Other variable copies, including grp%vars, are not synchronized.
     class(group_type), intent(in) :: grp
+    !! Open group containing the supplied variable when a file update is requested.
     type(variable_type), intent(inout) :: var
+    !! Variable whose matching attribute is renamed; its data and own name are preserved.
     character(len=*), intent(in) :: old_name, new_name
+    !! old_name: Existing local name to locate.
+    !! new_name: Replacement local name; trailing Fortran blank padding is removed.
     logical, intent(in), optional :: update_file
+    !! Whether to update the open NetCDF file as well as the model (default false).
     type(error_type), intent(out), optional :: err
+    !! Receives the status and diagnostic; failures stop execution when omitted.
   end subroutine rename_att_nc_var
 
   module subroutine rename_att_nc_grp(grp, old_name, new_name, update_file, err)
     !! Rename a group/global attribute in the file and any matching cached entry.
     !! update_file is required to distinguish this from the model-only overload.
     class(group_type), intent(inout) :: grp
+    !! Group whose matching global attribute is renamed.
     character(len=*), intent(in) :: old_name, new_name
+    !! old_name: Existing local name to locate.
+    !! new_name: Replacement local name; trailing Fortran blank padding is removed.
     logical, intent(in) :: update_file
+    !! Whether to update the open NetCDF file as well as the model.
     type(error_type), intent(out), optional :: err
+    !! Receives the status and diagnostic; failures stop execution when omitted.
   end subroutine rename_att_nc_grp
 
   module function get_group(parent, name, err) result(group)
     !! Return a direct child group by name.
     class(group_type), intent(in) :: parent
-    !! Data or metadata used by this operation.
+    !! Open parent group whose direct children are queried.
     character(len=*), intent(in) :: name
     !! Name used to identify the NetCDF object.
     type(error_type), intent(out), optional :: err
@@ -130,7 +161,7 @@ interface
   module function inquire_subgroups(parent, err) result(grps)
     !! Return direct child groups with IDs and names populated.
     class(group_type), intent(in) :: parent
-    !! Data or metadata used by this operation.
+    !! Open parent group whose direct children are queried.
     type(error_type), intent(out), optional :: err
     !! Error object updated if the operation fails.
     type(group_type), allocatable :: grps(:)
@@ -143,9 +174,12 @@ interface
     class(group_type), intent(inout) :: group
     !! Dataset group to process.
     logical, intent(in), optional :: inq_dims, inq_atts, inq_vars, inq_grps
-    !! Data or metadata used by this operation.
+    !! inq_dims: Whether to populate the cached dimensions.
+    !! inq_atts: Whether to populate the cached group attributes.
+    !! inq_vars: Whether to populate the cached variable metadata.
+    !! inq_grps: Whether to populate the cached child groups.
     logical, intent(in), optional :: recur
-    !! Data or metadata used by this operation.
+    !! Whether to apply the requested inquiries recursively to descendants.
     type(error_type), intent(out), optional :: err
     !! Error object updated if the operation fails.
   end subroutine inquire_group
@@ -294,7 +328,7 @@ interface
   module function netcdf_err(status, context) result(err)
     !! Construct an `error_type` from a NetCDF C status and optional context.
     integer(c_int), intent(in) :: status
-    !! Data or metadata used by this operation.
+    !! Status code returned by a NetCDF C call.
     character(*), intent(in), optional :: context
     !! Context included in a validation or error message.
     type(error_type) :: err
@@ -318,7 +352,7 @@ interface
   pure module function c2fstr(cstr) result(fstr)
     !! Convert a NUL-terminated C string to a Fortran allocatable string.
     character(kind=c_char, len=*), intent(in) :: cstr
-    !! C-style NUL-terminated string to convert.
+    !! C character string whose first NUL marks the end of the converted text.
     character(len=:), allocatable :: fstr
     !! Fortran allocatable result string.
   end function c2fstr
@@ -326,7 +360,7 @@ interface
   pure module function f2cstr(fstr) result(cstr)
     !! Convert a Fortran string to a NUL-terminated C string.
     character(len=*), intent(in) :: fstr
-    !! Fortran string to convert.
+    !! Fortran string whose trailing blanks are removed before appending NUL.
     character(kind=c_char, len=:), allocatable :: cstr
     !! NUL-terminated C string result.
   end function f2cstr
@@ -444,7 +478,7 @@ interface
   module subroutine serialize_grp(root, grp, atts, err)
     !! Serialize one in-memory group as an existing file root.
     class(group_type), intent(in) :: root
-    !! Data or metadata used by this operation.
+    !! Open destination root group in which the source tree is serialized.
     type(group_type), intent(in) :: grp
     !! Dataset group to process.
     type(attribute_type), intent(in), optional :: atts(:)
@@ -456,9 +490,9 @@ interface
   module subroutine serialize_grps(root, grps, atts, err)
     !! Serialize in-memory groups as direct children of an existing file root.
     class(group_type), intent(in) :: root
-    !! Data or metadata used by this operation.
+    !! Open destination root group in which the source tree is serialized.
     type(group_type), target, intent(in) :: grps(:)
-    !! Data or metadata used by this operation.
+    !! Source child-group trees to write below the destination root.
     type(attribute_type), intent(in), optional :: atts(:)
     !! Attributes to process or attach.
     type(error_type), intent(out) :: err

@@ -70,7 +70,7 @@ end function arange
 
 integer recursive elemental function mandelbrot( &
   & z, zp, niter, niter_max) result(val)
-  !! Perform the mandelbrot operation.
+  !! Return the Mandelbrot escape iteration count, up to the requested limit.
   complex(kind=real64), intent(in) :: z
   !! Complex point whose escape iteration count is calculated.
   complex(kind=real64), intent(in), optional :: zp

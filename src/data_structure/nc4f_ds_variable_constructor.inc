@@ -1652,7 +1652,7 @@ interface
     type(attribute_type), intent(in), optional :: atts(:)
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
-    !! Copy values into owned storage when true (default); otherwise borrow.
+    !! Must be true (the default); borrowed character storage is unsupported.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_char_1d
@@ -1668,7 +1668,7 @@ interface
     type(attribute_type), intent(in), optional :: atts(:)
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
-    !! Copy values into owned storage when true (default); otherwise borrow.
+    !! Must be true (the default); borrowed character storage is unsupported.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_char_2d
@@ -1684,7 +1684,7 @@ interface
     type(attribute_type), intent(in), optional :: atts(:)
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
-    !! Copy values into owned storage when true (default); otherwise borrow.
+    !! Must be true (the default); borrowed character storage is unsupported.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_char_3d
@@ -1700,7 +1700,7 @@ interface
     type(attribute_type), intent(in), optional :: atts(:)
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
-    !! Copy values into owned storage when true (default); otherwise borrow.
+    !! Must be true (the default); borrowed character storage is unsupported.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_char_4d
@@ -1716,7 +1716,7 @@ interface
     type(attribute_type), intent(in), optional :: atts(:)
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
-    !! Copy values into owned storage when true (default); otherwise borrow.
+    !! Must be true (the default); borrowed character storage is unsupported.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_char_5d
@@ -1732,7 +1732,7 @@ interface
     type(attribute_type), intent(in), optional :: atts(:)
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
-    !! Copy values into owned storage when true (default); otherwise borrow.
+    !! Must be true (the default); borrowed character storage is unsupported.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_char_6d
@@ -1748,7 +1748,7 @@ interface
     type(attribute_type), intent(in), optional :: atts(:)
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
-    !! Copy values into owned storage when true (default); otherwise borrow.
+    !! Must be true (the default); borrowed character storage is unsupported.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_char_7d
@@ -1764,7 +1764,7 @@ interface
     type(attribute_type), intent(in), optional :: atts(:)
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
-    !! Copy values into owned storage when true (default); otherwise borrow.
+    !! Must be true (the default); borrowed character storage is unsupported.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_char_8d
@@ -1780,7 +1780,7 @@ interface
     type(attribute_type), intent(in), optional :: atts(:)
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
-    !! Copy values into owned storage when true (default); otherwise borrow.
+    !! Must be true (the default); borrowed character storage is unsupported.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_char_9d
@@ -1796,7 +1796,7 @@ interface
     type(attribute_type), intent(in), optional :: atts(:)
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
-    !! Copy values into owned storage when true (default); otherwise borrow.
+    !! Must be true (the default); borrowed character storage is unsupported.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_char_10d
@@ -1812,7 +1812,7 @@ interface
     type(attribute_type), intent(in), optional :: atts(:)
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
-    !! Copy values into owned storage when true (default); otherwise borrow.
+    !! Must be true (the default); borrowed character storage is unsupported.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_char_11d
@@ -1828,7 +1828,7 @@ interface
     type(attribute_type), intent(in), optional :: atts(:)
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
-    !! Copy values into owned storage when true (default); otherwise borrow.
+    !! Must be true (the default); borrowed character storage is unsupported.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_char_12d
@@ -1844,7 +1844,7 @@ interface
     type(attribute_type), intent(in), optional :: atts(:)
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
-    !! Copy values into owned storage when true (default); otherwise borrow.
+    !! Must be true (the default); borrowed character storage is unsupported.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_char_13d
@@ -1860,7 +1860,7 @@ interface
     type(attribute_type), intent(in), optional :: atts(:)
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
-    !! Copy values into owned storage when true (default); otherwise borrow.
+    !! Must be true (the default); borrowed character storage is unsupported.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_char_14d
@@ -1876,7 +1876,7 @@ interface
     type(attribute_type), intent(in), optional :: atts(:)
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
-    !! Copy values into owned storage when true (default); otherwise borrow.
+    !! Must be true (the default); borrowed character storage is unsupported.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_char_15d

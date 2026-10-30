@@ -230,7 +230,7 @@ interface
     type(attribute_type), target, intent(in) :: att
     !! Source attribute to extract from.
     character(len=:), pointer, intent(out) :: ptr
-    !! Output scalar string (allocated by caller via pointer assignment).
+    !! Receives a newly allocated string copy; the caller must deallocate its target.
   end subroutine extract_att_char_scalar
 
   module subroutine extract_var_int8_1d(var, ptr)

@@ -7,8 +7,11 @@ pure module subroutine chk_nc_name(name, err, context)
   !! Check NetCDF name syntax without C calls. Trailing Fortran padding is ignored.
   !! UTF-8 is validated here; callers supply NFC-normalized Unicode names.
   character(len=*), intent(in) :: name
+  !! NetCDF local name to validate; trailing Fortran blank padding is ignored.
   type(error_type), intent(out) :: err
+  !! Receives the operation status and diagnostic message.
   character(len=*), intent(in), optional :: context
+  !! Context label included in error diagnostics.
   character(len=:), allocatable :: ctx
   integer :: i, j, n, byte, ncont, lo, hi
 
@@ -67,7 +70,9 @@ end subroutine chk_nc_name
 pure module subroutine ret_ds_err(op_err, err)
   !! Apply the optional-error convention without depending on the I/O layer.
   type(error_type), intent(in) :: op_err
+  !! Completed operation result to return or use for error termination.
   type(error_type), intent(out), optional :: err
+  !! Receives the status and diagnostic; failures stop execution when omitted.
 
   if (present(err)) then
     err = op_err

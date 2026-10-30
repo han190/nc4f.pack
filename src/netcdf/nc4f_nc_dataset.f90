@@ -28,7 +28,7 @@ function open_netcdf_(file, mode, err) result(nc)
   character(len=*), intent(in) :: file
   !! Path of the NetCDF file to read or write.
   character(len=*), intent(in), optional :: mode
-  !! Data or metadata used by this operation.
+  !! File access mode: read, replace, or append, including supported aliases.
   type(error_type), intent(out) :: err
   !! Error object updated if the operation fails.
   type(netcdf_type) :: nc

@@ -5,7 +5,9 @@ implicit none (type, external)
 contains
 
 module subroutine rename_grp_model(passed)
+  !! Test in-memory group renaming and preservation of model contents.
   logical, intent(inout) :: passed
+  !! Set true when all checks in this test succeed.
   type(group_type) :: grp, parent, alias, snapshot, empty
   type(group_type), target :: kids(-2:0), grandchildren(1), none(0)
   type(netcdf_type) :: root
@@ -83,14 +85,20 @@ module subroutine rename_grp_model(passed)
 end subroutine rename_grp_model
 
 pure subroutine rename_grp_pure(grp, parent, err)
+  !! Exercise both model group-renaming overloads from a pure caller.
   class(group_type), intent(inout) :: grp, parent
+  !! grp: Non-root group whose local name is changed.
+  !! parent: Parent whose direct child collection is edited or whose ID locates the file group.
   type(error_type), intent(out) :: err
+  !! Receives the operation status and diagnostic message.
   call rename_group(grp, "pure")
   call rename_group(parent, "renamed", "pure_child", err)
 end subroutine rename_grp_pure
 
 module subroutine rename_grp_file(passed)
+  !! Test persistent group renaming and synchronization of supplied caches.
   logical, intent(inout) :: passed
+  !! Set true when all checks in this test succeed.
   character(*), parameter :: file = TEST_RESULTS_DIR//"rename-groups.nc"
   type(group_type) :: source, grp, snapshot, actual, alias, child
   type(group_type), target :: kids(2), descendants(1), cache(-1:0), nested_cache(1), partial(1)
@@ -174,7 +182,9 @@ module subroutine rename_grp_file(passed)
 end subroutine rename_grp_file
 
 module subroutine rename_grp_errors(passed)
+  !! Test group-renaming failures, unchanged state, and fail-fast behavior.
   logical, intent(inout) :: passed
+  !! Set true when all checks in this test succeed.
   character(*), parameter :: file = TEST_RESULTS_DIR//"rename-group-errors.nc"
   character(len=NC_MAX_NAME + 1) :: invalid(12)
   character(len=1024) :: executable, command
@@ -272,8 +282,11 @@ module subroutine rename_grp_errors(passed)
 end subroutine rename_grp_errors
 
 pure subroutine chk_grp(condition, context)
+  !! Terminate a group-renaming test when an assertion fails.
   logical, intent(in) :: condition
+  !! Condition that must be true for the assertion to succeed.
   character(len=*), intent(in) :: context
+  !! Label included in a failed assertion message.
   if (.not. condition) error stop "[rename group test] "//context
 end subroutine chk_grp
 

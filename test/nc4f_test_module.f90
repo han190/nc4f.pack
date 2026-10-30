@@ -14,7 +14,7 @@ end type test_type
 
 interface
   subroutine test_proc(passed)
-    !! Perform the test_proc operation.
+    !! Define the callback interface for a test that updates its pass flag.
     logical, intent(inout) :: passed
     !! Whether the test case has passed.
   end subroutine test_proc
@@ -32,9 +32,9 @@ subroutine setup_test_results()
 end subroutine setup_test_results
 
 subroutine run_tests(tests)
-  !! Execute `run_tests`.
+  !! Run registered test callbacks, print their results, and fail if any test fails.
   type(test_type), intent(inout) :: tests(:)
-  !! Data or metadata used by this operation.
+  !! Registered test names, callback procedures, and pass flags.
   integer :: i
   logical :: all_passed
 

@@ -229,7 +229,7 @@ module subroutine extract_att_char_scalar(att, ptr)
   type(attribute_type), target, intent(in) :: att
   !! Source attribute to extract from.
   character(len=:), pointer, intent(out) :: ptr
-  !! Output scalar string (allocated by caller via pointer assignment).
+  !! Receives a newly allocated string copy; the caller must deallocate its target.
   character, pointer :: ptrs(:)
   !! Temporary vector of characters used for scalar extraction.
   integer :: i

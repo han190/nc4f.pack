@@ -4,9 +4,13 @@ implicit none (type, external)
 contains
 
 pure module subroutine rename_var_var(var, new_name, err)
+  !! Rename an independent variable in memory; preserve its metadata and storage.
   type(variable_type), intent(inout) :: var
+  !! Variable whose local name is changed; its metadata and storage are preserved.
   character(len=*), intent(in) :: new_name
+  !! Replacement local name; trailing Fortran blank padding is removed.
   type(error_type), intent(out), optional :: err
+  !! Receives the status and diagnostic; failures stop execution when omitted.
   type(error_type) :: op_err
   character(len=:), allocatable :: name
 
@@ -19,9 +23,14 @@ pure module subroutine rename_var_var(var, new_name, err)
 end subroutine rename_var_var
 
 pure module subroutine rename_var_grp(grp, old_name, new_name, err)
+  !! Rename a direct member of grp%vars in memory, without accessing a file.
   class(group_type), intent(inout) :: grp
+  !! Group whose direct variable collection contains the name to change.
   character(len=*), intent(in) :: old_name, new_name
+  !! old_name: Existing local name to locate.
+  !! new_name: Replacement local name; trailing Fortran blank padding is removed.
   type(error_type), intent(out), optional :: err
+  !! Receives the status and diagnostic; failures stop execution when omitted.
   type(error_type) :: op_err
 
   call rename_vars_(grp%vars, old_name, new_name, op_err)
@@ -31,8 +40,12 @@ end subroutine rename_var_grp
 pure subroutine rename_vars_(vars, old_name, new_name, err)
   !! Rename one direct member without copying data or following child groups.
   type(variable_type), allocatable, intent(inout) :: vars(:)
+  !! Direct variable collection whose matching entry is renamed.
   character(len=*), intent(in) :: old_name, new_name
+  !! old_name: Existing local name to locate.
+  !! new_name: Replacement local name; trailing Fortran blank padding is removed.
   type(error_type), intent(out) :: err
+  !! Receives the operation status and diagnostic message.
   integer :: i, pos, lo
 
   call chk_nc_name(old_name, err, "[rename_variable]")
@@ -75,7 +88,7 @@ module subroutine init_var_mold(var, name, mold, atts, deep)
   character(len=*), intent(in) :: name
   !! Name for the new variable.
   type(variable_type), target, intent(in) :: mold
-  !! Data or metadata used by this operation.
+  !! Source metadata and storage to copy or borrow according to DEEP.
   type(attribute_type), intent(in), optional :: atts(:)
   !! Optional attributes for the new variable.
   logical, intent(in), optional :: deep
@@ -159,7 +172,8 @@ end function get_shape
 logical elemental module function eq_var(x, y) result(is_equal)
   !! Return true when two variables have identical metadata and byte values.
   type(variable_type), intent(in) :: x, y
-  !! Dataset objects or values used by this operation.
+  !! x: Left-hand value to compare.
+  !! y: Right-hand value to compare.
 
   call validate(x, context="[eq_var]")
   call validate(y, context="[eq_var]")
@@ -221,7 +235,8 @@ end function eq_var
 logical elemental module function neq_var(x, y) result(is_equal)
   !! Return true when two variables differ.
   type(variable_type), intent(in) :: x, y
-  !! Dataset objects or values used by this operation.
+  !! x: Left-hand value to compare.
+  !! y: Right-hand value to compare.
 
   is_equal = .not. eq_var(x, y)
 end function neq_var

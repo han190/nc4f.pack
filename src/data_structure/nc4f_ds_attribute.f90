@@ -4,9 +4,13 @@ implicit none (type, external)
 contains
 
 pure module subroutine rename_att_att(att, new_name, err)
+  !! Rename an independent attribute in memory; no file is accessed.
   type(attribute_type), intent(inout) :: att
+  !! Attribute whose local name is changed.
   character(len=*), intent(in) :: new_name
+  !! Replacement local name; trailing Fortran blank padding is removed.
   type(error_type), intent(out), optional :: err
+  !! Receives the status and diagnostic; failures stop execution when omitted.
   type(error_type) :: op_err
   character(len=:), allocatable :: name
 
@@ -19,9 +23,14 @@ pure module subroutine rename_att_att(att, new_name, err)
 end subroutine rename_att_att
 
 pure module subroutine rename_att_var(var, old_name, new_name, err)
+  !! Rename a variable attribute in memory, preserving its value and storage.
   type(variable_type), intent(inout) :: var
+  !! Variable whose matching attribute is renamed; its data and own name are preserved.
   character(len=*), intent(in) :: old_name, new_name
+  !! old_name: Existing local name to locate.
+  !! new_name: Replacement local name; trailing Fortran blank padding is removed.
   type(error_type), intent(out), optional :: err
+  !! Receives the status and diagnostic; failures stop execution when omitted.
   type(error_type) :: op_err
 
   call rename_atts_(var%atts, old_name, new_name, op_err)
@@ -29,9 +38,14 @@ pure module subroutine rename_att_var(var, old_name, new_name, err)
 end subroutine rename_att_var
 
 pure module subroutine rename_att_grp(grp, old_name, new_name, err)
+  !! Rename a group/global attribute in memory, without accessing a file.
   class(group_type), intent(inout) :: grp
+  !! Group whose matching global attribute is renamed.
   character(len=*), intent(in) :: old_name, new_name
+  !! old_name: Existing local name to locate.
+  !! new_name: Replacement local name; trailing Fortran blank padding is removed.
   type(error_type), intent(out), optional :: err
+  !! Receives the status and diagnostic; failures stop execution when omitted.
   type(error_type) :: op_err
 
   call rename_atts_(grp%atts, old_name, new_name, op_err)
@@ -41,8 +55,12 @@ end subroutine rename_att_grp
 pure subroutine rename_atts_(atts, old_name, new_name, err)
   !! Rename one array entry without copying or changing attribute storage.
   type(attribute_type), allocatable, intent(inout) :: atts(:)
+  !! Attribute collection whose matching entry is renamed.
   character(len=*), intent(in) :: old_name, new_name
+  !! old_name: Existing local name to locate.
+  !! new_name: Replacement local name; trailing Fortran blank padding is removed.
   type(error_type), intent(out) :: err
+  !! Receives the operation status and diagnostic message.
   integer :: i, pos
 
   call chk_nc_name(old_name, err, "[rename_attribute]")
@@ -87,7 +105,7 @@ module subroutine init_att_mold(att, name, mold, deep)
   character(len=*), intent(in) :: name
   !! Name for the new attribute.
   type(attribute_type), target, intent(in) :: mold
-  !! Data or metadata used by this operation.
+  !! Source metadata and storage to copy or borrow according to DEEP.
   logical, intent(in), optional :: deep
   !! Whether to allocate an owning data buffer or borrow the mold's storage.
   logical :: deep_copy
@@ -109,7 +127,8 @@ end subroutine init_att_mold
 logical elemental module function eq_att(x, y) result(is_equal)
   !! Return true when two attributes have identical metadata and byte values.
   type(attribute_type), intent(in) :: x, y
-  !! Dataset objects or values used by this operation.
+  !! x: Left-hand value to compare.
+  !! y: Right-hand value to compare.
 
   call validate(x, context="[eq_att]")
   call validate(y, context="[eq_att]")
@@ -153,7 +172,8 @@ end function eq_att
 logical elemental module function neq_att(x, y) result(is_equal)
   !! Return true when two attributes differ.
   type(attribute_type), intent(in) :: x, y
-  !! Dataset objects or values used by this operation.
+  !! x: Left-hand value to compare.
+  !! y: Right-hand value to compare.
 
   is_equal = .not. eq_att(x, y)
 end function neq_att

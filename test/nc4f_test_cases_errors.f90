@@ -5,7 +5,7 @@ implicit none (type, external)
 contains
 
 module subroutine creation_policy(passed)
-  !! Execute `creation_policy`.
+  !! Test file creation and reopening in append and overwrite modes.
   logical, intent(inout) :: passed
   !! Whether the test case has passed.
   real, parameter :: values(1) = [42.0]
@@ -39,7 +39,7 @@ module subroutine creation_policy(passed)
 end subroutine creation_policy
 
 module subroutine error_handling(passed)
-  !! Execute `error_handling`.
+  !! Test returned error codes, diagnostic messages, and successful recovery.
   logical, intent(inout) :: passed
   !! Whether the test case has passed.
   real, parameter :: values(1) = [42.0]

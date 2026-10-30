@@ -3,11 +3,17 @@ implicit none (type, external)
 contains
 
 module subroutine rename_grp_nc_grp(parent, grp, new_name, update_file, err)
+  !! Rename the supplied child, optionally updating its name in an open file.
   class(group_type), intent(in) :: parent
+  !! Open parent group used to locate the supplied child for a file update.
   class(group_type), intent(inout) :: grp
+  !! Non-root group whose local name is changed.
   character(len=*), intent(in) :: new_name
+  !! Replacement local name; trailing Fortran blank padding is removed.
   logical, intent(in), optional :: update_file
+  !! Whether to update the open NetCDF file as well as the model (default false).
   type(error_type), intent(out), optional :: err
+  !! Receives the status and diagnostic; failures stop execution when omitted.
   type(error_type) :: op_err
   class(group_type), allocatable :: staged
   logical :: write_file
@@ -38,10 +44,16 @@ module subroutine rename_grp_nc_grp(parent, grp, new_name, update_file, err)
 end subroutine rename_grp_nc_grp
 
 module subroutine rename_grp_nc_par(parent, old_name, new_name, update_file, err)
+  !! Rename a direct child by name; update a matching cached child if present.
   class(group_type), intent(inout) :: parent
+  !! Parent providing the file context and any cached direct children to update.
   character(len=*), intent(in) :: old_name, new_name
+  !! old_name: Existing local name to locate.
+  !! new_name: Replacement local name; trailing Fortran blank padding is removed.
   logical, intent(in) :: update_file
+  !! Whether to update the open NetCDF file as well as the model.
   type(error_type), intent(out), optional :: err
+  !! Receives the status and diagnostic; failures stop execution when omitted.
   type(error_type) :: op_err
   type(group_type) :: staged
   type(group_type), allocatable, target :: names(:)
@@ -85,8 +97,12 @@ end subroutine rename_grp_nc_par
 subroutine rename_grp_nc_(ncid, old_name, new_name, err)
   !! Resolve a direct child by name; never use a cached child's ID.
   integer(c_int), intent(in) :: ncid
+  !! Open file or group identifier used by the NetCDF C API.
   character(len=*), intent(in) :: old_name, new_name
+  !! old_name: Existing local name to locate.
+  !! new_name: Replacement local name; trailing Fortran blank padding is removed.
   type(error_type), intent(out) :: err
+  !! Receives the operation status and diagnostic message.
   type(group_type) :: name
   integer(c_int) :: stat, grpid
 
@@ -107,7 +123,7 @@ end subroutine rename_grp_nc_
 module function get_group(parent, name, err) result(group)
   !! Return a direct child group by name.
   class(group_type), intent(in) :: parent
-  !! Data or metadata used by this operation.
+  !! Open parent group whose direct children are queried.
   character(len=*), intent(in) :: name
   !! Name used to identify the NetCDF object.
   type(error_type), intent(out), optional :: err
@@ -127,7 +143,7 @@ end function get_group
 module function inquire_subgroups(parent, err) result(grps)
   !! Return direct child groups with IDs and names populated.
   class(group_type), intent(in) :: parent
-  !! Data or metadata used by this operation.
+  !! Open parent group whose direct children are queried.
   type(error_type), intent(out), optional :: err
   !! Error object updated if the operation fails.
   type(group_type), allocatable :: grps(:)
@@ -148,9 +164,12 @@ recursive module subroutine inquire_group(group, &
   class(group_type), intent(inout) :: group
   !! Dataset group to process.
   logical, intent(in), optional :: inq_dims, inq_atts, inq_vars, inq_grps
-  !! Data or metadata used by this operation.
+  !! inq_dims: Whether to populate the cached dimensions.
+  !! inq_atts: Whether to populate the cached group attributes.
+  !! inq_vars: Whether to populate the cached variable metadata.
+  !! inq_grps: Whether to populate the cached child groups.
   logical, intent(in), optional :: recur
-  !! Data or metadata used by this operation.
+  !! Whether to apply the requested inquiries recursively to descendants.
   type(error_type), intent(out), optional :: err
   !! Error object updated if the operation fails.
   type(error_type) :: op_err
@@ -202,9 +221,9 @@ end subroutine inquire_group
 module subroutine serialize_grp(root, grp, atts, err)
   !! Serialize one group as an existing file root.
   class(group_type), intent(in) :: root
-  !! Data or metadata used by this operation.
+  !! Open destination root group in which the source tree is serialized.
   type(group_type), intent(in) :: grp
-  !! Data or metadata used by this operation.
+  !! Source group tree whose metadata and values are written.
   type(attribute_type), intent(in), optional :: atts(:)
   !! Attributes to process or attach.
   type(error_type), intent(out) :: err
@@ -222,9 +241,9 @@ end subroutine serialize_grp
 module subroutine serialize_grps(root, grps, atts, err)
   !! Serialize groups as direct children of an existing file root.
   class(group_type), intent(in) :: root
-  !! Data or metadata used by this operation.
+  !! Open destination root group in which the source tree is serialized.
   type(group_type), target, intent(in) :: grps(:)
-  !! Data or metadata used by this operation.
+  !! Source child-group trees to write below the destination root.
   type(attribute_type), intent(in), optional :: atts(:)
   !! Attributes to process or attach.
   type(error_type), intent(out) :: err
@@ -384,7 +403,7 @@ end subroutine write_grp_tree_data_
 function def_grp_(parent, name, err) result(group)
   !! Define a direct child group while retaining NetCDF's status result.
   class(group_type), intent(in) :: parent
-  !! Data or metadata used by this operation.
+  !! Open parent group under which the new child is defined.
   character(len=*), intent(in) :: name
   !! Name used to identify the NetCDF object.
   type(error_type), intent(out) :: err
@@ -401,7 +420,7 @@ end function def_grp_
 function get_grp_(parent, name, err) result(group)
   !! Get a direct child group while retaining NetCDF's status result.
   class(group_type), intent(in) :: parent
-  !! Data or metadata used by this operation.
+  !! Open parent group whose direct children are queried.
   character(len=*), intent(in) :: name
   !! Name used to identify the NetCDF object.
   type(error_type), intent(out) :: err
@@ -418,7 +437,7 @@ end function get_grp_
 function inq_grps_(parent, err) result(grps)
   !! Return direct child group handles with their IDs and local names.
   class(group_type), intent(in) :: parent
-  !! Data or metadata used by this operation.
+  !! Open parent group whose direct children are queried.
   type(error_type), intent(out) :: err
   !! Error object updated if the operation fails.
   type(group_type), allocatable :: grps(:)
@@ -450,7 +469,7 @@ end function inq_grps_
 function inq_vars_(group, err) result(vars)
   !! Return local variables declared by a group.
   class(group_type), intent(in) :: group
-  !! Data or metadata used by this operation.
+  !! Open group whose directly defined variables are queried.
   type(error_type), intent(out) :: err
   !! Error object updated if the operation fails.
   type(variable_type), allocatable :: vars(:)
@@ -482,9 +501,9 @@ end function inq_vars_
 logical elemental function requested(default, flag)
   !! Return the value of an optional logical inquiry flag.
   logical, intent(in) :: default
-  !! Data or metadata used by this operation.
+  !! Value returned when the optional flag is absent.
   logical, intent(in), optional :: flag
-  !! Data or metadata used by this operation.
+  !! Optional value that overrides the default.
 
   requested = default
   if (present(flag)) requested = flag

@@ -59,7 +59,7 @@ elemental module function new_dim_args(name, args) result(dim)
   character(len=*), intent(in) :: name
   !! Name used to identify the NetCDF object.
   type(dimension_argument_type), intent(in) :: args
-  !! Data or metadata used by this operation.
+  !! Dimension length and unlimited flag packaged by the .and. operator.
   type(dimension_type) :: dim
   !! Result produced by this operation.
 
@@ -71,7 +71,8 @@ end function new_dim_args
 logical elemental module function eq_dim(x, y)
   !! Return true when two dimensions have identical metadata.
   type(dimension_type), intent(in) :: x, y
-  !! Dataset objects or values used by this operation.
+  !! x: Left-hand value to compare.
+  !! y: Right-hand value to compare.
 
   eq_dim = x%len == y%len .and. x%is_unlim .eqv. y%is_unlim
   if (eq_dim) then
@@ -83,7 +84,8 @@ end function eq_dim
 logical elemental module function neq_dim(x, y)
   !! Return true when two dimensions have different metadata.
   type(dimension_type), intent(in) :: x, y
-  !! Dataset objects or values used by this operation.
+  !! x: Left-hand value to compare.
+  !! y: Right-hand value to compare.
 
   neq_dim = .not. eq_dim(x, y)
 end function neq_dim

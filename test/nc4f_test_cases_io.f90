@@ -5,7 +5,7 @@ implicit none (type, external)
 contains
 
 module subroutine unlimited_wr(passed)
-  !! Execute `unlimited_wr`.
+  !! Round-trip a variable whose record dimension is unlimited.
   logical, intent(inout) :: passed
   !! Whether the test case has passed.
   integer(int32), parameter :: values(2, 3) = reshape([ &
@@ -27,7 +27,7 @@ module subroutine unlimited_wr(passed)
 end subroutine unlimited_wr
 
 module subroutine unlimited_dims(passed)
-  !! Execute `unlimited_dims`.
+  !! Verify that dimension inquiries retain unlimited-dimension metadata.
   logical, intent(inout) :: passed
   !! Whether the test case has passed.
   integer(int32), parameter :: values(2, 3) = reshape([ &

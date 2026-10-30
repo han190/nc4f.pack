@@ -11,7 +11,7 @@ module subroutine extract_att_${K}$_${R}$(att, ptr)
   !! Source attribute to extract from.
       #: if K == 'char' and R == 'scalar'
   character(len=:), pointer, intent(out) :: ptr
-  !! Output scalar string (allocated by caller via pointer assignment).
+  !! Receives a newly allocated string copy; the caller must deallocate its target.
       #: elif K == 'char' and R == 'vector'
   character, pointer, intent(out) :: ptr(:)
   !! Output vector of characters.

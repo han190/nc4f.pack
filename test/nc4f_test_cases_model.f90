@@ -8,7 +8,7 @@ implicit none (type, external)
 contains
 
 module subroutine data_model(passed)
-  !! Execute `data_model`.
+  !! Test data-model metadata, validation, equality, and formatted output.
   logical, intent(inout) :: passed
   !! Whether the test case has passed.
   type(attribute_type) :: atts(1), cloned_att

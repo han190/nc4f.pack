@@ -3,11 +3,19 @@ implicit none (type, external)
 contains
 
 module subroutine rename_att_nc_var(grp, var, old_name, new_name, update_file, err)
+  !! Rename a variable attribute; optionally update the file and supplied cache.
+  !! Other variable copies, including grp%vars, are not synchronized.
   class(group_type), intent(in) :: grp
+  !! Open group containing the supplied variable when a file update is requested.
   type(variable_type), intent(inout) :: var
+  !! Variable whose matching attribute is renamed; its data and own name are preserved.
   character(len=*), intent(in) :: old_name, new_name
+  !! old_name: Existing local name to locate.
+  !! new_name: Replacement local name; trailing Fortran blank padding is removed.
   logical, intent(in), optional :: update_file
+  !! Whether to update the open NetCDF file as well as the model (default false).
   type(error_type), intent(out), optional :: err
+  !! Receives the status and diagnostic; failures stop execution when omitted.
   type(error_type) :: op_err
   type(variable_type) :: name
   integer(c_int) :: stat, varid
@@ -38,10 +46,17 @@ module subroutine rename_att_nc_var(grp, var, old_name, new_name, update_file, e
 end subroutine rename_att_nc_var
 
 module subroutine rename_att_nc_grp(grp, old_name, new_name, update_file, err)
+  !! Rename a group/global attribute in the file and any matching cached entry.
+  !! update_file is required to distinguish this from the model-only overload.
   class(group_type), intent(inout) :: grp
+  !! Group whose matching global attribute is renamed.
   character(len=*), intent(in) :: old_name, new_name
+  !! old_name: Existing local name to locate.
+  !! new_name: Replacement local name; trailing Fortran blank padding is removed.
   logical, intent(in) :: update_file
+  !! Whether to update the open NetCDF file as well as the model.
   type(error_type), intent(out), optional :: err
+  !! Receives the status and diagnostic; failures stop execution when omitted.
   type(error_type) :: op_err
 
   if (update_file) then
@@ -60,9 +75,15 @@ subroutine rename_att_nc_(ncid, varid, atts, old_name, new_name, err)
   !! Stage only names: attribute values and borrowed buffers are never copied.
   !! An unloaded cache remains unloaded. The file is authoritative for existence.
   integer(c_int), intent(in) :: ncid, varid
+  !! ncid: Open file or group identifier used by the NetCDF C API.
+  !! varid: Variable identifier, or NC_GLOBAL for group attributes.
   type(attribute_type), allocatable, intent(inout) :: atts(:)
+  !! Attribute collection whose matching entry is renamed.
   character(len=*), intent(in) :: old_name, new_name
+  !! old_name: Existing local name to locate.
+  !! new_name: Replacement local name; trailing Fortran blank padding is removed.
   type(error_type), intent(out) :: err
+  !! Receives the operation status and diagnostic message.
   type(group_type) :: staged
   integer(c_int) :: stat, attid
   integer :: i, n, pos

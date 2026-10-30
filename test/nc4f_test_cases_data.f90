@@ -5,7 +5,7 @@ implicit none (type, external)
 contains
 
 module subroutine sum_vars_test(passed)
-  !! Execute `sum_vars_test`.
+  !! Verify element-wise summation of compatible variable objects.
   logical, intent(inout) :: passed
   !! Whether the test case has passed.
   real(real64), parameter :: a(2, 3) = reshape([ &
@@ -29,7 +29,7 @@ module subroutine sum_vars_test(passed)
 end subroutine sum_vars_test
 
 module subroutine sfc_pres_temp_wr(passed)
-  !! Execute `sfc_pres_temp_wr`.
+  !! Write the surface pressure and temperature example with dimensions and units.
   logical, intent(inout) :: passed
   !! Whether the test case has passed.
   integer, parameter :: nlat = 181, nlon = 361
@@ -65,7 +65,7 @@ module subroutine sfc_pres_temp_wr(passed)
 end subroutine sfc_pres_temp_wr
 
 module subroutine sfc_pres_temp_rd(passed)
-  !! Execute `sfc_pres_temp_rd`.
+  !! Read and verify the surface pressure and temperature example file.
   logical, intent(inout) :: passed
   !! Whether the test case has passed.
   type(netcdf_type) :: nc
@@ -110,7 +110,7 @@ module subroutine sfc_pres_temp_rd(passed)
 end subroutine sfc_pres_temp_rd
 
 module subroutine extensive_wr(passed)
-  !! Execute `extensive_wr`.
+  !! Write the mixed-type, mixed-rank round-trip fixture to NetCDF.
   logical, intent(inout) :: passed
   !! Whether the test case has passed.
   type(variable_type), allocatable :: vars(:)
@@ -126,7 +126,7 @@ module subroutine extensive_wr(passed)
 end subroutine extensive_wr
 
 module subroutine extensive_rd(passed)
-  !! Execute `extensive_rd`.
+  !! Verify types, shapes, attributes, and values in the extensive round-trip file.
   logical, intent(inout) :: passed
   !! Whether the test case has passed.
   character(len=16), parameter :: names(7) = [character(len=16) :: &
@@ -454,19 +454,19 @@ function render_sample_uddtio_(file, label, expected_dim, expected_var, &
   character(len=*), intent(in) :: file
   !! Path of the NetCDF file to read or write.
   character(len=*), intent(in) :: label
-  !! Data or metadata used by this operation.
+  !! Fixture label used to name its rendered output file.
   character(len=*), intent(in) :: expected_dim
-  !! Data or metadata used by this operation.
+  !! Expected dimension declaration in the rendered output.
   character(len=*), intent(in) :: expected_var
-  !! Data or metadata used by this operation.
+  !! Expected variable declaration in the rendered output.
   character(len=*), intent(in) :: expected_var_att
-  !! Data or metadata used by this operation.
+  !! Expected variable-attribute declaration in the rendered output.
   character(len=*), intent(in) :: expected_att
-  !! Data or metadata used by this operation.
+  !! Expected global-attribute declaration in the rendered output.
   character(len=*), intent(in) :: expected_group
-  !! Data or metadata used by this operation.
+  !! Expected child-group declaration in the rendered output.
   logical :: rendered
-  !! Rendered NetCDF text.
+  !! Whether rendering succeeded and every expected output fragment was found.
   character(len=256) :: line
   character(len=:), allocatable :: expected_header, output_file
   integer :: base, extension, file_unit, iostat
@@ -746,14 +746,15 @@ pure logical function starts_with(text, prefix)
   !! Return whether `text` begins with `prefix`; trailing NULs are retained when
   !! an externally written `NC_CHAR` attribute includes them in its stored value.
   character(len=*), intent(in) :: text, prefix
-  !! Dataset objects or values used by this operation.
+  !! text: Text to test for the requested prefix.
+  !! prefix: Leading substring that the text must contain.
 
   starts_with = len(text) >= len(prefix)
   if (starts_with) starts_with = text(:len(prefix)) == prefix
 end function starts_with
 
 function extensive_variables() result(vars)
-  !! Compute `extensive_variables`.
+  !! Construct numeric variables of ranks one through seven for round-trip tests.
   type(variable_type), allocatable :: vars(:)
   !! Retrieved variables.
   type(dimension_type) :: dims(7)
@@ -803,7 +804,7 @@ function extensive_variables() result(vars)
 end function extensive_variables
 
 pure function extensive_attributes() result(atts)
-  !! Compute `extensive_attributes`.
+  !! Construct mixed-type global attributes for the round-trip fixture.
   type(attribute_type), allocatable :: atts(:)
   !! Retrieved attributes.
 

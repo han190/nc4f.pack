@@ -29,9 +29,9 @@ end subroutine initialize_var
 pure module function clip(string) result(clipped)
   !! Trim space from both ends of a character string.
   character(len=*), intent(in) :: string
-  !! Data or metadata used by this operation.
+  !! String to trim and left-adjust.
   character(len=:), allocatable :: clipped
-  !! String with trailing blanks removed.
+  !! String with leading and trailing blanks removed.
 
   clipped = trim(adjustl(string))
 end function clip
@@ -39,7 +39,7 @@ end function clip
 pure module function c2fstr(cstr) result(fstr)
   !! Convert a NUL-terminated C string into a Fortran string.
   character(kind=c_char, len=*), intent(in) :: cstr
-  !! Data or metadata used by this operation.
+  !! C character string whose first NUL marks the end of the converted text.
   character(len=:), allocatable :: fstr
   !! Fortran string converted from C storage.
   integer :: inull, str_len
@@ -54,7 +54,7 @@ end function c2fstr
 pure module function f2cstr(fstr) result(cstr)
   !! Convert a Fortran string into a NUL-terminated C string.
   character(len=*), intent(in) :: fstr
-  !! Data or metadata used by this operation.
+  !! Fortran string whose trailing blanks are removed before appending NUL.
   character(kind=c_char, len=:), allocatable :: cstr
   !! C-compatible string converted from Fortran text.
 

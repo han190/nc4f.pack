@@ -19,16 +19,22 @@ character(*), parameter :: RESULTS = "build/test-results/"
 contains
 
 subroutine check(status, context)
+  !! Report a failing NetCDF C status and terminate the binding test.
   integer(c_int), intent(in) :: status
+  !! Status code returned by a NetCDF C call.
   character(*), intent(in) :: context
+  !! Context label included in error diagnostics.
   if (status == NC_NOERR) return
   print *, "[C binding] ", context, ": status = ", status
   error stop "NetCDF C call failed."
 end subroutine check
 
 subroutine require(condition, context)
+  !! Report a failed condition and terminate the C-binding test.
   logical, intent(in) :: condition
+  !! Condition that must be true for the assertion to succeed.
   character(*), intent(in) :: context
+  !! Context label included in error diagnostics.
   if (condition) return
   print *, "[C binding] ", context
   error stop "NetCDF C binding assertion failed."
@@ -37,6 +43,7 @@ end subroutine require
 subroutine c_bindings_storage(passed)
   !! Append strided records, convert numbers, and inspect persisted storage metadata.
   logical, intent(inout) :: passed
+  !! Set true when all checks in this test succeed.
   integer(c_int) :: ncid, dimids(2), varid, grpid, format, mode, storage
   integer(c_int) :: shuffle, deflate, level, checksum, endian, nofill, xtype, attid
   integer(c_int) :: ndims, nvars, natts, unlim, oldfill
@@ -148,6 +155,7 @@ end subroutine c_bindings_storage
 subroutine c_bindings_formats(passed)
   !! Exercise classic define mode, CDF-2/CDF-5 flags, and unsigned conversion.
   logical, intent(inout) :: passed
+  !! Set true when all checks in this test succeed.
   integer(c_int), parameter :: modes(4) = [NC_CLOBBER, NC_64BIT_OFFSET, NC_64BIT_DATA, &
     & ior(NC_NETCDF4, NC_CLASSIC_MODEL)]
   integer(c_int), parameter :: formats(4) = [NC_FORMAT_CLASSIC, NC_FORMAT_64BIT_OFFSET, &
@@ -220,6 +228,7 @@ end subroutine c_bindings_formats
 subroutine c_bindings_strings(passed)
   !! Verify char ** indirection, string ownership, and all string access shapes.
   logical, intent(inout) :: passed
+  !! Set true when all checks in this test succeed.
   integer(c_int) :: ncid, dimid, varid, textid, scalarid
   integer(c_size_t) :: length
   integer(c_size_t), target :: start(1), count(1)
@@ -292,6 +301,7 @@ end subroutine c_bindings_strings
 subroutine c_bindings_user_types(passed)
   !! Exercise native padding, nested strings/VLENs, deep copy, enums, and opaque data.
   logical, intent(inout) :: passed
+  !! Set true when all checks in this test succeed.
   integer(c_int) :: ncid, compound, sequence, enumeration, opaque, varid, enumvar, blobvar
   integer(c_int) :: base, classid, fieldid, fieldtype, rank, ntypes, equal
   integer(c_int), target :: members(2), fieldshape(1), histories(3), decoded_history(3), typeids(4)
@@ -389,6 +399,7 @@ end subroutine c_bindings_user_types
 subroutine c_bindings_memory_mapped(passed)
   !! Exercise memory-file ownership, mapped layouts, scalar I/O, and filter controls.
   logical, intent(inout) :: passed
+  !! Set true when all checks in this test succeed.
   integer(c_int) :: ncid, dims(2), varid, floatid, qmode, precision
   integer(c_int), target :: values(6), mapped(6)
   integer(c_int) :: shuffle, deflate, level
@@ -453,6 +464,7 @@ end subroutine c_bindings_memory_mapped
 subroutine c_bindings_legacy_aux(passed)
   !! Exercise legacy long-vector ABI, C-owned auxiliary output, and runtime configuration.
   logical, intent(inout) :: passed
+  !! Set true when all checks in this test succeed.
   integer(c_int) :: ncid, varid
   integer(c_int), target :: dimid
   integer(c_int), target :: values(3), actual(3)

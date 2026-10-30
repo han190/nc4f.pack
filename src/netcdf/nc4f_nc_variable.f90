@@ -3,11 +3,18 @@ implicit none (type, external)
 contains
 
 module subroutine rename_var_nc_var(grp, var, new_name, update_file, err)
+  !! Rename the supplied variable, optionally updating its name in the file.
+  !! grp%vars and other copies are not synchronized; the old name selects the target.
   class(group_type), intent(in) :: grp
+  !! Open group containing the supplied variable when a file update is requested.
   type(variable_type), intent(inout) :: var
+  !! Variable whose local name is changed; its metadata and storage are preserved.
   character(len=*), intent(in) :: new_name
+  !! Replacement local name; trailing Fortran blank padding is removed.
   logical, intent(in), optional :: update_file
+  !! Whether to update the open NetCDF file as well as the model (default false).
   type(error_type), intent(out), optional :: err
+  !! Receives the status and diagnostic; failures stop execution when omitted.
   type(error_type) :: op_err
   type(variable_type) :: staged
   logical :: write_file
@@ -34,10 +41,17 @@ module subroutine rename_var_nc_var(grp, var, new_name, update_file, err)
 end subroutine rename_var_nc_var
 
 module subroutine rename_var_nc_grp(grp, old_name, new_name, update_file, err)
+  !! Rename a file variable and its matching grp%vars entry, if loaded.
+  !! update_file is required to distinguish this from the model-only overload.
   class(group_type), intent(inout) :: grp
+  !! Group whose direct variable collection contains the name to change.
   character(len=*), intent(in) :: old_name, new_name
+  !! old_name: Existing local name to locate.
+  !! new_name: Replacement local name; trailing Fortran blank padding is removed.
   logical, intent(in) :: update_file
+  !! Whether to update the open NetCDF file as well as the model.
   type(error_type), intent(out), optional :: err
+  !! Receives the status and diagnostic; failures stop execution when omitted.
   type(error_type) :: op_err
   type(group_type) :: staged
   integer :: i, n, pos, lo
@@ -79,8 +93,12 @@ end subroutine rename_var_nc_grp
 subroutine rename_var_nc_(ncid, old_name, new_name, err)
   !! Resolve by name in the supplied group; stored variable IDs are not trusted.
   integer(c_int), intent(in) :: ncid
+  !! Open file or group identifier used by the NetCDF C API.
   character(len=*), intent(in) :: old_name, new_name
+  !! old_name: Existing local name to locate.
+  !! new_name: Replacement local name; trailing Fortran blank padding is removed.
   type(error_type), intent(out) :: err
+  !! Receives the operation status and diagnostic message.
   type(variable_type) :: name
   integer(c_int) :: stat, varid
 

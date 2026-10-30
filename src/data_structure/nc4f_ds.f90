@@ -210,63 +210,93 @@ interface
   pure module subroutine rename_grp_grp(grp, new_name, err)
     !! Rename a non-root group in memory, preserving its contents and child aliases.
     class(group_type), intent(inout) :: grp
+    !! Non-root group whose local name is changed.
     character(len=*), intent(in) :: new_name
+    !! Replacement local name; trailing Fortran blank padding is removed.
     type(error_type), intent(out), optional :: err
+    !! Receives the status and diagnostic; failures stop execution when omitted.
   end subroutine rename_grp_grp
 
   pure module subroutine rename_grp_par(parent, old_name, new_name, err)
     !! Rename one direct child in parent%grps without accessing a file.
     class(group_type), intent(inout) :: parent
+    !! Parent whose matching direct child is renamed in memory.
     character(len=*), intent(in) :: old_name, new_name
+    !! old_name: Existing local name to locate.
+    !! new_name: Replacement local name; trailing Fortran blank padding is removed.
     type(error_type), intent(out), optional :: err
+    !! Receives the status and diagnostic; failures stop execution when omitted.
   end subroutine rename_grp_par
 
   pure module subroutine chk_nc_name(name, err, context)
     !! Shared NetCDF name validation, private to the data-model module/submodules.
     character(len=*), intent(in) :: name
+    !! NetCDF local name to validate; trailing Fortran blank padding is ignored.
     type(error_type), intent(out) :: err
+    !! Receives the operation status and diagnostic message.
     character(len=*), intent(in), optional :: context
+    !! Context label included in error diagnostics.
   end subroutine chk_nc_name
 
   pure module subroutine ret_ds_err(op_err, err)
     !! Apply the optional-error convention for data-model operations.
     type(error_type), intent(in) :: op_err
+    !! Completed operation result to return or use for error termination.
     type(error_type), intent(out), optional :: err
+    !! Receives the status and diagnostic; failures stop execution when omitted.
   end subroutine ret_ds_err
 
   pure module subroutine rename_var_var(var, new_name, err)
     !! Rename an independent variable in memory; preserve its metadata and storage.
     type(variable_type), intent(inout) :: var
+    !! Variable whose local name is changed; its metadata and storage are preserved.
     character(len=*), intent(in) :: new_name
+    !! Replacement local name; trailing Fortran blank padding is removed.
     type(error_type), intent(out), optional :: err
+    !! Receives the status and diagnostic; failures stop execution when omitted.
   end subroutine rename_var_var
 
   pure module subroutine rename_var_grp(grp, old_name, new_name, err)
     !! Rename a direct member of grp%vars in memory, without accessing a file.
     class(group_type), intent(inout) :: grp
+    !! Group whose direct variable collection contains the name to change.
     character(len=*), intent(in) :: old_name, new_name
+    !! old_name: Existing local name to locate.
+    !! new_name: Replacement local name; trailing Fortran blank padding is removed.
     type(error_type), intent(out), optional :: err
+    !! Receives the status and diagnostic; failures stop execution when omitted.
   end subroutine rename_var_grp
 
   pure module subroutine rename_att_att(att, new_name, err)
     !! Rename an independent attribute in memory; no file is accessed.
     type(attribute_type), intent(inout) :: att
+    !! Attribute whose local name is changed.
     character(len=*), intent(in) :: new_name
+    !! Replacement local name; trailing Fortran blank padding is removed.
     type(error_type), intent(out), optional :: err
+    !! Receives the status and diagnostic; failures stop execution when omitted.
   end subroutine rename_att_att
 
   pure module subroutine rename_att_var(var, old_name, new_name, err)
     !! Rename a variable attribute in memory, preserving its value and storage.
     type(variable_type), intent(inout) :: var
+    !! Variable whose matching attribute is renamed; its data and own name are preserved.
     character(len=*), intent(in) :: old_name, new_name
+    !! old_name: Existing local name to locate.
+    !! new_name: Replacement local name; trailing Fortran blank padding is removed.
     type(error_type), intent(out), optional :: err
+    !! Receives the status and diagnostic; failures stop execution when omitted.
   end subroutine rename_att_var
 
   pure module subroutine rename_att_grp(grp, old_name, new_name, err)
     !! Rename a group/global attribute in memory, without accessing a file.
     class(group_type), intent(inout) :: grp
+    !! Group whose matching global attribute is renamed.
     character(len=*), intent(in) :: old_name, new_name
+    !! old_name: Existing local name to locate.
+    !! new_name: Replacement local name; trailing Fortran blank padding is removed.
     type(error_type), intent(out), optional :: err
+    !! Receives the status and diagnostic; failures stop execution when omitted.
   end subroutine rename_att_grp
 
   elemental module subroutine init_att(att, name, dtype, len)
@@ -276,9 +306,9 @@ interface
     character(len=*), intent(in) :: name
     !! Name used to identify the NetCDF object.
     integer(data_type), intent(in) :: dtype
-    !! Data or metadata used by this operation.
+    !! NetCDF data-type code used to determine the stored element representation.
     integer(int64), intent(in) :: len
-    !! Data or metadata used by this operation.
+    !! Number of stored data elements.
   end subroutine init_att
 
   module subroutine init_var(var, name, dtype, len, dims, atts)
@@ -288,9 +318,9 @@ interface
     character(len=*), intent(in) :: name
     !! Name used to identify the NetCDF object.
     integer(data_type), intent(in) :: dtype
-    !! Data or metadata used by this operation.
+    !! NetCDF data-type code used to determine the stored element representation.
     integer(int64), intent(in) :: len
-    !! Data or metadata used by this operation.
+    !! Number of stored data elements.
     type(dimension_type), intent(in) :: dims(:)
     !! Dimensions describing the variable shape.
     type(attribute_type), intent(in), optional :: atts(:)
@@ -304,9 +334,9 @@ interface
     character(len=*), intent(in) :: name
     !! Name used to identify the NetCDF object.
     integer(data_type), intent(in) :: dtype
-    !! Data or metadata used by this operation.
+    !! NetCDF data-type code used to determine the stored element representation.
     integer(int64), intent(in) :: len
-    !! Data or metadata used by this operation.
+    !! Number of stored data elements.
     logical, intent(in), optional :: deep
     !! Whether to make an owned deep copy of the data.
   end subroutine init_att_
@@ -318,9 +348,9 @@ interface
     character(len=*), intent(in) :: name
     !! Name used to identify the NetCDF object.
     integer(data_type), intent(in) :: dtype
-    !! Data or metadata used by this operation.
+    !! NetCDF data-type code used to determine the stored element representation.
     integer(int64), intent(in) :: len
-    !! Data or metadata used by this operation.
+    !! Number of stored data elements.
     type(dimension_type), intent(in) :: dims(:)
     !! Dimensions describing the variable shape.
     type(attribute_type), intent(in), optional :: atts(:)
@@ -336,7 +366,7 @@ interface
     character(len=*), intent(in) :: name
     !! Name used to identify the NetCDF object.
     type(attribute_type), target, intent(in) :: mold
-    !! Data or metadata used by this operation.
+    !! Source metadata and storage to copy or borrow according to DEEP.
     logical, intent(in), optional :: deep
     !! Whether to make an owned deep copy of the data.
   end subroutine init_att_mold
@@ -348,7 +378,7 @@ interface
     character(len=*), intent(in) :: name
     !! Name used to identify the NetCDF object.
     type(variable_type), target, intent(in) :: mold
-    !! Data or metadata used by this operation.
+    !! Source metadata and storage to copy or borrow according to DEEP.
     type(attribute_type), intent(in), optional :: atts(:)
     !! Attributes to process or attach.
     logical, intent(in), optional :: deep
@@ -356,7 +386,7 @@ interface
   end subroutine init_var_mold
 
   module function new_dataset_empty(name, atts, deep) result(grp)
-    !! Construct a dataset object from the supplied metadata and data.
+    !! Construct a named group with optional attributes and no child collections.
     character(len=*), intent(in) :: name
     !! Name used to identify the NetCDF object.
     type(attribute_type), intent(in), optional :: atts(:)
@@ -368,7 +398,7 @@ interface
   end function new_dataset_empty
 
   module function new_dataset_vars(name, vars, atts, deep) result(grp)
-    !! Construct a dataset object from the supplied metadata and data.
+    !! Construct a named group from variables and optional attributes.
     character(len=*), intent(in) :: name
     !! Name used to identify the NetCDF object.
     type(variable_type), intent(in) :: vars(:)
@@ -382,11 +412,11 @@ interface
   end function new_dataset_vars
 
   module function new_dataset_grps(name, grps, atts, deep) result(grp)
-    !! Construct a dataset object from the supplied metadata and data.
+    !! Construct a named group from child groups and optional attributes.
     character(len=*), intent(in) :: name
     !! Name used to identify the NetCDF object.
     type(group_type), intent(in) :: grps(:)
-    !! Data or metadata used by this operation.
+    !! Child groups to include in the constructed group.
     type(attribute_type), intent(in), optional :: atts(:)
     !! Attributes to process or attach.
     logical, intent(in), optional :: deep
@@ -396,13 +426,13 @@ interface
   end function new_dataset_grps
 
   module function new_dataset_all(name, vars, grps, atts, deep) result(grp)
-    !! Construct a dataset object from the supplied metadata and data.
+    !! Construct a named group from variables, child groups, and optional attributes.
     character(len=*), intent(in) :: name
     !! Name used to identify the NetCDF object.
     type(variable_type), intent(in) :: vars(:)
     !! Variables to process or add to the dataset.
     type(group_type), intent(in) :: grps(:)
-    !! Data or metadata used by this operation.
+    !! Child groups to include in the constructed group.
     type(attribute_type), intent(in), optional :: atts(:)
     !! Attributes to process or attach.
     logical, intent(in), optional :: deep
@@ -420,7 +450,7 @@ interface
     type(variable_type), intent(in), optional :: vars(:)
     !! Variables to process or add to the dataset.
     type(group_type), intent(in), optional :: grps(:)
-    !! Data or metadata used by this operation.
+    !! Child groups to include in the constructed group.
     type(attribute_type), intent(in), optional :: atts(:)
     !! Attributes to process or attach.
     logical, intent(in), optional :: deep
@@ -428,7 +458,7 @@ interface
   end subroutine new_dataset_
 
   impure elemental module subroutine clone_att(src, dest)
-    !! Clone a dataset object and its data.
+    !! Deep-copy attribute metadata and active bytes into owned destination storage.
     type(attribute_type), intent(in) :: src
     !! Source object or group to read from.
     type(attribute_type), intent(out) :: dest
@@ -436,7 +466,7 @@ interface
   end subroutine clone_att
 
   impure elemental module subroutine clone_var(src, dest)
-    !! Clone a dataset object and its data.
+    !! Deep-copy a variable, its attributes, and active bytes into owned storage.
     type(variable_type), intent(in) :: src
     !! Source object or group to read from.
     type(variable_type), intent(out) :: dest
@@ -444,7 +474,7 @@ interface
   end subroutine clone_var
 
   impure elemental module subroutine clone_grp(src, dest)
-    !! Clone a dataset object and its data.
+    !! Deep-copy a group and its complete descendant tree.
     type(group_type), intent(in) :: src
     !! Source object or group to read from.
     type(group_type), intent(out) :: dest
@@ -456,9 +486,9 @@ interface
     type(attribute_type), intent(in) :: att
     !! Attribute to process.
     integer(data_type), intent(in), optional :: dtype
-    !! Data or metadata used by this operation.
+    !! Expected NetCDF data-type code, when supplied.
     character(len=*), intent(in) :: context
-    !! Data or metadata used by this operation.
+    !! Context label included in error diagnostics.
   end subroutine validate_att
 
   pure module subroutine validate_var(var, dtype, rank, context)
@@ -466,15 +496,15 @@ interface
     type(variable_type), intent(in) :: var
     !! Variable to process.
     integer(data_type), intent(in), optional :: dtype
-    !! Data or metadata used by this operation.
+    !! Expected NetCDF data-type code, when supplied.
     integer, intent(in), optional :: rank
-    !! Data or metadata used by this operation.
+    !! Expected variable rank, when supplied.
     character(len=*), intent(in) :: context
-    !! Data or metadata used by this operation.
+    !! Context label included in error diagnostics.
   end subroutine validate_var
 
   module function buffer2cptr_att(att) result(cptr)
-    !! Perform the buffer2cptr_att operation.
+    !! Return the C address of an attribute's active byte storage.
     type(attribute_type), target, intent(in) :: att
     !! Attribute to process.
     type(c_ptr) :: cptr
@@ -482,7 +512,7 @@ interface
   end function buffer2cptr_att
 
   module function buffer2cptr_var(var) result(cptr)
-    !! Perform the buffer2cptr_var operation.
+    !! Return the C address of a variable's active byte storage.
     type(variable_type), target, intent(in) :: var
     !! Variable to process.
     type(c_ptr) :: cptr
@@ -490,99 +520,99 @@ interface
   end function buffer2cptr_var
 
   module subroutine write_frmt_att(att, unit, iotype, v_list, iostat, iomsg)
-    !! Write supplied data or metadata to a NetCDF object.
+    !! Write a formatted attribute representation to a Fortran I/O unit.
     class(attribute_type), intent(in) :: att
     !! Attribute to process.
     integer, intent(in) :: unit
-    !! Data or metadata used by this operation.
+    !! Fortran output unit supplied by the invoking formatted WRITE.
     character(len=*), intent(in) :: iotype
-    !! Data or metadata used by this operation.
+    !! Requested defined-I/O mode; LISTDIRECTED and DT are supported.
     integer, intent(in) :: v_list(:)
-    !! Data or metadata used by this operation.
+    !! Integer DT edit-descriptor parameters; currently ignored.
     integer, intent(out) :: iostat
-    !! Data or metadata used by this operation.
+    !! Receives zero on success or a nonzero I/O status on failure.
     character(len=*), intent(inout) :: iomsg
-    !! Data or metadata used by this operation.
+    !! Receives the diagnostic message if the underlying WRITE fails.
   end subroutine write_frmt_att
 
   module subroutine write_frmt_dim(dim, unit, iotype, v_list, iostat, iomsg)
-    !! Write supplied data or metadata to a NetCDF object.
+    !! Write a formatted dimension representation to a Fortran I/O unit.
     class(dimension_type), intent(in) :: dim
     !! Dimension to process.
     integer, intent(in) :: unit
-    !! Data or metadata used by this operation.
+    !! Fortran output unit supplied by the invoking formatted WRITE.
     character(len=*), intent(in) :: iotype
-    !! Data or metadata used by this operation.
+    !! Requested defined-I/O mode; LISTDIRECTED and DT are supported.
     integer, intent(in) :: v_list(:)
-    !! Data or metadata used by this operation.
+    !! Integer DT edit-descriptor parameters; currently ignored.
     integer, intent(out) :: iostat
-    !! Data or metadata used by this operation.
+    !! Receives zero on success or a nonzero I/O status on failure.
     character(len=*), intent(inout) :: iomsg
-    !! Data or metadata used by this operation.
+    !! Receives the diagnostic message if the underlying WRITE fails.
   end subroutine write_frmt_dim
 
   module subroutine write_frmt_var(var, unit, iotype, v_list, iostat, iomsg)
-    !! Write supplied data or metadata to a NetCDF object.
+    !! Write a formatted variable representation to a Fortran I/O unit.
     class(variable_type), intent(in) :: var
     !! Variable to process.
     integer, intent(in) :: unit
-    !! Data or metadata used by this operation.
+    !! Fortran output unit supplied by the invoking formatted WRITE.
     character(len=*), intent(in) :: iotype
-    !! Data or metadata used by this operation.
+    !! Requested defined-I/O mode; LISTDIRECTED and DT are supported.
     integer, intent(in) :: v_list(:)
-    !! Data or metadata used by this operation.
+    !! Integer DT edit-descriptor parameters; currently ignored.
     integer, intent(out) :: iostat
-    !! Data or metadata used by this operation.
+    !! Receives zero on success or a nonzero I/O status on failure.
     character(len=*), intent(inout) :: iomsg
-    !! Data or metadata used by this operation.
+    !! Receives the diagnostic message if the underlying WRITE fails.
   end subroutine write_frmt_var
 
   module subroutine write_frmt_grp(grp, unit, iotype, v_list, iostat, iomsg)
-    !! Write supplied data or metadata to a NetCDF object.
+    !! Write a formatted group representation to a Fortran I/O unit.
     class(group_type), intent(in) :: grp
     !! Dataset group to process.
     integer, intent(in) :: unit
-    !! Data or metadata used by this operation.
+    !! Fortran output unit supplied by the invoking formatted WRITE.
     character(len=*), intent(in) :: iotype
-    !! Data or metadata used by this operation.
+    !! Requested defined-I/O mode; LISTDIRECTED and DT are supported.
     integer, intent(in) :: v_list(:)
-    !! Data or metadata used by this operation.
+    !! Integer DT edit-descriptor parameters; currently ignored.
     integer, intent(out) :: iostat
-    !! Data or metadata used by this operation.
+    !! Receives zero on success or a nonzero I/O status on failure.
     character(len=*), intent(inout) :: iomsg
-    !! Data or metadata used by this operation.
+    !! Receives the diagnostic message if the underlying WRITE fails.
   end subroutine write_frmt_grp
 
   module subroutine write_frmt_netcdf(grp, unit, iotype, v_list, iostat, iomsg)
-    !! Write supplied data or metadata to a NetCDF object.
+    !! Write a formatted dataset representation to a Fortran I/O unit.
     class(netcdf_type), intent(in) :: grp
     !! Dataset group to process.
     integer, intent(in) :: unit
-    !! Data or metadata used by this operation.
+    !! Fortran output unit supplied by the invoking formatted WRITE.
     character(len=*), intent(in) :: iotype
-    !! Data or metadata used by this operation.
+    !! Requested defined-I/O mode; LISTDIRECTED and DT are supported.
     integer, intent(in) :: v_list(:)
-    !! Data or metadata used by this operation.
+    !! Integer DT edit-descriptor parameters; currently ignored.
     integer, intent(out) :: iostat
-    !! Data or metadata used by this operation.
+    !! Receives zero on success or a nonzero I/O status on failure.
     character(len=*), intent(inout) :: iomsg
-    !! Data or metadata used by this operation.
+    !! Receives the diagnostic message if the underlying WRITE fails.
   end subroutine write_frmt_netcdf
 
   module subroutine write_frmt_err(err, unit, iotype, v_list, iostat, iomsg)
-    !! Write supplied data or metadata to a NetCDF object.
+    !! Write a formatted error result representation to a Fortran I/O unit.
     class(error_type), intent(in) :: err
     !! Error object updated if the operation fails.
     integer, intent(in) :: unit
-    !! Data or metadata used by this operation.
+    !! Fortran output unit supplied by the invoking formatted WRITE.
     character(len=*), intent(in) :: iotype
-    !! Data or metadata used by this operation.
+    !! Requested defined-I/O mode; LISTDIRECTED and DT are supported.
     integer, intent(in) :: v_list(:)
-    !! Data or metadata used by this operation.
+    !! Integer DT edit-descriptor parameters; currently ignored.
     integer, intent(out) :: iostat
-    !! Data or metadata used by this operation.
+    !! Receives zero on success or a nonzero I/O status on failure.
     character(len=*), intent(inout) :: iomsg
-    !! Data or metadata used by this operation.
+    !! Receives the diagnostic message if the underlying WRITE fails.
   end subroutine write_frmt_err
 
   elemental module function new_dim_len_int32(name, len) result(dim)
@@ -590,7 +620,7 @@ interface
     character(len=*), intent(in) :: name
     !! Name used to identify the NetCDF object.
     integer(int32), intent(in) :: len
-    !! Data or metadata used by this operation.
+    !! Dimension length in elements.
     type(dimension_type) :: dim
     !! Result produced by this operation.
   end function new_dim_len_int32
@@ -600,7 +630,7 @@ interface
     character(len=*), intent(in) :: name
     !! Name used to identify the NetCDF object.
     integer(int64), intent(in) :: len
-    !! Data or metadata used by this operation.
+    !! Dimension length in elements.
     type(dimension_type) :: dim
     !! Result produced by this operation.
   end function new_dim_len_int64
@@ -608,9 +638,9 @@ interface
   elemental module function new_dim_arg_int32(len, is_unlim) result(arg)
     !! Construct a dataset object from the supplied metadata and data.
     integer(int32), intent(in) :: len
-    !! Data or metadata used by this operation.
+    !! Dimension length in elements.
     logical, intent(in) :: is_unlim
-    !! Data or metadata used by this operation.
+    !! Whether this dimension can grow when records are written.
     type(dimension_argument_type) :: arg
     !! Result produced by this operation.
   end function new_dim_arg_int32
@@ -618,9 +648,9 @@ interface
   elemental module function new_dim_arg_int64(len, is_unlim) result(arg)
     !! Construct a dataset object from the supplied metadata and data.
     integer(int64), intent(in) :: len
-    !! Data or metadata used by this operation.
+    !! Dimension length in elements.
     logical, intent(in) :: is_unlim
-    !! Data or metadata used by this operation.
+    !! Whether this dimension can grow when records are written.
     type(dimension_argument_type) :: arg
     !! Result produced by this operation.
   end function new_dim_arg_int64
@@ -630,33 +660,51 @@ interface
     character(len=*), intent(in) :: name
     !! Name used to identify the NetCDF object.
     type(dimension_argument_type), intent(in) :: args
-    !! Data or metadata used by this operation.
+    !! Dimension length and unlimited flag packaged by the .and. operator.
     type(dimension_type) :: dim
     !! Result produced by this operation.
   end function new_dim_args
 
   logical elemental module function eq_dim(x, y)
+    !! Return true when two dimensions have identical metadata.
     type(dimension_type), intent(in) :: x, y
+    !! x: Left-hand value to compare.
+    !! y: Right-hand value to compare.
   end function eq_dim
 
   logical elemental module function neq_dim(x, y)
+    !! Return true when two dimensions have different metadata.
     type(dimension_type), intent(in) :: x, y
+    !! x: Left-hand value to compare.
+    !! y: Right-hand value to compare.
   end function neq_dim
 
   logical elemental module function eq_att(x, y) result(is_equal)
+    !! Return true when two attributes have identical metadata and byte values.
     type(attribute_type), intent(in) :: x, y
+    !! x: Left-hand value to compare.
+    !! y: Right-hand value to compare.
   end function eq_att
 
   logical elemental module function neq_att(x, y) result(is_equal)
+    !! Return true when two attributes differ.
     type(attribute_type), intent(in) :: x, y
+    !! x: Left-hand value to compare.
+    !! y: Right-hand value to compare.
   end function neq_att
 
   logical elemental module function eq_var(x, y) result(is_equal)
+    !! Return true when two variables have identical metadata and byte values.
     type(variable_type), intent(in) :: x, y
+    !! x: Left-hand value to compare.
+    !! y: Right-hand value to compare.
   end function eq_var
 
   logical elemental module function neq_var(x, y) result(is_equal)
+    !! Return true when two variables differ.
     type(variable_type), intent(in) :: x, y
+    !! x: Left-hand value to compare.
+    !! y: Right-hand value to compare.
   end function neq_var
 
   pure module function get_size(var, dim) result(n)
@@ -678,7 +726,7 @@ interface
   end function get_shape
 
   module function sum_vars(vars) result(total)
-    !! Perform the sum_vars operation.
+    !! Return the element-wise sum of compatible variables in `vars`.
     type(variable_type), intent(in) :: vars(:)
     !! Variables to process or add to the dataset.
     type(variable_type) :: total
@@ -686,13 +734,13 @@ interface
   end function sum_vars
 
   pure module function buffer_size(dtype, len, context) result(nbytes)
-    !! Perform the buffer_size operation.
+    !! Compute the byte count for a NetCDF type and element count, checking overflow.
     integer(data_type), intent(in) :: dtype
-    !! Data or metadata used by this operation.
+    !! NetCDF data-type code used to determine the stored element representation.
     integer(int64), intent(in) :: len
-    !! Data or metadata used by this operation.
+    !! Number of stored data elements.
     character(len=*), intent(in), optional :: context
-    !! Data or metadata used by this operation.
+    !! Context label included in error diagnostics.
     integer :: nbytes
     !! Result produced by this operation.
   end function buffer_size

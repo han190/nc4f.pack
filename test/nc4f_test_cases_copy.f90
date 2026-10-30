@@ -8,7 +8,7 @@ implicit none (type, external)
 contains
 
 module subroutine copy_semantics(passed)
-  !! Execute `copy_semantics`.
+  !! Test owned buffers, borrowed views, and deep versus shallow group copies.
   logical, intent(inout) :: passed
   !! Whether the test case has passed.
   type(attribute_type) :: copied_att, empty_att, owned_att, source_att
@@ -148,7 +148,7 @@ contains
   subroutine check_scoped_owned_value(valid)
     !! Exercise a deep value after the constructor's source has left scope.
     logical, intent(out) :: valid
-    !! Data or metadata used by this operation.
+    !! Receives whether the scoped owned value retains the expected data.
     type(variable_type) :: scoped_var
     real(real32), pointer :: scoped_values(:)
 
