@@ -165,7 +165,7 @@ elemental module function new_att_real64_scalar(name, value) result(att)
 end function new_att_real64_scalar
 
 
-module function new_att_character(name, value) result(att)
+pure module function new_att_character(name, value) result(att)
   !! Create an `attribute_type` containing character data.
   character(len=*), intent(in) :: name
   !! Name used to identify the NetCDF object.

@@ -10,7 +10,7 @@ logical elemental module function has_err(err) result(is_err)
   is_err = err%code /= NC_NOERR
 end function has_err
 
-logical impure module function handle_err(err) result(has_failed)
+pure logical module function handle_err(err) result(has_failed)
   !! Apply nc4f's fail-fast policy to a completed error result.
   type(error_type), intent(in) :: err
   !! Completed result of an nc4f operation.

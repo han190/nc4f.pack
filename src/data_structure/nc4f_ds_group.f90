@@ -3,6 +3,85 @@ submodule(nc4f_ds) nc4f_ds_group
 implicit none (type, external)
 contains
 
+pure module subroutine rename_grp_grp(grp, new_name, err)
+  !! Rename an independent non-root group without changing its child tree.
+  class(group_type), intent(inout) :: grp
+  character(len=*), intent(in) :: new_name
+  type(error_type), intent(out), optional :: err
+  type(error_type) :: op_err
+  character(len=:), allocatable :: name
+
+  select type (grp)
+  class is (netcdf_type)
+    op_err = error_type(NC_EBADGRPID, "[rename_group] Cannot rename the root group.")
+  class default
+    if (allocated(grp%name)) then
+      if (grp%name == "/") then
+        op_err = error_type(NC_EBADGRPID, "[rename_group] Cannot rename the root group.")
+      end if
+    end if
+  end select
+  if (op_err%code == NC_NOERR) call chk_nc_name(new_name, op_err, "[rename_group]")
+  if (op_err%code == NC_NOERR) then
+    name = trim(new_name)
+    call move_alloc(name, grp%name)
+  end if
+  call ret_ds_err(op_err, err)
+end subroutine rename_grp_grp
+
+pure module subroutine rename_grp_par(parent, old_name, new_name, err)
+  !! Rename one direct child; aliases to parent%grps observe the same change.
+  class(group_type), intent(inout) :: parent
+  character(len=*), intent(in) :: old_name, new_name
+  type(error_type), intent(out), optional :: err
+  type(error_type) :: op_err
+
+  call chk_nc_name(old_name, op_err, "[rename_group]")
+  if (op_err%code == NC_NOERR) call chk_nc_name(new_name, op_err, "[rename_group]")
+  if (op_err%code == NC_NOERR) then
+    if (associated(parent%grps)) then
+      call rename_grps_(parent%grps, old_name, new_name, op_err)
+    else
+      op_err = error_type(NC_ENOGRP, "[rename_group] Group not found: "//trim(old_name))
+    end if
+  end if
+  call ret_ds_err(op_err, err)
+end subroutine rename_grp_par
+
+pure subroutine rename_grps_(grps, old_name, new_name, err)
+  !! Assumed-shape indexing also supports pointer arrays with nonunit lower bounds.
+  type(group_type), intent(inout) :: grps(:)
+  character(len=*), intent(in) :: old_name, new_name
+  type(error_type), intent(out) :: err
+  integer :: i, pos
+
+  err = error_type()
+  pos = 0
+  do i = 1, size(grps)
+    if (.not. allocated(grps(i)%name)) cycle
+    if (grps(i)%name /= trim(old_name)) cycle
+    if (pos /= 0) then
+      err = error_type(NC_EINVAL, "[rename_group] Ambiguous duplicate group: "//trim(old_name))
+      return
+    end if
+    pos = i
+  end do
+  if (pos == 0) then
+    err = error_type(NC_ENOGRP, "[rename_group] Group not found: "//trim(old_name))
+    return
+  end if
+  do i = 1, size(grps)
+    if (i == pos .or. .not. allocated(grps(i)%name)) cycle
+    if (grps(i)%name == trim(new_name)) then
+      err = error_type(NC_ENAMEINUSE, "[rename_group] Group name already in use: "//trim(new_name))
+      return
+    end if
+  end do
+  if (trim(old_name) == trim(new_name)) return
+  call rename_grp_grp(grps(pos), new_name, err)
+end subroutine rename_grps_
+
+
 elemental module subroutine init_att(att, name, dtype, len)
   !! Initialize an owning attribute buffer.
   type(attribute_type), intent(inout) :: att
@@ -199,7 +278,7 @@ module subroutine new_dataset_(grp, name, vars, grps, atts, deep)
   end if
 end subroutine new_dataset_
 
-function collect_dims_(vars) result(dims)
+pure function collect_dims_(vars) result(dims)
   !! Collect unique variable dimensions in first-seen order.
   !!
   !! Dimensions sharing a name must have matching length and unlimited status.

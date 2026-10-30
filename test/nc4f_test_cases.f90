@@ -7,6 +7,9 @@ implicit none (type, external)
 
 public :: simple_wr, simple_rd, character_variables, elemental_reads, hyperslab_reads, buffer_edges
 public :: creation_policy, error_handling
+public :: rename_att_model, rename_att_file, rename_att_errors
+public :: rename_var_model, rename_var_file, rename_var_errors
+public :: rename_grp_model, rename_grp_file, rename_grp_errors
 public :: unlimited_wr, unlimited_dims
 public :: sum_vars_test, sfc_pres_temp_wr, &
   & sfc_pres_temp_rd, extensive_wr, extensive_rd
@@ -24,6 +27,42 @@ character(*), parameter :: NETCDF_TYPE_RESULT_FILE = &
   & "build/test-results/nasa_cosp_netcdf_type.txt"
 
 interface
+  module subroutine rename_grp_model(passed)
+    logical, intent(inout) :: passed
+  end subroutine rename_grp_model
+
+  module subroutine rename_grp_file(passed)
+    logical, intent(inout) :: passed
+  end subroutine rename_grp_file
+
+  module subroutine rename_grp_errors(passed)
+    logical, intent(inout) :: passed
+  end subroutine rename_grp_errors
+
+  module subroutine rename_var_model(passed)
+    logical, intent(inout) :: passed
+  end subroutine rename_var_model
+
+  module subroutine rename_var_file(passed)
+    logical, intent(inout) :: passed
+  end subroutine rename_var_file
+
+  module subroutine rename_var_errors(passed)
+    logical, intent(inout) :: passed
+  end subroutine rename_var_errors
+
+  module subroutine rename_att_model(passed)
+    logical, intent(inout) :: passed
+  end subroutine rename_att_model
+
+  module subroutine rename_att_file(passed)
+    logical, intent(inout) :: passed
+  end subroutine rename_att_file
+
+  module subroutine rename_att_errors(passed)
+    logical, intent(inout) :: passed
+  end subroutine rename_att_errors
+
   module subroutine simple_wr(passed)
     !! Perform the simple_wr operation.
     logical, intent(inout) :: passed

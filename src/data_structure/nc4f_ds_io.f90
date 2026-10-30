@@ -237,7 +237,7 @@ recursive function render_grp_(grp, indent, depth) result(text)
   end if
 end function render_grp_
 
-function render_dims(grp, indent) result(text)
+pure function render_dims(grp, indent) result(text)
   !! Compute the dimensions section of a group in ncdump-like formatted output.
   class(group_type), intent(in) :: grp
   !! Data or metadata used by this operation.

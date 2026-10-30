@@ -10,7 +10,8 @@ public :: &
 public :: &
   & NC_EBADID, NC_EBADDIM, NC_EBADGRPID, NC_EEDGE, &
   & NC_EINVAL, NC_EINVALCOORDS, NC_ENOGRP, &
-  & NC_ENOTATT, NC_ENOTFOUND, NC_ENOTVAR, NC_NOERR
+  & NC_ENOTATT, NC_ENOTFOUND, NC_ENOTVAR, NC_NOERR, &
+  & NC_EBADNAME, NC_EMAXNAME, NC_ENAMEINUSE
 public :: &
   & datarray, dataset, extract, initialize, &
   & operator(.att.), operator(.and.), operator(.dim.), &
@@ -20,6 +21,7 @@ public :: &
   & open_netcdf, close_netcdf, to_netcdf, &
   & inquire_dimensions, inquire_variable, &
   & inquire_subgroups, inquire_group, &
-  & get_attribute, get_variable, get_group
+  & get_attribute, get_variable, get_group, &
+  & rename_attribute, rename_variable, rename_group
 
 end module nc4f

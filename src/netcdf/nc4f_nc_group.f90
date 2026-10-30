@@ -2,6 +2,108 @@ submodule(nc4f_nc) nc4f_nc_group
 implicit none (type, external)
 contains
 
+module subroutine rename_grp_nc_grp(parent, grp, new_name, update_file, err)
+  class(group_type), intent(in) :: parent
+  class(group_type), intent(inout) :: grp
+  character(len=*), intent(in) :: new_name
+  logical, intent(in), optional :: update_file
+  type(error_type), intent(out), optional :: err
+  type(error_type) :: op_err
+  class(group_type), allocatable :: staged
+  logical :: write_file
+
+  write_file = .false.
+  if (present(update_file)) write_file = update_file
+  if (.not. write_file) then
+    call rename_group(grp, new_name, op_err)
+  else
+    ! MOLD preserves the dynamic type for root validation without copying children.
+    allocate (staged, mold=grp)
+    if (allocated(grp%name)) staged%name = grp%name
+    call rename_group(staged, new_name, op_err)
+    if (.not. has_err(op_err)) then
+      if (.not. allocated(grp%name)) then
+        op_err = error_type(NC_EINVAL, "[rename_group] Group must have a name.")
+      else
+        call rename_grp_nc_(parent%id, grp%name, staged%name, op_err)
+        if (.not. has_err(op_err)) call move_alloc(staged%name, grp%name)
+      end if
+    end if
+  end if
+  if (present(err)) then
+    err = op_err
+  else if (handle_err(op_err)) then
+    return
+  end if
+end subroutine rename_grp_nc_grp
+
+module subroutine rename_grp_nc_par(parent, old_name, new_name, update_file, err)
+  class(group_type), intent(inout) :: parent
+  character(len=*), intent(in) :: old_name, new_name
+  logical, intent(in) :: update_file
+  type(error_type), intent(out), optional :: err
+  type(error_type) :: op_err
+  type(group_type) :: staged
+  type(group_type), allocatable, target :: names(:)
+  integer :: i, n, pos, lo
+
+  if (.not. update_file) then
+    call rename_group(parent, old_name, new_name, op_err)
+  else
+    ! The allocatable scratch array owns only names, never a copied child tree.
+    n = 0
+    lo = 1
+    if (associated(parent%grps)) then
+      n = size(parent%grps)
+      lo = lbound(parent%grps, 1)
+    end if
+    allocate (names(n + 1))
+    staged%grps => names
+    pos = 0
+    do i = 1, n
+      if (.not. allocated(parent%grps(lo + i - 1)%name)) cycle
+      names(i)%name = parent%grps(lo + i - 1)%name
+      if (names(i)%name == trim(old_name)) pos = i
+    end do
+    if (pos == 0) names(n + 1)%name = trim(old_name)
+    call rename_group(staged, old_name, new_name, op_err)
+    if (.not. has_err(op_err)) then
+      call rename_grp_nc_(parent%id, old_name, new_name, op_err)
+      if (.not. has_err(op_err) .and. pos /= 0) then
+        call move_alloc(names(pos)%name, parent%grps(lo + pos - 1)%name)
+      end if
+    end if
+    nullify (staged%grps)
+  end if
+  if (present(err)) then
+    err = op_err
+  else if (handle_err(op_err)) then
+    return
+  end if
+end subroutine rename_grp_nc_par
+
+subroutine rename_grp_nc_(ncid, old_name, new_name, err)
+  !! Resolve a direct child by name; never use a cached child's ID.
+  integer(c_int), intent(in) :: ncid
+  character(len=*), intent(in) :: old_name, new_name
+  type(error_type), intent(out) :: err
+  type(group_type) :: name
+  integer(c_int) :: stat, grpid
+
+  call rename_group(name, old_name, err)
+  if (has_err(err)) return
+  call rename_group(name, new_name, err)
+  if (has_err(err)) return
+  stat = nc_inq_ncid(ncid, f2cstr(old_name), grpid)
+  err = netcdf_err(stat, "[rename_group] Find group: "//trim(old_name))
+  if (has_err(err)) return
+  stat = nc_rename_grp(grpid, f2cstr(new_name))
+  ! A self-rename still checks existence and write access through the C API.
+  if (trim(old_name) == trim(new_name) .and. stat == NC_ENAMEINUSE) stat = NC_NOERR
+  err = netcdf_err(stat, "[rename_group] Rename group: "//trim(old_name)//" -> "//trim(new_name))
+end subroutine rename_grp_nc_
+
+
 module function get_group(parent, name, err) result(group)
   !! Return a direct child group by name.
   class(group_type), intent(in) :: parent

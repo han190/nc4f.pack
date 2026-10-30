@@ -14,6 +14,20 @@ public :: &
   & get_group, inquire_subgroups, inquire_group, operator(.exists.)
 private
 
+public :: rename_attribute, rename_variable, rename_group
+
+interface rename_attribute
+  module procedure :: rename_att_nc_var, rename_att_nc_grp
+end interface rename_attribute
+
+interface rename_group
+  module procedure :: rename_grp_nc_grp, rename_grp_nc_par
+end interface rename_group
+
+interface rename_variable
+  module procedure :: rename_var_nc_var, rename_var_nc_grp
+end interface rename_variable
+
 integer, parameter :: MAX_CHAR_LEN = 1024
 !! Fixed scratch length for operation-context diagnostics.
 
@@ -46,6 +60,61 @@ interface initialize
 end interface initialize
 
 interface
+  module subroutine rename_grp_nc_grp(parent, grp, new_name, update_file, err)
+    !! Rename the supplied child, optionally updating its name in an open file.
+    class(group_type), intent(in) :: parent
+    class(group_type), intent(inout) :: grp
+    character(len=*), intent(in) :: new_name
+    logical, intent(in), optional :: update_file
+    type(error_type), intent(out), optional :: err
+  end subroutine rename_grp_nc_grp
+
+  module subroutine rename_grp_nc_par(parent, old_name, new_name, update_file, err)
+    !! Rename a direct child by name; update a matching cached child if present.
+    class(group_type), intent(inout) :: parent
+    character(len=*), intent(in) :: old_name, new_name
+    logical, intent(in) :: update_file
+    type(error_type), intent(out), optional :: err
+  end subroutine rename_grp_nc_par
+
+  module subroutine rename_var_nc_var(grp, var, new_name, update_file, err)
+    !! Rename the supplied variable, optionally updating its name in the file.
+    !! grp%vars and other copies are not synchronized; the old name selects the target.
+    class(group_type), intent(in) :: grp
+    type(variable_type), intent(inout) :: var
+    character(len=*), intent(in) :: new_name
+    logical, intent(in), optional :: update_file
+    type(error_type), intent(out), optional :: err
+  end subroutine rename_var_nc_var
+
+  module subroutine rename_var_nc_grp(grp, old_name, new_name, update_file, err)
+    !! Rename a file variable and its matching grp%vars entry, if loaded.
+    !! update_file is required to distinguish this from the model-only overload.
+    class(group_type), intent(inout) :: grp
+    character(len=*), intent(in) :: old_name, new_name
+    logical, intent(in) :: update_file
+    type(error_type), intent(out), optional :: err
+  end subroutine rename_var_nc_grp
+
+  module subroutine rename_att_nc_var(grp, var, old_name, new_name, update_file, err)
+    !! Rename a variable attribute; optionally update the file and supplied cache.
+    !! Other variable copies, including grp%vars, are not synchronized.
+    class(group_type), intent(in) :: grp
+    type(variable_type), intent(inout) :: var
+    character(len=*), intent(in) :: old_name, new_name
+    logical, intent(in), optional :: update_file
+    type(error_type), intent(out), optional :: err
+  end subroutine rename_att_nc_var
+
+  module subroutine rename_att_nc_grp(grp, old_name, new_name, update_file, err)
+    !! Rename a group/global attribute in the file and any matching cached entry.
+    !! update_file is required to distinguish this from the model-only overload.
+    class(group_type), intent(inout) :: grp
+    character(len=*), intent(in) :: old_name, new_name
+    logical, intent(in) :: update_file
+    type(error_type), intent(out), optional :: err
+  end subroutine rename_att_nc_grp
+
   module function get_group(parent, name, err) result(group)
     !! Return a direct child group by name.
     class(group_type), intent(in) :: parent
@@ -215,7 +284,7 @@ interface
   end function inq_dims_var
 
 
-  logical impure module function handle_err(err) result(has_failed)
+  pure logical module function handle_err(err) result(has_failed)
     !! submodule_utility.f90
     !! Apply the library's fail-fast policy to a completed error result.
     type(error_type), intent(in) :: err

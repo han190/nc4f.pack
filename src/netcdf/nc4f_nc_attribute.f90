@@ -2,6 +2,101 @@ submodule(nc4f_nc) nc4f_nc_attribute
 implicit none (type, external)
 contains
 
+module subroutine rename_att_nc_var(grp, var, old_name, new_name, update_file, err)
+  class(group_type), intent(in) :: grp
+  type(variable_type), intent(inout) :: var
+  character(len=*), intent(in) :: old_name, new_name
+  logical, intent(in), optional :: update_file
+  type(error_type), intent(out), optional :: err
+  type(error_type) :: op_err
+  type(variable_type) :: name
+  integer(c_int) :: stat, varid
+  logical :: write_file
+
+  write_file = .false.
+  if (present(update_file)) write_file = update_file
+  if (.not. write_file) then
+    call rename_attribute(var, old_name, new_name, op_err)
+  else if (.not. allocated(var%name)) then
+    op_err = error_type(NC_EINVAL, "[rename_attribute] Variable must have a name.")
+  else
+    ! Validate before crossing the C boundary, including embedded NULs/paths.
+    call rename_variable(name, var%name, op_err)
+    if (.not. has_err(op_err)) then
+      stat = nc_inq_varid(grp%id, f2cstr(name%name), varid)
+      op_err = netcdf_err(stat, "[rename_attribute] Resolve variable: "//name%name)
+      if (.not. has_err(op_err)) then
+        call rename_att_nc_(grp%id, varid, var%atts, old_name, new_name, op_err)
+      end if
+    end if
+  end if
+  if (present(err)) then
+    err = op_err
+  else if (handle_err(op_err)) then
+    return
+  end if
+end subroutine rename_att_nc_var
+
+module subroutine rename_att_nc_grp(grp, old_name, new_name, update_file, err)
+  class(group_type), intent(inout) :: grp
+  character(len=*), intent(in) :: old_name, new_name
+  logical, intent(in) :: update_file
+  type(error_type), intent(out), optional :: err
+  type(error_type) :: op_err
+
+  if (update_file) then
+    call rename_att_nc_(grp%id, NC_GLOBAL, grp%atts, old_name, new_name, op_err)
+  else
+    call rename_attribute(grp, old_name, new_name, op_err)
+  end if
+  if (present(err)) then
+    err = op_err
+  else if (handle_err(op_err)) then
+    return
+  end if
+end subroutine rename_att_nc_grp
+
+subroutine rename_att_nc_(ncid, varid, atts, old_name, new_name, err)
+  !! Stage only names: attribute values and borrowed buffers are never copied.
+  !! An unloaded cache remains unloaded. The file is authoritative for existence.
+  integer(c_int), intent(in) :: ncid, varid
+  type(attribute_type), allocatable, intent(inout) :: atts(:)
+  character(len=*), intent(in) :: old_name, new_name
+  type(error_type), intent(out) :: err
+  type(group_type) :: staged
+  integer(c_int) :: stat, attid
+  integer :: i, n, pos
+
+  n = 0
+  if (allocated(atts)) n = size(atts)
+  allocate (staged%atts(n + 1))
+  pos = 0
+  do i = 1, n
+    if (.not. allocated(atts(i)%name)) cycle
+    staged%atts(i)%name = atts(i)%name
+    if (atts(i)%name == trim(old_name)) pos = i
+  end do
+  if (pos == 0) then
+    ! A name-only placeholder lets the model layer check syntax and collisions
+    ! even when the source attribute has not been materialized.
+    staged%atts(n + 1)%name = trim(old_name)
+  end if
+  call rename_attribute(staged, old_name, new_name, err)
+  if (has_err(err)) return
+
+  stat = nc_inq_attid(ncid, varid, f2cstr(old_name), attid)
+  err = netcdf_err(stat, "[rename_attribute] Find attribute: "//trim(old_name))
+  if (has_err(err)) return
+  stat = nc_rename_att(ncid, varid, f2cstr(old_name), f2cstr(new_name))
+  ! NetCDF-4 reports a collision for an existing attribute renamed to itself.
+  ! Preserve other errors (notably read-only access), and verify existence above.
+  if (trim(old_name) == trim(new_name) .and. stat == NC_ENAMEINUSE) stat = NC_NOERR
+  err = netcdf_err(stat, "[rename_attribute] Rename attribute: "// &
+    & trim(old_name)//" -> "//trim(new_name))
+  if (has_err(err)) return
+  if (pos /= 0) call move_alloc(staged%atts(pos)%name, atts(pos)%name)
+end subroutine rename_att_nc_
+
 impure elemental module function get_att_grp(nc, name, err) result(att)
   !! Read a global attribute by name and return it.
   class(group_type), intent(in) :: nc

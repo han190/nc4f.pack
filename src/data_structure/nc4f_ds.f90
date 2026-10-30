@@ -6,7 +6,8 @@ use, intrinsic :: iso_c_binding, only: &
   & c_f_pointer, c_int, c_loc, c_null_ptr, c_ptr
 use, non_intrinsic :: nc4f_c_interface, only: &
   & NC_EBADID, NC_EBADDIM, NC_EBADGRPID, NC_EEDGE, NC_EINVAL, NC_EINVALCOORDS, &
-  & NC_ENOGRP, NC_ENOTATT, NC_ENOTFOUND, NC_ENOTVAR, NC_NOERR, NC_NOWRITE
+  & NC_ENOGRP, NC_ENOTATT, NC_ENOTFOUND, NC_ENOTVAR, NC_NOERR, NC_NOWRITE, &
+  & NC_EBADNAME, NC_EMAXNAME, NC_ENAMEINUSE, NC_MAX_NAME
 implicit none (type, external)
 
 public :: attribute_type, dimension_type, error_type, &
@@ -18,6 +19,7 @@ public :: datarray, dataset, extract, initialize, operator(.att.), &
   & operator(.and.), operator(.dim.), &
   & operator(==), operator(/=), shape, size, sum
 public :: buffer_size, buffer2cptr, validate
+public :: rename_attribute, rename_variable, rename_group, NC_EBADNAME, NC_EMAXNAME, NC_ENAMEINUSE
 private
 
 integer(int32), parameter :: INVALID_INT32 = -2147483647_int32
@@ -133,6 +135,18 @@ include "nc4f_ds_attribute_constructor.inc"
 include "nc4f_ds_variable_constructor.inc"
 include "nc4f_ds_extract.inc"
 
+interface rename_attribute
+  module procedure :: rename_att_att, rename_att_var, rename_att_grp
+end interface rename_attribute
+
+interface rename_group
+  module procedure :: rename_grp_grp, rename_grp_par
+end interface rename_group
+
+interface rename_variable
+  module procedure :: rename_var_var, rename_var_grp
+end interface rename_variable
+
 interface operator(.dim.)
   module procedure :: new_dim_len_int32
   module procedure :: new_dim_len_int64
@@ -193,6 +207,68 @@ interface dataset
 end interface dataset
 
 interface
+  pure module subroutine rename_grp_grp(grp, new_name, err)
+    !! Rename a non-root group in memory, preserving its contents and child aliases.
+    class(group_type), intent(inout) :: grp
+    character(len=*), intent(in) :: new_name
+    type(error_type), intent(out), optional :: err
+  end subroutine rename_grp_grp
+
+  pure module subroutine rename_grp_par(parent, old_name, new_name, err)
+    !! Rename one direct child in parent%grps without accessing a file.
+    class(group_type), intent(inout) :: parent
+    character(len=*), intent(in) :: old_name, new_name
+    type(error_type), intent(out), optional :: err
+  end subroutine rename_grp_par
+
+  pure module subroutine chk_nc_name(name, err, context)
+    !! Shared NetCDF name validation, private to the data-model module/submodules.
+    character(len=*), intent(in) :: name
+    type(error_type), intent(out) :: err
+    character(len=*), intent(in), optional :: context
+  end subroutine chk_nc_name
+
+  pure module subroutine ret_ds_err(op_err, err)
+    !! Apply the optional-error convention for data-model operations.
+    type(error_type), intent(in) :: op_err
+    type(error_type), intent(out), optional :: err
+  end subroutine ret_ds_err
+
+  pure module subroutine rename_var_var(var, new_name, err)
+    !! Rename an independent variable in memory; preserve its metadata and storage.
+    type(variable_type), intent(inout) :: var
+    character(len=*), intent(in) :: new_name
+    type(error_type), intent(out), optional :: err
+  end subroutine rename_var_var
+
+  pure module subroutine rename_var_grp(grp, old_name, new_name, err)
+    !! Rename a direct member of grp%vars in memory, without accessing a file.
+    class(group_type), intent(inout) :: grp
+    character(len=*), intent(in) :: old_name, new_name
+    type(error_type), intent(out), optional :: err
+  end subroutine rename_var_grp
+
+  pure module subroutine rename_att_att(att, new_name, err)
+    !! Rename an independent attribute in memory; no file is accessed.
+    type(attribute_type), intent(inout) :: att
+    character(len=*), intent(in) :: new_name
+    type(error_type), intent(out), optional :: err
+  end subroutine rename_att_att
+
+  pure module subroutine rename_att_var(var, old_name, new_name, err)
+    !! Rename a variable attribute in memory, preserving its value and storage.
+    type(variable_type), intent(inout) :: var
+    character(len=*), intent(in) :: old_name, new_name
+    type(error_type), intent(out), optional :: err
+  end subroutine rename_att_var
+
+  pure module subroutine rename_att_grp(grp, old_name, new_name, err)
+    !! Rename a group/global attribute in memory, without accessing a file.
+    class(group_type), intent(inout) :: grp
+    character(len=*), intent(in) :: old_name, new_name
+    type(error_type), intent(out), optional :: err
+  end subroutine rename_att_grp
+
   elemental module subroutine init_att(att, name, dtype, len)
     !! Initialize a dataset object.
     type(attribute_type), intent(inout) :: att

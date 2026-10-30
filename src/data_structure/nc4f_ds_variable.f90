@@ -1,7 +1,72 @@
 submodule(nc4f_ds) nc4f_ds_variable
-!! Variable construction, inquiry, and equality for the direct v2 data model.
+!! Variable construction, renaming, inquiry, and equality for the direct v2 data model.
 implicit none (type, external)
 contains
+
+pure module subroutine rename_var_var(var, new_name, err)
+  type(variable_type), intent(inout) :: var
+  character(len=*), intent(in) :: new_name
+  type(error_type), intent(out), optional :: err
+  type(error_type) :: op_err
+  character(len=:), allocatable :: name
+
+  call chk_nc_name(new_name, op_err, "[rename_variable]")
+  if (op_err%code == NC_NOERR) then
+    name = trim(new_name)
+    call move_alloc(name, var%name)
+  end if
+  call ret_ds_err(op_err, err)
+end subroutine rename_var_var
+
+pure module subroutine rename_var_grp(grp, old_name, new_name, err)
+  class(group_type), intent(inout) :: grp
+  character(len=*), intent(in) :: old_name, new_name
+  type(error_type), intent(out), optional :: err
+  type(error_type) :: op_err
+
+  call rename_vars_(grp%vars, old_name, new_name, op_err)
+  call ret_ds_err(op_err, err)
+end subroutine rename_var_grp
+
+pure subroutine rename_vars_(vars, old_name, new_name, err)
+  !! Rename one direct member without copying data or following child groups.
+  type(variable_type), allocatable, intent(inout) :: vars(:)
+  character(len=*), intent(in) :: old_name, new_name
+  type(error_type), intent(out) :: err
+  integer :: i, pos, lo
+
+  call chk_nc_name(old_name, err, "[rename_variable]")
+  if (err%code /= NC_NOERR) return
+  call chk_nc_name(new_name, err, "[rename_variable]")
+  if (err%code /= NC_NOERR) return
+  pos = 0
+  lo = 1
+  if (allocated(vars)) then
+    lo = lbound(vars, 1)
+    do i = 1, size(vars)
+      if (.not. allocated(vars(lo + i - 1)%name)) cycle
+      if (vars(lo + i - 1)%name /= trim(old_name)) cycle
+      if (pos /= 0) then
+        err = error_type(NC_EINVAL, "[rename_variable] Ambiguous duplicate variable: "//trim(old_name))
+        return
+      end if
+      pos = i
+    end do
+  end if
+  if (pos == 0) then
+    err = error_type(NC_ENOTVAR, "[rename_variable] Variable not found: "//trim(old_name))
+    return
+  end if
+  do i = 1, size(vars)
+    if (i == pos .or. .not. allocated(vars(lo + i - 1)%name)) cycle
+    if (vars(lo + i - 1)%name == trim(new_name)) then
+      err = error_type(NC_ENAMEINUSE, "[rename_variable] Variable name already in use: "//trim(new_name))
+      return
+    end if
+  end do
+  if (trim(old_name) == trim(new_name)) return
+  call rename_var_var(vars(lo + pos - 1), new_name, err)
+end subroutine rename_vars_
 
 module subroutine init_var_mold(var, name, mold, atts, deep)
   !! Initialize a variable from a name and existing shape/type metadata.

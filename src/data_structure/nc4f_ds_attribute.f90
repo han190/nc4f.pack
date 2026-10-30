@@ -1,10 +1,87 @@
 submodule(nc4f_ds) nc4f_ds_attribute
-!! Attribute construction and equality for the direct v2 data model.
+!! Attribute construction, renaming, and equality for the direct v2 data model.
 implicit none (type, external)
 contains
 
+pure module subroutine rename_att_att(att, new_name, err)
+  type(attribute_type), intent(inout) :: att
+  character(len=*), intent(in) :: new_name
+  type(error_type), intent(out), optional :: err
+  type(error_type) :: op_err
+  character(len=:), allocatable :: name
+
+  call chk_nc_name(new_name, op_err, "[rename_attribute]")
+  if (op_err%code == NC_NOERR) then
+    name = trim(new_name)
+    call move_alloc(name, att%name)
+  end if
+  call ret_ds_err(op_err, err)
+end subroutine rename_att_att
+
+pure module subroutine rename_att_var(var, old_name, new_name, err)
+  type(variable_type), intent(inout) :: var
+  character(len=*), intent(in) :: old_name, new_name
+  type(error_type), intent(out), optional :: err
+  type(error_type) :: op_err
+
+  call rename_atts_(var%atts, old_name, new_name, op_err)
+  call ret_ds_err(op_err, err)
+end subroutine rename_att_var
+
+pure module subroutine rename_att_grp(grp, old_name, new_name, err)
+  class(group_type), intent(inout) :: grp
+  character(len=*), intent(in) :: old_name, new_name
+  type(error_type), intent(out), optional :: err
+  type(error_type) :: op_err
+
+  call rename_atts_(grp%atts, old_name, new_name, op_err)
+  call ret_ds_err(op_err, err)
+end subroutine rename_att_grp
+
+pure subroutine rename_atts_(atts, old_name, new_name, err)
+  !! Rename one array entry without copying or changing attribute storage.
+  type(attribute_type), allocatable, intent(inout) :: atts(:)
+  character(len=*), intent(in) :: old_name, new_name
+  type(error_type), intent(out) :: err
+  integer :: i, pos
+
+  call chk_nc_name(old_name, err, "[rename_attribute]")
+  if (err%code /= NC_NOERR) return
+  call chk_nc_name(new_name, err, "[rename_attribute]")
+  if (err%code /= NC_NOERR) return
+  pos = 0
+  if (allocated(atts)) then
+    do i = 1, size(atts)
+      if (.not. allocated(atts(i)%name)) cycle
+      if (atts(i)%name /= trim(old_name)) cycle
+      if (pos /= 0) then
+        err = error_type(NC_EINVAL, "[rename_attribute]"// &
+          & " Ambiguous duplicate attribute: "//trim(old_name))
+        return
+      end if
+      pos = i
+    end do
+  end if
+  if (pos == 0) then
+    err = error_type(NC_ENOTATT, "[rename_attribute]"// &
+      & " Attribute not found: "//trim(old_name))
+    return
+  end if
+  do i = 1, size(atts)
+    if (i == pos .or. .not. allocated(atts(i)%name)) cycle
+    if (atts(i)%name == trim(new_name)) then
+      err = error_type(NC_ENAMEINUSE, "[rename_attribute]"// &
+        & " Attribute name already in use: "//trim(new_name))
+      return
+    end if
+  end do
+  if (trim(old_name) == trim(new_name)) return
+  call rename_att_att(atts(pos), new_name, err)
+end subroutine rename_atts_
+
 module subroutine init_att_mold(att, name, mold, deep)
   !! Initialize an attribute from a name and existing value metadata.
+  !! Must remain impure: shallow construction exposes the intent(in) mold's storage.
   type(attribute_type), intent(inout) :: att
   !! Attribute to process.
   character(len=*), intent(in) :: name

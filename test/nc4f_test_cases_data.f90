@@ -802,7 +802,7 @@ function extensive_variables() result(vars)
     & ["description".att."rank-seven variable"])]
 end function extensive_variables
 
-function extensive_attributes() result(atts)
+pure function extensive_attributes() result(atts)
   !! Compute `extensive_attributes`.
   type(attribute_type), allocatable :: atts(:)
   !! Retrieved attributes.

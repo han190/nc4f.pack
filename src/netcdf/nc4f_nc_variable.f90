@@ -2,6 +2,103 @@ submodule(nc4f_nc) nc4f_nc_variable
 implicit none (type, external)
 contains
 
+module subroutine rename_var_nc_var(grp, var, new_name, update_file, err)
+  class(group_type), intent(in) :: grp
+  type(variable_type), intent(inout) :: var
+  character(len=*), intent(in) :: new_name
+  logical, intent(in), optional :: update_file
+  type(error_type), intent(out), optional :: err
+  type(error_type) :: op_err
+  type(variable_type) :: staged
+  logical :: write_file
+
+  write_file = .false.
+  if (present(update_file)) write_file = update_file
+  if (.not. write_file) then
+    call rename_variable(var, new_name, op_err)
+  else if (.not. allocated(var%name)) then
+    op_err = error_type(NC_EINVAL, "[rename_variable] Variable must have a name.")
+  else
+    ! Prepare only the new name; never copy owned data or borrowed pointers.
+    call rename_variable(staged, new_name, op_err)
+    if (.not. has_err(op_err)) then
+      call rename_var_nc_(grp%id, var%name, staged%name, op_err)
+      if (.not. has_err(op_err)) call move_alloc(staged%name, var%name)
+    end if
+  end if
+  if (present(err)) then
+    err = op_err
+  else if (handle_err(op_err)) then
+    return
+  end if
+end subroutine rename_var_nc_var
+
+module subroutine rename_var_nc_grp(grp, old_name, new_name, update_file, err)
+  class(group_type), intent(inout) :: grp
+  character(len=*), intent(in) :: old_name, new_name
+  logical, intent(in) :: update_file
+  type(error_type), intent(out), optional :: err
+  type(error_type) :: op_err
+  type(group_type) :: staged
+  integer :: i, n, pos, lo
+
+  if (.not. update_file) then
+    call rename_variable(grp, old_name, new_name, op_err)
+  else
+    ! Stage names alone so the pure model layer checks syntax and collisions.
+    ! An unloaded/partial cache must not require or invent a full variable.
+    n = 0
+    lo = 1
+    if (allocated(grp%vars)) then
+      n = size(grp%vars)
+      lo = lbound(grp%vars, 1)
+    end if
+    allocate (staged%vars(n + 1))
+    pos = 0
+    do i = 1, n
+      if (.not. allocated(grp%vars(lo + i - 1)%name)) cycle
+      staged%vars(i)%name = grp%vars(lo + i - 1)%name
+      if (staged%vars(i)%name == trim(old_name)) pos = i
+    end do
+    if (pos == 0) staged%vars(n + 1)%name = trim(old_name)
+    call rename_variable(staged, old_name, new_name, op_err)
+    if (.not. has_err(op_err)) then
+      call rename_var_nc_(grp%id, old_name, new_name, op_err)
+      if (.not. has_err(op_err) .and. pos /= 0) then
+        call move_alloc(staged%vars(pos)%name, grp%vars(lo + pos - 1)%name)
+      end if
+    end if
+  end if
+  if (present(err)) then
+    err = op_err
+  else if (handle_err(op_err)) then
+    return
+  end if
+end subroutine rename_var_nc_grp
+
+subroutine rename_var_nc_(ncid, old_name, new_name, err)
+  !! Resolve by name in the supplied group; stored variable IDs are not trusted.
+  integer(c_int), intent(in) :: ncid
+  character(len=*), intent(in) :: old_name, new_name
+  type(error_type), intent(out) :: err
+  type(variable_type) :: name
+  integer(c_int) :: stat, varid
+
+  ! The data-model generic applies the private shared checker without C calls.
+  call rename_variable(name, old_name, err)
+  if (has_err(err)) return
+  call rename_variable(name, new_name, err)
+  if (has_err(err)) return
+  stat = nc_inq_varid(ncid, f2cstr(old_name), varid)
+  err = netcdf_err(stat, "[rename_variable] Find variable: "//trim(old_name))
+  if (has_err(err)) return
+  stat = nc_rename_var(ncid, varid, f2cstr(new_name))
+  ! Preserve access errors, but accept an existing variable renamed to itself.
+  if (trim(old_name) == trim(new_name) .and. stat == NC_ENAMEINUSE) stat = NC_NOERR
+  err = netcdf_err(stat, "[rename_variable] Rename variable: "// &
+    & trim(old_name)//" -> "//trim(new_name))
+end subroutine rename_var_nc_
+
 module function get_variable(nc, name, start, count, stride, err) result(var)
   !! Read a variable's data from a netCDF dataset into a `variable_type`.
   class(group_type), intent(in) :: nc

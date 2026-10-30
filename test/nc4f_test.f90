@@ -16,6 +16,18 @@ case ("--ownership-invalid-noncontiguous")
   call invalid_noncontiguous_shallow_constructor()
 case ("--ownership-invalid-character")
   call invalid_character_shallow_constructor()
+case ("--rename-invalid-model")
+  call invalid_model_rename()
+case ("--rename-invalid-file")
+  call invalid_file_rename()
+case ("--rename-var-invalid-model")
+  call invalid_model_var_rename()
+case ("--rename-var-invalid-file")
+  call invalid_file_var_rename()
+case ("--rename-grp-invalid-model")
+  call invalid_model_grp_rename()
+case ("--rename-grp-invalid-file")
+  call invalid_file_grp_rename()
 case default
   tests = [&
     & test_type("c_bindings_storage", c_bindings_storage), &
@@ -31,6 +43,15 @@ case default
     & test_type("hyperslab_reads", hyperslab_reads), &
     & test_type("creation_policy", creation_policy), &
     & test_type("error_handling", error_handling), &
+    & test_type("rename_att_model", rename_att_model), &
+    & test_type("rename_att_file", rename_att_file), &
+    & test_type("rename_att_errors", rename_att_errors), &
+    & test_type("rename_var_model", rename_var_model), &
+    & test_type("rename_var_file", rename_var_file), &
+    & test_type("rename_var_errors", rename_var_errors), &
+    & test_type("rename_grp_model", rename_grp_model), &
+    & test_type("rename_grp_file", rename_grp_file), &
+    & test_type("rename_grp_errors", rename_grp_errors), &
     & test_type("unlimited_wr", unlimited_wr), &
     & test_type("unlimited_dims", unlimited_dims), &
     & test_type("sum_vars", sum_vars_test), &
@@ -56,6 +77,47 @@ case default
 end select
 
 contains
+
+subroutine invalid_model_grp_rename()
+  type(group_type) :: grp
+  call rename_group(grp, "bad/name")
+  stop 0
+end subroutine invalid_model_grp_rename
+
+subroutine invalid_file_grp_rename()
+  type(group_type) :: parent
+  call rename_group(parent, "old", "new", update_file=.true.)
+  stop 0
+end subroutine invalid_file_grp_rename
+
+subroutine invalid_model_var_rename()
+  type(variable_type) :: var
+
+  call rename_variable(var, "bad/name")
+  stop 0
+end subroutine invalid_model_var_rename
+
+subroutine invalid_file_var_rename()
+  type(group_type) :: grp
+
+  call rename_variable(grp, "old", "new", update_file=.true.)
+  stop 0
+end subroutine invalid_file_var_rename
+
+subroutine invalid_model_rename()
+  type(attribute_type) :: att
+
+  att = "old".att.1
+  call rename_attribute(att, "bad/name")
+  stop 0 ! The parent test requires the library to fail before this point.
+end subroutine invalid_model_rename
+
+subroutine invalid_file_rename()
+  type(group_type) :: grp
+
+  call rename_attribute(grp, "old", "new", update_file=.true.)
+  stop 0
+end subroutine invalid_file_rename
 
 subroutine invalid_noncontiguous_shallow_constructor()
   !! Attempt shallow construction from a noncontiguous array section.
