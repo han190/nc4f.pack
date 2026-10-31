@@ -629,28 +629,19 @@ Constants](exposed-nc-constants.md) for constants used with `error_type`.
 |:--|
 | <span class="ind3">Generic subroutine.</span> |
 
-The first three forms change only the supplied in-memory object. They do not
-access a file, even if the object contains a valid NetCDF ID. Attribute values,
-types, IDs, array order, owned buffers, and borrowed pointers are preserved.
-These three overloads are pure and can be called from a pure procedure.
-An independent attribute can be named without belonging to a variable or group;
-there is no surrounding collection in which to check name collisions.
+| Description |
+|:--|
+| <span class="ind3">The first three forms are pure, in-memory attribute renames that preserve all other data, while the last two are impure and optionally update a file via UPDATE_FILE, which defaults to .false. for the variable form and is required for the group form; GRP also accepts netcdf_type, and standalone attributes have no collection for collision checks.</span> |
 
-The last two forms can also update an existing file. `UPDATE_FILE` defaults to
-`.false.` for the variable form. It is required in the file-capable group form
-to distinguish it from the model-only group form. Passing `.false.` delegates
-to model-only renaming. A `netcdf_type` is accepted wherever `GRP` is used.
-These two overloads remain impure even when `UPDATE_FILE=.false.`.
-
-| Argument | Type and intent | Meaning |
-|:--|:--|:--|
-| `ATT` | `type(attribute_type), intent(inout)` | Independent attribute to rename. |
-| `VAR` | `type(variable_type), intent(inout)` | Variable whose attribute is renamed. |
-| `GRP` | `class(group_type)` | Group/global attribute owner (`intent(inout)`), or file context for `VAR` (`intent(in)`). |
-| `OLD_NAME` | `character(len=*), intent(in)` | Existing attribute name. |
-| `NEW_NAME` | `character(len=*), intent(in)` | Replacement attribute name. |
-| `UPDATE_FILE` | `logical, intent(in)` | Explicitly request a file update when true. |
-| `ERR` | `type(error_type), optional, intent(out)` | Receives the error; failure stops execution when omitted. |
+| Arguments |
+|:--|
+| <span class="grid"><span>`ATT`</span><span>`type(attribute_type), INTENT(inout)`</span></span><br><span class="ind6">Independent attribute to rename.</span> |
+| <span class="grid"><span>`VAR`</span><span>`type(variable_type), INTENT(inout)`</span></span><br><span class="ind6">Variable whose attribute is renamed.</span> |
+| <span class="grid"><span>`GRP`</span><span>`class(group_type)`</span></span><br><span class="ind6">Group/global attribute owner (`INTENT(inout)`), or file context for `VAR` (`INTENT(in)`).</span> |
+| <span class="grid"><span>`OLD_NAME`</span><span>`character(len=*), INTENT(in)`</span></span><br><span class="ind6">Existing attribute name.</span> |
+| <span class="grid"><span>`NEW_NAME`</span><span>`character(len=*), INTENT(in)`</span></span><br><span class="ind6">Replacement attribute name.</span> |
+| <span class="grid"><span>`UPDATE_FILE`</span><span>`logical, INTENT(in)`</span></span><br><span class="ind6">Explicitly request a file update when true.</span> |
+| <span class="grid"><span>`ERR`</span><span>`type(error_type), OPTIONAL, INTENT(out)`</span></span><br><span class="ind6">Receives the error; failure stops execution when omitted.</span> |
 
 :::{list-table}
 :class: example-table
@@ -680,39 +671,6 @@ These two overloads remain impure even when `UPDATE_FILE=.false.`.
     ```
 :::
 
-### File updates and cached metadata
-
-With `UPDATE_FILE=.true.`, the group must identify an open, writable dataset or
-subgroup. A variable is resolved by `VAR%name` within that group, rather than by
-its possibly stale stored ID. The supplied group and variable name identify
-the target; the routine does not infer which file originally produced `VAR`.
-
-The file is authoritative for attribute existence. Attribute metadata need not
-be loaded: an unallocated or partial cache stays unallocated or partial. When
-the old attribute is cached in the supplied object, its name is updated only
-after the file operation succeeds. A conflicting cached name is rejected before
-the file is changed. Other object copies, including a separate `GRP%vars` entry,
-are not synchronized. Re-inquire them when fresh metadata is needed.
-
-Errors never silently fall back to model-only editing and leave the supplied
-in-memory metadata unchanged. File attribute order may differ after reopening;
-use names to identify attributes rather than assuming their positions persist.
-
-### Names and errors
-
-Names are case-sensitive. Trailing Fortran blank padding is removed, but leading
-blanks are not removed. Names must be nonempty, at most `NC_MAX_NAME` bytes, start
-with a letter, digit, underscore, or a UTF-8 multibyte character, and contain no
-slash, ASCII control characters, or malformed UTF-8. Supply Unicode names in
-NFC-normalized form; model operations do not normalize Unicode.
-
-A missing model attribute, including an unallocated attribute array, returns
-`NC_ENOTATT`. A conflicting destination returns `NC_ENAMEINUSE`; invalid syntax
-returns `NC_EBADNAME`; excessive length returns `NC_EMAXNAME`. Duplicate source
-names in a model return `NC_EINVAL` because the target is ambiguous. File errors
-retain the underlying NetCDF status. Renaming an existing attribute to itself
-is a no-op; a file-backed no-op still checks file access and source existence.
-
 ## `DELETE_ATTRIBUTE` -- Delete an Attribute
 
 | Synopsis |
@@ -726,24 +684,17 @@ is a no-op; a file-backed no-op still checks file access and source existence.
 |:--|
 | <span class="ind3">Generic subroutine.</span> |
 
-The first two forms are pure and remove an attribute only from the supplied model.
-They do not access a file, even if the object contains a valid NetCDF ID. There
-is no overload for resetting a standalone `attribute_type`.
+| Description |
+|:--|
+| <span class="ind3">Remove a variable or group attribute using pure model-only forms or impure file-capable forms controlled by `UPDATE_FILE`, which defaults to `.false.` for the variable form and is required for the group form; `GRP` also accepts `netcdf_type`, and standalone attributes cannot be reset.</span> |
 
-The last two forms are impure and can also update an open file. `UPDATE_FILE`
-defaults to `.false.` when a variable object is supplied. It is required for the
-file-capable group form to distinguish it from the model-only group form. Passing
-`.false.` delegates to model-only deletion and never accesses a file, even when
-the supplied group ID is invalid. A `netcdf_type` is accepted wherever `GRP` is
-used, so group attributes include root (global) attributes.
-
-| Argument | Type and intent | Meaning |
-|:--|:--|:--|
-| `VAR` | `type(variable_type), intent(inout)` | Variable whose attribute is deleted, or the variable context for `GRP`. |
-| `GRP` | `class(group_type)` | Group/global attribute owner (`intent(inout)`), or file context for `VAR` (`intent(in)`). |
-| `NAME` | `character(len=*), intent(in)` | Name of the attribute to delete. |
-| `UPDATE_FILE` | `logical, intent(in)` | Explicitly request a file update when true. |
-| `ERR` | `type(error_type), optional, intent(out)` | Receives the error; failure stops execution when omitted. |
+| Arguments |
+|:--|
+| <span class="grid"><span>`VAR`</span><span>`type(variable_type), INTENT(inout)`</span></span><br><span class="ind6">Variable whose attribute is deleted, or the variable context for `GRP`.</span> |
+| <span class="grid"><span>`GRP`</span><span>`class(group_type)`</span></span><br><span class="ind6">Group/global attribute owner (`INTENT(inout)`), or file context for `VAR` (`INTENT(in)`).</span> |
+| <span class="grid"><span>`NAME`</span><span>`character(len=*), INTENT(in)`</span></span><br><span class="ind6">Name of the attribute to delete.</span> |
+| <span class="grid"><span>`UPDATE_FILE`</span><span>`logical, INTENT(in)`</span></span><br><span class="ind6">Explicitly request a file update when true.</span> |
+| <span class="grid"><span>`ERR`</span><span>`type(error_type), OPTIONAL, INTENT(out)`</span></span><br><span class="ind6">Receives the error; failure stops execution when omitted.</span> |
 
 :::{list-table}
 :class: example-table
@@ -772,41 +723,6 @@ used, so group attributes include root (global) attributes.
     ```
 :::
 
-### Model changes
-
-Deletion immediately reduces `%atts`, preserves survivor order, and leaves an
-allocated zero-length array after removing the last entry. Surviving owned
-buffers are moved without copying their values; borrowed pointers retain their
-associations. Removing an owned attribute releases its buffer, invalidating any
-external pointers into that deleted buffer. Removing a borrowed attribute does
-not free the caller's storage. Array positions may change; do not retain pointers
-to attribute entries across deletion. Model-only removal preserves survivor IDs.
-
-### File updates and cached metadata
-
-With `UPDATE_FILE=.true.`, the group must identify an open, writable dataset or
-subgroup. A variable is resolved by `VAR%name` within that group, rather than by
-its possibly stale stored ID. The file determines whether the attribute exists.
-The routine prepares the reduced cache before calling `nc_del_att`, then commits
-it only after success. An unloaded cache remains unallocated, and a partial cache
-is not populated. Only the supplied cache is updated; independent copies,
-including `grp%vars`, are not synchronized. Ordinary aliases to the same supplied
-object observe its changes.
-
-NetCDF renumbers attributes after deletion, so successful file deletion resets
-all surviving cached attribute IDs to their default invalid value, including
-when the removed attribute was absent from the cache. Names remain usable for
-subsequent operations; these routines do not refresh numeric attribute IDs.
-Deleting metadata does not rewrite the variable's stored data values.
-
-### Names and errors
-
-Names are case-sensitive and use the shared name checker; trailing Fortran blank
-padding is ignored. A missing attribute returns `NC_ENOTATT`, and multiple cached
-entries matching the requested name return `NC_EINVAL`. C errors, such as
-read-only access or a closed group, are propagated without changing the supplied
-cache. Classic-format support is not added by this operation.
-
 ## `RENAME_DIMENSION` -- Rename a Dimension
 
 | Synopsis |
@@ -821,29 +737,19 @@ cache. Classic-format support is not added by this operation.
 |:--|
 | <span class="ind3">Generic subroutine.</span> |
 
-The first three forms are pure model operations. The standalone form changes
-only `DIM%name`. The variable form changes every matching entry in `VAR%dims`,
-including repeated axes such as `matrix(x, x)`. The group form updates a local
-`GRP%dims` definition and all matching references in its direct `GRP%vars`.
-If `GRP%dims` is unallocated, direct variable dimensions supply implicit
-definitions; the operation does not allocate a group dimension collection. An
-allocated group dimension collection must contain the requested definition.
-A `netcdf_type` is accepted wherever `GRP` is used.
+| Description |
+|:--|
+| <span class="ind3">Rename a standalone dimension, matching variable dimensions, or a group's local dimension and direct variable references using pure model-only forms or impure file-capable forms controlled by `UPDATE_FILE`, which defaults to `.false.` for the dimension-object form and is required for the group/name form; `GRP` also accepts `netcdf_type`.</span> |
 
-The last two forms are impure and can also update an open file. `UPDATE_FILE`
-defaults to `.false.` when a dimension object is supplied. It is required for the
-file-capable group/name form to distinguish it from the model-only overload.
-Passing `.false.` delegates to model-only renaming and never accesses a file.
-
-| Argument | Type and intent | Meaning |
-|:--|:--|:--|
-| `DIM` | `type(dimension_type), intent(inout)` | Dimension whose name is changed, or the dimension context for `GRP`. |
-| `VAR` | `type(variable_type), intent(inout)` | Variable whose matching dimensions are renamed. |
-| `GRP` | `class(group_type)` | Dimension owner (`intent(inout)`), or file context for `DIM` (`intent(in)`). |
-| `OLD_NAME` | `character(len=*), intent(in)` | Existing dimension name. |
-| `NEW_NAME` | `character(len=*), intent(in)` | Replacement dimension name. |
-| `UPDATE_FILE` | `logical, intent(in)` | Explicitly request a file update when true. |
-| `ERR` | `type(error_type), optional, intent(out)` | Receives the error; failure stops execution when omitted. |
+| Arguments |
+|:--|
+| <span class="grid"><span>`DIM`</span><span>`type(dimension_type), INTENT(inout)`</span></span><br><span class="ind6">Dimension whose name is changed, or the dimension context for `GRP`.</span> |
+| <span class="grid"><span>`VAR`</span><span>`type(variable_type), INTENT(inout)`</span></span><br><span class="ind6">Variable whose matching dimensions are renamed.</span> |
+| <span class="grid"><span>`GRP`</span><span>`class(group_type)`</span></span><br><span class="ind6">Dimension owner (`INTENT(inout)`), or file context for `DIM` (`INTENT(in)`).</span> |
+| <span class="grid"><span>`OLD_NAME`</span><span>`character(len=*), INTENT(in)`</span></span><br><span class="ind6">Existing dimension name.</span> |
+| <span class="grid"><span>`NEW_NAME`</span><span>`character(len=*), INTENT(in)`</span></span><br><span class="ind6">Replacement dimension name.</span> |
+| <span class="grid"><span>`UPDATE_FILE`</span><span>`logical, INTENT(in)`</span></span><br><span class="ind6">Explicitly request a file update when true.</span> |
+| <span class="grid"><span>`ERR`</span><span>`type(error_type), OPTIONAL, INTENT(out)`</span></span><br><span class="ind6">Receives the error; failure stops execution when omitted.</span> |
 
 :::{list-table}
 :class: example-table
@@ -871,48 +777,6 @@ Passing `.false.` delegates to model-only renaming and never accesses a file.
     ```
 :::
 
-### Model changes
-
-All forms preserve IDs, lengths, unlimited status, dimension order, variable
-names, attributes, and owned or borrowed data storage. No coordinate variable is
-automatically renamed, and textual attribute references are not rewritten. To
-rename a coordinate variable too, explicitly call `rename_variable` separately.
-
-### File updates and cached metadata
-
-With `UPDATE_FILE=.true.`, the group must be open for writing and must **define**
-the dimension locally. File targets are resolved by the old name using local
-dimension inquiries, never by a cached ID. An inherited dimension is rejected
-with `NC_EBADDIM`; pass its defining group instead. Same-name file requests still
-check existence and write permission.
-
-The file is authoritative for existence. Unloaded caches remain unloaded, and
-partial caches are not populated. The group overload synchronizes only existing
-matching entries in the supplied group's dimension collection and direct variable
-dimensions. The dimension-object overload synchronizes only the supplied object.
-Independent snapshots and descendant caches are unchanged. On disk, descendant
-variables still reference the renamed dimension; explicitly re-inquire their
-metadata before relying on cached names or serializing a previously loaded tree.
-Same-named local dimensions in descendants are separate objects and remain intact.
-
-Before changing the model or calling `nc_rename_dim`, the routines validate names
-and affected cached metadata and prepare replacement names. Cache updates are
-committed only after a successful C call. Variable payloads are never copied.
-Matching cached entries must agree in length, unlimited status, and any known
-(nonnegative) IDs; conflicting identities are rejected rather than merged.
-Consistent stale IDs are preserved, but never used to select the file target.
-Model-only references without IDs are identified by name within the documented
-scope; they do not encode an ancestor's identity.
-
-### Names and errors
-
-Names use the shared checker, including UTF-8 validation and removal of trailing
-Fortran padding. A missing dimension returns `NC_EBADDIM`; a distinct destination
-dimension returns `NC_ENAMEINUSE`; duplicate local declarations or inconsistent
-matching metadata return `NC_EINVAL`. Repeated references to the same dimension
-are valid. C errors such as read-only access propagate without cache mutation.
-Classic-format support is not added by this operation.
-
 ## `RENAME_VARIABLE` -- Rename a Variable
 
 | Synopsis |
@@ -926,26 +790,18 @@ Classic-format support is not added by this operation.
 |:--|
 | <span class="ind3">Generic subroutine.</span> |
 
-The first two forms are pure and change only the supplied model. The first
-sets `VAR%name`, including for a previously unnamed variable. The second finds
-`OLD_NAME` among the direct members of `GRP%vars`, checks for name conflicts,
-and changes that entry's name. It does not search child groups. Neither form
-accesses a file, even if the object contains a valid NetCDF ID.
+| Description |
+|:--|
+| <span class="ind3">Rename a standalone variable or a direct member of a group using pure model-only forms or impure file-capable forms controlled by `UPDATE_FILE`, which defaults to `.false.` for the variable-object form and is required for the group/name form; `GRP` also accepts `netcdf_type`.</span> |
 
-The last two forms are impure and can update an open file. `UPDATE_FILE` defaults
-to `.false.` when a variable object is supplied. It is required for the
-file-capable group/name form to distinguish that overload from the pure model
-operation. Passing `.false.` delegates to model-only renaming. `netcdf_type`
-is accepted wherever `GRP` is used.
-
-| Argument | Type and intent | Meaning |
-|:--|:--|:--|
-| `VAR` | `type(variable_type), intent(inout)` | Variable whose name is changed. |
-| `GRP` | `class(group_type)` | Owner of the variable collection (`intent(inout)`), or file context for a supplied `VAR` (`intent(in)`). |
-| `OLD_NAME` | `character(len=*), intent(in)` | Existing direct variable name. The object overload uses `VAR%name` instead. |
-| `NEW_NAME` | `character(len=*), intent(in)` | Replacement variable name. |
-| `UPDATE_FILE` | `logical, intent(in)` | Request a file update when true. |
-| `ERR` | `type(error_type), optional, intent(out)` | Receives the error; failure stops execution when omitted. |
+| Arguments |
+|:--|
+| <span class="grid"><span>`VAR`</span><span>`type(variable_type), INTENT(inout)`</span></span><br><span class="ind6">Variable whose name is changed.</span> |
+| <span class="grid"><span>`GRP`</span><span>`class(group_type)`</span></span><br><span class="ind6">Owner of the variable collection (`INTENT(inout)`), or file context for a supplied `VAR` (`INTENT(in)`).</span> |
+| <span class="grid"><span>`OLD_NAME`</span><span>`character(len=*), INTENT(in)`</span></span><br><span class="ind6">Existing direct variable name. The object overload uses `VAR%name` instead.</span> |
+| <span class="grid"><span>`NEW_NAME`</span><span>`character(len=*), INTENT(in)`</span></span><br><span class="ind6">Replacement variable name.</span> |
+| <span class="grid"><span>`UPDATE_FILE`</span><span>`logical, INTENT(in)`</span></span><br><span class="ind6">Request a file update when true.</span> |
+| <span class="grid"><span>`ERR`</span><span>`type(error_type), OPTIONAL, INTENT(out)`</span></span><br><span class="ind6">Receives the error; failure stops execution when omitted.</span> |
 
 :::{list-table}
 :class: example-table
@@ -974,45 +830,6 @@ is accepted wherever `GRP` is used.
     ```
 :::
 
-### Variable file updates and caches
-
-With `UPDATE_FILE=.true.`, the supplied group must identify an open, writable
-dataset or subgroup. The existing variable is resolved by name within that
-group, rather than by its possibly stale stored ID. The routine does not infer
-the file from which a detached variable originated.
-
-The object overload updates the file and the supplied `VAR` only. Other copies,
-including a separate `GRP%vars` entry, remain snapshots. The group/name overload
-updates the matching `GRP%vars` entry if present. Unloaded and partial caches
-stay unloaded or partial. A conflicting destination or duplicate source in the
-supplied collection is rejected before the file changes.
-
-Only the name is changed. Values, attributes, dimensions, IDs, model array
-order, owned buffers, and borrowed pointers are preserved. Renaming a coordinate
-variable does not rename its dimension, and strings in attributes such as
-`coordinates` are not rewritten. Use variable names rather than assuming that
-file ordering or IDs will persist across reopening.
-
-In-memory changes are committed only after a successful file operation. Errors
-never silently fall back to model-only behavior. Re-inquire other objects when
-fresh metadata is needed.
-
-### Variable names and errors
-
-Attribute, variable, and group renaming share the same name validation: case-sensitive,
-nonempty names of at most `NC_MAX_NAME` bytes, with trailing Fortran blank padding
-removed. Leading blanks, slashes, ASCII control characters, invalid initial
-characters, and malformed UTF-8 are rejected. Supply Unicode names in
-NFC-normalized form; model operations do not normalize Unicode.
-
-Missing variables (including an unallocated model collection) return `NC_ENOTVAR`;
-conflicts return `NC_ENAMEINUSE`. Invalid names return `NC_EBADNAME`, excessive
-length returns `NC_EMAXNAME`, and ambiguous duplicate source names return
-`NC_EINVAL`. A file-backed object call also returns `NC_EINVAL` if `VAR%name` is
-unallocated. File failures preserve the NetCDF status. Renaming an existing
-variable to itself is a no-op; the file-backed form still checks source existence
-and write access.
-
 ## `RENAME_GROUP` -- Rename a Group
 
 | Synopsis |
@@ -1026,99 +843,48 @@ and write access.
 |:--|
 | <span class="ind3">Generic subroutine.</span> |
 
-The first two forms are pure model operations. The first sets `GRP%name`,
-including for a previously unnamed non-root group. The second finds `OLD_NAME`
-among the direct children in `PARENT%grps`, checks for sibling name conflicts,
-and changes that child's name. It does not search descendants. Neither accesses
-a file, even when the supplied object contains a valid NetCDF ID.
+| Description |
+|:--|
+| <span class="ind3">Rename a non-root group or a direct child of a parent using pure model-only forms or impure file-capable forms controlled by `UPDATE_FILE`, which defaults to `.false.` for the supplied-object form and is required for the parent/name form.</span> |
 
-The last two forms are impure and support explicit file updates. `UPDATE_FILE`
-is optional and defaults to `.false.` for the supplied-object form; it is
-required for the parent/name form to distinguish it from the pure overload.
-Passing `.false.` delegates to model-only renaming.
+| Arguments |
+|:--|
+| <span class="grid"><span>`GRP`</span><span>`class(group_type), INTENT(inout)`</span></span><br><span class="ind6">Non-root group whose name is changed.</span> |
+| <span class="grid"><span>`PARENT`</span><span>`class(group_type)`</span></span><br><span class="ind6">Owner of the child collection (`INTENT(inout)`), or file context for a supplied `GRP` (`INTENT(in)`).</span> |
+| <span class="grid"><span>`OLD_NAME`</span><span>`character(len=*), INTENT(in)`</span></span><br><span class="ind6">Existing direct child name; the object overload uses `GRP%name`.</span> |
+| <span class="grid"><span>`NEW_NAME`</span><span>`character(len=*), INTENT(in)`</span></span><br><span class="ind6">Replacement local group name.</span> |
+| <span class="grid"><span>`UPDATE_FILE`</span><span>`logical, INTENT(in)`</span></span><br><span class="ind6">Request a file update when true.</span> |
+| <span class="grid"><span>`ERR`</span><span>`type(error_type), OPTIONAL, INTENT(out)`</span></span><br><span class="ind6">Receives the error; failure stops execution when omitted.</span> |
 
-| Argument | Type and intent | Meaning |
-|:--|:--|:--|
-| `GRP` | `class(group_type), intent(inout)` | Non-root group whose name is changed. |
-| `PARENT` | `class(group_type)` | Owner of the child collection (`intent(inout)`), or file context for a supplied `GRP` (`intent(in)`). |
-| `OLD_NAME` | `character(len=*), intent(in)` | Existing direct child name; the object overload uses `GRP%name`. |
-| `NEW_NAME` | `character(len=*), intent(in)` | Replacement local group name. |
-| `UPDATE_FILE` | `logical, intent(in)` | Request a file update when true. |
-| `ERR` | `type(error_type), optional, intent(out)` | Receives the error; failure stops execution when omitted. |
+:::{list-table}
+:class: example-table
+:header-rows: 1
 
-```fortran
-use, non_intrinsic :: nc4f
-implicit none (type, external)
+*
+  - Example
+*
+  -
+    ```fortran
+    use, non_intrinsic :: nc4f
+    implicit none (type, external)
 
-type(netcdf_type) :: nc
-type(group_type) :: root, child
-type(group_type), target :: children(1)
+    type(netcdf_type) :: nc
+    type(group_type) :: root, child
+    type(group_type), target :: children(1)
 
-children(1) = dataset("observations")
-root%name = "/"
-root%grps => children
-call rename_group(root, "observations", "measurements")
-call to_netcdf("groups.nc", root)
+    children(1) = dataset("observations")
+    root%name = "/"
+    root%grps => children
+    call rename_group(root, "observations", "measurements")
+    call to_netcdf("groups.nc", root)
 
-nc = open_netcdf("groups.nc", "a")
-child = get_group(nc, "measurements")
-call rename_group(nc, child, "samples", update_file=.true.)
-call rename_group(nc, "samples", "observations", update_file=.true.)
-call close_netcdf(nc)
-```
-
-### Group roots, names, and scope
-
-A `netcdf_type` object can be the parent, but cannot itself be renamed. The
-object forms also reject an ordinary `group_type` whose current name is `"/"`.
-These checks use the model's type and name; model-only operations do not inspect
-IDs to infer file identity. Both known-root cases return `NC_EBADGRPID`.
-
-Group renaming uses the same name checker as attribute and variable renaming:
-case-sensitive, nonempty local names of at most `NC_MAX_NAME` bytes, with trailing
-Fortran blank padding removed. Invalid initial characters, leading blanks,
-slashes, ASCII control characters, and malformed UTF-8 are rejected. Supply
-Unicode names in NFC-normalized form. Paths, including `"/"` as `OLD_NAME`, are
-invalid names and return `NC_EBADNAME`.
-
-The standalone overload cannot detect sibling collisions without a parent
-collection. The parent/name overload checks direct siblings only. Equal names
-in different parent groups are independent. Renaming a parent preserves its
-children's local names; it does not rewrite paths stored in attribute strings.
-
-### Group file updates and shared caches
-
-With `UPDATE_FILE=.true.`, `PARENT%id` must identify an open, writable file or
-group. The child is resolved by its old name under that parent; the supplied
-child's cached ID is not used to locate it. The routine stages the new name,
-calls `nc_rename_grp`, and changes the model only after C reports success.
-Failures never fall back to model-only behavior.
-
-The object overload changes the supplied `GRP`. Independent copies retain their
-old names. The parent/name overload changes the matching `PARENT%grps` entry if
-present. Unloaded and partial caches remain unloaded or partial; the operation
-does not create missing cache entries. Duplicate source names or conflicting
-destination names in that collection are rejected before the file changes.
-
-Unlike variable arrays, `PARENT%grps` is pointer-backed. Copies of a parent can
-share the same child array: all aliases to a renamed child observe its new name.
-The same applies when the supplied `GRP` is itself an element of that array.
-An independent copy of the child still has its own name. Renaming preserves IDs,
-child-array bounds and associations, descendants, dimensions, attributes,
-variables, and data storage. Re-inquire independent snapshots when fresh names
-are needed, and do not assume IDs persist across reopening a file.
-
-### Group errors
-
-Missing children, including an unassociated or empty model collection, return
-`NC_ENOGRP`. Sibling name conflicts return `NC_ENAMEINUSE`; ambiguous duplicate
-source names return `NC_EINVAL`. Invalid names return `NC_EBADNAME`, and excessive
-length returns `NC_EMAXNAME`. A file-backed object call with an unallocated name
-returns `NC_EINVAL`, except that a `netcdf_type` is always rejected as a root.
-Other file failures preserve the NetCDF status.
-
-Renaming an existing group to itself succeeds as a no-op. File-backed calls still
-check that the source exists and that the file is writable.
+    nc = open_netcdf("groups.nc", "a")
+    child = get_group(nc, "measurements")
+    call rename_group(nc, child, "samples", update_file=.true.)
+    call rename_group(nc, "samples", "observations", update_file=.true.)
+    call close_netcdf(nc)
+    ```
+:::
 
 ## `SHAPE` -- Get Variable Extents
 
