@@ -13,7 +13,7 @@ an [xarray](https://xarray.dev/)-like programming style in modern Fortran that w
 - Build a [NetCDF data model](https://docs.unidata.ucar.edu/netcdf-c/4.10.0/netcdf_data_model.html) with `DATARRAY` and `DATASET`;
 - Write a data model to a NetCDF file with `TO_NETCDF`;
 - Open a NetCDF file and retrieve variables with `OPEN_NETCDF` and `GET_VARIABLE`;
-- Use [diskless access](reference/functions-and-subroutines.md#open_netcdf--open-a-netcdf-file)
+- Use {ref}`diskless access <open_netcdf--open-a-netcdf-file>`
   with `OPEN_NETCDF(..., diskless=.true.)`: `"r"` reads in RAM, `"a"`/`"an"`
   modify in RAM, and `"w"`/`"wn"` create in RAM; writable modes save by default,
   while `n` discards on close. Equivalent aliases are `"read"`, `"append"`,

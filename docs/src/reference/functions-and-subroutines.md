@@ -599,6 +599,7 @@ if (.exists. err) print '(a)', error_msg(err)
     ```
 :::
 
+(open_netcdf--open-a-netcdf-file)=
 ## `OPEN_NETCDF` -- Open a NetCDF File
 
 | Synopsis |
