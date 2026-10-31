@@ -251,11 +251,13 @@ module subroutine rename_dim_errors(passed)
     do
       read (unit, '(a)', iostat=iostat) line
       if (iostat /= 0) exit
+      ! Runtime prefixes differ: gfortran uses ERROR STOP, Flang adds a colon.
+      if (index(line, "ERROR STOP") == 0) cycle
       if (i == 1) then
-        if (index(line, "ERROR STOP [rename_dimension]") > 0) &
+        if (index(line, "[rename_dimension] Dimension not found: missing") > 0) &
           & found_diagnostic = .true.
       else
-        if (index(line, "ERROR STOP [inq_dims] Dimension count.") > 0) &
+        if (index(line, "[inq_dims] Dimension count.") > 0) &
           & found_diagnostic = .true.
       end if
     end do
