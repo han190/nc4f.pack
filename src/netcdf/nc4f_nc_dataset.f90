@@ -29,7 +29,7 @@ function open_netcdf_(file, mode, err) result(nc)
   !! Error object updated if the operation fails.
   type(netcdf_type) :: nc
   !! Result produced by this operation.
-  character(len=MAX_CHAR_LEN) :: msg, open_mode
+  character(len=MAX_CHAR_LEN) :: open_mode
   integer(c_int) :: stat
 
   err = error_type()
@@ -45,17 +45,15 @@ function open_netcdf_(file, mode, err) result(nc)
 
     nc%file = clip(file)
     stat = nc_open(f2cstr(nc%file), NC_NOWRITE, nc%id)
-    write (msg, "('[open_netcdf]', 1x, a)") nc%file
-    err = netcdf_err(stat, msg)
+    err = netcdf_err(stat, "open_netcdf", nc%file)
     if (has_err(err)) return
     nc%mode = NC_NOWRITE
 
   case ("w", "write", "replace", "overwrite")
 
     nc%file = clip(file)
-    write (msg, "('[open_netcdf]', 1x, a)") nc%file
     stat = nc_create(f2cstr(nc%file), ior(NC_NETCDF4, NC_CLOBBER), nc%id)
-    err = netcdf_err(stat, msg)
+    err = netcdf_err(stat, "open_netcdf", nc%file)
     if (has_err(err)) return
     nc%mode = NC_NETCDF4
 
@@ -63,16 +61,13 @@ function open_netcdf_(file, mode, err) result(nc)
 
     nc%file = clip(file)
     stat = nc_open(f2cstr(nc%file), NC_WRITE, nc%id)
-    write (msg, "('[open_netcdf]', 1x, a)") nc%file
-    err = netcdf_err(stat, msg)
+    err = netcdf_err(stat, "open_netcdf", nc%file)
     if (has_err(err)) return
     nc%mode = NC_WRITE
 
   case default
-    associate (fmt => "('[open_netcdf]', 1x, 'Invalid mode:', 1x, a)")
-      write (msg, fmt) trim(open_mode)
-    end associate
-    err = error_type(NC_EINVAL, clip(msg))
+    err = error_type(NC_EINVAL, "open_netcdf", &
+      & "Invalid mode: "//trim(open_mode))
     return
   end select
 end function open_netcdf_
@@ -99,7 +94,7 @@ subroutine close_netcdf_(nc, err)
 
   err = error_type()
   stat = nc_close(nc%id)
-  err = netcdf_err(stat, "[close_netcdf]")
+  err = netcdf_err(stat, "close_netcdf")
   if (has_err(err)) return
   if (allocated(nc%atts)) deallocate (nc%atts)
   if (allocated(nc%dims)) deallocate (nc%dims)
@@ -133,8 +128,8 @@ module subroutine to_netcdf_var(file, vars, atts, err)
         if (has_err(op_err)) exit
       end do
     rank default
-      op_err = error_type(NC_EINVAL, &
-        & "[to_netcdf_var] Expected a scalar or rank-one variable array.")
+      op_err = error_type(NC_EINVAL, "to_netcdf_var", &
+        & "Expected a scalar or rank-one variable array.")
     end select
 
     if (.not. has_err(op_err) .and. present(atts)) then
@@ -176,8 +171,8 @@ module subroutine to_netcdf_grp(file, grp, atts, err)
     rank (1)
       call serialize_grps(file_root, items, atts, op_err)
     rank default
-      op_err = error_type(NC_EINVAL, &
-        & "[to_netcdf_grp] Expected a scalar or rank-one group array.")
+      op_err = error_type(NC_EINVAL, "to_netcdf_grp", &
+        & "Expected a scalar or rank-one group array.")
     end select
     if (has_err(op_err)) then
       call close_netcdf_(nc, cleanup_err)

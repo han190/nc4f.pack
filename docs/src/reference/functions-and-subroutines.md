@@ -6,6 +6,32 @@ follows the library's fail-fast policy. See [Exposed NC
 Constants](exposed-nc-constants.md) for constants used with `error_type`.
 
 
+## `ERROR_MSG` -- Format an Operation Result
+
+| Synopsis |
+|:--|
+| <span class="ind3">`TEXT = ERROR_MSG(ERR)`</span> |
+
+| Class |
+|:--|
+| <span class="ind3">Pure function.</span> |
+
+| Description |
+|:--|
+| <span class="ind3">Return `[fname] msg` on failure or `No error` on success, without printing. Failure fields must be allocated and nonblank; malformed failures cause `error stop`.</span> |
+
+| Arguments |
+|:--|
+| <span class="grid"><span>`ERR`</span><span>`class(error_type), INTENT(in)`</span></span><br><span class="ind6">Operation result to validate and format.</span> |
+
+| Result |
+|:--|
+| <span class="grid"><span>`TEXT`</span><span>`character(len=:), allocatable`</span></span><br><span class="ind6">Complete diagnostic, with trailing field padding removed.</span> |
+
+```fortran
+if (.exists. err) print '(a)', error_msg(err)
+```
+
 ## `CLOSE_NETCDF` -- Close a NetCDF File
 
 | Synopsis |

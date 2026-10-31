@@ -13,7 +13,7 @@ pure module subroutine rename_dim_dim(dim, new_name, err)
   type(error_type) :: op_err
   character(len=:), allocatable :: name
 
-  call check_nc_name(new_name, op_err, "[rename_dimension]")
+  call check_nc_name(new_name, op_err, "rename_dimension")
   if (op_err%code == NC_NOERR) then
     name = trim(new_name)
     call move_alloc(name, dim%name)
@@ -63,8 +63,8 @@ pure module subroutine rename_dim_grp(grp, old_name, new_name, err)
   type(dimension_type), allocatable :: staged(:)
   integer :: n, i, j, k, matches
 
-  call check_nc_name(old_name, op_err, "[rename_dimension]")
-  if (op_err%code == NC_NOERR) call check_nc_name(new_name, op_err, "[rename_dimension]")
+  call check_nc_name(old_name, op_err, "rename_dimension")
+  if (op_err%code == NC_NOERR) call check_nc_name(new_name, op_err, "rename_dimension")
   if (op_err%code /= NC_NOERR) then
     call return_err(op_err, err)
     return
@@ -78,9 +78,11 @@ pure module subroutine rename_dim_grp(grp, old_name, new_name, err)
       if (grp%dims(i)%name == trim(old_name)) matches = matches + 1
     end do
     if (matches == 0) then
-      op_err = error_type(NC_EBADDIM, "[rename_dimension] Local dimension not found: "//trim(old_name))
+      op_err = error_type(NC_EBADDIM, "rename_dimension", &
+        & "Local dimension not found: "//trim(old_name))
     else if (matches > 1) then
-      op_err = error_type(NC_EINVAL, "[rename_dimension] Duplicate local dimension: "//trim(old_name))
+      op_err = error_type(NC_EINVAL, "rename_dimension", &
+        & "Duplicate local dimension: "//trim(old_name))
     end if
     if (op_err%code /= NC_NOERR) then
       call return_err(op_err, err)
@@ -142,9 +144,9 @@ pure subroutine rename_dims_(dims, old_name, new_name, err)
   integer :: i, first
   integer(c_int) :: known_id
 
-  call check_nc_name(old_name, err, "[rename_dimension]")
+  call check_nc_name(old_name, err, "rename_dimension")
   if (err%code /= NC_NOERR) return
-  call check_nc_name(new_name, err, "[rename_dimension]")
+  call check_nc_name(new_name, err, "rename_dimension")
   if (err%code /= NC_NOERR) return
   first = 0
   known_id = -1
@@ -154,25 +156,29 @@ pure subroutine rename_dims_(dims, old_name, new_name, err)
     if (first == 0) first = i
     if (dims(i)%id >= 0) then
       if (known_id >= 0 .and. known_id /= dims(i)%id) then
-        err = error_type(NC_EINVAL, "[rename_dimension] Conflicting cached dimension identities: "//trim(old_name))
+        err = error_type(NC_EINVAL, "rename_dimension", &
+          & "Conflicting cached dimension identities: "//trim(old_name))
         return
       end if
       known_id = dims(i)%id
     end if
     if (dims(i)%len /= dims(first)%len .or. (dims(i)%is_unlim .neqv. dims(first)%is_unlim)) then
-      err = error_type(NC_EINVAL, "[rename_dimension] Conflicting dimension metadata: "//trim(old_name))
+      err = error_type(NC_EINVAL, "rename_dimension", &
+        & "Conflicting dimension metadata: "//trim(old_name))
       return
     end if
   end do
   if (first == 0) then
-    err = error_type(NC_EBADDIM, "[rename_dimension] Dimension not found: "//trim(old_name))
+    err = error_type(NC_EBADDIM, "rename_dimension", &
+      & "Dimension not found: "//trim(old_name))
     return
   end if
   if (trim(old_name) == trim(new_name)) return
   do i = 1, size(dims)
     if (.not. allocated(dims(i)%name)) cycle
     if (dims(i)%name == trim(new_name)) then
-      err = error_type(NC_ENAMEINUSE, "[rename_dimension] Dimension name already in use: "//trim(new_name))
+      err = error_type(NC_ENAMEINUSE, "rename_dimension", &
+        & "Dimension name already in use: "//trim(new_name))
       return
     end if
   end do

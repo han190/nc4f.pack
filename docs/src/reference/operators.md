@@ -167,7 +167,7 @@
     
     type(error_type) :: error
 
-    if (.exists. error) print *, error%msg
+    if (.exists. error) print *, error_msg(error)
     ```
 :::
 

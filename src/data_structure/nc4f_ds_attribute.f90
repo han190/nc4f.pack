@@ -43,7 +43,7 @@ pure subroutine del_atts_(atts, name, err)
   type(attribute_type), allocatable :: kept(:)
   integer :: i, j, pos, matches, stat
 
-  call check_nc_name(name, err, "[delete_attribute]")
+  call check_nc_name(name, err, "delete_attribute")
   if (err%code /= NC_NOERR) return
   matches = 0
   pos = 0
@@ -56,15 +56,18 @@ pure subroutine del_atts_(atts, name, err)
     end do
   end if
   if (matches == 0) then
-    err = error_type(NC_ENOTATT, "[delete_attribute] Attribute not found: "//trim(name))
+    err = error_type(NC_ENOTATT, "delete_attribute", &
+      & "Attribute not found: "//trim(name))
     return
   else if (matches > 1) then
-    err = error_type(NC_EINVAL, "[delete_attribute] Ambiguous duplicate attribute: "//trim(name))
+    err = error_type(NC_EINVAL, "delete_attribute", &
+      & "Ambiguous duplicate attribute: "//trim(name))
     return
   end if
   allocate (kept(size(atts) - 1), stat=stat)
   if (stat /= 0) then
-    err = error_type(NC_ENOMEM, "[delete_attribute] Cannot allocate reduced attribute collection.")
+    err = error_type(NC_ENOMEM, "delete_attribute", &
+      & "Cannot allocate reduced attribute collection.")
     return
   end if
   j = 0
@@ -92,7 +95,7 @@ pure module subroutine rename_att_att(att, new_name, err)
   type(error_type) :: op_err
   character(len=:), allocatable :: name
 
-  call check_nc_name(new_name, op_err, "[rename_attribute]")
+  call check_nc_name(new_name, op_err, "rename_attribute")
   if (op_err%code == NC_NOERR) then
     name = trim(new_name)
     call move_alloc(name, att%name)
@@ -141,9 +144,9 @@ pure subroutine rename_atts_(atts, old_name, new_name, err)
   !! Receives the operation status and diagnostic message.
   integer :: i, pos
 
-  call check_nc_name(old_name, err, "[rename_attribute]")
+  call check_nc_name(old_name, err, "rename_attribute")
   if (err%code /= NC_NOERR) return
-  call check_nc_name(new_name, err, "[rename_attribute]")
+  call check_nc_name(new_name, err, "rename_attribute")
   if (err%code /= NC_NOERR) return
   pos = 0
   if (allocated(atts)) then
@@ -151,23 +154,23 @@ pure subroutine rename_atts_(atts, old_name, new_name, err)
       if (.not. allocated(atts(i)%name)) cycle
       if (atts(i)%name /= trim(old_name)) cycle
       if (pos /= 0) then
-        err = error_type(NC_EINVAL, "[rename_attribute]"// &
-          & " Ambiguous duplicate attribute: "//trim(old_name))
+        err = error_type(NC_EINVAL, "rename_attribute", &
+          & "Ambiguous duplicate attribute: "//trim(old_name))
         return
       end if
       pos = i
     end do
   end if
   if (pos == 0) then
-    err = error_type(NC_ENOTATT, "[rename_attribute]"// &
-      & " Attribute not found: "//trim(old_name))
+    err = error_type(NC_ENOTATT, "rename_attribute", &
+      & "Attribute not found: "//trim(old_name))
     return
   end if
   do i = 1, size(atts)
     if (i == pos .or. .not. allocated(atts(i)%name)) cycle
     if (atts(i)%name == trim(new_name)) then
-      err = error_type(NC_ENAMEINUSE, "[rename_attribute]"// &
-        & " Attribute name already in use: "//trim(new_name))
+      err = error_type(NC_ENAMEINUSE, "rename_attribute", &
+        & "Attribute name already in use: "//trim(new_name))
       return
     end if
   end do

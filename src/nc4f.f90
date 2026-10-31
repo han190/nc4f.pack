@@ -26,6 +26,6 @@ public :: &
   & inquire_subgroups, inquire_group, &
   & get_attribute, get_variable, get_group, &
   & rename_attribute, rename_variable, rename_group, rename_dimension, &
-  & delete_attribute
+  & delete_attribute, error_msg
 
 end module nc4f

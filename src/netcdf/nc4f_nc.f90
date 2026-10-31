@@ -380,10 +380,12 @@ interface
     !! Allocatable array of `dimension_type` for that variable.
   end function inq_dims_var
 
-  module function netcdf_err(status, context) result(err)
+  module function netcdf_err(status, fname, context) result(err)
     !! Construct an `error_type` from a NetCDF C status and optional context.
     integer(c_int), intent(in) :: status
     !! Status code returned by a NetCDF C call.
+    character(len=*), intent(in) :: fname
+    !! Name of the operation that produced the status.
     character(*), intent(in), optional :: context
     !! Context included in a validation or error message.
     type(error_type) :: err

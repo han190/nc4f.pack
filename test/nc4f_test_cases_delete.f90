@@ -214,7 +214,7 @@ module subroutine delete_att_errors(passed)
     end if
     call execute_command_line(trim(command)//" > "//TEST_RESULTS_DIR// "delete-failfast.log 2>&1", &
       & exitstat=status, cmdstat=cmdstat)
-    call chk_del(cmdstat == 0 .and. status /= 0, "failure without err stops child process")
+    call chk_del(cmdstat == 0 .and. status == 1, "failure without err stops child process")
   end do
   passed = .true.
 end subroutine delete_att_errors

@@ -63,7 +63,32 @@ described by the NetCDF data model.
 | Component |
 |:--|
 | <span class="grid"><span>`CODE`</span><span>`integer(c_int)`</span></span><br><span class="ind6">NetCDF status code; zero indicates success.</span> |
-| <span class="grid"><span>`MSG`</span><span>`character(len=:), allocatable`</span></span><br><span class="ind6">Diagnostic message for a failed operation.</span> |
+| <span class="grid"><span>`FNAME`</span><span>`character(len=:), allocatable`</span></span><br><span class="ind6">Operation name without brackets; required and nonblank on failure.</span> |
+| <span class="grid"><span>`MSG`</span><span>`character(len=:), allocatable`</span></span><br><span class="ind6">Diagnostic text without the operation prefix; required and nonblank on failure.</span> |
+
+Use the checked constructor to create failures:
+
+```fortran
+err = error_type(NC_EINVAL, "rename_dimension", &
+  & "Dimension must have a name.")
+print '(a)', error_msg(err)
+! [rename_dimension] Dimension must have a name.
+```
+
+`error_type()` and a plain `type(error_type) :: err` declaration denote success;
+`fname` and `msg` may be unallocated in that state. `error_msg(err)` returns
+`"No error"` for success. For failures, it returns `"[fname] msg"`, trimming
+trailing padding from each field. Defined formatted output uses the same text.
+
+The constructor, formatter, and shared error-return utility reject failures
+with unallocated or blank fields using `error stop`, even when an optional
+`err` output is supplied. Components remain public, so direct assignments can
+bypass construction checks; malformed results are rejected when formatted or
+passed through the error-return utility.
+
+Migration: replace `error_type(code, "[operation] message")` with
+`error_type(code, "operation", "message")`. Use `error_msg(err)` for a complete
+diagnostic; `err%msg` now contains only the message body.
 
 ## Supported NetCDF Types
 

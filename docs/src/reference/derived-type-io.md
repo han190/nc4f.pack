@@ -12,7 +12,7 @@
 
 | Description |
 |:--|
-| <span class="ind3">Write an `error_type`, `dimension_type`, `attribute_type`, `variable_type`, `group_type`, or `netcdf_type`. List-directed output (`FMT=*`) and the `DT` edit descriptor are supported. Model objects render in an ncdump-like representation; `error_type` renders its NetCDF status and, when available, diagnostic message.</span> |
+| <span class="ind3">Write an `error_type`, `dimension_type`, `attribute_type`, `variable_type`, `group_type`, or `netcdf_type`. List-directed output (`FMT=*`) and the `DT` edit descriptor are supported. Model objects render in an ncdump-like representation; `error_type` uses `error_msg` to render `[fname] msg` on failure or `No error` on success.</span> |
 
 | Arguments |
 |:--|

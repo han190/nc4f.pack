@@ -2626,3 +2626,17 @@ The file overloads (`rename_dim_nc_dim`, `rename_dim_nc_grp`) remain impure thro
 `netcdf_err`). Their metadata staging and commit helpers (`stage_dim_grp_`,
 `commit_dim_grp_`) are pure. The tests exercise all three public model overloads
 from `pure_dim_calls`; their assertion helper `chk_dim` is pure as well.
+
+## Structured error diagnostics follow-up
+
+`error_type` now separates `fname` and `msg`. Its checked constructor
+`make_err`, validator `check_err`, and public formatter `error_msg` are pure.
+`return_err` validates both returned and terminating failures; the latter
+uses `error_msg` for the `error stop` text. `write_frmt_err` uses the same
+formatter but remains impure because it performs external I/O.
+
+`netcdf_err` now takes `(status, fname, context)` with optional context and
+constructs errors through the checked constructor. It and `netcdf_msg` remain
+impure because they retrieve diagnostics from the NetCDF C library. The old
+missing-message fallback described above is superseded by explicit rejection
+of malformed failures. Default success results still need no allocated fields.

@@ -29,7 +29,8 @@ module subroutine rename_grp_nc_grp(parent, grp, new_name, update_file, err)
     call rename_group(staged, new_name, op_err)
     if (.not. has_err(op_err)) then
       if (.not. allocated(grp%name)) then
-        op_err = error_type(NC_EINVAL, "[rename_group] Group must have a name.")
+        op_err = error_type(NC_EINVAL, "rename_group", &
+          & "Group must have a name.")
       else
         call rename_grp_nc_(parent%id, grp%name, staged%name, op_err)
         if (.not. has_err(op_err)) call move_alloc(staged%name, grp%name)
@@ -103,12 +104,13 @@ subroutine rename_grp_nc_(ncid, old_name, new_name, err)
   call rename_group(name, new_name, err)
   if (has_err(err)) return
   stat = nc_inq_ncid(ncid, f2cstr(old_name), grpid)
-  err = netcdf_err(stat, "[rename_group] Find group: "//trim(old_name))
+  err = netcdf_err(stat, "rename_group", "Find group: "//trim(old_name))
   if (has_err(err)) return
   stat = nc_rename_grp(grpid, f2cstr(new_name))
   ! A self-rename still checks existence and write access through the C API.
   if (trim(old_name) == trim(new_name) .and. stat == NC_ENAMEINUSE) stat = NC_NOERR
-  err = netcdf_err(stat, "[rename_group] Rename group: "//trim(old_name)//" -> "//trim(new_name))
+  err = netcdf_err(stat, "rename_group", &
+    & "Rename group: "//trim(old_name)//" -> "//trim(new_name))
 end subroutine rename_grp_nc_
 
 module function get_group(parent, name, err) result(group)
@@ -236,12 +238,13 @@ module subroutine serialize_grps(root, grps, atts, err)
   do i = 1, size(grps)
     source_child => grps(i)
     if (.not. allocated(source_child%name)) then
-      err = error_type(NC_EINVAL, "[to_netcdf_grps] Each group must have a name.")
+      err = error_type(NC_EINVAL, "to_netcdf_grps", &
+        & "Each group must have a name.")
       return
     end if
     if (trim(source_child%name) == "/") then
-      err = error_type(NC_EINVAL, &
-        & "[to_netcdf_grps] A first-level group cannot be named '/'.")
+      err = error_type(NC_EINVAL, "to_netcdf_grps", &
+        & "A first-level group cannot be named '/'.")
       return
     end if
   end do
@@ -297,7 +300,8 @@ recursive subroutine define_grp_tree_(target, source, err)
   if (allocated(source%vars)) then
     do i = 1, size(source%vars)
       if (.not. allocated(source%vars(i)%name)) then
-        err = error_type(NC_EINVAL, "[to_netcdf] Each variable must have a name.")
+        err = error_type(NC_EINVAL, "to_netcdf", &
+          & "Each variable must have a name.")
         return
       end if
       defined_var = def_var(target, source%vars(i), err)
@@ -310,7 +314,8 @@ recursive subroutine define_grp_tree_(target, source, err)
     do i = 1, size(source%grps)
       source_child => source%grps(i)
       if (.not. allocated(source_child%name)) then
-        err = error_type(NC_EINVAL, "[to_netcdf] Each child group must have a name.")
+        err = error_type(NC_EINVAL, "to_netcdf", &
+          & "Each child group must have a name.")
         return
       end if
       child_name = source_child%name
@@ -393,7 +398,7 @@ function def_grp_(parent, name, err) result(group)
 
   group%name = clip(name)
   stat = nc_def_grp(parent%id, f2cstr(group%name), group%id)
-  err = netcdf_err(stat, "[def_grp] "//group%name)
+  err = netcdf_err(stat, "def_grp", group%name)
 end function def_grp_
 
 function get_grp_(parent, name, err) result(group)
@@ -410,7 +415,7 @@ function get_grp_(parent, name, err) result(group)
 
   group%name = clip(name)
   stat = nc_inq_ncid(parent%id, f2cstr(group%name), group%id)
-  err = netcdf_err(stat, "[get_grp] "//group%name)
+  err = netcdf_err(stat, "get_grp", group%name)
 end function get_grp_
 
 function inq_grps_(parent, err) result(grps)
@@ -425,20 +430,23 @@ function inq_grps_(parent, err) result(grps)
   character(kind=c_char, len=NC_MAX_NAME + 1) :: name
   integer(c_int) :: i, ngroups, stat
 
+  ! Callers assign the result before inspecting ERR, even on failure.
+  allocate (grps(0))
   err = error_type()
   stat = nc_inq_grps(parent%id, ngroups, c_null_ptr)
-  err = netcdf_err(stat, "[inq_grps] Group count.")
+  err = netcdf_err(stat, "inq_grps", "Group count.")
   if (has_err(err)) return
+  deallocate (grps)
   allocate (grps(ngroups), ids(ngroups))
   if (ngroups == 0) return
 
   stat = nc_inq_grps(parent%id, ngroups, c_loc(ids(1)))
-  err = netcdf_err(stat, "[inq_grps] Group identifiers.")
+  err = netcdf_err(stat, "inq_grps", "Group identifiers.")
   if (has_err(err)) return
   do i = 1, ngroups
     name = c_null_char
     stat = nc_inq_grpname(ids(i), name)
-    err = netcdf_err(stat, "[inq_grps] Group name.")
+    err = netcdf_err(stat, "inq_grps", "Group name.")
     if (has_err(err)) return
     grps(i)%id = ids(i)
     grps(i)%name = clip(c2fstr(name))
@@ -457,20 +465,23 @@ function inq_vars_(group, err) result(vars)
   character(kind=c_char, len=NC_MAX_NAME + 1) :: name
   integer(c_int) :: i, nvars, stat
 
+  ! Callers assign the result before inspecting ERR, even on failure.
+  allocate (vars(0))
   err = error_type()
   stat = nc_inq_varids(group%id, nvars, c_null_ptr)
-  err = netcdf_err(stat, "[inq_grp] Variable count.")
+  err = netcdf_err(stat, "inq_grp", "Variable count.")
   if (has_err(err)) return
+  deallocate (vars)
   allocate (vars(nvars), ids(nvars))
   if (nvars == 0) return
 
   stat = nc_inq_varids(group%id, nvars, c_loc(ids(1)))
-  err = netcdf_err(stat, "[inq_grp] Variable identifiers.")
+  err = netcdf_err(stat, "inq_grp", "Variable identifiers.")
   if (has_err(err)) return
   do i = 1, nvars
     name = c_null_char
     stat = nc_inq_varname(group%id, ids(i), name)
-    err = netcdf_err(stat, "[inq_grp] Variable name.")
+    err = netcdf_err(stat, "inq_grp", "Variable name.")
     if (has_err(err)) return
     vars(i) = inquire_variable(group, c2fstr(name), err)
     if (has_err(err)) return

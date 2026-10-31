@@ -3,6 +3,54 @@ submodule(nc4f_ds) nc4f_ds_utility
 implicit none (type, external)
 contains
 
+pure module function make_err(code, fname, msg) result(err)
+  !! Construct a success result or a checked failure diagnostic.
+  integer(c_int), intent(in), optional :: code
+  !! NetCDF status code; defaults to NC_NOERR.
+  character(len=*), intent(in), optional :: fname
+  !! Operation name, required and nonblank on failure.
+  character(len=*), intent(in), optional :: msg
+  !! Diagnostic text, required and nonblank on failure.
+  type(error_type) :: err
+  !! Constructed result with validated failure fields.
+
+  if (present(code)) err%code = code
+  if (present(fname)) err%fname = fname
+  if (present(msg)) err%msg = msg
+  call check_err(err)
+end function make_err
+
+pure module subroutine check_err(err)
+  !! Reject failures with missing or blank diagnostic fields.
+  class(error_type), intent(in) :: err
+  !! Result to validate; success needs no diagnostic fields.
+
+  if (err%code == NC_NOERR) return
+  if (.not. allocated(err%fname)) &
+    & error stop "[error_type] Failure requires an allocated fname."
+  if (len_trim(err%fname) == 0) &
+    & error stop "[error_type] Failure requires a nonblank fname."
+  if (.not. allocated(err%msg)) &
+    & error stop "[error_type] Failure requires an allocated msg."
+  if (len_trim(err%msg) == 0) &
+    & error stop "[error_type] Failure requires a nonblank msg."
+end subroutine check_err
+
+pure module function error_msg(err) result(text)
+  !! Return "[fname] msg" for failures or "No error" for success.
+  class(error_type), intent(in) :: err
+  !! Result to validate and format without external I/O.
+  character(len=:), allocatable :: text
+  !! Complete formatted diagnostic.
+
+  call check_err(err)
+  if (err%code == NC_NOERR) then
+    text = "No error"
+  else
+    text = "["//trim(err%fname)//"] "//trim(err%msg)
+  end if
+end function error_msg
+
 pure module subroutine check_nc_name(name, err, context)
   !! Check NetCDF name syntax without C calls. Trailing Fortran padding is ignored.
   !! UTF-8 is validated here; callers supply NFC-normalized Unicode names.
@@ -11,18 +59,18 @@ pure module subroutine check_nc_name(name, err, context)
   type(error_type), intent(out) :: err
   !! Receives the operation status and diagnostic message.
   character(len=*), intent(in), optional :: context
-  !! Context label included in error diagnostics.
+  !! Operation name for diagnostics, without brackets.
   character(len=:), allocatable :: ctx
   integer :: i, j, n, byte, ncont, lo, hi
 
-  ctx = "[check_nc_name]"
+  ctx = "check_nc_name"
   if (present(context)) ctx = context
-  err = error_type(NC_EBADNAME, ctx//" Invalid NetCDF name.")
+  err = error_type(NC_EBADNAME, ctx, "Invalid NetCDF name.")
   n = len_trim(name)
   if (n == 0) return
   if (n > NC_MAX_NAME) then
-    err = error_type(NC_EMAXNAME, &
-      & ctx//" NetCDF name exceeds NC_MAX_NAME bytes.")
+    err = error_type(NC_EMAXNAME, ctx, &
+      & "NetCDF name exceeds NC_MAX_NAME bytes.")
     return
   end if
   byte = iachar(name(1:1))
@@ -74,14 +122,11 @@ pure module subroutine return_err(op_err, err)
   type(error_type), intent(out), optional :: err
   !! Receives the status and diagnostic; failures stop execution when omitted.
 
+  call check_err(op_err)
   if (present(err)) then
     err = op_err
   else if (op_err%code /= NC_NOERR) then
-    if (allocated(op_err%msg)) then
-      error stop trim(op_err%msg)
-    else
-      error stop "nc4f operation failed without a diagnostic."
-    end if
+    error stop error_msg(op_err)
   end if
 end subroutine return_err
 

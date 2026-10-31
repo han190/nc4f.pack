@@ -23,7 +23,8 @@ module subroutine rename_dim_nc_dim(grp, dim, new_name, update_file, err)
   if (.not. write_file) then
     call rename_dimension(dim, new_name, op_err)
   else if (.not. allocated(dim%name)) then
-    op_err = error_type(NC_EINVAL, "[rename_dimension] Dimension must have a name.")
+    op_err = error_type(NC_EINVAL, "rename_dimension", &
+      & "Dimension must have a name.")
   else
     call find_dim_nc_(grp%id, dim%name, new_name, actual, op_err)
     if (.not. has_err(op_err)) then
@@ -88,7 +89,8 @@ subroutine find_dim_nc_(ncid, old_name, new_name, dim, err)
     dim = dims(i)
     return
   end do
-  err = error_type(NC_EBADDIM, "[rename_dimension] Dimension is not defined in this group: "//trim(old_name))
+  err = error_type(NC_EBADDIM, "rename_dimension", &
+    & "Dimension is not defined in this group: "//trim(old_name))
 end subroutine find_dim_nc_
 
 subroutine put_dim_name_(ncid, dimid, old_name, new_name, err)
@@ -103,7 +105,8 @@ subroutine put_dim_name_(ncid, dimid, old_name, new_name, err)
 
   stat = nc_rename_dim(ncid, dimid, f2cstr(new_name))
   if (trim(old_name) == trim(new_name) .and. stat == NC_ENAMEINUSE) stat = NC_NOERR
-  err = netcdf_err(stat, "[rename_dimension] Rename dimension: "//trim(old_name)//" -> "//trim(new_name))
+  err = netcdf_err(stat, "rename_dimension", &
+    & "Rename dimension: "//trim(old_name)//" -> "//trim(new_name))
 end subroutine put_dim_name_
 
 pure subroutine stage_dim_grp_(grp, actual, staged)
@@ -226,38 +229,41 @@ function inq_dims_(ncid, varid, err) result(dims)
   integer(c_int) :: i, j, nunlim, ndims, stat
   integer(c_int), parameter :: include_parents = 0_c_int
 
+  ! Callers assign the result before inspecting ERR, even on failure.
+  allocate (dims(0))
   err = error_type()
   if (present(varid)) then
     stat = nc_inq_varndims(ncid, varid, ndims)
-    err = netcdf_err(stat, "[inq_dims] Variable rank.")
+    err = netcdf_err(stat, "inq_dims", "Variable rank.")
     if (has_err(err)) return
     allocate (dimids(ndims))
     if (ndims > 0) then
       stat = nc_inq_vardimid(ncid, varid, dimids)
-      err = netcdf_err(stat, "[inq_dims] Variable dimensions.")
+      err = netcdf_err(stat, "inq_dims", "Variable dimensions.")
       if (has_err(err)) return
     end if
   else
     stat = nc_inq_dimids(ncid, ndims, c_null_ptr, include_parents)
-    err = netcdf_err(stat, "[inq_dims] Dimension count.")
+    err = netcdf_err(stat, "inq_dims", "Dimension count.")
     if (has_err(err)) return
     allocate (dimids(ndims))
     if (ndims > 0) then
       stat = nc_inq_dimids(ncid, ndims, c_loc(dimids(1)), include_parents)
-      err = netcdf_err(stat, "[inq_dims] Dimension identifiers.")
+      err = netcdf_err(stat, "inq_dims", "Dimension identifiers.")
       if (has_err(err)) return
     end if
   end if
   stat = nc_inq_unlimdims(ncid, nunlim, c_null_ptr)
-  err = netcdf_err(stat, "[inq_dims] Unlimited dimension count.")
+  err = netcdf_err(stat, "inq_dims", "Unlimited dimension count.")
   if (has_err(err)) return
   allocate (unlimdimids(nunlim))
   if (nunlim > 0) then
     stat = nc_inq_unlimdims(ncid, nunlim, c_loc(unlimdimids(1)))
-    err = netcdf_err(stat, "[inq_dims] Unlimited dimension identifiers.")
+    err = netcdf_err(stat, "inq_dims", "Unlimited dimension identifiers.")
     if (has_err(err)) return
   end if
 
+  deallocate (dims)
   allocate (dims(ndims))
 
   do i = 1, ndims
@@ -266,10 +272,10 @@ function inq_dims_(ncid, varid, err) result(dims)
     j = ndims - i + 1
     dims(j)%id = dimids(i)
     stat = nc_inq_dimname(ncid, dimids(i), dim_name)
-    err = netcdf_err(stat, "[inq_dims] Dimension name.")
+    err = netcdf_err(stat, "inq_dims", "Dimension name.")
     if (has_err(err)) return
     stat = nc_inq_dimlen(ncid, dimids(i), dims(j)%len)
-    err = netcdf_err(stat, "[inq_dims] Dimension length.")
+    err = netcdf_err(stat, "inq_dims", "Dimension length.")
     if (has_err(err)) return
     dims(j)%name = clip(c2fstr(dim_name))
     dims(j)%is_unlim = any(dimids(i) == unlimdimids)
@@ -291,20 +297,20 @@ module function def_dim(nc, dim, err) result(new_dim)
   character(len=:), allocatable :: context
 
   err = error_type()
-  context = "[def_dim] Dimension: "//trim(dim%name)//"."
+  context = "Dimension: "//trim(dim%name)//"."
   stat = nc_inq_dimid(nc%id, f2cstr(dim%name), dimid)
   dimension_exists: if (stat == NC_NOERR) then
     new_dim = dimension_type(dimid, dim%name, dim%len, dim%is_unlim)
     return
   end if dimension_exists
   if (stat /= NC_EBADDIM) then
-    err = netcdf_err(stat, context)
+    err = netcdf_err(stat, "def_dim", context)
     return
   end if
 
   len = merge(NC_UNLIMITED, dim%len, dim%is_unlim)
   stat = nc_def_dim(nc%id, f2cstr(dim%name), len, dimid)
-  err = netcdf_err(stat, context)
+  err = netcdf_err(stat, "def_dim", context)
   if (has_err(err)) return
   new_dim = dimension_type(dimid, dim%name, dim%len, dim%is_unlim)
 end function def_dim

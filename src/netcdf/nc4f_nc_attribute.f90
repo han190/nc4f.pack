@@ -25,13 +25,15 @@ module subroutine del_att_nc_var(grp, var, name, update_file, err)
   if (.not. write_file) then
     call delete_attribute(var, name, op_err)
   else if (.not. allocated(var%name)) then
-    op_err = error_type(NC_EINVAL, "[delete_attribute] Variable must have a name.")
+    op_err = error_type(NC_EINVAL, "delete_attribute", &
+      & "Variable must have a name.")
   else
     ! Reuse model validation before converting the variable name to a C string.
     call rename_variable(checked, var%name, op_err)
     if (.not. has_err(op_err)) then
       stat = nc_inq_varid(grp%id, f2cstr(checked%name), varid)
-      op_err = netcdf_err(stat, "[delete_attribute] Resolve variable: "//checked%name)
+      op_err = netcdf_err(stat, "delete_attribute", &
+        & "Resolve variable: "//checked%name)
       if (.not. has_err(op_err)) call del_att_nc_(grp%id, varid, var%atts, name, op_err)
     end if
   end if
@@ -88,7 +90,8 @@ subroutine del_att_nc_(ncid, varid, atts, name, err)
   end if
   allocate (staged%atts(n + merge(0, 1, cached)), stat=alloc_stat)
   if (alloc_stat /= 0) then
-    err = error_type(NC_ENOMEM, "[delete_attribute] Cannot allocate staged attribute collection.")
+    err = error_type(NC_ENOMEM, "delete_attribute", &
+      & "Cannot allocate staged attribute collection.")
     return
   end if
   j = 0
@@ -104,7 +107,7 @@ subroutine del_att_nc_(ncid, varid, atts, name, err)
   if (has_err(err)) return
 
   stat = nc_del_att(ncid, varid, f2cstr(name))
-  err = netcdf_err(stat, "[delete_attribute] Delete attribute: "//trim(name))
+  err = netcdf_err(stat, "delete_attribute", "Delete attribute: "//trim(name))
   if (has_err(err)) return
   if (.not. allocated(atts)) return
   if (cached) then
@@ -149,13 +152,15 @@ module subroutine rename_att_nc_var(grp, var, old_name, new_name, update_file, &
   if (.not. write_file) then
     call rename_attribute(var, old_name, new_name, op_err)
   else if (.not. allocated(var%name)) then
-    op_err = error_type(NC_EINVAL, "[rename_attribute] Variable must have a name.")
+    op_err = error_type(NC_EINVAL, "rename_attribute", &
+      & "Variable must have a name.")
   else
     ! Validate before crossing the C boundary, including embedded NULs/paths.
     call rename_variable(name, var%name, op_err)
     if (.not. has_err(op_err)) then
       stat = nc_inq_varid(grp%id, f2cstr(name%name), varid)
-      op_err = netcdf_err(stat, "[rename_attribute] Resolve variable: "//name%name)
+      op_err = netcdf_err(stat, "rename_attribute", &
+        & "Resolve variable: "//name%name)
       if (.not. has_err(op_err)) then
         call rename_att_nc_(grp%id, varid, var%atts, old_name, new_name, op_err)
       end if
@@ -221,13 +226,13 @@ subroutine rename_att_nc_(ncid, varid, atts, old_name, new_name, err)
   if (has_err(err)) return
 
   stat = nc_inq_attid(ncid, varid, f2cstr(old_name), attid)
-  err = netcdf_err(stat, "[rename_attribute] Find attribute: "//trim(old_name))
+  err = netcdf_err(stat, "rename_attribute", "Find attribute: "//trim(old_name))
   if (has_err(err)) return
   stat = nc_rename_att(ncid, varid, f2cstr(old_name), f2cstr(new_name))
   ! NetCDF-4 reports a collision for an existing attribute renamed to itself.
   ! Preserve other errors (notably read-only access), and verify existence above.
   if (trim(old_name) == trim(new_name) .and. stat == NC_ENAMEINUSE) stat = NC_NOERR
-  err = netcdf_err(stat, "[rename_attribute] Rename attribute: "// &
+  err = netcdf_err(stat, "rename_attribute", "Rename attribute: "// &
     & trim(old_name)//" -> "//trim(new_name))
   if (has_err(err)) return
   if (pos /= 0) call move_alloc(staged%atts(pos)%name, atts(pos)%name)
@@ -310,20 +315,23 @@ function get_atts_(ncid, varid, err) result(atts)
   integer(c_int) :: natts, i, stat
   character(kind=c_char, len=NC_MAX_NAME + 1) :: name
 
+  ! Callers assign the result before inspecting ERR, even on failure.
+  allocate (atts(0))
   err = error_type()
   if (varid == NC_GLOBAL) then
     stat = nc_inq_natts(ncid, natts)
   else
     stat = nc_inq_varnatts(ncid, varid, natts)
   end if
-  err = netcdf_err(stat, "[get_atts] Attribute count.")
+  err = netcdf_err(stat, "get_atts", "Attribute count.")
   if (has_err(err)) return
 
+  deallocate (atts)
   allocate (atts(natts))
   do i = 0, natts - 1
     !! For the NetCDF C library, attribute IDs start from 0.
     stat = nc_inq_attname(ncid, varid, i, name)
-    err = netcdf_err(stat, "[get_atts] Attribute name.")
+    err = netcdf_err(stat, "get_atts", "Attribute name.")
     if (has_err(err)) return
     atts(i + 1) = get_att_(ncid, varid, c2fstr(name), err)
     if (has_err(err)) return
@@ -348,9 +356,9 @@ function get_att_(ncid, varid, name, err) result(att)
 
   err = error_type()
   att%name = clip(name)
-  context = "[get_att] Invalid attribute: "//att%name//"."
+  context = "Invalid attribute: "//att%name//"."
   stat = nc_inq_att(ncid, varid, f2cstr(att%name), xtypep=dtype, lenp=len)
-  err = netcdf_err(stat, context)
+  err = netcdf_err(stat, "get_attribute", context)
   if (has_err(err)) return
   att%len = len
   att%dtype = dtype
@@ -363,7 +371,7 @@ function get_att_(ncid, varid, name, err) result(att)
   call initialize(att)
   call validate(att, context="[get_att]")
   stat = nc_get_att(ncid, varid, f2cstr(att%name), buffer2cptr(att))
-  err = netcdf_err(stat, context)
+  err = netcdf_err(stat, "get_attribute", context)
 end function get_att_
 
 module subroutine put_att_var(nc, var, err)
@@ -416,8 +424,8 @@ subroutine put_atts_(ncid, varid, atts, context, err)
       end if
       stat = nc_put_att(ncid, varid, f2cstr(att%name), &
         & att%dtype, att%len, cptr)
-      associate(msg => "[put_att] Invalid attribute: "//att%name//".")
-        err = netcdf_err(stat, msg)
+      associate(msg => "Invalid attribute: "//att%name//".")
+        err = netcdf_err(stat, "put_att", msg)
       end associate
       if (has_err(err)) return
     end associate

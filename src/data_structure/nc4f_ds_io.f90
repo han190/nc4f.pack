@@ -135,7 +135,7 @@ end subroutine write_frmt_netcdf
 module subroutine write_frmt_err(err, unit, iotype, v_list, iostat, iomsg)
   !! Write a formatted error result representation to a Fortran I/O unit.
   class(error_type), intent(in) :: err
-  !! Error object updated if the operation fails.
+  !! Result to validate and format through error_msg.
   integer, intent(in) :: unit
   !! Fortran output unit supplied by the invoking formatted WRITE.
   character(len=*), intent(in) :: iotype
@@ -151,20 +151,7 @@ module subroutine write_frmt_err(err, unit, iotype, v_list, iostat, iomsg)
   end associate
   iostat = 1
   if (iotype /= "LISTDIRECTED" .and. iotype /= "DT") return
-  if (err%code == NC_NOERR) then
-    associate (fmt => "('NetCDF status (', i0, ')')")
-      write (unit, fmt, iostat=iostat, iomsg=iomsg) err%code
-    end associate
-  else if (allocated(err%msg)) then
-    associate (fmt => "('NetCDF error (', i0, '): ', a)")
-      write (unit, fmt, iostat=iostat, iomsg=iomsg) &
-        & err%code, trim(err%msg)
-    end associate
-  else
-    associate (fmt => "('NetCDF status (', i0, ')')")
-      write (unit, fmt, iostat=iostat, iomsg=iomsg) err%code
-    end associate
-  end if
+  write (unit, '(a)', iostat=iostat, iomsg=iomsg) error_msg(err)
 end subroutine write_frmt_err
 
 recursive function render_grp(grp, depth) result(text)

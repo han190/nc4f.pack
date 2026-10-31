@@ -277,7 +277,7 @@ module subroutine rename_grp_errors(passed)
     end if
     call execute_command_line(trim(command)//" > "//TEST_RESULTS_DIR//"rename-group-failfast.log 2>&1", &
       & exitstat=status, cmdstat=cmdstat)
-    call chk_grp(cmdstat == 0 .and. status /= 0, "group rename without err stops on failure")
+    call chk_grp(cmdstat == 0 .and. status == 1, "group rename without err stops on failure")
   end do
   passed = .true.
 end subroutine rename_grp_errors

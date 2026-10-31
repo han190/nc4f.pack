@@ -14,7 +14,7 @@ pure module subroutine rename_var_var(var, new_name, err)
   type(error_type) :: op_err
   character(len=:), allocatable :: name
 
-  call check_nc_name(new_name, op_err, "[rename_variable]")
+  call check_nc_name(new_name, op_err, "rename_variable")
   if (op_err%code == NC_NOERR) then
     name = trim(new_name)
     call move_alloc(name, var%name)
@@ -48,9 +48,9 @@ pure subroutine rename_vars_(vars, old_name, new_name, err)
   !! Receives the operation status and diagnostic message.
   integer :: i, pos, lo
 
-  call check_nc_name(old_name, err, "[rename_variable]")
+  call check_nc_name(old_name, err, "rename_variable")
   if (err%code /= NC_NOERR) return
-  call check_nc_name(new_name, err, "[rename_variable]")
+  call check_nc_name(new_name, err, "rename_variable")
   if (err%code /= NC_NOERR) return
   pos = 0
   lo = 1
@@ -60,20 +60,23 @@ pure subroutine rename_vars_(vars, old_name, new_name, err)
       if (.not. allocated(vars(lo + i - 1)%name)) cycle
       if (vars(lo + i - 1)%name /= trim(old_name)) cycle
       if (pos /= 0) then
-        err = error_type(NC_EINVAL, "[rename_variable] Ambiguous duplicate variable: "//trim(old_name))
+        err = error_type(NC_EINVAL, "rename_variable", &
+          & "Ambiguous duplicate variable: "//trim(old_name))
         return
       end if
       pos = i
     end do
   end if
   if (pos == 0) then
-    err = error_type(NC_ENOTVAR, "[rename_variable] Variable not found: "//trim(old_name))
+    err = error_type(NC_ENOTVAR, "rename_variable", &
+      & "Variable not found: "//trim(old_name))
     return
   end if
   do i = 1, size(vars)
     if (i == pos .or. .not. allocated(vars(lo + i - 1)%name)) cycle
     if (vars(lo + i - 1)%name == trim(new_name)) then
-      err = error_type(NC_ENAMEINUSE, "[rename_variable] Variable name already in use: "//trim(new_name))
+      err = error_type(NC_ENAMEINUSE, "rename_variable", &
+        & "Variable name already in use: "//trim(new_name))
       return
     end if
   end do

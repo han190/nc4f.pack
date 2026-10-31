@@ -261,7 +261,7 @@ module subroutine rename_att_errors(passed)
     end if
     call execute_command_line(trim(command)//" > "//TEST_RESULTS_DIR//"rename-failfast.log 2>&1", &
       & exitstat=status, cmdstat=cmdstat)
-    call chk_rename(cmdstat == 0 .and. status /= 0, "failure without err stops child process")
+    call chk_rename(cmdstat == 0 .and. status == 1, "failure without err stops child process")
   end do
   passed = .true.
 end subroutine rename_att_errors
@@ -516,7 +516,7 @@ module subroutine rename_var_errors(passed)
     end if
     call execute_command_line(trim(command)//" > "//TEST_RESULTS_DIR//"rename-var-failfast.log 2>&1", &
       & exitstat=status, cmdstat=cmdstat)
-    call chk_rename(cmdstat == 0 .and. status /= 0, "variable rename failure without err stops")
+    call chk_rename(cmdstat == 0 .and. status == 1, "variable rename failure without err stops")
   end do
   passed = .true.
 end subroutine rename_var_errors

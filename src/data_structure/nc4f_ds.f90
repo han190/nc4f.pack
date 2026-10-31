@@ -20,6 +20,7 @@ public :: datarray, dataset, extract, initialize, operator(.att.), &
   & operator(.and.), operator(.dim.), &
   & operator(==), operator(/=), shape, size, sum
 public :: buffer_size, buffer2cptr, validate
+public :: error_msg
 public :: return_err
 !! Shared implementation utility for the data-model and NetCDF layers.
 public :: delete_attribute, rename_attribute, rename_variable, rename_group, &
@@ -33,14 +34,20 @@ integer(int64), parameter :: INVALID_INT64 = -9223372036854775807_int64
 type :: error_type
   !! Result of an nc4f operation that was allowed to return normally on error.
   !!
-  !! A zero `code` denotes success. On failure, `msg` contains an nc4f
-  !! diagnostic and `code` preserves the originating NetCDF status.
+  !! A zero `code` denotes success, with optional diagnostic fields.
+  !! Failures require nonblank `fname` and `msg` and preserve the status code.
   integer(c_int) :: code = NC_NOERR
-  character(len=:), allocatable :: msg
+  !! NetCDF status code; zero denotes success.
+  character(len=:), allocatable :: fname, msg
+  !! Operation name and diagnostic text, required for failures.
 contains
   procedure, private :: write_frmt_err
   generic, public :: write(formatted) => write_frmt_err
 end type error_type
+
+interface error_type
+  module procedure :: make_err
+end interface error_type
 
 enum, bind(c)
   !! Type constant used for NetCDF external data types.
@@ -278,8 +285,34 @@ interface
     type(error_type), intent(out) :: err
     !! Receives the operation status and diagnostic message.
     character(len=*), intent(in), optional :: context
-    !! Context label included in error diagnostics.
+    !! Operation name for diagnostics, without brackets.
   end subroutine check_nc_name
+
+  pure module function make_err(code, fname, msg) result(err)
+    !! Construct a success result or a checked failure diagnostic.
+    integer(c_int), intent(in), optional :: code
+    !! NetCDF status code; defaults to NC_NOERR.
+    character(len=*), intent(in), optional :: fname
+    !! Operation name, required and nonblank on failure.
+    character(len=*), intent(in), optional :: msg
+    !! Diagnostic text, required and nonblank on failure.
+    type(error_type) :: err
+    !! Constructed result with validated failure fields.
+  end function make_err
+
+  pure module subroutine check_err(err)
+    !! Reject failures with missing or blank diagnostic fields.
+    class(error_type), intent(in) :: err
+    !! Result to validate; success needs no diagnostic fields.
+  end subroutine check_err
+
+  pure module function error_msg(err) result(text)
+    !! Return "[fname] msg" for failures or "No error" for success.
+    class(error_type), intent(in) :: err
+    !! Result to validate and format without external I/O.
+    character(len=:), allocatable :: text
+    !! Complete formatted diagnostic.
+  end function error_msg
 
   pure module subroutine return_err(op_err, err)
     !! Return an optional error or terminate, shared by model and NetCDF
@@ -552,7 +585,7 @@ interface
     integer(data_type), intent(in), optional :: dtype
     !! Expected NetCDF data-type code, when supplied.
     character(len=*), intent(in) :: context
-    !! Context label included in error diagnostics.
+    !! Operation name for diagnostics, without brackets.
   end subroutine validate_att
 
   pure module subroutine validate_var(var, dtype, rank, context)
@@ -564,7 +597,7 @@ interface
     integer, intent(in), optional :: rank
     !! Expected variable rank, when supplied.
     character(len=*), intent(in) :: context
-    !! Context label included in error diagnostics.
+    !! Operation name for diagnostics, without brackets.
   end subroutine validate_var
 
   module function buffer2cptr_att(att) result(cptr)
@@ -666,7 +699,7 @@ interface
   module subroutine write_frmt_err(err, unit, iotype, v_list, iostat, iomsg)
     !! Write a formatted error result representation to a Fortran I/O unit.
     class(error_type), intent(in) :: err
-    !! Error object updated if the operation fails.
+    !! Result to validate and format through error_msg.
     integer, intent(in) :: unit
     !! Fortran output unit supplied by the invoking formatted WRITE.
     character(len=*), intent(in) :: iotype
@@ -804,7 +837,7 @@ interface
     integer(int64), intent(in) :: len
     !! Number of stored data elements.
     character(len=*), intent(in), optional :: context
-    !! Context label included in error diagnostics.
+    !! Operation name for diagnostics, without brackets.
     integer :: nbytes
     !! Result produced by this operation.
   end function buffer_size

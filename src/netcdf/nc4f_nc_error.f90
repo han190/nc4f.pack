@@ -10,10 +10,12 @@ logical elemental module function has_err(err) result(is_err)
   is_err = err%code /= NC_NOERR
 end function has_err
 
-module function netcdf_err(status, context) result(err)
+module function netcdf_err(status, fname, context) result(err)
   !! Convert a NetCDF C status into nc4f's normal error result.
   integer(c_int), intent(in) :: status
   !! Status code returned by a NetCDF C API call.
+  character(len=*), intent(in) :: fname
+  !! Name of the operation that produced the status.
   character(len=*), intent(in), optional :: context
   !! Optional nc4f operation context for the diagnostic.
   type(error_type) :: err
@@ -21,12 +23,8 @@ module function netcdf_err(status, context) result(err)
 
   if (status == NC_NOERR) then
     err = error_type()
-  else if (present(context)) then
-    err%code = status
-    err%msg = netcdf_msg(status, context)
   else
-    err%code = status
-    err%msg = netcdf_msg(status)
+    err = error_type(status, fname, netcdf_msg(status, context))
   end if
 end function netcdf_err
 
@@ -60,7 +58,8 @@ function netcdf_msg(stat, context) result(msg)
   end if
 
   if (present(context)) then
-    msg = trim(stat_msg)//new_line("a")//clip(context)
+    msg = trim(stat_msg)
+    if (len_trim(context) > 0) msg = clip(context)//": "//msg
   else
     msg = trim(stat_msg)
   end if

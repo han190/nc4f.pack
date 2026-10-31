@@ -24,7 +24,8 @@ module subroutine rename_var_nc_var(grp, var, new_name, update_file, err)
   if (.not. write_file) then
     call rename_variable(var, new_name, op_err)
   else if (.not. allocated(var%name)) then
-    op_err = error_type(NC_EINVAL, "[rename_variable] Variable must have a name.")
+    op_err = error_type(NC_EINVAL, "rename_variable", &
+      & "Variable must have a name.")
   else
     ! Prepare only the new name; never copy owned data or borrowed pointers.
     call rename_variable(staged, new_name, op_err)
@@ -100,12 +101,12 @@ subroutine rename_var_nc_(ncid, old_name, new_name, err)
   call rename_variable(name, new_name, err)
   if (has_err(err)) return
   stat = nc_inq_varid(ncid, f2cstr(old_name), varid)
-  err = netcdf_err(stat, "[rename_variable] Find variable: "//trim(old_name))
+  err = netcdf_err(stat, "rename_variable", "Find variable: "//trim(old_name))
   if (has_err(err)) return
   stat = nc_rename_var(ncid, varid, f2cstr(new_name))
   ! Preserve access errors, but accept an existing variable renamed to itself.
   if (trim(old_name) == trim(new_name) .and. stat == NC_ENAMEINUSE) stat = NC_NOERR
-  err = netcdf_err(stat, "[rename_variable] Rename variable: "// &
+  err = netcdf_err(stat, "rename_variable", "Rename variable: "// &
     & trim(old_name)//" -> "//trim(new_name))
 end subroutine rename_var_nc_
 
@@ -158,8 +159,8 @@ function get_var_(nc, name, start, count, stride, err) result(var)
 
   if (present(count) .and. .not. present(start) .or. &
     & present(stride) .and. (.not. present(start) .or. .not. present(count))) then
-    err = error_type(NC_EINVAL, &
-      & "[get_variable] count requires start; stride requires start and count.")
+    err = error_type(NC_EINVAL, "get_variable", &
+      & "count requires start; stride requires start and count.")
     return
   end if
 
@@ -171,22 +172,22 @@ function get_var_(nc, name, start, count, stride, err) result(var)
   ndims = size(var%dims)
   if (present(start)) then
     if (size(start) /= ndims) then
-      err = error_type(NC_EINVAL, &
-        & "[get_variable] start must have one entry per dimension.")
+      err = error_type(NC_EINVAL, "get_variable", &
+        & "start must have one entry per dimension.")
       return
     end if
   end if
   if (present(count)) then
     if (size(count) /= ndims) then
-      err = error_type(NC_EINVAL, &
-        & "[get_variable] count must have one entry per dimension.")
+      err = error_type(NC_EINVAL, "get_variable", &
+        & "count must have one entry per dimension.")
       return
     end if
   end if
   if (present(stride)) then
     if (size(stride) /= ndims) then
-      err = error_type(NC_EINVAL, &
-        & "[get_variable] stride must have one entry per dimension.")
+      err = error_type(NC_EINVAL, "get_variable", &
+        & "stride must have one entry per dimension.")
       return
     end if
   end if
@@ -211,19 +212,19 @@ function get_var_(nc, name, start, count, stride, err) result(var)
     f_count = int(count_(i), int64)
     f_stride = int(stride_(i), int64)
     if (f_start < 1) then
-      err = error_type(NC_EINVALCOORDS, &
-        & "[get_variable] start indices must be positive.")
+      err = error_type(NC_EINVALCOORDS, "get_variable", &
+        & "start indices must be positive.")
       return
     end if
     if (f_count < 1 .or. f_stride < 1) then
-      err = error_type(NC_EINVAL, &
-        & "[get_variable] count and stride entries must be positive.")
+      err = error_type(NC_EINVAL, "get_variable", &
+        & "count and stride entries must be positive.")
       return
     end if
     if (f_start > var%dims(i)%len .or. &
       & f_count - 1_int64 > (var%dims(i)%len - f_start) / f_stride) then
-      err = error_type(NC_EEDGE, &
-        & "[get_variable] Requested hyperslab exceeds a dimension bound.")
+      err = error_type(NC_EEDGE, "get_variable", &
+        & "Requested hyperslab exceeds a dimension bound.")
       return
     end if
     var%dims(i)%len = f_count
@@ -254,9 +255,9 @@ function get_var_(nc, name, start, count, stride, err) result(var)
     stridep = c_null_ptr
   end if
   cptr = buffer2cptr(var)
-  write (msg, "('[get_variable] Invalid variable:', 1x, a)") name
+  write (msg, "('Invalid variable:', 1x, a)") name
   stat = nc_get_vars(nc%id, var%id, startp, countp, stridep, cptr)
-  err = netcdf_err(stat, msg)
+  err = netcdf_err(stat, "get_variable", msg)
 end function get_var_
 
 impure elemental module function inquire_variable(nc, name, err) result(var)
@@ -290,9 +291,9 @@ function inq_var_(nc, name, err) result(var)
 
   err = error_type()
   var%name = clip(name)
-  write (msg, "('[inq_varid]', 1x, a)") var%name
+  write (msg, "(a)") var%name
   stat = nc_inq_varid(nc%id, f2cstr(var%name), var%id)
-  err = netcdf_err(stat, msg)
+  err = netcdf_err(stat, "inquire_variable", msg)
   if (has_err(err)) return
   var%dtype = inq_vartype_(nc%id, var%id, err)
   if (has_err(err)) return
@@ -318,10 +319,10 @@ function inq_vartype_(ncid, varid, err) result(vartype)
 
   err = error_type()
   vartype = NC_NAT
-  fmt = "('[inq_vartype]', 2(1x, a, 1x, i0))"
+  fmt = "(2(a, 1x, i0, 1x))"
   write (msg, fmt) "NCID", ncid, "VARID", varid
   stat = nc_inq_vartype(ncid, varid, vartype)
-  err = netcdf_err(stat, msg)
+  err = netcdf_err(stat, "inquire_variable", msg)
 end function inq_vartype_
 
 module subroutine put_vara(nc, var, start, count, err)
@@ -350,18 +351,18 @@ module subroutine put_vara(nc, var, start, count, err)
 
   ndims = size(target%dims)
   if (size(start) /= ndims .or. size(count) /= ndims) then
-    err = error_type(NC_EINVAL, &
-      & "[put_vara] start and count must have one entry per dimension.")
+    err = error_type(NC_EINVAL, "put_vara", &
+      & "start and count must have one entry per dimension.")
     return
   end if
   if (.not. allocated(var%dims) .or. size(var%dims) /= ndims) then
-    err = error_type(NC_EINVAL, &
-      & "[put_vara] Source rank must match the destination variable.")
+    err = error_type(NC_EINVAL, "put_vara", &
+      & "Source rank must match the destination variable.")
     return
   end if
   if (var%dtype /= target%dtype) then
-    err = error_type(NC_EINVAL, &
-      & "[put_vara] Source and destination variable types must match.")
+    err = error_type(NC_EINVAL, "put_vara", &
+      & "Source and destination variable types must match.")
     return
   end if
 
@@ -371,24 +372,24 @@ module subroutine put_vara(nc, var, start, count, err)
     f_start = int(start(i), int64)
     f_count = int(count(i), int64)
     if (f_start < 1) then
-      err = error_type(NC_EINVALCOORDS, &
-        & "[put_vara] start indices must be positive.")
+      err = error_type(NC_EINVALCOORDS, "put_vara", &
+        & "start indices must be positive.")
       return
     end if
     if (f_count <= 0) then
-      err = error_type(NC_EINVAL, "[put_vara] count entries must be positive.")
+      err = error_type(NC_EINVAL, "put_vara", "count entries must be positive.")
       return
     end if
     if (var%dims(i)%len /= f_count) then
-      err = error_type(NC_EINVAL, &
-        & "[put_vara] Source dimensions must equal count.")
+      err = error_type(NC_EINVAL, "put_vara", &
+        & "Source dimensions must equal count.")
       return
     end if
     if (.not. target%dims(i)%is_unlim) then
       if (f_start > target%dims(i)%len .or. &
         & f_count > target%dims(i)%len - f_start + 1_int64) then
-        err = error_type(NC_EEDGE, &
-          & "[put_vara] Requested hyperslab exceeds a fixed dimension bound.")
+        err = error_type(NC_EEDGE, "put_vara", &
+          & "Requested hyperslab exceeds a fixed dimension bound.")
         return
       end if
     end if
@@ -398,7 +399,7 @@ module subroutine put_vara(nc, var, start, count, err)
     c_count(j) = int(f_count, c_size_t)
   end do
   if (var%len == 0) then
-    err = error_type(NC_EINVAL, "[put_vara] Source variable is empty.")
+    err = error_type(NC_EINVAL, "put_vara", "Source variable is empty.")
     return
   end if
   if (ndims > 0) then
@@ -408,9 +409,9 @@ module subroutine put_vara(nc, var, start, count, err)
     startp = c_null_ptr
     countp = c_null_ptr
   end if
-  write (msg, "('[put_vara] Invalid variable:', 1x, a)") var%name
+  write (msg, "('Invalid variable:', 1x, a)") var%name
   stat = nc_put_vara(nc%id, target%id, startp, countp, buffer2cptr(var))
-  err = netcdf_err(stat, msg)
+  err = netcdf_err(stat, "put_vara", msg)
 end subroutine put_vara
 
 module subroutine put_var(nc, var, err)
@@ -452,7 +453,7 @@ module subroutine put_var(nc, var, err)
     countp = c_null_ptr
   end if
   stat = nc_put_vara(nc%id, tmp%id, startp, countp, buffer2cptr(var))
-  err = netcdf_err(stat, "[put_var] Write variable data.")
+  err = netcdf_err(stat, "put_var", "Write variable data.")
 end subroutine put_var
 
 module function def_var(nc, var, err) result(new_var)
@@ -486,7 +487,7 @@ module function def_var(nc, var, err) result(new_var)
 
   stat = nc_def_var(nc%id, f2cstr(var%name), var%dtype, size(new_dims), &
     & new_dimids, varid)
-  err = netcdf_err(stat, "[def_var] Define variable.")
+  err = netcdf_err(stat, "def_var", "Define variable.")
   if (has_err(err)) return
   new_var%id = varid
   if (allocated(var%atts)) new_var%atts = var%atts

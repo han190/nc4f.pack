@@ -103,7 +103,7 @@ module subroutine data_model(passed)
   if (any(abs(sum_values - [546.0_real32, 548.0_real32]) > &
     & epsilon(1.0_real32))) return
 
-  err%code = NC_ENOTFOUND
+  err = error_type(NC_ENOTFOUND, "data_model", "Not found.")
   if (.not. .exists.err) return
   err = error_type()
   open (newunit=unit, status="scratch", action="readwrite", &
@@ -117,7 +117,7 @@ module subroutine data_model(passed)
   if (iostat /= 0) return
   rewind (unit)
   read (unit, "(a)", iostat=iostat, iomsg=iomsg) line
-  if (iostat /= 0 .or. index(line, "NetCDF status (0)") == 0) return
+  if (iostat /= 0 .or. index(line, "No error") == 0) return
   read (unit, "(a)", iostat=iostat, iomsg=iomsg) line
   if (iostat /= 0 .or. index(line, "group: root {") == 0) return
   netcdf_found = .false.

@@ -168,9 +168,13 @@ module subroutine rename_dim_errors(passed)
   type(variable_type) :: var
   type(dimension_type) :: dim
   type(error_type) :: err
-  integer :: i, status, cmdstat
-  character(len=1024) :: executable, command
+  integer :: i, status, cmdstat, unit, iostat
+  character(len=1024) :: executable, command, line
+  logical :: found_diagnostic
 
+  call rename_dimension(grp, "missing", "new", update_file=.true., err=err)
+  call chk_dim(err%code == NC_EBADID, "invalid group returns error safely")
+  call chk_dim(.not. allocated(grp%dims), "failed lookup preserves cache")
   call rename_dimension(dim, "bad/name", err)
   call chk_dim(err%code == NC_EBADNAME .and. .not. allocated(dim%name), "bad name unchanged")
   call rename_dimension(dim, "x"//char(0), err)
@@ -238,7 +242,25 @@ module subroutine rename_dim_errors(passed)
     end if
     call execute_command_line(trim(command)//" > "//TEST_RESULTS_DIR// "rename-dim-failfast.log 2>&1", &
       & exitstat=status, cmdstat=cmdstat)
-    call chk_dim(cmdstat == 0 .and. status /= 0, "missing err stops child process")
+    call chk_dim(cmdstat == 0 .and. status == 1, &
+      & "missing err must ERROR STOP, not crash")
+    open (newunit=unit, file=TEST_RESULTS_DIR//"rename-dim-failfast.log", &
+      & status="old", iostat=iostat)
+    call chk_dim(iostat == 0, "read child diagnostic")
+    found_diagnostic = .false.
+    do
+      read (unit, '(a)', iostat=iostat) line
+      if (iostat /= 0) exit
+      if (i == 1) then
+        if (index(line, "ERROR STOP [rename_dimension]") > 0) &
+          & found_diagnostic = .true.
+      else
+        if (index(line, "ERROR STOP [inq_dims] Dimension count.") > 0) &
+          & found_diagnostic = .true.
+      end if
+    end do
+    close (unit)
+    call chk_dim(found_diagnostic, "expected dimension failure diagnostic")
   end do
   passed = .true.
 end subroutine rename_dim_errors

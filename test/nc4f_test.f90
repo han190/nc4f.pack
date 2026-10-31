@@ -16,8 +16,8 @@ case ("--ownership-invalid-noncontiguous")
   call invalid_noncontiguous_shallow_constructor()
 case ("--ownership-invalid-character")
   call invalid_character_shallow_constructor()
-case ("--error-without-message")
-  call invalid_error_without_message()
+case ("--invalid-error")
+  call invalid_error()
 case ("--delete-invalid-model")
   call invalid_model_delete()
 case ("--delete-invalid-file")
@@ -110,15 +110,51 @@ subroutine invalid_file_dim_rename()
   stop 0
 end subroutine invalid_file_dim_rename
 
-subroutine invalid_error_without_message()
-  !! Exercise the shared termination policy for an error with no diagnostic.
+subroutine invalid_error()
+  !! Exercise diagnostic validation and fail-fast formatting in a child.
   use nc4f_ds, only: return_err
-  type(error_type) :: err
+  type(error_type) :: err, returned
+  character(len=64) :: mode, text
 
-  err%code = NC_EINVAL
-  call return_err(err)
+  call get_command_argument(2, mode)
+  select case (trim(mode))
+  case ("construct-no-fname")
+    err = error_type(code=NC_EINVAL, msg="Diagnostic.")
+  case ("construct-no-msg")
+    err = error_type(NC_EINVAL, "test_error")
+  case ("construct-blank-fname")
+    err = error_type(NC_EINVAL, "", "Diagnostic.")
+  case ("construct-blank-msg")
+    err = error_type(NC_EINVAL, "test_error", "   ")
+  case ("return-no-fname")
+    err%code = NC_EINVAL
+    err%msg = "Diagnostic."
+    call return_err(err, returned)
+  case ("return-no-msg")
+    err%code = NC_EINVAL
+    err%fname = "test_error"
+    call return_err(err)
+  case ("format-no-fname")
+    err%code = NC_EINVAL
+    err%msg = "Diagnostic."
+    text = error_msg(err)
+    print '(a)', trim(text)
+  case ("format-blank-fname")
+    err = error_type(NC_EINVAL, "test_error", "Diagnostic.")
+    err%fname = " "
+    text = error_msg(err)
+    print '(a)', trim(text)
+  case ("write-blank-msg")
+    err = error_type(NC_EINVAL, "test_error", "Diagnostic.")
+    err%msg = ""
+    write (text, '(dt)') err
+    print '(a)', trim(text)
+  case ("fail-fast")
+    err = error_type(NC_EINVAL, "test_error", "Diagnostic.")
+    call return_err(err)
+  end select
   stop 0
-end subroutine invalid_error_without_message
+end subroutine invalid_error
 
 subroutine invalid_model_delete()
   !! Trigger a model deletion failure without ERR.
