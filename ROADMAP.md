@@ -16,7 +16,7 @@ NetCDF format support is excluded from this assessment.
 | --- | --- | --- | --- |
 | Rename attributes | Very low | Complete | Five `rename_attribute` overloads support model editing and explicit file updates, with tests and documented cache semantics. |
 | Delete attributes | Very low | Complete | Four `delete_attribute` overloads support pure model removal and explicit file deletion, preserving surviving storage and invalidating cached attribute IDs after file updates. |
-| Diskless I/O | Low | Planned | Expose diskless and persistence options through `open_netcdf`; test creation, opening, and close behavior. |
+| Diskless I/O | Low | Complete | `open_netcdf(file, mode, diskless, err)` supports RAM-backed reads, save-by-default writable modes, and temporary modes. The full debug regression suite passes with GNU Fortran and LLVM Flang. |
 | Rename variables | Low–medium | Complete | Four `rename_variable` overloads support pure model editing and explicit file updates, using the shared name checker. |
 | Rename groups | Low–medium | Complete | Four `rename_group` overloads support pure model editing and explicit file updates, with root protection and shared-child-cache semantics. |
 | Rename dimensions | Low–medium | Complete | Five `rename_dimension` overloads support pure model editing and explicit file updates, synchronizing direct caches and rejecting inherited file targets. |
@@ -48,12 +48,20 @@ NetCDF format support is excluded from this assessment.
 - [x] Test persistence, missing attributes, read-only access, and unchanged state on failure.
 - [x] Document the operations and update the README limitation.
 
-### 2. Diskless I/O
+### 2. Diskless I/O -- Complete
 
-- [ ] Define diskless and persistence options for `open_netcdf`.
-- [ ] Apply the appropriate flags when creating or opening a dataset.
-- [ ] Test data access, persistence on close, and nonpersistent operation.
-- [ ] Document lifecycle behavior and update the README limitation.
+- [x] Define `open_netcdf(file, mode, diskless, err)` with `diskless` defaulting to false and `err` last.
+- [x] Accept only `r`/`read`, `a`/`append`, `w`/`write` for disk-backed access; add `an`/`append_temp` and `wn`/`write_temp` for diskless access.
+- [x] Document save-by-default writable modes; only temporary modes require `diskless=.true.`.
+- [x] Apply diskless and persistence flags, rejecting invalid combinations before file access.
+- [x] Add regression cases for data access, rename/delete persistence, creation, invalid modes, and errors.
+- [x] Extend regression cases for long-alias reads, save-by-default behavior, discarded changes, temporary-mode rejection without diskless access, and retired mode names.
+- [x] Compile and run the regression suite with GNU Fortran and LLVM Flang in debug mode, including persistence and nonpersistent behavior.
+- [x] Document lifecycle behavior, positional-argument migration, and update the README limitation.
+
+`to_netcdf` remains disk-backed and path-based. There is no new high-level writer
+for open handles; creation-mode regression cases populate them through existing
+low-level bindings. Modifying extracted Fortran values does not write them back.
 
 ### 3a. Variable renaming — Complete
 

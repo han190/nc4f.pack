@@ -311,13 +311,18 @@ interface
     !! Right-hand attribute to compare.
   end function neq_att
 
-  module function open_netcdf(file, mode, err) result(nc)
+  module function open_netcdf(file, mode, diskless, err) result(nc)
     !! Open or create a dataset and return a `netcdf_type` handle.
     character(len=*), intent(in) :: file
     !! Path to the dataset file.
     character(len=*), intent(in), optional :: mode
-    !! Mode to open the file: 'r' for read, 'w' to recreate, or 'a' for
-    !! read/write access to an existing dataset.
+    !! Disk-backed aliases: r/read, a/append, w/write.
+    !! Diskless aliases: r/read, a/append, an/append_temp, w/write, wn/write_temp.
+    logical, intent(in), optional :: diskless
+    !! Keep the NetCDF dataset in RAM; defaults to false (disk-backed access).
+    !! When true, use a diskless mode or alias listed above.
+    !! a/w and their aliases save on close; an/wn and their _temp aliases discard changes.
+    !! This does not write back values modified in separate Fortran objects.
     type(error_type), intent(out), optional :: err
     !! Optional error result. When absent, failures stop the program.
     type(netcdf_type) :: nc

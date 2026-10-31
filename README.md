@@ -63,7 +63,7 @@ model. It does NOT currently support:
 - user-defined types, the NetCDF `STRING` type and unsigned primitive types;
 - NetCDF-4 storage controls, such as chunking, compression,
   shuffle/checksum filters, endianness, and custom fill values;
-- parallel, in-memory, or diskless I/O;
+- parallel I/O or importing/exporting caller-owned in-memory file images;
 - advanced variable access, such as mapped or multi-slab I/O and strided writes;
 - deleting dimensions, variables, or groups from files.
 

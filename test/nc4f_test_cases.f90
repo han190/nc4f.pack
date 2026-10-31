@@ -13,6 +13,7 @@ public :: rename_var_model, rename_var_file, rename_var_errors
 public :: rename_dim_model, rename_dim_file, rename_dim_errors
 public :: rename_grp_model, rename_grp_file, rename_grp_errors
 public :: unlimited_wr, unlimited_dims
+public :: diskless_read, diskless_edit, diskless_create, diskless_modes
 public :: sum_vars_test, sfc_pres_temp_wr, &
   & sfc_pres_temp_rd, extensive_wr, extensive_rd
 public :: group_model, group_write
@@ -29,6 +30,22 @@ character(*), parameter :: NETCDF_TYPE_RESULT_FILE = &
   & "build/test-results/nasa_cosp_netcdf_type.txt"
 
 interface
+  module subroutine diskless_read(passed)
+    logical, intent(inout) :: passed
+  end subroutine diskless_read
+
+  module subroutine diskless_edit(passed)
+    logical, intent(inout) :: passed
+  end subroutine diskless_edit
+
+  module subroutine diskless_create(passed)
+    logical, intent(inout) :: passed
+  end subroutine diskless_create
+
+  module subroutine diskless_modes(passed)
+    logical, intent(inout) :: passed
+  end subroutine diskless_modes
+
   module subroutine rename_dim_model(passed)
     !! Test dimension renaming and its documented scope and error guarantees.
     logical, intent(inout) :: passed

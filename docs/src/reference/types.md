@@ -56,7 +56,7 @@ described by the NetCDF data model.
 | Component |
 |:--|
 | <span class="grid"><span>`FILE`</span><span>`character(len=:), allocatable`</span></span><br><span class="ind6">Path of the open NetCDF file.</span> |
-| <span class="grid"><span>`MODE`</span><span>`integer(c_int)`</span></span><br><span class="ind6">NetCDF file access mode.</span> |
+| <span class="grid"><span>`MODE`</span><span>`integer(c_int)`</span></span><br><span class="ind6">NetCDF open/create flags, including diskless and persistence flags when selected. Changing this cached value does not change an open dataset's behavior.</span> |
 
 ## `ERROR_TYPE` -- Operation Error Result
 

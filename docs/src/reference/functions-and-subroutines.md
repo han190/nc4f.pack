@@ -44,7 +44,7 @@ if (.exists. err) print '(a)', error_msg(err)
 
 | Description |
 |:--|
-| <span class="ind3">Close an open dataset and release its allocated model metadata.</span> |
+| <span class="ind3">Close an open dataset and release its allocated model metadata. For diskless datasets, `"a"`/`"w"` (or `"append"`/`"write"`) request persistence to disk on close; `"an"`/`"wn"` (or `"append_temp"`/`"write_temp"`) discard the in-memory contents. Close errors, including persistence failures, follow the usual `ERR` convention.</span> |
 
 | Arguments |
 |:--|
@@ -603,7 +603,7 @@ if (.exists. err) print '(a)', error_msg(err)
 
 | Synopsis |
 |:--|
-| <span class="ind3">`NC = OPEN_NETCDF(FILE[, MODE, ERR])`</span> |
+| <span class="ind3">`NC = OPEN_NETCDF(FILE[, MODE, DISKLESS, ERR])`</span> |
 
 | Class |
 |:--|
@@ -611,17 +611,37 @@ if (.exists. err) print '(a)', error_msg(err)
 
 | Description |
 |:--|
-| <span class="ind3">Open or create a NetCDF dataset. `MODE` accepts `"r"`/`"read"` (default), `"w"`/`"write"`/`"replace"`, and `"a"`/`"append"`/`"rw"`.</span> |
+| <span class="ind3">Open or create a NetCDF dataset. `MODE` defaults to `"r"`; `DISKLESS` defaults to `.false.`. Diskless access keeps the NetCDF file representation in RAM, with persistence selected by the mode.</span> |
 
 | Arguments |
 |:--|
 | <span class="grid"><span>`FILE`</span><span>`character(len=*), INTENT(in)`</span></span><br><span class="ind6">Path of the dataset to open or create.</span> |
 | <span class="grid"><span>`MODE`</span><span>`character(len=*), OPTIONAL, INTENT(in)`</span></span><br><span class="ind6">Requested file access mode.</span> |
+| <span class="grid"><span>`DISKLESS`</span><span>`logical, OPTIONAL, INTENT(in)`</span></span><br><span class="ind6">Whether to use a RAM-backed dataset. Defaults to `.false.`.</span> |
 | <span class="grid"><span>`ERR`</span><span>`type(error_type), OPTIONAL, INTENT(out)`</span></span><br><span class="ind6">Receives an operation error.</span> |
 
 | Return |
 |:--|
 | <span class="grid"><span>`NC`</span><span>`type(netcdf_type)`</span></span><br><span class="ind6">Opened or created NetCDF dataset.</span> |
+
+| Mode & Diskless Options |
+|:--|
+| <span class="grid"><span>`OPT 1`</span><span>`MODE="read", DISKLESS=.FALSE.`</span></span><br><span class="ind6">Read an existing disk-backed file.</span> |
+| <span class="grid"><span>`OPT 2`</span><span>`MODE="append", DISKLESS=.FALSE.`</span></span><br><span class="ind6">Modify an existing disk-backed file.</span> |
+| <span class="grid"><span>`OPT 3`</span><span>`MODE="write", DISKLESS=.FALSE.`</span></span><br><span class="ind6">Create or overwrite a disk-backed NetCDF-4 file.</span> |
+| <span class="grid"><span>`OPT 4`</span><span>`MODE="read", DISKLESS=.TRUE.`</span></span><br><span class="ind6">Read an existing file loaded into RAM.</span> |
+| <span class="grid"><span>`OPT 5`</span><span>`MODE="append", DISKLESS=.TRUE.`</span></span><br><span class="ind6">Modify an existing dataset in RAM; save on close.</span> |
+| <span class="grid"><span>`OPT 6`</span><span>`MODE="append_temp", DISKLESS=.TRUE.`</span></span><br><span class="ind6">Modify an existing dataset in RAM; discard changes on close.</span> |
+| <span class="grid"><span>`OPT 7`</span><span>`MODE="write", DISKLESS=.TRUE.`</span></span><br><span class="ind6">Create a NetCDF-4 dataset in RAM; save on close, replacing any existing file.</span> |
+| <span class="grid"><span>`OPT 8`</span><span>`MODE="write_temp", DISKLESS=.TRUE.`</span></span><br><span class="ind6">Create a temporary NetCDF-4 dataset in RAM; discard on close, leaving any existing file unchanged.</span> |
+
+| Mode Aliases |
+|:--|
+| <span class="grid"><span>`R`</span><span>`READ (OPT 1,4)`</span> |
+| <span class="grid"><span>`A`</span><span>`APPEND (OPT 2,5)`</span> |
+| <span class="grid"><span>`W`</span><span>`WRITE (OPT 3,7)`</span> |
+| <span class="grid"><span>`AN`</span><span>`APPEND_TEMP (OPT 6)`</span> |
+| <span class="grid"><span>`WN`</span><span>`WRITE_TEMP (OPT 8)`</span> |
 
 :::{list-table}
 :class: example-table

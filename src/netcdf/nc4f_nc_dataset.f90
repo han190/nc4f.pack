@@ -2,37 +2,28 @@ submodule(nc4f_nc) nc4f_nc_dataset
 implicit none (type, external)
 contains
 
-module function open_netcdf(file, mode, err) result(nc)
+module function open_netcdf(file, mode, diskless, err) result(nc)
   !! Open or create a dataset and return a `netcdf_type` handle.
   character(len=*), intent(in) :: file
   !! Path to the dataset file.
   character(len=*), intent(in), optional :: mode
-  !! Mode to open the file: 'r' for read, 'w' to recreate, or 'a' for
-  !! read/write access to an existing dataset.
+  !! Disk-backed aliases: r/read, a/append, w/write.
+  !! Diskless aliases: r/read, a/append, an/append_temp, w/write, wn/write_temp.
+  logical, intent(in), optional :: diskless
+  !! Keep the NetCDF dataset in RAM; defaults to false (disk-backed access).
+  !! When true, use a diskless mode or alias listed above.
+  !! a/w and their aliases save on close; an/wn and their _temp aliases discard changes.
+  !! This does not write back values modified in separate Fortran objects.
   type(error_type), intent(out), optional :: err
   !! Optional error result. When absent, failures stop the program.
   type(netcdf_type) :: nc
   !! Returned `netcdf_type` describing the opened dataset.
   type(error_type) :: op_err
-
-  nc = open_netcdf_(file, mode, op_err)
-  call return_err(op_err, err)
-end function open_netcdf
-
-function open_netcdf_(file, mode, err) result(nc)
-  !! Open or create a dataset and construct the operation result.
-  character(len=*), intent(in) :: file
-  !! Path of the NetCDF file to read or write.
-  character(len=*), intent(in), optional :: mode
-  !! File access mode: read, replace, or append, including supported aliases.
-  type(error_type), intent(out) :: err
-  !! Error object updated if the operation fails.
-  type(netcdf_type) :: nc
-  !! Result produced by this operation.
   character(len=MAX_CHAR_LEN) :: open_mode
-  integer(c_int) :: stat
+  integer(c_int) :: stat, flags
+  logical :: in_memory, create_file
 
-  err = error_type()
+  op_err = error_type()
   nc%name = "/"
   if (present(mode)) then
     open_mode = trim(mode)
@@ -40,37 +31,56 @@ function open_netcdf_(file, mode, err) result(nc)
     open_mode = "r"
   end if
 
-  select case (trim(open_mode))
-  case ("r", "read")
+  in_memory = .false.
+  if (present(diskless)) in_memory = diskless
+  create_file = .false.
+  if (in_memory) then
+    select case (trim(open_mode))
+    case ("r", "read")
+      flags = ior(NC_NOWRITE, NC_DISKLESS)
+    case ("a", "an", "append", "append_temp")
+      flags = ior(NC_WRITE, NC_DISKLESS)
+      if (trim(open_mode) == "append" .or. &
+        & trim(open_mode) == "a") flags = ior(flags, NC_PERSIST)
+    case ("w", "wn", "write", "write_temp")
+      create_file = .true.
+      flags = ior(ior(NC_NETCDF4, NC_CLOBBER), NC_DISKLESS)
+      if (trim(open_mode) == "write" .or. &
+        & trim(open_mode) == "w") flags = ior(flags, NC_PERSIST)
+    case default
+      op_err = error_type(NC_EINVAL, "open_netcdf", &
+        & "Invalid diskless mode: "//trim(open_mode)// &
+        & "; expected r/read, a/append, an/append_temp, w/write, or wn/write_temp.")
+      call return_err(op_err, err)
+      return
+    end select
+  else
+    select case (trim(open_mode))
+    case ("r", "read")
+      flags = NC_NOWRITE
+    case ("w", "write")
+      create_file = .true.
+      flags = ior(NC_NETCDF4, NC_CLOBBER)
+    case ("a", "append")
+      flags = NC_WRITE
+    case default
+      op_err = error_type(NC_EINVAL, "open_netcdf", &
+        & "Invalid mode: "//trim(open_mode))
+      call return_err(op_err, err)
+      return
+    end select
+  end if
 
-    nc%file = clip(file)
-    stat = nc_open(f2cstr(nc%file), NC_NOWRITE, nc%id)
-    err = netcdf_err(stat, "open_netcdf", nc%file)
-    if (has_err(err)) return
-    nc%mode = NC_NOWRITE
-
-  case ("w", "write", "replace", "overwrite")
-
-    nc%file = clip(file)
-    stat = nc_create(f2cstr(nc%file), ior(NC_NETCDF4, NC_CLOBBER), nc%id)
-    err = netcdf_err(stat, "open_netcdf", nc%file)
-    if (has_err(err)) return
-    nc%mode = NC_NETCDF4
-
-  case ("a", "append", "rw", "readwrite")
-
-    nc%file = clip(file)
-    stat = nc_open(f2cstr(nc%file), NC_WRITE, nc%id)
-    err = netcdf_err(stat, "open_netcdf", nc%file)
-    if (has_err(err)) return
-    nc%mode = NC_WRITE
-
-  case default
-    err = error_type(NC_EINVAL, "open_netcdf", &
-      & "Invalid mode: "//trim(open_mode))
-    return
-  end select
-end function open_netcdf_
+  nc%file = clip(file)
+  if (create_file) then
+    stat = nc_create(f2cstr(nc%file), flags, nc%id)
+  else
+    stat = nc_open(f2cstr(nc%file), flags, nc%id)
+  end if
+  op_err = netcdf_err(stat, "open_netcdf", nc%file)
+  if (.not. has_err(op_err)) nc%mode = flags
+  call return_err(op_err, err)
+end function open_netcdf
 
 module subroutine close_netcdf(nc, err)
   !! Close a dataset and free associated allocatables.
@@ -117,7 +127,7 @@ module subroutine to_netcdf_var(file, vars, atts, err)
   integer :: i
 
   op_err = error_type()
-  nc = open_netcdf_(file, mode="w", err=op_err)
+  nc = open_netcdf(file, mode="w", err=op_err)
   if (.not. has_err(op_err)) then
     select rank (items => vars)
     rank (0)
@@ -161,7 +171,7 @@ module subroutine to_netcdf_grp(file, grp, atts, err)
   type(netcdf_type) :: nc
 
   op_err = error_type()
-  nc = open_netcdf_(file, mode="w", err=op_err)
+  nc = open_netcdf(file, mode="w", err=op_err)
   if (.not. has_err(op_err)) then
     file_root%id = nc%id
     file_root%name = "/"

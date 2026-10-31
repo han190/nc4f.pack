@@ -70,6 +70,10 @@ case default
     & test_type("rename_grp_errors", rename_grp_errors), &
     & test_type("unlimited_wr", unlimited_wr), &
     & test_type("unlimited_dims", unlimited_dims), &
+    & test_type("diskless_read", diskless_read), &
+    & test_type("diskless_edit", diskless_edit), &
+    & test_type("diskless_create", diskless_create), &
+    & test_type("diskless_modes", diskless_modes), &
     & test_type("sum_vars", sum_vars_test), &
     & test_type("sfc_pres_temp_wr", sfc_pres_temp_wr), &
     & test_type("sfc_pres_temp_rd", sfc_pres_temp_rd), &
