@@ -2,6 +2,7 @@ submodule(nc4f_test_cases) nc4f_test_cases_rename
 
 use, intrinsic :: iso_c_binding, only: c_ptr, c_associated
 use, non_intrinsic :: nc4f_c_interface, only: NC_MAX_NAME, NC_EPERM
+use, non_intrinsic :: nc4f_ds, only: buffer2cptr
 implicit none (type, external)
 contains
 

@@ -1,7 +1,85 @@
 submodule(nc4f_ds) nc4f_ds_attribute
-!! Attribute construction, renaming, and equality for the direct v2 data model.
+!! Attribute construction, deletion, renaming, and equality for the direct v2
+!! data model.
 implicit none (type, external)
 contains
+
+pure module subroutine del_att_var(var, name, err)
+  !! Remove a named attribute from the supplied model without accessing a file.
+  type(variable_type), intent(inout) :: var
+  !! Owner whose attribute collection is reduced, preserving survivor order and storage.
+  character(len=*), intent(in) :: name
+  !! Local attribute name; trailing Fortran padding is ignored.
+  type(error_type), intent(out), optional :: err
+  !! Receives status and diagnostic; failures stop execution when omitted.
+  type(error_type) :: op_err
+
+  call del_atts_(var%atts, name, op_err)
+  call return_err(op_err, err)
+end subroutine del_att_var
+
+pure module subroutine del_att_grp(grp, name, err)
+  !! Remove a named attribute from the supplied model without accessing a file.
+  class(group_type), intent(inout) :: grp
+  !! Owner whose attribute collection is reduced, preserving survivor order and storage.
+  character(len=*), intent(in) :: name
+  !! Local attribute name; trailing Fortran padding is ignored.
+  type(error_type), intent(out), optional :: err
+  !! Receives status and diagnostic; failures stop execution when omitted.
+  type(error_type) :: op_err
+
+  call del_atts_(grp%atts, name, op_err)
+  call return_err(op_err, err)
+end subroutine del_att_grp
+
+pure subroutine del_atts_(atts, name, err)
+  !! Remove one matching entry, moving owned storage and retaining borrowed pointers.
+  type(attribute_type), allocatable, intent(inout) :: atts(:)
+  !! Collection to reduce; deleting its last entry leaves an allocated empty array.
+  character(len=*), intent(in) :: name
+  !! Local name of the attribute to remove.
+  type(error_type), intent(out) :: err
+  !! Receives validation or allocation failure; the collection is unchanged on failure.
+  type(attribute_type), allocatable :: kept(:)
+  integer :: i, j, pos, matches, stat
+
+  call check_nc_name(name, err, "[delete_attribute]")
+  if (err%code /= NC_NOERR) return
+  matches = 0
+  pos = 0
+  if (allocated(atts)) then
+    do i = lbound(atts, 1), ubound(atts, 1)
+      if (.not. allocated(atts(i)%name)) cycle
+      if (atts(i)%name /= trim(name)) cycle
+      matches = matches + 1
+      pos = i
+    end do
+  end if
+  if (matches == 0) then
+    err = error_type(NC_ENOTATT, "[delete_attribute] Attribute not found: "//trim(name))
+    return
+  else if (matches > 1) then
+    err = error_type(NC_EINVAL, "[delete_attribute] Ambiguous duplicate attribute: "//trim(name))
+    return
+  end if
+  allocate (kept(size(atts) - 1), stat=stat)
+  if (stat /= 0) then
+    err = error_type(NC_ENOMEM, "[delete_attribute] Cannot allocate reduced attribute collection.")
+    return
+  end if
+  j = 0
+  do i = lbound(atts, 1), ubound(atts, 1)
+    if (i == pos) cycle
+    j = j + 1
+    kept(j)%id = atts(i)%id
+    kept(j)%dtype = atts(i)%dtype
+    kept(j)%len = atts(i)%len
+    call move_alloc(atts(i)%name, kept(j)%name)
+    call move_alloc(atts(i)%buffer, kept(j)%buffer)
+    kept(j)%ptr => atts(i)%ptr
+  end do
+  call move_alloc(kept, atts)
+end subroutine del_atts_
 
 pure module subroutine rename_att_att(att, new_name, err)
   !! Rename an independent attribute in memory; no file is accessed.
@@ -14,12 +92,12 @@ pure module subroutine rename_att_att(att, new_name, err)
   type(error_type) :: op_err
   character(len=:), allocatable :: name
 
-  call chk_nc_name(new_name, op_err, "[rename_attribute]")
+  call check_nc_name(new_name, op_err, "[rename_attribute]")
   if (op_err%code == NC_NOERR) then
     name = trim(new_name)
     call move_alloc(name, att%name)
   end if
-  call ret_ds_err(op_err, err)
+  call return_err(op_err, err)
 end subroutine rename_att_att
 
 pure module subroutine rename_att_var(var, old_name, new_name, err)
@@ -34,7 +112,7 @@ pure module subroutine rename_att_var(var, old_name, new_name, err)
   type(error_type) :: op_err
 
   call rename_atts_(var%atts, old_name, new_name, op_err)
-  call ret_ds_err(op_err, err)
+  call return_err(op_err, err)
 end subroutine rename_att_var
 
 pure module subroutine rename_att_grp(grp, old_name, new_name, err)
@@ -49,7 +127,7 @@ pure module subroutine rename_att_grp(grp, old_name, new_name, err)
   type(error_type) :: op_err
 
   call rename_atts_(grp%atts, old_name, new_name, op_err)
-  call ret_ds_err(op_err, err)
+  call return_err(op_err, err)
 end subroutine rename_att_grp
 
 pure subroutine rename_atts_(atts, old_name, new_name, err)
@@ -63,9 +141,9 @@ pure subroutine rename_atts_(atts, old_name, new_name, err)
   !! Receives the operation status and diagnostic message.
   integer :: i, pos
 
-  call chk_nc_name(old_name, err, "[rename_attribute]")
+  call check_nc_name(old_name, err, "[rename_attribute]")
   if (err%code /= NC_NOERR) return
-  call chk_nc_name(new_name, err, "[rename_attribute]")
+  call check_nc_name(new_name, err, "[rename_attribute]")
   if (err%code /= NC_NOERR) return
   pos = 0
   if (allocated(atts)) then

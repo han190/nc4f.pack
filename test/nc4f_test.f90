@@ -16,6 +16,12 @@ case ("--ownership-invalid-noncontiguous")
   call invalid_noncontiguous_shallow_constructor()
 case ("--ownership-invalid-character")
   call invalid_character_shallow_constructor()
+case ("--error-without-message")
+  call invalid_error_without_message()
+case ("--delete-invalid-model")
+  call invalid_model_delete()
+case ("--delete-invalid-file")
+  call invalid_file_delete()
 case ("--rename-invalid-model")
   call invalid_model_rename()
 case ("--rename-invalid-file")
@@ -28,6 +34,10 @@ case ("--rename-grp-invalid-model")
   call invalid_model_grp_rename()
 case ("--rename-grp-invalid-file")
   call invalid_file_grp_rename()
+case ("--rename-dim-invalid-model")
+  call invalid_model_dim_rename()
+case ("--rename-dim-invalid-file")
+  call invalid_file_dim_rename()
 case default
   tests = [&
     & test_type("c_bindings_storage", c_bindings_storage), &
@@ -43,12 +53,18 @@ case default
     & test_type("hyperslab_reads", hyperslab_reads), &
     & test_type("creation_policy", creation_policy), &
     & test_type("error_handling", error_handling), &
+    & test_type("delete_att_model", delete_att_model), &
+    & test_type("delete_att_file", delete_att_file), &
+    & test_type("delete_att_errors", delete_att_errors), &
     & test_type("rename_att_model", rename_att_model), &
     & test_type("rename_att_file", rename_att_file), &
     & test_type("rename_att_errors", rename_att_errors), &
     & test_type("rename_var_model", rename_var_model), &
     & test_type("rename_var_file", rename_var_file), &
     & test_type("rename_var_errors", rename_var_errors), &
+    & test_type("rename_dim_model", rename_dim_model), &
+    & test_type("rename_dim_file", rename_dim_file), &
+    & test_type("rename_dim_errors", rename_dim_errors), &
     & test_type("rename_grp_model", rename_grp_model), &
     & test_type("rename_grp_file", rename_grp_file), &
     & test_type("rename_grp_errors", rename_grp_errors), &
@@ -77,6 +93,48 @@ case default
 end select
 
 contains
+
+subroutine invalid_model_dim_rename()
+  !! Trigger a model dimension rename failure without ERR.
+  type(variable_type) :: var
+
+  call rename_dimension(var, "missing", "new")
+  stop 0
+end subroutine invalid_model_dim_rename
+
+subroutine invalid_file_dim_rename()
+  !! Trigger a file dimension rename failure without ERR.
+  type(group_type) :: grp
+
+  call rename_dimension(grp, "missing", "new", update_file=.true.)
+  stop 0
+end subroutine invalid_file_dim_rename
+
+subroutine invalid_error_without_message()
+  !! Exercise the shared termination policy for an error with no diagnostic.
+  use nc4f_ds, only: return_err
+  type(error_type) :: err
+
+  err%code = NC_EINVAL
+  call return_err(err)
+  stop 0
+end subroutine invalid_error_without_message
+
+subroutine invalid_model_delete()
+  !! Trigger a model deletion failure without ERR.
+  type(group_type) :: grp
+
+  call delete_attribute(grp, "missing")
+  stop 0
+end subroutine invalid_model_delete
+
+subroutine invalid_file_delete()
+  !! Trigger a file deletion failure without ERR.
+  type(group_type) :: grp
+
+  call delete_attribute(grp, "missing", update_file=.true.)
+  stop 0
+end subroutine invalid_file_delete
 
 subroutine invalid_model_grp_rename()
   !! Trigger a group-renaming model error without ERR to test error termination.

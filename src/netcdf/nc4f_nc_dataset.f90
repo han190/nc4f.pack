@@ -16,11 +16,7 @@ module function open_netcdf(file, mode, err) result(nc)
   type(error_type) :: op_err
 
   nc = open_netcdf_(file, mode, op_err)
-  if (present(err)) then
-    err = op_err
-  else if (handle_err(op_err)) then
-    return
-  end if
+  call return_err(op_err, err)
 end function open_netcdf
 
 function open_netcdf_(file, mode, err) result(nc)
@@ -90,11 +86,7 @@ module subroutine close_netcdf(nc, err)
   type(error_type) :: op_err
 
   call close_netcdf_(nc, op_err)
-  if (present(err)) then
-    err = op_err
-  else if (handle_err(op_err)) then
-    return
-  end if
+  call return_err(op_err, err)
 end subroutine close_netcdf
 
 subroutine close_netcdf_(nc, err)
@@ -156,11 +148,7 @@ module subroutine to_netcdf_var(file, vars, atts, err)
     end if
   end if
 
-  if (present(err)) then
-    err = op_err
-  else if (handle_err(op_err)) then
-    return
-  end if
+  call return_err(op_err, err)
 end subroutine to_netcdf_var
 
 module subroutine to_netcdf_grp(file, grp, atts, err)
@@ -198,11 +186,7 @@ module subroutine to_netcdf_grp(file, grp, atts, err)
     end if
   end if
 
-  if (present(err)) then
-    err = op_err
-  else if (handle_err(op_err)) then
-    return
-  end if
+  call return_err(op_err, err)
 end subroutine to_netcdf_grp
 
 end submodule nc4f_nc_dataset

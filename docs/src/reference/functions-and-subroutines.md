@@ -652,6 +652,34 @@ These two overloads remain impure even when `UPDATE_FILE=.false.`.
 | `UPDATE_FILE` | `logical, intent(in)` | Explicitly request a file update when true. |
 | `ERR` | `type(error_type), optional, intent(out)` | Receives the error; failure stops execution when omitted. |
 
+:::{list-table}
+:class: example-table
+:header-rows: 1
+
+*
+  - Example
+*
+  -
+    ```fortran
+    use, non_intrinsic :: nc4f
+    implicit none (type, external)
+
+    type(netcdf_type) :: nc
+    type(variable_type) :: var
+
+    var = datarray("temperature", [273.15], ["point".dim.1], &
+      & atts=["longname".att."Temperature"])
+    call rename_attribute(var, "longname", "long_name")
+    call to_netcdf("temperature.nc", var, atts=["title".att."Example"])
+
+    nc = open_netcdf("temperature.nc", "a")
+    var = inquire_variable(nc, "temperature")
+    call rename_attribute(nc, var, "long_name", "description", update_file=.true.)
+    call rename_attribute(nc, "title", "heading", update_file=.true.)
+    call close_netcdf(nc)
+    ```
+:::
+
 ### File updates and cached metadata
 
 With `UPDATE_FILE=.true.`, the group must identify an open, writable dataset or
@@ -685,6 +713,38 @@ names in a model return `NC_EINVAL` because the target is ambiguous. File errors
 retain the underlying NetCDF status. Renaming an existing attribute to itself
 is a no-op; a file-backed no-op still checks file access and source existence.
 
+## `DELETE_ATTRIBUTE` -- Delete an Attribute
+
+| Synopsis |
+|:--|
+| <span class="ind3">`CALL DELETE_ATTRIBUTE(VAR, NAME[, ERR])`</span> |
+| <span class="ind3">`CALL DELETE_ATTRIBUTE(GRP, NAME[, ERR])`</span> |
+| <span class="ind3">`CALL DELETE_ATTRIBUTE(GRP, VAR, NAME[, UPDATE_FILE, ERR])`</span> |
+| <span class="ind3">`CALL DELETE_ATTRIBUTE(GRP, NAME, UPDATE_FILE[, ERR])`</span> |
+
+| Class |
+|:--|
+| <span class="ind3">Generic subroutine.</span> |
+
+The first two forms are pure and remove an attribute only from the supplied model.
+They do not access a file, even if the object contains a valid NetCDF ID. There
+is no overload for resetting a standalone `attribute_type`.
+
+The last two forms are impure and can also update an open file. `UPDATE_FILE`
+defaults to `.false.` when a variable object is supplied. It is required for the
+file-capable group form to distinguish it from the model-only group form. Passing
+`.false.` delegates to model-only deletion and never accesses a file, even when
+the supplied group ID is invalid. A `netcdf_type` is accepted wherever `GRP` is
+used, so group attributes include root (global) attributes.
+
+| Argument | Type and intent | Meaning |
+|:--|:--|:--|
+| `VAR` | `type(variable_type), intent(inout)` | Variable whose attribute is deleted, or the variable context for `GRP`. |
+| `GRP` | `class(group_type)` | Group/global attribute owner (`intent(inout)`), or file context for `VAR` (`intent(in)`). |
+| `NAME` | `character(len=*), intent(in)` | Name of the attribute to delete. |
+| `UPDATE_FILE` | `logical, intent(in)` | Explicitly request a file update when true. |
+| `ERR` | `type(error_type), optional, intent(out)` | Receives the error; failure stops execution when omitted. |
+
 :::{list-table}
 :class: example-table
 :header-rows: 1
@@ -701,17 +761,157 @@ is a no-op; a file-backed no-op still checks file access and source existence.
     type(variable_type) :: var
 
     var = datarray("temperature", [273.15], ["point".dim.1], &
-      & atts=["longname".att."Temperature"])
-    call rename_attribute(var, "longname", "long_name")
-    call to_netcdf("temperature.nc", var, atts=["title".att."Example"])
+      & atts=["comment".att."Draft"])
+    call delete_attribute(var, "comment")
 
     nc = open_netcdf("temperature.nc", "a")
-    var = inquire_variable(nc, "temperature")
-    call rename_attribute(nc, var, "long_name", "description", update_file=.true.)
-    call rename_attribute(nc, "title", "heading", update_file=.true.)
+    var = get_variable(nc, "temperature")
+    call delete_attribute(nc, var, "comment", update_file=.true.)
+    call delete_attribute(nc, "history", update_file=.true.)
     call close_netcdf(nc)
     ```
 :::
+
+### Model changes
+
+Deletion immediately reduces `%atts`, preserves survivor order, and leaves an
+allocated zero-length array after removing the last entry. Surviving owned
+buffers are moved without copying their values; borrowed pointers retain their
+associations. Removing an owned attribute releases its buffer, invalidating any
+external pointers into that deleted buffer. Removing a borrowed attribute does
+not free the caller's storage. Array positions may change; do not retain pointers
+to attribute entries across deletion. Model-only removal preserves survivor IDs.
+
+### File updates and cached metadata
+
+With `UPDATE_FILE=.true.`, the group must identify an open, writable dataset or
+subgroup. A variable is resolved by `VAR%name` within that group, rather than by
+its possibly stale stored ID. The file determines whether the attribute exists.
+The routine prepares the reduced cache before calling `nc_del_att`, then commits
+it only after success. An unloaded cache remains unallocated, and a partial cache
+is not populated. Only the supplied cache is updated; independent copies,
+including `grp%vars`, are not synchronized. Ordinary aliases to the same supplied
+object observe its changes.
+
+NetCDF renumbers attributes after deletion, so successful file deletion resets
+all surviving cached attribute IDs to their default invalid value, including
+when the removed attribute was absent from the cache. Names remain usable for
+subsequent operations; these routines do not refresh numeric attribute IDs.
+Deleting metadata does not rewrite the variable's stored data values.
+
+### Names and errors
+
+Names are case-sensitive and use the shared name checker; trailing Fortran blank
+padding is ignored. A missing attribute returns `NC_ENOTATT`, and multiple cached
+entries matching the requested name return `NC_EINVAL`. C errors, such as
+read-only access or a closed group, are propagated without changing the supplied
+cache. Classic-format support is not added by this operation.
+
+## `RENAME_DIMENSION` -- Rename a Dimension
+
+| Synopsis |
+|:--|
+| <span class="ind3">`CALL RENAME_DIMENSION(DIM, NEW_NAME[, ERR])`</span> |
+| <span class="ind3">`CALL RENAME_DIMENSION(VAR, OLD_NAME, NEW_NAME[, ERR])`</span> |
+| <span class="ind3">`CALL RENAME_DIMENSION(GRP, OLD_NAME, NEW_NAME[, ERR])`</span> |
+| <span class="ind3">`CALL RENAME_DIMENSION(GRP, DIM, NEW_NAME[, UPDATE_FILE, ERR])`</span> |
+| <span class="ind3">`CALL RENAME_DIMENSION(GRP, OLD_NAME, NEW_NAME, UPDATE_FILE[, ERR])`</span> |
+
+| Class |
+|:--|
+| <span class="ind3">Generic subroutine.</span> |
+
+The first three forms are pure model operations. The standalone form changes
+only `DIM%name`. The variable form changes every matching entry in `VAR%dims`,
+including repeated axes such as `matrix(x, x)`. The group form updates a local
+`GRP%dims` definition and all matching references in its direct `GRP%vars`.
+If `GRP%dims` is unallocated, direct variable dimensions supply implicit
+definitions; the operation does not allocate a group dimension collection. An
+allocated group dimension collection must contain the requested definition.
+A `netcdf_type` is accepted wherever `GRP` is used.
+
+The last two forms are impure and can also update an open file. `UPDATE_FILE`
+defaults to `.false.` when a dimension object is supplied. It is required for the
+file-capable group/name form to distinguish it from the model-only overload.
+Passing `.false.` delegates to model-only renaming and never accesses a file.
+
+| Argument | Type and intent | Meaning |
+|:--|:--|:--|
+| `DIM` | `type(dimension_type), intent(inout)` | Dimension whose name is changed, or the dimension context for `GRP`. |
+| `VAR` | `type(variable_type), intent(inout)` | Variable whose matching dimensions are renamed. |
+| `GRP` | `class(group_type)` | Dimension owner (`intent(inout)`), or file context for `DIM` (`intent(in)`). |
+| `OLD_NAME` | `character(len=*), intent(in)` | Existing dimension name. |
+| `NEW_NAME` | `character(len=*), intent(in)` | Replacement dimension name. |
+| `UPDATE_FILE` | `logical, intent(in)` | Explicitly request a file update when true. |
+| `ERR` | `type(error_type), optional, intent(out)` | Receives the error; failure stops execution when omitted. |
+
+:::{list-table}
+:class: example-table
+:header-rows: 1
+
+*
+  - Example
+*
+  -
+    ```fortran
+    use, non_intrinsic :: nc4f
+    implicit none (type, external)
+
+    type(netcdf_type) :: nc
+    type(variable_type) :: var
+
+    var = datarray("temperature", [273.15], ["x".dim.1])
+    call rename_dimension(var, "x", "point")
+    call to_netcdf("temperature.nc", var)
+
+    nc = open_netcdf("temperature.nc", "a")
+    call inquire_group(nc)
+    call rename_dimension(nc, "point", "station", update_file=.true.)
+    call close_netcdf(nc)
+    ```
+:::
+
+### Model changes
+
+All forms preserve IDs, lengths, unlimited status, dimension order, variable
+names, attributes, and owned or borrowed data storage. No coordinate variable is
+automatically renamed, and textual attribute references are not rewritten. To
+rename a coordinate variable too, explicitly call `rename_variable` separately.
+
+### File updates and cached metadata
+
+With `UPDATE_FILE=.true.`, the group must be open for writing and must **define**
+the dimension locally. File targets are resolved by the old name using local
+dimension inquiries, never by a cached ID. An inherited dimension is rejected
+with `NC_EBADDIM`; pass its defining group instead. Same-name file requests still
+check existence and write permission.
+
+The file is authoritative for existence. Unloaded caches remain unloaded, and
+partial caches are not populated. The group overload synchronizes only existing
+matching entries in the supplied group's dimension collection and direct variable
+dimensions. The dimension-object overload synchronizes only the supplied object.
+Independent snapshots and descendant caches are unchanged. On disk, descendant
+variables still reference the renamed dimension; explicitly re-inquire their
+metadata before relying on cached names or serializing a previously loaded tree.
+Same-named local dimensions in descendants are separate objects and remain intact.
+
+Before changing the model or calling `nc_rename_dim`, the routines validate names
+and affected cached metadata and prepare replacement names. Cache updates are
+committed only after a successful C call. Variable payloads are never copied.
+Matching cached entries must agree in length, unlimited status, and any known
+(nonnegative) IDs; conflicting identities are rejected rather than merged.
+Consistent stale IDs are preserved, but never used to select the file target.
+Model-only references without IDs are identified by name within the documented
+scope; they do not encode an ancestor's identity.
+
+### Names and errors
+
+Names use the shared checker, including UTF-8 validation and removal of trailing
+Fortran padding. A missing dimension returns `NC_EBADDIM`; a distinct destination
+dimension returns `NC_ENAMEINUSE`; duplicate local declarations or inconsistent
+matching metadata return `NC_EINVAL`. Repeated references to the same dimension
+are valid. C errors such as read-only access propagate without cache mutation.
+Classic-format support is not added by this operation.
 
 ## `RENAME_VARIABLE` -- Rename a Variable
 
@@ -746,6 +946,33 @@ is accepted wherever `GRP` is used.
 | `NEW_NAME` | `character(len=*), intent(in)` | Replacement variable name. |
 | `UPDATE_FILE` | `logical, intent(in)` | Request a file update when true. |
 | `ERR` | `type(error_type), optional, intent(out)` | Receives the error; failure stops execution when omitted. |
+
+:::{list-table}
+:class: example-table
+:header-rows: 1
+
+*
+  - Example
+*
+  -
+    ```fortran
+    use, non_intrinsic :: nc4f
+    implicit none (type, external)
+
+    type(netcdf_type) :: nc
+    type(variable_type) :: var
+
+    var = datarray("temp", [273.15], ["point".dim.1])
+    call rename_variable(var, "temperature")
+    call to_netcdf("temperature.nc", var)
+
+    nc = open_netcdf("temperature.nc", "a")
+    var = inquire_variable(nc, "temperature")
+    call rename_variable(nc, var, "air_temperature", update_file=.true.)
+    call rename_variable(nc, "air_temperature", "temperature", update_file=.true.)
+    call close_netcdf(nc)
+    ```
+:::
 
 ### Variable file updates and caches
 
@@ -786,33 +1013,6 @@ unallocated. File failures preserve the NetCDF status. Renaming an existing
 variable to itself is a no-op; the file-backed form still checks source existence
 and write access.
 
-:::{list-table}
-:class: example-table
-:header-rows: 1
-
-*
-  - Example
-*
-  -
-    ```fortran
-    use, non_intrinsic :: nc4f
-    implicit none (type, external)
-
-    type(netcdf_type) :: nc
-    type(variable_type) :: var
-
-    var = datarray("temp", [273.15], ["point".dim.1])
-    call rename_variable(var, "temperature")
-    call to_netcdf("temperature.nc", var)
-
-    nc = open_netcdf("temperature.nc", "a")
-    var = inquire_variable(nc, "temperature")
-    call rename_variable(nc, var, "air_temperature", update_file=.true.)
-    call rename_variable(nc, "air_temperature", "temperature", update_file=.true.)
-    call close_netcdf(nc)
-    ```
-:::
-
 ## `RENAME_GROUP` -- Rename a Group
 
 | Synopsis |
@@ -845,6 +1045,27 @@ Passing `.false.` delegates to model-only renaming.
 | `NEW_NAME` | `character(len=*), intent(in)` | Replacement local group name. |
 | `UPDATE_FILE` | `logical, intent(in)` | Request a file update when true. |
 | `ERR` | `type(error_type), optional, intent(out)` | Receives the error; failure stops execution when omitted. |
+
+```fortran
+use, non_intrinsic :: nc4f
+implicit none (type, external)
+
+type(netcdf_type) :: nc
+type(group_type) :: root, child
+type(group_type), target :: children(1)
+
+children(1) = dataset("observations")
+root%name = "/"
+root%grps => children
+call rename_group(root, "observations", "measurements")
+call to_netcdf("groups.nc", root)
+
+nc = open_netcdf("groups.nc", "a")
+child = get_group(nc, "measurements")
+call rename_group(nc, child, "samples", update_file=.true.)
+call rename_group(nc, "samples", "observations", update_file=.true.)
+call close_netcdf(nc)
+```
 
 ### Group roots, names, and scope
 
@@ -898,27 +1119,6 @@ Other file failures preserve the NetCDF status.
 
 Renaming an existing group to itself succeeds as a no-op. File-backed calls still
 check that the source exists and that the file is writable.
-
-```fortran
-use, non_intrinsic :: nc4f
-implicit none (type, external)
-
-type(netcdf_type) :: nc
-type(group_type) :: root, child
-type(group_type), target :: children(1)
-
-children(1) = dataset("observations")
-root%name = "/"
-root%grps => children
-call rename_group(root, "observations", "measurements")
-call to_netcdf("groups.nc", root)
-
-nc = open_netcdf("groups.nc", "a")
-child = get_group(nc, "measurements")
-call rename_group(nc, child, "samples", update_file=.true.)
-call rename_group(nc, "samples", "observations", update_file=.true.)
-call close_netcdf(nc)
-```
 
 ## `SHAPE` -- Get Variable Extents
 

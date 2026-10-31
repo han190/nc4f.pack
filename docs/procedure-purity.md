@@ -96,6 +96,15 @@ implementations in that module. They are retained and listed separately from the
 implemented `nc4f_ds` procedures. The third interface-only entry is the test
 callback signature `test_proc`.
 
+## Error termination under optimization
+
+`handle_err` remains pure, but is a subroutine invoked with `CALL`. Its former
+logical-function form was used in a final conditional whose two paths both
+returned. Gfortran's release optimization removed that function reference,
+allowing file errors to return normally when `ERR` was omitted. Explicit
+subroutine calls preserve the intended error termination without relying on
+an otherwise unused function result. All file-layer wrappers use this form.
+
 ## Validation
 
 - All 41 tests pass with gfortran and Flang.
@@ -1074,7 +1083,7 @@ nc4f_nc::neq_att [D,E] @ src/netcdf/nc4f_nc.f90:209 | DECL: interface only; no l
 invalid_model_grp_rename [I] @ test/nc4f_test.f90:81 | STOP: normal STOP statement
 └── rename_grp_grp [P] @ src/data_structure/nc4f_ds_group.f90:6
     ├── chk_nc_name [P] @ src/data_structure/nc4f_ds_utility.f90:6
-    └── ret_ds_err [P] @ src/data_structure/nc4f_ds_utility.f90:67
+    └── return_err [P] @ src/data_structure/nc4f_ds_utility.f90:67
 
 invalid_file_grp_rename [I] @ test/nc4f_test.f90:87 | STOP: normal STOP statement
 └── rename_grp_nc_par [I] @ src/netcdf/nc4f_nc_group.f90:40 | DEP
@@ -1096,12 +1105,12 @@ invalid_file_grp_rename [I] @ test/nc4f_test.f90:87 | STOP: normal STOP statemen
         ├── chk_nc_name [P] => shared
         ├── rename_grps_ [P] @ src/data_structure/nc4f_ds_group.f90:51
         │   └── rename_grp_grp [P] => shared
-        └── ret_ds_err [P] => shared
+        └── return_err [P] => shared
 
 invalid_model_var_rename [I] @ test/nc4f_test.f90:93 | STOP: normal STOP statement
 └── rename_var_var [P] @ src/data_structure/nc4f_ds_variable.f90:6
     ├── chk_nc_name [P] => shared
-    └── ret_ds_err [P] => shared
+    └── return_err [P] => shared
 
 invalid_file_var_rename [I] @ test/nc4f_test.f90:100 | STOP: normal STOP statement
 └── rename_var_nc_grp [I] @ src/netcdf/nc4f_nc_variable.f90:36 | DEP
@@ -1111,7 +1120,7 @@ invalid_file_var_rename [I] @ test/nc4f_test.f90:100 | STOP: normal STOP stateme
     │   ├── rename_vars_ [P] @ src/data_structure/nc4f_ds_variable.f90:31
     │   │   ├── chk_nc_name [P] => shared
     │   │   └── rename_var_var [P] => shared
-    │   └── ret_ds_err [P] => shared
+    │   └── return_err [P] => shared
     └── rename_var_nc_ [I] @ src/netcdf/nc4f_nc_variable.f90:79 | DEP
         ├── f2cstr [P] => shared
         ├── has_err [E] => shared
@@ -1128,7 +1137,7 @@ invalid_model_rename [I] @ test/nc4f_test.f90:107 | STOP: normal STOP statement
 │               └── buffer_size [P] => shared
 └── rename_att_att [P] @ src/data_structure/nc4f_ds_attribute.f90:6
     ├── chk_nc_name [P] => shared
-    └── ret_ds_err [P] => shared
+    └── return_err [P] => shared
 
 invalid_file_rename [I] @ test/nc4f_test.f90:115 | STOP: normal STOP statement
 └── rename_att_nc_grp [I] @ src/netcdf/nc4f_nc_attribute.f90:40 | DEP
@@ -1137,7 +1146,7 @@ invalid_file_rename [I] @ test/nc4f_test.f90:115 | STOP: normal STOP statement
     │   ├── rename_atts_ [P] @ src/data_structure/nc4f_ds_attribute.f90:41
     │   │   ├── chk_nc_name [P] => shared
     │   │   └── rename_att_att [P] => shared
-    │   └── ret_ds_err [P] => shared
+    │   └── return_err [P] => shared
     └── rename_att_nc_ [I] @ src/netcdf/nc4f_nc_attribute.f90:59 | DEP
         ├── f2cstr [P] => shared
         ├── has_err [E] => shared
@@ -1858,7 +1867,7 @@ run_tests [I] @ test/nc4f_test_module.f90:34 | IO/CALLBACK: PRINT and impure pro
 │   │   ├── rename_att_nc_ [I] => shared
 │   │   ├── rename_att_var [P] @ src/data_structure/nc4f_ds_attribute.f90:21
 │   │   │   ├── rename_atts_ [P] => shared
-│   │   │   └── ret_ds_err [P] => shared
+│   │   │   └── return_err [P] => shared
 │   │   └── rename_var_var [P] => shared
 │   ├── rename_att_var [P] => shared
 │   └── to_netcdf_var [I] => shared
@@ -2562,3 +2571,58 @@ ncaux_add_field [X,I] @ src/c_interface/nc4f_c_interface_variable.inc:1348 | EXT
 mandelbrot [E] @ example/mandelbrot.f90:71
 └── mandelbrot [E] => cycle
 ```
+
+## Attribute deletion follow-up
+
+The inventory above predates `delete_attribute`. Its new dependency paths are:
+
+```text
+del_att_var / del_att_grp [pure]
+  del_atts_ [pure]
+    chk_nc_name [pure]
+  return_err [pure]
+del_att_nc_var / del_att_nc_grp [impure]
+  delete_attribute model overload [pure, when update_file is false]
+  del_att_nc_ [impure]
+    del_att_grp [pure, validates and reduces staged names]
+    nc_del_att [impure C boundary]
+    netcdf_err [impure]
+  handle_err [pure]
+```
+
+`del_att_nc_var` also calls `rename_var_var` for pure variable-name validation,
+`nc_inq_varid` to resolve the file variable, and `netcdf_err`. Both file wrappers
+and their helper remain impure even when a particular invocation avoids file I/O.
+The model routines move allocatable buffers and associate pointers from their
+`intent(inout)` collections; they do not modify borrowed targets. The tests include
+a pure caller (`del_pure`) of both public model overloads and a pure assertion
+helper (`chk_del`). The two fail-fast test entry points remain impure because they
+also use ordinary `STOP` to detect unexpected success.
+
+## Shared optional-error handling follow-up
+
+`return_err` now serves all 23 NetCDF wrappers that previously duplicated
+`present(err)` branching and called `handle_err`. It remains pure and uses an
+explicit `CALL`, preserving termination under release optimization. It also
+retains the former `handle_err` fallback diagnostic when an error has no allocated
+message. `handle_err` and its interface have been removed; references to it in
+the historical forest above now resolve to `return_err`.
+
+The helper is exported from the lower-level `nc4f_ds` module for use by
+`nc4f_nc`, but remains private in both `nc4f_nc` and the high-level `nc4f` module.
+Mandatory-error helpers still return errors to their callers, and constructors
+and validation routines with unconditional contract checks keep their existing
+termination behavior. No Fypp-generated optional-error wrappers need changing.
+
+## Dimension renaming follow-up
+
+The three new model overloads (`rename_dim_dim`, `rename_dim_var`, and
+`rename_dim_grp`) are pure. They use the pure `chk_nc_name`, `return_err`, and
+`rename_dims_` helpers. Collections are staged as dimension metadata only;
+prepared names are committed through `move_alloc` without copying variable data.
+
+The file overloads (`rename_dim_nc_dim`, `rename_dim_nc_grp`) remain impure through
+`find_dim_nc_` (dimension inquiries) and `put_dim_name_` (`nc_rename_dim` and
+`netcdf_err`). Their metadata staging and commit helpers (`stage_dim_grp_`,
+`commit_dim_grp_`) are pure. The tests exercise all three public model overloads
+from `pure_dim_calls`; their assertion helper `chk_dim` is pure as well.

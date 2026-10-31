@@ -7,8 +7,10 @@ implicit none (type, external)
 
 public :: simple_wr, simple_rd, character_variables, elemental_reads, hyperslab_reads, buffer_edges
 public :: creation_policy, error_handling
+public :: delete_att_model, delete_att_file, delete_att_errors
 public :: rename_att_model, rename_att_file, rename_att_errors
 public :: rename_var_model, rename_var_file, rename_var_errors
+public :: rename_dim_model, rename_dim_file, rename_dim_errors
 public :: rename_grp_model, rename_grp_file, rename_grp_errors
 public :: unlimited_wr, unlimited_dims
 public :: sum_vars_test, sfc_pres_temp_wr, &
@@ -27,6 +29,42 @@ character(*), parameter :: NETCDF_TYPE_RESULT_FILE = &
   & "build/test-results/nasa_cosp_netcdf_type.txt"
 
 interface
+  module subroutine rename_dim_model(passed)
+    !! Test dimension renaming and its documented scope and error guarantees.
+    logical, intent(inout) :: passed
+    !! Set true when all assertions pass.
+  end subroutine rename_dim_model
+
+  module subroutine rename_dim_file(passed)
+    !! Test dimension renaming and its documented scope and error guarantees.
+    logical, intent(inout) :: passed
+    !! Set true when all assertions pass.
+  end subroutine rename_dim_file
+
+  module subroutine rename_dim_errors(passed)
+    !! Test dimension renaming and its documented scope and error guarantees.
+    logical, intent(inout) :: passed
+    !! Set true when all assertions pass.
+  end subroutine rename_dim_errors
+
+  module subroutine delete_att_model(passed)
+    !! Test pure model deletion and surviving attribute storage.
+    logical, intent(inout) :: passed
+    !! Set true when all checks pass.
+  end subroutine delete_att_model
+
+  module subroutine delete_att_file(passed)
+    !! Test persistent file deletion and supplied cache synchronization.
+    logical, intent(inout) :: passed
+    !! Set true when all checks pass.
+  end subroutine delete_att_file
+
+  module subroutine delete_att_errors(passed)
+    !! Test deletion errors, unchanged state, and failure without ERR.
+    logical, intent(inout) :: passed
+    !! Set true when all checks pass.
+  end subroutine delete_att_errors
+
   module subroutine rename_grp_model(passed)
     !! Test in-memory group renaming and preservation of model contents.
     logical, intent(inout) :: passed

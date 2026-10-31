@@ -15,11 +15,11 @@ NetCDF format support is excluded from this assessment.
 | Feature | Estimated effort | Status | Remaining work |
 | --- | --- | --- | --- |
 | Rename attributes | Very low | Complete | Five `rename_attribute` overloads support model editing and explicit file updates, with tests and documented cache semantics. |
-| Delete attributes | Very low | Planned | Expose model and file deletion with the same optional-error and explicit-file-update conventions as renaming. |
+| Delete attributes | Very low | Complete | Four `delete_attribute` overloads support pure model removal and explicit file deletion, preserving surviving storage and invalidating cached attribute IDs after file updates. |
 | Diskless I/O | Low | Planned | Expose diskless and persistence options through `open_netcdf`; test creation, opening, and close behavior. |
 | Rename variables | Low–medium | Complete | Four `rename_variable` overloads support pure model editing and explicit file updates, using the shared name checker. |
 | Rename groups | Low–medium | Complete | Four `rename_group` overloads support pure model editing and explicit file updates, with root protection and shared-child-cache semantics. |
-| Rename dimensions | Low–medium | Planned | Expose the existing binding and define how loaded dimension references remain consistent. |
+| Rename dimensions | Low–medium | Complete | Five `rename_dimension` overloads support pure model editing and explicit file updates, synchronizing direct caches and rejecting inherited file targets. |
 | Strided writes | Low–medium | Planned | Extend the private hyperslab writer with stride validation and expose a public write operation. |
 | NetCDF-4 storage controls | Medium | Under consideration | Represent per-variable chunking, compression, shuffle/checksum, endianness, and fill settings; apply them before data writes and support inquiry and validation. |
 | Multi-slab I/O | Medium | Under consideration | Compose slab operations and define result ordering, shapes, and partial-failure behavior. |
@@ -41,12 +41,12 @@ NetCDF format support is excluded from this assessment.
 - [x] Test persistence after reopening, missing names, name conflicts, and read-only access.
 - [x] Document the operations and update the README limitation.
 
-### 1b. Attribute deletion — Planned
+### 1b. Attribute deletion — Complete
 
-- [ ] Define model and file deletion operations consistent with `rename_attribute`.
-- [ ] Implement deletion with error handling and cache synchronization.
-- [ ] Test persistence, missing attributes, read-only access, and unchanged state on failure.
-- [ ] Document the operations and update the README limitation.
+- [x] Define model and file deletion operations consistent with `rename_attribute`.
+- [x] Implement deletion with error handling and cache synchronization.
+- [x] Test persistence, missing attributes, read-only access, and unchanged state on failure.
+- [x] Document the operations and update the README limitation.
 
 ### 2. Diskless I/O
 
@@ -72,13 +72,13 @@ NetCDF format support is excluded from this assessment.
 - [x] Test persistence, nested groups, stale IDs, partial caches, root protection, and errors.
 - [x] Document the operations and update the README limitation.
 
-### 3c. Dimension renaming — Planned
+### 3c. Dimension renaming — Complete
 
-- [ ] Define public rename operations and metadata-refresh semantics.
-- [ ] Handle dimension references and names in already-loaded models.
-- [ ] Implement wrappers and error propagation.
-- [ ] Test persistence after reopening, shared dimensions, and failure cases.
-- [ ] Document the operations and update the README limitation.
+- [x] Define public rename operations and metadata-refresh semantics.
+- [x] Synchronize direct dimension references; document explicit refresh of descendant caches.
+- [x] Implement wrappers and error propagation.
+- [x] Test persistence after reopening, shared dimensions, and failure cases.
+- [x] Document the operations and update the README limitation.
 
 ### 4. Strided writes
 

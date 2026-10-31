@@ -2,7 +2,130 @@ submodule(nc4f_nc) nc4f_nc_attribute
 implicit none (type, external)
 contains
 
-module subroutine rename_att_nc_var(grp, var, old_name, new_name, update_file, err)
+module subroutine del_att_nc_var(grp, var, name, update_file, err)
+  !! Delete a variable attribute in the model and optionally in its open NetCDF group.
+  !! Independent copies, including grp%vars, are not synchronized.
+  class(group_type), intent(in) :: grp
+  !! Open containing group, used only when updating the file.
+  type(variable_type), intent(inout) :: var
+  !! Variable whose supplied attribute cache is updated after successful deletion.
+  character(len=*), intent(in) :: name
+  !! Local attribute name; trailing Fortran padding is ignored.
+  logical, intent(in), optional :: update_file
+  !! Whether to delete from the file too; defaults to false.
+  type(error_type), intent(out), optional :: err
+  !! Receives status and diagnostic; failures stop execution when omitted.
+  type(error_type) :: op_err
+  type(variable_type) :: checked
+  integer(c_int) :: stat, varid
+  logical :: write_file
+
+  write_file = .false.
+  if (present(update_file)) write_file = update_file
+  if (.not. write_file) then
+    call delete_attribute(var, name, op_err)
+  else if (.not. allocated(var%name)) then
+    op_err = error_type(NC_EINVAL, "[delete_attribute] Variable must have a name.")
+  else
+    ! Reuse model validation before converting the variable name to a C string.
+    call rename_variable(checked, var%name, op_err)
+    if (.not. has_err(op_err)) then
+      stat = nc_inq_varid(grp%id, f2cstr(checked%name), varid)
+      op_err = netcdf_err(stat, "[delete_attribute] Resolve variable: "//checked%name)
+      if (.not. has_err(op_err)) call del_att_nc_(grp%id, varid, var%atts, name, op_err)
+    end if
+  end if
+  call return_err(op_err, err)
+end subroutine del_att_nc_var
+
+module subroutine del_att_nc_grp(grp, name, update_file, err)
+  !! Delete a group/global attribute in the model and optionally in the open file.
+  class(group_type), intent(inout) :: grp
+  !! Group whose supplied attribute cache is updated after successful deletion.
+  character(len=*), intent(in) :: name
+  !! Local attribute name; trailing Fortran padding is ignored.
+  logical, intent(in) :: update_file
+  !! Whether to delete from the file too; required to distinguish model-only calls.
+  type(error_type), intent(out), optional :: err
+  !! Receives status and diagnostic; failures stop execution when omitted.
+  type(error_type) :: op_err
+
+  if (update_file) then
+    call del_att_nc_(grp%id, NC_GLOBAL, grp%atts, name, op_err)
+  else
+    call delete_attribute(grp, name, op_err)
+  end if
+  call return_err(op_err, err)
+end subroutine del_att_nc_grp
+
+subroutine del_att_nc_(ncid, varid, atts, name, err)
+  !! Stage cache removal, delete from the file, then commit without copying values.
+  integer(c_int), intent(in) :: ncid, varid
+  !! ncid: Open file/group identifier. varid: Variable identifier or NC_GLOBAL.
+  type(attribute_type), allocatable, intent(inout) :: atts(:)
+  !! Optional cache; successful deletion invalidates all surviving attribute IDs.
+  character(len=*), intent(in) :: name
+  !! Local name to delete; existence is determined by the file.
+  type(error_type), intent(out) :: err
+  !! Receives status; C-call failures leave the supplied cache unchanged.
+  type(group_type) :: staged
+  type(attribute_type) :: empty
+  integer(c_int) :: stat
+  integer :: i, j, n, pos, alloc_stat
+  logical :: cached
+
+  n = 0
+  pos = 0
+  cached = .false.
+  if (allocated(atts)) then
+    n = size(atts)
+    do i = lbound(atts, 1), ubound(atts, 1)
+      if (.not. allocated(atts(i)%name)) cycle
+      if (atts(i)%name /= trim(name)) cycle
+      pos = i
+      cached = .true.
+    end do
+  end if
+  allocate (staged%atts(n + merge(0, 1, cached)), stat=alloc_stat)
+  if (alloc_stat /= 0) then
+    err = error_type(NC_ENOMEM, "[delete_attribute] Cannot allocate staged attribute collection.")
+    return
+  end if
+  j = 0
+  if (allocated(atts)) then
+    do i = lbound(atts, 1), ubound(atts, 1)
+      j = j + 1
+      if (allocated(atts(i)%name)) staged%atts(j)%name = atts(i)%name
+    end do
+  end if
+  ! A placeholder permits an unloaded/partial cache while checking names and duplicates.
+  if (.not. cached) staged%atts(n + 1)%name = trim(name)
+  call delete_attribute(staged, name, err)
+  if (has_err(err)) return
+
+  stat = nc_del_att(ncid, varid, f2cstr(name))
+  err = netcdf_err(stat, "[delete_attribute] Delete attribute: "//trim(name))
+  if (has_err(err)) return
+  if (.not. allocated(atts)) return
+  if (cached) then
+    j = 0
+    do i = lbound(atts, 1), ubound(atts, 1)
+      if (i == pos) cycle
+      j = j + 1
+      staged%atts(j)%dtype = atts(i)%dtype
+      staged%atts(j)%len = atts(i)%len
+      call move_alloc(atts(i)%name, staged%atts(j)%name)
+      call move_alloc(atts(i)%buffer, staged%atts(j)%buffer)
+      staged%atts(j)%ptr => atts(i)%ptr
+    end do
+    call move_alloc(staged%atts, atts)
+  end if
+  ! Attribute numbers shift on disk, including when the deleted entry was not cached.
+  atts%id = empty%id
+end subroutine del_att_nc_
+
+module subroutine rename_att_nc_var(grp, var, old_name, new_name, update_file, &
+    err)
   !! Rename a variable attribute; optionally update the file and supplied cache.
   !! Other variable copies, including grp%vars, are not synchronized.
   class(group_type), intent(in) :: grp
@@ -38,11 +161,7 @@ module subroutine rename_att_nc_var(grp, var, old_name, new_name, update_file, e
       end if
     end if
   end if
-  if (present(err)) then
-    err = op_err
-  else if (handle_err(op_err)) then
-    return
-  end if
+  call return_err(op_err, err)
 end subroutine rename_att_nc_var
 
 module subroutine rename_att_nc_grp(grp, old_name, new_name, update_file, err)
@@ -64,11 +183,7 @@ module subroutine rename_att_nc_grp(grp, old_name, new_name, update_file, err)
   else
     call rename_attribute(grp, old_name, new_name, op_err)
   end if
-  if (present(err)) then
-    err = op_err
-  else if (handle_err(op_err)) then
-    return
-  end if
+  call return_err(op_err, err)
 end subroutine rename_att_nc_grp
 
 subroutine rename_att_nc_(ncid, varid, atts, old_name, new_name, err)
@@ -131,11 +246,7 @@ impure elemental module function get_att_grp(nc, name, err) result(att)
   type(error_type) :: op_err
 
   att = get_att_(nc%id, NC_GLOBAL, clip(name), op_err)
-  if (present(err)) then
-    err = op_err
-  else if (handle_err(op_err)) then
-    return
-  end if
+  call return_err(op_err, err)
 end function get_att_grp
 
 module function get_atts_grp(nc, err) result(atts)
@@ -149,11 +260,7 @@ module function get_atts_grp(nc, err) result(atts)
   type(error_type) :: op_err
 
   atts = get_atts_(nc%id, NC_GLOBAL, op_err)
-  if (present(err)) then
-    err = op_err
-  else if (handle_err(op_err)) then
-    return
-  end if
+  call return_err(op_err, err)
 end function get_atts_grp
 
 module function get_att_var(nc, var, name, err) result(att)
@@ -171,11 +278,7 @@ module function get_att_var(nc, var, name, err) result(att)
   type(error_type) :: op_err
 
   att = get_att_(nc%id, var%id, name, op_err)
-  if (present(err)) then
-    err = op_err
-  else if (handle_err(op_err)) then
-    return
-  end if
+  call return_err(op_err, err)
 end function get_att_var
 
 module function get_atts_var(nc, var, err) result(atts)
@@ -191,11 +294,7 @@ module function get_atts_var(nc, var, err) result(atts)
   type(error_type) :: op_err
 
   atts = get_atts_(nc%id, var%id, op_err)
-  if (present(err)) then
-    err = op_err
-  else if (handle_err(op_err)) then
-    return
-  end if
+  call return_err(op_err, err)
 end function get_atts_var
 
 function get_atts_(ncid, varid, err) result(atts)

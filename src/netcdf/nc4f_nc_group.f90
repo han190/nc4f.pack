@@ -36,11 +36,7 @@ module subroutine rename_grp_nc_grp(parent, grp, new_name, update_file, err)
       end if
     end if
   end if
-  if (present(err)) then
-    err = op_err
-  else if (handle_err(op_err)) then
-    return
-  end if
+  call return_err(op_err, err)
 end subroutine rename_grp_nc_grp
 
 module subroutine rename_grp_nc_par(parent, old_name, new_name, update_file, err)
@@ -87,11 +83,7 @@ module subroutine rename_grp_nc_par(parent, old_name, new_name, update_file, err
     end if
     nullify (staged%grps)
   end if
-  if (present(err)) then
-    err = op_err
-  else if (handle_err(op_err)) then
-    return
-  end if
+  call return_err(op_err, err)
 end subroutine rename_grp_nc_par
 
 subroutine rename_grp_nc_(ncid, old_name, new_name, err)
@@ -119,7 +111,6 @@ subroutine rename_grp_nc_(ncid, old_name, new_name, err)
   err = netcdf_err(stat, "[rename_group] Rename group: "//trim(old_name)//" -> "//trim(new_name))
 end subroutine rename_grp_nc_
 
-
 module function get_group(parent, name, err) result(group)
   !! Return a direct child group by name.
   class(group_type), intent(in) :: parent
@@ -133,11 +124,7 @@ module function get_group(parent, name, err) result(group)
   type(error_type) :: op_err
 
   group = get_grp_(parent, name, op_err)
-  if (present(err)) then
-    err = op_err
-  else if (handle_err(op_err)) then
-    return
-  end if
+  call return_err(op_err, err)
 end function get_group
 
 module function inquire_subgroups(parent, err) result(grps)
@@ -151,11 +138,7 @@ module function inquire_subgroups(parent, err) result(grps)
   type(error_type) :: op_err
 
   grps = inq_grps_(parent, op_err)
-  if (present(err)) then
-    err = op_err
-  else if (handle_err(op_err)) then
-    return
-  end if
+  call return_err(op_err, err)
 end function inquire_subgroups
 
 recursive module subroutine inquire_group(group, &
@@ -211,11 +194,7 @@ recursive module subroutine inquire_group(group, &
     end if
   end if
 
-  if (present(err)) then
-    err = op_err
-  else if (handle_err(op_err)) then
-    return
-  end if
+  call return_err(op_err, err)
 end subroutine inquire_group
 
 module subroutine serialize_grp(root, grp, atts, err)

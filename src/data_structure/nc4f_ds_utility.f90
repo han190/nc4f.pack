@@ -1,9 +1,9 @@
 submodule(nc4f_ds) nc4f_ds_utility
-!! Shared pure utilities for data-model operations.
+!! Shared pure validation and error-handling utilities.
 implicit none (type, external)
 contains
 
-pure module subroutine chk_nc_name(name, err, context)
+pure module subroutine check_nc_name(name, err, context)
   !! Check NetCDF name syntax without C calls. Trailing Fortran padding is ignored.
   !! UTF-8 is validated here; callers supply NFC-normalized Unicode names.
   character(len=*), intent(in) :: name
@@ -15,7 +15,7 @@ pure module subroutine chk_nc_name(name, err, context)
   character(len=:), allocatable :: ctx
   integer :: i, j, n, byte, ncont, lo, hi
 
-  ctx = "[chk_nc_name]"
+  ctx = "[check_nc_name]"
   if (present(context)) ctx = context
   err = error_type(NC_EBADNAME, ctx//" Invalid NetCDF name.")
   n = len_trim(name)
@@ -65,10 +65,10 @@ pure module subroutine chk_nc_name(name, err, context)
     i = i + ncont + 1
   end do
   err = error_type()
-end subroutine chk_nc_name
+end subroutine check_nc_name
 
-pure module subroutine ret_ds_err(op_err, err)
-  !! Apply the optional-error convention without depending on the I/O layer.
+pure module subroutine return_err(op_err, err)
+  !! Return an optional error or terminate, shared by model and NetCDF operations.
   type(error_type), intent(in) :: op_err
   !! Completed operation result to return or use for error termination.
   type(error_type), intent(out), optional :: err
@@ -77,8 +77,12 @@ pure module subroutine ret_ds_err(op_err, err)
   if (present(err)) then
     err = op_err
   else if (op_err%code /= NC_NOERR) then
-    error stop op_err%msg
+    if (allocated(op_err%msg)) then
+      error stop trim(op_err%msg)
+    else
+      error stop "nc4f operation failed without a diagnostic."
+    end if
   end if
-end subroutine ret_ds_err
+end subroutine return_err
 
 end submodule nc4f_ds_utility

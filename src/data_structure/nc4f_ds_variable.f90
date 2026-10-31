@@ -14,12 +14,12 @@ pure module subroutine rename_var_var(var, new_name, err)
   type(error_type) :: op_err
   character(len=:), allocatable :: name
 
-  call chk_nc_name(new_name, op_err, "[rename_variable]")
+  call check_nc_name(new_name, op_err, "[rename_variable]")
   if (op_err%code == NC_NOERR) then
     name = trim(new_name)
     call move_alloc(name, var%name)
   end if
-  call ret_ds_err(op_err, err)
+  call return_err(op_err, err)
 end subroutine rename_var_var
 
 pure module subroutine rename_var_grp(grp, old_name, new_name, err)
@@ -34,7 +34,7 @@ pure module subroutine rename_var_grp(grp, old_name, new_name, err)
   type(error_type) :: op_err
 
   call rename_vars_(grp%vars, old_name, new_name, op_err)
-  call ret_ds_err(op_err, err)
+  call return_err(op_err, err)
 end subroutine rename_var_grp
 
 pure subroutine rename_vars_(vars, old_name, new_name, err)
@@ -48,9 +48,9 @@ pure subroutine rename_vars_(vars, old_name, new_name, err)
   !! Receives the operation status and diagnostic message.
   integer :: i, pos, lo
 
-  call chk_nc_name(old_name, err, "[rename_variable]")
+  call check_nc_name(old_name, err, "[rename_variable]")
   if (err%code /= NC_NOERR) return
-  call chk_nc_name(new_name, err, "[rename_variable]")
+  call check_nc_name(new_name, err, "[rename_variable]")
   if (err%code /= NC_NOERR) return
   pos = 0
   lo = 1

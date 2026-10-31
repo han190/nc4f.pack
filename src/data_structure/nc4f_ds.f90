@@ -6,7 +6,8 @@ use, intrinsic :: iso_c_binding, only: &
   & c_f_pointer, c_int, c_loc, c_null_ptr, c_ptr
 use, non_intrinsic :: nc4f_c_interface, only: &
   & NC_EBADID, NC_EBADDIM, NC_EBADGRPID, NC_EEDGE, NC_EINVAL, NC_EINVALCOORDS, &
-  & NC_ENOGRP, NC_ENOTATT, NC_ENOTFOUND, NC_ENOTVAR, NC_NOERR, NC_NOWRITE, &
+  & NC_ENOMEM, NC_ENOGRP, NC_ENOTATT, NC_ENOTFOUND, NC_ENOTVAR, NC_NOERR, &
+    NC_NOWRITE, &
   & NC_EBADNAME, NC_EMAXNAME, NC_ENAMEINUSE, NC_MAX_NAME
 implicit none (type, external)
 
@@ -19,7 +20,11 @@ public :: datarray, dataset, extract, initialize, operator(.att.), &
   & operator(.and.), operator(.dim.), &
   & operator(==), operator(/=), shape, size, sum
 public :: buffer_size, buffer2cptr, validate
-public :: rename_attribute, rename_variable, rename_group, NC_EBADNAME, NC_EMAXNAME, NC_ENAMEINUSE
+public :: return_err
+!! Shared implementation utility for the data-model and NetCDF layers.
+public :: delete_attribute, rename_attribute, rename_variable, rename_group, &
+    rename_dimension, &
+  & NC_EBADNAME, NC_EMAXNAME, NC_ENAMEINUSE
 private
 
 integer(int32), parameter :: INVALID_INT32 = -2147483647_int32
@@ -135,6 +140,14 @@ include "nc4f_ds_attribute_constructor.inc"
 include "nc4f_ds_variable_constructor.inc"
 include "nc4f_ds_extract.inc"
 
+interface rename_dimension
+  module procedure :: rename_dim_dim, rename_dim_var, rename_dim_grp
+end interface rename_dimension
+
+interface delete_attribute
+  module procedure :: del_att_var, del_att_grp
+end interface delete_attribute
+
 interface rename_attribute
   module procedure :: rename_att_att, rename_att_var, rename_att_grp
 end interface rename_attribute
@@ -207,6 +220,36 @@ interface dataset
 end interface dataset
 
 interface
+  pure module subroutine rename_dim_dim(dim, new_name, err)
+    !! Rename one dimension without changing its identity, length, or unlimited flag.
+    type(dimension_type), intent(inout) :: dim
+    !! Standalone dimension to rename; other copies are unchanged.
+    character(len=*), intent(in) :: new_name
+    !! Replacement local name; trailing Fortran padding is ignored.
+    type(error_type), intent(out), optional :: err
+    !! Receives status; failures terminate execution when omitted.
+  end subroutine rename_dim_dim
+
+  pure module subroutine rename_dim_var(var, old_name, new_name, err)
+    !! Rename all matching axes in one variable, including repeated dimension references.
+    type(variable_type), intent(inout) :: var
+    !! Variable whose dimension names change; data and other metadata are preserved.
+    character(len=*), intent(in) :: old_name, new_name
+    !! old_name: Dimension to find. new_name: Replacement local name.
+    type(error_type), intent(out), optional :: err
+    !! Receives status; failures terminate execution when omitted.
+  end subroutine rename_dim_var
+
+  pure module subroutine rename_dim_grp(grp, old_name, new_name, err)
+    !! Rename a local dimension and its direct variable references; do not traverse children.
+    class(group_type), intent(inout) :: grp
+    !! Group with local definitions or, if dims is unallocated, implicit variable dimensions.
+    character(len=*), intent(in) :: old_name, new_name
+    !! old_name: Dimension to find. new_name: Replacement local name.
+    type(error_type), intent(out), optional :: err
+    !! Receives status; failures terminate execution when omitted.
+  end subroutine rename_dim_grp
+
   pure module subroutine rename_grp_grp(grp, new_name, err)
     !! Rename a non-root group in memory, preserving its contents and child aliases.
     class(group_type), intent(inout) :: grp
@@ -228,7 +271,7 @@ interface
     !! Receives the status and diagnostic; failures stop execution when omitted.
   end subroutine rename_grp_par
 
-  pure module subroutine chk_nc_name(name, err, context)
+  pure module subroutine check_nc_name(name, err, context)
     !! Shared NetCDF name validation, private to the data-model module/submodules.
     character(len=*), intent(in) :: name
     !! NetCDF local name to validate; trailing Fortran blank padding is ignored.
@@ -236,15 +279,16 @@ interface
     !! Receives the operation status and diagnostic message.
     character(len=*), intent(in), optional :: context
     !! Context label included in error diagnostics.
-  end subroutine chk_nc_name
+  end subroutine check_nc_name
 
-  pure module subroutine ret_ds_err(op_err, err)
-    !! Apply the optional-error convention for data-model operations.
+  pure module subroutine return_err(op_err, err)
+    !! Return an optional error or terminate, shared by model and NetCDF
+    !! operations.
     type(error_type), intent(in) :: op_err
     !! Completed operation result to return or use for error termination.
     type(error_type), intent(out), optional :: err
     !! Receives the status and diagnostic; failures stop execution when omitted.
-  end subroutine ret_ds_err
+  end subroutine return_err
 
   pure module subroutine rename_var_var(var, new_name, err)
     !! Rename an independent variable in memory; preserve its metadata and storage.
@@ -266,6 +310,26 @@ interface
     type(error_type), intent(out), optional :: err
     !! Receives the status and diagnostic; failures stop execution when omitted.
   end subroutine rename_var_grp
+
+  pure module subroutine del_att_var(var, name, err)
+    !! Remove a named attribute from the supplied model without accessing a file.
+    type(variable_type), intent(inout) :: var
+    !! Owner whose attribute collection is reduced, preserving survivor order and storage.
+    character(len=*), intent(in) :: name
+    !! Local attribute name; trailing Fortran padding is ignored.
+    type(error_type), intent(out), optional :: err
+    !! Receives status and diagnostic; failures stop execution when omitted.
+  end subroutine del_att_var
+
+  pure module subroutine del_att_grp(grp, name, err)
+    !! Remove a named attribute from the supplied model without accessing a file.
+    class(group_type), intent(inout) :: grp
+    !! Owner whose attribute collection is reduced, preserving survivor order and storage.
+    character(len=*), intent(in) :: name
+    !! Local attribute name; trailing Fortran padding is ignored.
+    type(error_type), intent(out), optional :: err
+    !! Receives status and diagnostic; failures stop execution when omitted.
+  end subroutine del_att_grp
 
   pure module subroutine rename_att_att(att, new_name, err)
     !! Rename an independent attribute in memory; no file is accessed.

@@ -10,21 +10,6 @@ logical elemental module function has_err(err) result(is_err)
   is_err = err%code /= NC_NOERR
 end function has_err
 
-pure logical module function handle_err(err) result(has_failed)
-  !! Apply nc4f's fail-fast policy to a completed error result.
-  type(error_type), intent(in) :: err
-  !! Completed result of an nc4f operation.
-
-  has_failed = has_err(err)
-  if (.not. has_failed) return
-
-  if (allocated(err%msg)) then
-    error stop trim(err%msg)
-  else
-    error stop "nc4f operation failed without a diagnostic."
-  end if
-end function handle_err
-
 module function netcdf_err(status, context) result(err)
   !! Convert a NetCDF C status into nc4f's normal error result.
   integer(c_int), intent(in) :: status

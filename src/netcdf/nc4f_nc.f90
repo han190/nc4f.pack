@@ -10,11 +10,19 @@ implicit none (type, external)
 public :: &
   & open_netcdf, close_netcdf, to_netcdf, &
   & inquire_dimensions, inquire_variable, &
-  & get_attribute, get_variable, &
-  & get_group, inquire_subgroups, inquire_group, operator(.exists.)
+  & get_attribute, get_variable, get_group, &
+  & delete_attribute, rename_attribute, rename_variable, rename_group, &
+    rename_dimension, &
+  & inquire_subgroups, inquire_group, operator(.exists.)
 private
 
-public :: rename_attribute, rename_variable, rename_group
+interface rename_dimension
+  module procedure :: rename_dim_nc_dim, rename_dim_nc_grp
+end interface rename_dimension
+
+interface delete_attribute
+  module procedure :: del_att_nc_var, del_att_nc_grp
+end interface delete_attribute
 
 interface rename_attribute
   module procedure :: rename_att_nc_var, rename_att_nc_grp
@@ -60,6 +68,32 @@ interface initialize
 end interface initialize
 
 interface
+  module subroutine rename_dim_nc_dim(grp, dim, new_name, update_file, err)
+    !! Rename a locally defined file dimension and only the supplied dimension object.
+    class(group_type), intent(in) :: grp
+    !! Defining open group when update_file is true; its caches are not synchronized.
+    type(dimension_type), intent(inout) :: dim
+    !! Dimension whose old name selects the file target; its cached ID is not trusted.
+    character(len=*), intent(in) :: new_name
+    !! Replacement local name; trailing padding is ignored.
+    logical, intent(in), optional :: update_file
+    !! Whether to update the file as well as dim; defaults to false.
+    type(error_type), intent(out), optional :: err
+    !! Receives status; failures terminate execution when omitted.
+  end subroutine rename_dim_nc_dim
+
+  module subroutine rename_dim_nc_grp(grp, old_name, new_name, update_file, err)
+    !! Rename a local file dimension and synchronize only direct loaded dimension references.
+    class(group_type), intent(inout) :: grp
+    !! Defining group; descendant caches and independent snapshots are unchanged.
+    character(len=*), intent(in) :: old_name, new_name
+    !! old_name: Local dimension to find. new_name: Replacement local name.
+    logical, intent(in) :: update_file
+    !! Whether to update the file; required to distinguish the model-only overload.
+    type(error_type), intent(out), optional :: err
+    !! Receives status; failures terminate execution when omitted.
+  end subroutine rename_dim_nc_grp
+
   module subroutine rename_grp_nc_grp(parent, grp, new_name, update_file, err)
     !! Rename the supplied child, optionally updating its name in an open file.
     class(group_type), intent(in) :: parent
@@ -116,8 +150,37 @@ interface
     !! Receives the status and diagnostic; failures stop execution when omitted.
   end subroutine rename_var_nc_grp
 
-  module subroutine rename_att_nc_var(grp, var, old_name, new_name, update_file, err)
-    !! Rename a variable attribute; optionally update the file and supplied cache.
+  module subroutine del_att_nc_var(grp, var, name, update_file, err)
+    !! Delete a variable attribute in the model and optionally in its open NetCDF group.
+    !! Independent copies, including grp%vars, are not synchronized.
+    class(group_type), intent(in) :: grp
+    !! Open containing group, used only when updating the file.
+    type(variable_type), intent(inout) :: var
+    !! Variable whose supplied attribute cache is updated after successful deletion.
+    character(len=*), intent(in) :: name
+    !! Local attribute name; trailing Fortran padding is ignored.
+    logical, intent(in), optional :: update_file
+    !! Whether to delete from the file too; defaults to false.
+    type(error_type), intent(out), optional :: err
+    !! Receives status and diagnostic; failures stop execution when omitted.
+  end subroutine del_att_nc_var
+
+  module subroutine del_att_nc_grp(grp, name, update_file, err)
+    !! Delete a group/global attribute in the model and optionally in the open file.
+    class(group_type), intent(inout) :: grp
+    !! Group whose supplied attribute cache is updated after successful deletion.
+    character(len=*), intent(in) :: name
+    !! Local attribute name; trailing Fortran padding is ignored.
+    logical, intent(in) :: update_file
+    !! Whether to delete from the file too; required to distinguish model-only calls.
+    type(error_type), intent(out), optional :: err
+    !! Receives status and diagnostic; failures stop execution when omitted.
+  end subroutine del_att_nc_grp
+
+  module subroutine rename_att_nc_var(grp, var, old_name, new_name, &
+      update_file, err)
+    !! Rename a variable attribute; optionally update the file and supplied
+    !! cache.
     !! Other variable copies, including grp%vars, are not synchronized.
     class(group_type), intent(in) :: grp
     !! Open group containing the supplied variable when a file update is requested.
@@ -317,14 +380,6 @@ interface
     !! Allocatable array of `dimension_type` for that variable.
   end function inq_dims_var
 
-
-  pure logical module function handle_err(err) result(has_failed)
-    !! submodule_utility.f90
-    !! Apply the library's fail-fast policy to a completed error result.
-    type(error_type), intent(in) :: err
-    !! Completed result of an nc4f operation.
-  end function handle_err
-
   module function netcdf_err(status, context) result(err)
     !! Construct an `error_type` from a NetCDF C status and optional context.
     integer(c_int), intent(in) :: status
@@ -376,7 +431,6 @@ interface
     type(variable_type), intent(inout) :: var
     !! Variable to process.
   end subroutine initialize_var
-
 
   module function get_variable(nc, name, start, count, stride, err) result(var)
     !! submodule_variable.f90

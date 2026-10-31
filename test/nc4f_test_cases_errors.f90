@@ -44,13 +44,31 @@ module subroutine error_handling(passed)
   !! Whether the test case has passed.
   real, parameter :: values(1) = [42.0]
   character(len=1024) :: stdout
-  integer :: iostat
+  integer :: iostat, unit, status, cmdstat
+  character(len=1024) :: executable, command
+  logical :: found_fallback
   type(attribute_type) :: att
   type(error_type) :: err
   type(netcdf_type) :: nc
   type(variable_type) :: invalid, present, var, vars(2)
 
   passed = .false.
+  call get_command_argument(0, executable)
+  command = '"'//trim(executable)//'" --error-without-message > '// &
+    & TEST_RESULTS_DIR//"error-without-message.log 2>&1"
+  call execute_command_line(trim(command), exitstat=status, cmdstat=cmdstat)
+  if (cmdstat /= 0 .or. status == 0) return
+  open (newunit=unit, file=TEST_RESULTS_DIR//"error-without-message.log", status="old", iostat=iostat)
+  if (iostat /= 0) return
+  found_fallback = .false.
+  do
+    read (unit, '(a)', iostat=iostat) stdout
+    if (iostat /= 0) exit
+    if (index(stdout, "nc4f operation failed without a diagnostic.") > 0) found_fallback = .true.
+  end do
+  close (unit)
+  if (.not. found_fallback) return
+
   err = error_type(NC_ENOTVAR, "constructed error")
   if (.not. (.exists.err .and. allocated(err%msg))) return
   err = error_type()

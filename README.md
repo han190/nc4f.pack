@@ -14,10 +14,13 @@ an [xarray](https://xarray.dev/)-like programming style in modern Fortran that w
 - Write a data model to a NetCDF file with `TO_NETCDF`;
 - Open a NetCDF file and retrieve variables with `OPEN_NETCDF` and `GET_VARIABLE`;
 - Extract intrinsic Fortran data from an attribute or variable with `EXTRACT`;
-- Rename attributes, variables, and groups in memory or explicitly update an open file with
+- Rename attributes, dimensions, variables, and groups in memory or explicitly update an open file with
   [`RENAME_ATTRIBUTE`](docs/src/reference/functions-and-subroutines.md#rename_attribute--rename-an-attribute),
+  [`RENAME_DIMENSION`](docs/src/reference/functions-and-subroutines.md#rename_dimension--rename-a-dimension),
   [`RENAME_VARIABLE`](docs/src/reference/functions-and-subroutines.md#rename_variable--rename-a-variable),
-  and [`RENAME_GROUP`](docs/src/reference/functions-and-subroutines.md#rename_group--rename-a-group).
+  and [`RENAME_GROUP`](docs/src/reference/functions-and-subroutines.md#rename_group--rename-a-group);
+- Delete variable or group attributes in memory or explicitly update an open file with
+  [`DELETE_ATTRIBUTE`](docs/src/reference/functions-and-subroutines.md#delete_attribute--delete-an-attribute).
 
 ## A First Program
 
@@ -62,8 +65,7 @@ model. It does NOT currently support:
   shuffle/checksum filters, endianness, and custom fill values;
 - parallel, in-memory, or diskless I/O;
 - advanced variable access, such as mapped or multi-slab I/O and strided writes;
-- renaming dimensions, or deleting dimensions, variables,
-  groups, or attributes from files.
+- deleting dimensions, variables, or groups from files.
 
 See [ROADMAP.md](ROADMAP.md) for planned extensions.
 

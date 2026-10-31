@@ -164,7 +164,6 @@ elemental module function new_att_real64_scalar(name, value) result(att)
   att = new_att_real64(name, tmp)
 end function new_att_real64_scalar
 
-
 pure module function new_att_character(name, value) result(att)
   !! Create an `attribute_type` containing character data.
   character(len=*), intent(in) :: name

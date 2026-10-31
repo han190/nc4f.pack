@@ -33,11 +33,7 @@ module subroutine rename_var_nc_var(grp, var, new_name, update_file, err)
       if (.not. has_err(op_err)) call move_alloc(staged%name, var%name)
     end if
   end if
-  if (present(err)) then
-    err = op_err
-  else if (handle_err(op_err)) then
-    return
-  end if
+  call return_err(op_err, err)
 end subroutine rename_var_nc_var
 
 module subroutine rename_var_nc_grp(grp, old_name, new_name, update_file, err)
@@ -83,11 +79,7 @@ module subroutine rename_var_nc_grp(grp, old_name, new_name, update_file, err)
       end if
     end if
   end if
-  if (present(err)) then
-    err = op_err
-  else if (handle_err(op_err)) then
-    return
-  end if
+  call return_err(op_err, err)
 end subroutine rename_var_nc_grp
 
 subroutine rename_var_nc_(ncid, old_name, new_name, err)
@@ -136,11 +128,7 @@ module function get_variable(nc, name, start, count, stride, err) result(var)
   type(error_type) :: op_err
 
   var = get_var_(nc, name, start, count, stride, op_err)
-  if (present(err)) then
-    err = op_err
-  else if (handle_err(op_err)) then
-    return
-  end if
+  call return_err(op_err, err)
 end function get_variable
 
 function get_var_(nc, name, start, count, stride, err) result(var)
@@ -284,11 +272,7 @@ impure elemental module function inquire_variable(nc, name, err) result(var)
   type(error_type) :: op_err
 
   var = inq_var_(nc, name, op_err)
-  if (present(err)) then
-    err = op_err
-  else if (handle_err(op_err)) then
-    return
-  end if
+  call return_err(op_err, err)
 end function inquire_variable
 
 function inq_var_(nc, name, err) result(var)
