@@ -5,8 +5,6 @@ use, non_intrinsic :: nc4f_nc
 use, non_intrinsic :: nc4f_c_interface
 implicit none (type, external)
 
-private
-
 public :: &
   & attribute_type, dimension_type, error_type, &
   & group_type, netcdf_type, variable_type
@@ -25,7 +23,9 @@ public :: &
   & inquire_dimensions, inquire_variable, &
   & inquire_subgroups, inquire_group, &
   & get_attribute, get_variable, get_group, &
-  & rename_attribute, rename_variable, rename_group, rename_dimension, &
+  & rename_attribute, rename_variable, &
+  & rename_group, rename_dimension, &
   & delete_attribute, error_msg
+private
 
 end module nc4f

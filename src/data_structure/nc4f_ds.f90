@@ -7,25 +7,16 @@ use, intrinsic :: iso_c_binding, only: &
 use, non_intrinsic :: nc4f_c_interface, only: &
   & NC_EBADID, NC_EBADDIM, NC_EBADGRPID, NC_EEDGE, NC_EINVAL, NC_EINVALCOORDS, &
   & NC_ENOMEM, NC_ENOGRP, NC_ENOTATT, NC_ENOTFOUND, NC_ENOTVAR, NC_NOERR, &
-    NC_NOWRITE, &
-  & NC_EBADNAME, NC_EMAXNAME, NC_ENAMEINUSE, NC_MAX_NAME
+  & NC_NOWRITE, NC_EBADNAME, NC_EMAXNAME, NC_ENAMEINUSE, NC_MAX_NAME
 implicit none (type, external)
 
 public :: attribute_type, dimension_type, error_type, &
-  & group_type, netcdf_type, variable_type
-public :: NC_EBADID, NC_EBADDIM, NC_EBADGRPID, NC_EEDGE, NC_EINVAL, &
-  & NC_EINVALCOORDS, NC_ENOGRP, &
-  & NC_ENOTATT, NC_ENOTFOUND, NC_ENOTVAR, NC_NOERR
-public :: datarray, dataset, extract, initialize, operator(.att.), &
-  & operator(.and.), operator(.dim.), &
-  & operator(==), operator(/=), shape, size, sum
-public :: buffer_size, buffer2cptr, validate
-public :: error_msg
-public :: return_err
-!! Shared implementation utility for the data-model and NetCDF layers.
-public :: delete_attribute, rename_attribute, rename_variable, rename_group, &
-    rename_dimension, &
-  & NC_EBADNAME, NC_EMAXNAME, NC_ENAMEINUSE
+  & group_type, netcdf_type, variable_type, datarray, dataset, extract, &
+  & initialize, delete_attribute, rename_attribute, rename_variable, &
+  & rename_group, rename_dimension, &
+  & operator(.att.), operator(.and.), operator(.dim.), &
+  & operator(==), operator(/=), shape, size, sum, &
+  & buffer_size, buffer2cptr, validate, error_msg, return_err
 private
 
 integer(int32), parameter :: INVALID_INT32 = -2147483647_int32

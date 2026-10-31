@@ -212,7 +212,7 @@ module subroutine delete_att_errors(passed)
     else
       command = '"'//trim(executable)//'" --delete-invalid-file'
     end if
-    call execute_command_line(trim(command)//" > "//TEST_RESULTS_DIR// "delete-failfast.log 2>&1", &
+    call execute_command_line(trim(command)//" > "//TEST_RESULTS_DIR//"delete-failfast.log 2>&1", &
       & exitstat=status, cmdstat=cmdstat)
     call chk_del(cmdstat == 0 .and. status == 1, "failure without err stops child process")
   end do

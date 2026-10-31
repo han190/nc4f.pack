@@ -240,7 +240,7 @@ module subroutine rename_dim_errors(passed)
     else
       command = '"'//trim(executable)//'" --rename-dim-invalid-file'
     end if
-    call execute_command_line(trim(command)//" > "//TEST_RESULTS_DIR// "rename-dim-failfast.log 2>&1", &
+    call execute_command_line(trim(command)//" > "//TEST_RESULTS_DIR//"rename-dim-failfast.log 2>&1", &
       & exitstat=status, cmdstat=cmdstat)
     call chk_dim(cmdstat == 0 .and. status == 1, &
       & "missing err must ERROR STOP, not crash")

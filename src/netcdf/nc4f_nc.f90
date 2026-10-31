@@ -7,12 +7,10 @@ use, non_intrinsic :: nc4f_c_interface
 use, non_intrinsic :: nc4f_ds
 implicit none (type, external)
 
-public :: &
-  & open_netcdf, close_netcdf, to_netcdf, &
+public :: open_netcdf, close_netcdf, to_netcdf, &
   & inquire_dimensions, inquire_variable, &
-  & get_attribute, get_variable, get_group, &
-  & delete_attribute, rename_attribute, rename_variable, rename_group, &
-    rename_dimension, &
+  & get_attribute, get_variable, get_group, delete_attribute, &
+  & rename_attribute, rename_variable, rename_group, rename_dimension, &
   & inquire_subgroups, inquire_group, operator(.exists.)
 private
 
