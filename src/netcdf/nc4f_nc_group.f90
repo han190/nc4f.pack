@@ -304,6 +304,8 @@ recursive subroutine define_grp_tree_(target, source, err)
           & "Each variable must have a name.")
         return
       end if
+      call validate(source%vars(i), context="to_netcdf", err=err)
+      if (.exists. err) return
       defined_var = def_var(target, source%vars(i), err)
       if (has_err(err)) return
       call put_att_var(target, defined_var, err)

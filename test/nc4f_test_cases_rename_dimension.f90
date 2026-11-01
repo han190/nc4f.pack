@@ -184,6 +184,14 @@ module subroutine rename_dim_errors(passed)
   call rename_dimension(var, "x", "y", err)
   call chk_dim(err%code == NC_EBADDIM .and. .not. allocated(var%dims), "absent dimensions")
   grp%dims = ["x".dim.2, "x".dim.2]
+  call rename_dimension(grp, "missing", "bad/name", err)
+  call chk_dim(err%code == NC_EBADNAME, &
+    & "invalid destination precedes missing dimension")
+  call rename_dimension(grp, "x", repeat("a", NC_MAX_NAME + 1), err)
+  call chk_dim(err%code == NC_EMAXNAME, &
+    & "invalid destination precedes duplicate dimensions")
+  call chk_dim(grp%dims(1)%name == "x" .and. grp%dims(2)%name == "x", &
+    & "invalid destination preserves dimension definitions")
   call rename_dimension(grp, "x", "y", err)
   call chk_dim(err%code == NC_EINVAL .and. grp%dims(1)%name == "x", "duplicate definitions")
   var = datarray("v", [1., 2.], ["x".dim.2])

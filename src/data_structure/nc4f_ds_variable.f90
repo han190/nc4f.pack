@@ -14,11 +14,13 @@ pure module subroutine rename_var_var(var, new_name, err)
   type(error_type) :: op_err
   character(len=:), allocatable :: name
 
-  call check_nc_name(new_name, op_err, "rename_variable")
-  if (op_err%code == NC_NOERR) then
-    name = trim(new_name)
-    call move_alloc(name, var%name)
+  call validate(new_name, context="rename_variable", err=op_err)
+  if (.exists. op_err) then
+    call return_err(op_err, err)
+    return
   end if
+  name = trim(new_name)
+  call move_alloc(name, var%name)
   call return_err(op_err, err)
 end subroutine rename_var_var
 
@@ -48,10 +50,10 @@ pure subroutine rename_vars_(vars, old_name, new_name, err)
   !! Receives the operation status and diagnostic message.
   integer :: i, pos, lo
 
-  call check_nc_name(old_name, err, "rename_variable")
-  if (err%code /= NC_NOERR) return
-  call check_nc_name(new_name, err, "rename_variable")
-  if (err%code /= NC_NOERR) return
+  call validate(old_name, context="rename_variable", err=err)
+  if (.exists. err) return
+  call validate(new_name, context="rename_variable", err=err)
+  if (.exists. err) return
   pos = 0
   lo = 1
   if (allocated(vars)) then
@@ -125,10 +127,26 @@ pure module function get_size(var, dim) result(n)
   !! Dimension to process.
   integer(int64) :: n
   !! Result produced by this operation.
+  type(error_type) :: op_err
+
+  call compute_size(var, n, op_err, dim)
+  call return_err(op_err)
+end function get_size
+
+pure module subroutine compute_size(var, n, err, dim)
+  type(variable_type), intent(in) :: var
+  integer(int64), intent(out) :: n
+  type(error_type), intent(out) :: err
+  integer, intent(in), optional :: dim
   integer :: dim_, i
 
-  if (.not. allocated(var%dims)) error stop &
-    & "[size] Variable dimensions are not allocated."
+  err = error_type()
+  n = 0_int64
+  if (.not. allocated(var%dims)) then
+    err = error_type(NC_EINVAL, "size", &
+      & "Variable dimensions are not allocated.")
+    return
+  end if
   dim_ = 0
   if (present(dim)) dim_ = dim
 
@@ -136,22 +154,41 @@ pure module function get_size(var, dim) result(n)
   case (0)
     n = 1_int64
     do i = 1, size(var%dims)
-      if (var%dims(i)%len < 0) error stop "[size] Negative dimension length."
+      if (var%dims(i)%len < 0) then
+        n = 0_int64
+        err = error_type(NC_EINVAL, "size", &
+          & "Negative dimension length.")
+        return
+      end if
       if (var%dims(i)%len /= 0) then
         if (n > huge(n)/var%dims(i)%len) then
-          error stop "[size] Dimension product overflow."
+          n = 0_int64
+          err = error_type(NC_EINVAL, "size", &
+            & "Dimension product overflow.")
+          return
         end if
       end if
       n = n*var%dims(i)%len
     end do
   case (1:)
-    if (dim_ > size(var%dims)) error stop "[size] Invalid dimension index."
+    if (dim_ > size(var%dims)) then
+      err = error_type(NC_EINVAL, "size", &
+        & "Invalid dimension index.")
+      return
+    end if
     n = var%dims(size(var%dims) - dim_ + 1)%len
-    if (n < 0) error stop "[size] Negative dimension length."
+    if (n < 0) then
+      n = 0_int64
+      err = error_type(NC_EINVAL, "size", &
+        & "Negative dimension length.")
+      return
+    end if
   case default
-    error stop "[size] Invalid dimension index."
+    err = error_type(NC_EINVAL, "size", &
+      & "Invalid dimension index.")
+    return
   end select
-end function get_size
+end subroutine compute_size
 
 pure module function get_shape(var) result(extents)
   !! Return variable dimension lengths in their stored Fortran order.

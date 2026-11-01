@@ -2,28 +2,44 @@ submodule(nc4f_nc) nc4f_nc_utility
 implicit none (type, external)
 contains
 
-pure module subroutine initialize_att(att)
+pure module subroutine initialize_att(att, err)
   !! Allocate a fresh byte buffer for an attribute read from a NetCDF file.
   type(attribute_type), intent(inout) :: att
   !! Attribute to process.
-  integer :: nbytes
+  type(error_type), intent(out) :: err
+  integer :: nbytes, alloc_stat
 
-  nbytes = buffer_size(att%dtype, att%len, "[initialize_att]")
+  call compute_buffer_size(att%dtype, att%len, nbytes, err)
+  if (.exists. err) then
+    err%fname = "initialize_att"
+    return
+  end if
   if (allocated(att%buffer)) deallocate (att%buffer)
   nullify (att%ptr)
-  allocate (att%buffer(nbytes))
+  allocate (att%buffer(nbytes), stat=alloc_stat)
+  if (alloc_stat /= 0) then
+    err = error_type(NC_ENOMEM, "initialize_att", "Buffer allocation failed.")
+  end if
 end subroutine initialize_att
 
-pure module subroutine initialize_var(var)
+pure module subroutine initialize_var(var, err)
   !! Allocate a fresh byte buffer for a variable read from a NetCDF file.
   type(variable_type), intent(inout) :: var
   !! Variable to process.
-  integer :: nbytes
+  type(error_type), intent(out) :: err
+  integer :: nbytes, alloc_stat
 
-  nbytes = buffer_size(var%dtype, var%len, "[initialize_var]")
+  call compute_buffer_size(var%dtype, var%len, nbytes, err)
+  if (.exists. err) then
+    err%fname = "initialize_var"
+    return
+  end if
   if (allocated(var%buffer)) deallocate (var%buffer)
   nullify (var%ptr)
-  allocate (var%buffer(nbytes))
+  allocate (var%buffer(nbytes), stat=alloc_stat)
+  if (alloc_stat /= 0) then
+    err = error_type(NC_ENOMEM, "initialize_var", "Buffer allocation failed.")
+  end if
 end subroutine initialize_var
 
 pure module function clip(string) result(clipped)

@@ -364,12 +364,14 @@ function get_att_(ncid, varid, name, err) result(att)
   att%dtype = dtype
 
   zero_size_attr: if (att%len == 0) then
-    call validate(att, context="[get_att]")
+    call validate(att, context="get_att", err=err)
     return
   end if zero_size_attr
 
-  call initialize(att)
-  call validate(att, context="[get_att]")
+  call initialize(att, err)
+  if (.exists. err) return
+  call validate(att, context="get_att", err=err)
+  if (.exists. err) return
   stat = nc_get_att(ncid, varid, f2cstr(att%name), buffer2cptr(att))
   err = netcdf_err(stat, "get_attribute", context)
 end function get_att_
@@ -416,7 +418,8 @@ subroutine put_atts_(ncid, varid, atts, context, err)
   if (.not. allocated(atts)) return
   do i = 1, size(atts)
     associate (att => atts(i))
-      call validate(att, context=context)
+      call validate(att, context=context, err=err)
+      if (.exists. err) return
       if (att%len == 0) then
         cptr = c_null_ptr
       else

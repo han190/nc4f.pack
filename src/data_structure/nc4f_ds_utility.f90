@@ -3,6 +3,14 @@ submodule(nc4f_ds) nc4f_ds_utility
 implicit none (type, external)
 contains
 
+logical elemental module function has_err(err) result(is_err)
+  !! Return true when `err` represents a failed operation.
+  type(error_type), intent(in) :: err
+  !! Completed result of an nc4f operation.
+
+  is_err = err%code /= NC_NOERR
+end function has_err
+
 pure module function make_err(code, fname, msg) result(err)
   !! Construct a success result or a checked failure diagnostic.
   integer(c_int), intent(in), optional :: code
@@ -17,24 +25,8 @@ pure module function make_err(code, fname, msg) result(err)
   if (present(code)) err%code = code
   if (present(fname)) err%fname = fname
   if (present(msg)) err%msg = msg
-  call check_err(err)
+  call validate_err(err)
 end function make_err
-
-pure module subroutine check_err(err)
-  !! Reject failures with missing or blank diagnostic fields.
-  class(error_type), intent(in) :: err
-  !! Result to validate; success needs no diagnostic fields.
-
-  if (err%code == NC_NOERR) return
-  if (.not. allocated(err%fname)) &
-    & error stop "[error_type] Failure requires an allocated fname."
-  if (len_trim(err%fname) == 0) &
-    & error stop "[error_type] Failure requires a nonblank fname."
-  if (.not. allocated(err%msg)) &
-    & error stop "[error_type] Failure requires an allocated msg."
-  if (len_trim(err%msg) == 0) &
-    & error stop "[error_type] Failure requires a nonblank msg."
-end subroutine check_err
 
 pure module function error_msg(err) result(text)
   !! Return "[fname] msg" for failures or "No error" for success.
@@ -43,91 +35,93 @@ pure module function error_msg(err) result(text)
   character(len=:), allocatable :: text
   !! Complete formatted diagnostic.
 
-  call check_err(err)
-  if (err%code == NC_NOERR) then
-    text = "No error"
-  else
+  call validate_err(err)
+  if (.exists. err) then
     text = "["//trim(err%fname)//"] "//trim(err%msg)
+  else
+    text = "No error"
   end if
 end function error_msg
 
-pure module subroutine check_nc_name(name, err, context)
-  !! Check NetCDF name syntax without C calls. Trailing Fortran padding is ignored.
-  !! UTF-8 is validated here; callers supply NFC-normalized Unicode names.
-  character(len=*), intent(in) :: name
-  !! NetCDF local name to validate; trailing Fortran blank padding is ignored.
-  type(error_type), intent(out) :: err
-  !! Receives the operation status and diagnostic message.
-  character(len=*), intent(in), optional :: context
-  !! Operation name for diagnostics, without brackets.
-  character(len=:), allocatable :: ctx
-  integer :: i, j, n, byte, ncont, lo, hi
+pure subroutine validate_err(err)
+  !! Reject failures with missing or blank diagnostic fields.
+  class(error_type), intent(in) :: err
+  !! Result to validate; success needs no diagnostic fields.
 
-  ctx = "check_nc_name"
-  if (present(context)) ctx = context
-  err = error_type(NC_EBADNAME, ctx, "Invalid NetCDF name.")
-  n = len_trim(name)
-  if (n == 0) return
-  if (n > NC_MAX_NAME) then
-    err = error_type(NC_EMAXNAME, ctx, &
-      & "NetCDF name exceeds NC_MAX_NAME bytes.")
-    return
-  end if
-  byte = iachar(name(1:1))
-  if (byte < 128) then
-    if (index("ABCDEFGHIJKLMNOPQRSTUVWXYZ"// &
-      & "abcdefghijklmnopqrstuvwxyz0123456789_", name(1:1)) == 0) return
-  end if
-  i = 1
-  do while (i <= n)
-    byte = iachar(name(i:i))
-    if (byte < 128) then
-      if (byte < 32 .or. byte == 127 .or. name(i:i) == "/") return
-      i = i + 1
-      cycle
-    end if
-    ! Reject malformed, overlong, surrogate, and out-of-range UTF-8 sequences.
-    lo = 128
-    hi = 191
-    select case (byte)
-    case (194:223)
-      ncont = 1
-    case (224:239)
-      ncont = 2
-      if (byte == 224) lo = 160
-      if (byte == 237) hi = 159
-    case (240:244)
-      ncont = 3
-      if (byte == 240) lo = 144
-      if (byte == 244) hi = 143
-    case default
-      return
-    end select
-    if (i + ncont > n) return
-    byte = iachar(name(i + 1:i + 1))
-    if (byte < lo .or. byte > hi) return
-    do j = i + 2, i + ncont
-      byte = iachar(name(j:j))
-      if (byte < 128 .or. byte > 191) return
-    end do
-    i = i + ncont + 1
-  end do
-  err = error_type()
-end subroutine check_nc_name
+  if (.not. (.exists. err)) return
+  if (.not. allocated(err%fname)) &
+    & error stop "[error_type] Failure requires an allocated fname."
+  if (len_trim(err%fname) == 0) &
+    & error stop "[error_type] Failure requires a nonblank fname."
+  if (.not. allocated(err%msg)) &
+    & error stop "[error_type] Failure requires an allocated msg."
+  if (len_trim(err%msg) == 0) &
+    & error stop "[error_type] Failure requires a nonblank msg."
+end subroutine validate_err
 
 pure module subroutine return_err(op_err, err)
-  !! Return an optional error or terminate, shared by model and NetCDF operations.
+  !! Return an optional error or terminate, shared by model
+  !! and NetCDF operations.
   type(error_type), intent(in) :: op_err
   !! Completed operation result to return or use for error termination.
   type(error_type), intent(out), optional :: err
   !! Receives the status and diagnostic; failures stop execution when omitted.
 
-  call check_err(op_err)
+  call validate_err(op_err)
   if (present(err)) then
     err = op_err
-  else if (op_err%code /= NC_NOERR) then
+  else if (.exists. op_err) then
     error stop error_msg(op_err)
   end if
 end subroutine return_err
+
+pure module function buffer_size(dtype, len) result(nbytes)
+  !! Compute the byte count for a NetCDF type and element count,
+  !! checking overflow.
+  integer(data_type), intent(in) :: dtype
+  !! Dataset data type code to validate or translate.
+  integer(int64), intent(in) :: len
+  !! Length of the dimension or attribute.
+  integer :: nbytes
+  !! Result produced by this operation.
+  type(error_type) :: op_err
+
+  call compute_buffer_size(dtype, len, nbytes, op_err)
+  call return_err(op_err)
+end function buffer_size
+
+pure module subroutine compute_buffer_size(dtype, len, nbytes, err)
+  integer(data_type), intent(in) :: dtype
+  integer(int64), intent(in) :: len
+  integer, intent(out) :: nbytes
+  type(error_type), intent(out) :: err
+  integer(int64) :: item_bytes
+
+  err = error_type()
+  nbytes = 0
+  if (len < 0) then
+    err = error_type(NC_EINVAL, "buffer_size", "Negative element count.")
+    return
+  end if
+  select case (dtype)
+  case (BYTE_TYPE, CHAR_TYPE)
+    item_bytes = 1
+  case (SHORT_TYPE)
+    item_bytes = storage_size(0_int16)/storage_size(0_int8)
+  case (INT_TYPE, FLOAT_TYPE)
+    item_bytes = storage_size(0_int32)/storage_size(0_int8)
+  case (INT64_TYPE, DOUBLE_TYPE)
+    item_bytes = storage_size(0_int64)/storage_size(0_int8)
+  case default
+    err = error_type(NC_EINVAL, "buffer_size", &
+      & "Unsupported NetCDF data type.")
+    return
+  end select
+  if (len > int(huge(nbytes), int64)/item_bytes) then
+    err = error_type(NC_EINVAL, "buffer_size", "Byte-size overflow.")
+    return
+  end if
+  nbytes = int(len*item_bytes)
+end subroutine compute_buffer_size
 
 end submodule nc4f_ds_utility

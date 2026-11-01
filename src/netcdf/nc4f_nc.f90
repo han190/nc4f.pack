@@ -54,11 +54,6 @@ interface to_netcdf
   module procedure :: to_netcdf_grp
 end interface to_netcdf
 
-interface operator(.exists.)
-  !! Return whether an error result represents a failed operation.
-  module procedure :: has_err
-end interface operator(.exists.)
-
 interface initialize
   !! Allocate a fresh byte buffer for metadata read from the C API.
   module procedure :: initialize_att
@@ -395,12 +390,6 @@ interface
     !! Result produced by this operation.
   end function netcdf_err
 
-  logical elemental module function has_err(err) result(is_err)
-    !! Return true when `err` represents a failed operation.
-    type(error_type), intent(in) :: err
-    !! Completed result of an nc4f operation.
-  end function has_err
-
   pure module function clip(string) result(clipped)
     !! Trim left and right space of a character variable.
     character(len=*), intent(in) :: string
@@ -425,16 +414,20 @@ interface
     !! NUL-terminated C string result.
   end function f2cstr
 
-  pure module subroutine initialize_att(att)
+  pure module subroutine initialize_att(att, err)
     !! Allocate a fresh byte buffer for an attribute read from a NetCDF file.
     type(attribute_type), intent(inout) :: att
     !! Attribute to process.
+    type(error_type), intent(out) :: err
+    !! Receives size-validation or allocation errors.
   end subroutine initialize_att
 
-  pure module subroutine initialize_var(var)
+  pure module subroutine initialize_var(var, err)
     !! Allocate a fresh byte buffer for a variable read from a NetCDF file.
     type(variable_type), intent(inout) :: var
     !! Variable to process.
+    type(error_type), intent(out) :: err
+    !! Receives size-validation or allocation errors.
   end subroutine initialize_var
 
   module function get_variable(nc, name, start, count, stride, err) result(var)

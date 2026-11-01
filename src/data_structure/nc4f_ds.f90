@@ -15,8 +15,9 @@ public :: attribute_type, dimension_type, error_type, &
   & initialize, delete_attribute, rename_attribute, rename_variable, &
   & rename_group, rename_dimension, &
   & operator(.att.), operator(.and.), operator(.dim.), &
-  & operator(==), operator(/=), shape, size, sum, &
-  & buffer_size, buffer2cptr, validate, error_msg, return_err
+  & operator(==), operator(/=), operator(.exists.), shape, size, sum, &
+  & buffer_size, buffer2cptr, validate, error_msg, return_err, has_err, &
+  & compute_buffer_size, compute_size
 private
 
 integer(int32), parameter :: INVALID_INT32 = -2147483647_int32
@@ -39,6 +40,11 @@ end type error_type
 interface error_type
   module procedure :: make_err
 end interface error_type
+
+interface operator(.exists.)
+  !! Return whether an error result represents a failed operation.
+  module procedure :: has_err
+end interface operator(.exists.)
 
 enum, bind(c)
   !! Type constant used for NetCDF external data types.
@@ -208,6 +214,7 @@ end interface buffer2cptr
 interface validate
   module procedure :: validate_att
   module procedure :: validate_var
+  module procedure :: validate_nc_name
 end interface validate
 
 interface dataset
@@ -269,15 +276,21 @@ interface
     !! Receives the status and diagnostic; failures stop execution when omitted.
   end subroutine rename_grp_par
 
-  pure module subroutine check_nc_name(name, err, context)
-    !! Shared NetCDF name validation, private to the data-model module/submodules.
+  pure module subroutine validate_nc_name(name, context, err)
+    !! Validate a NetCDF local name through the generic validate interface.
     character(len=*), intent(in) :: name
     !! NetCDF local name to validate; trailing Fortran blank padding is ignored.
-    type(error_type), intent(out) :: err
-    !! Receives the operation status and diagnostic message.
-    character(len=*), intent(in), optional :: context
+    character(len=*), intent(in) :: context
     !! Operation name for diagnostics, without brackets.
-  end subroutine check_nc_name
+    type(error_type), intent(out), optional :: err
+    !! Optional error result; failures stop execution when absent.
+  end subroutine validate_nc_name
+
+  logical elemental module function has_err(err) result(is_err)
+    !! Return true when `err` represents a failed operation.
+    type(error_type), intent(in) :: err
+    !! Completed result of an nc4f operation.
+  end function has_err
 
   pure module function make_err(code, fname, msg) result(err)
     !! Construct a success result or a checked failure diagnostic.
@@ -290,12 +303,6 @@ interface
     type(error_type) :: err
     !! Constructed result with validated failure fields.
   end function make_err
-
-  pure module subroutine check_err(err)
-    !! Reject failures with missing or blank diagnostic fields.
-    class(error_type), intent(in) :: err
-    !! Result to validate; success needs no diagnostic fields.
-  end subroutine check_err
 
   pure module function error_msg(err) result(text)
     !! Return "[fname] msg" for failures or "No error" for success.
@@ -569,7 +576,7 @@ interface
     !! Destination object or group to update.
   end subroutine clone_grp
 
-  pure module subroutine validate_att(att, dtype, context)
+  pure module subroutine validate_att(att, dtype, context, err)
     !! Validate dataset buffer metadata before access.
     type(attribute_type), intent(in) :: att
     !! Attribute to process.
@@ -577,9 +584,11 @@ interface
     !! Expected NetCDF data-type code, when supplied.
     character(len=*), intent(in) :: context
     !! Operation name for diagnostics, without brackets.
+    type(error_type), intent(out), optional :: err
+    !! Optional error result; failures stop execution when absent.
   end subroutine validate_att
 
-  pure module subroutine validate_var(var, dtype, rank, context)
+  pure module subroutine validate_var(var, dtype, rank, context, err)
     !! Validate dataset buffer metadata before access.
     type(variable_type), intent(in) :: var
     !! Variable to process.
@@ -589,6 +598,8 @@ interface
     !! Expected variable rank, when supplied.
     character(len=*), intent(in) :: context
     !! Operation name for diagnostics, without brackets.
+    type(error_type), intent(out), optional :: err
+    !! Optional error result; failures stop execution when absent.
   end subroutine validate_var
 
   module function buffer2cptr_att(att) result(cptr)
@@ -805,6 +816,14 @@ interface
     !! Result produced by this operation.
   end function get_size
 
+  pure module subroutine compute_size(var, n, err, dim)
+    !! Return an element count or an error without terminating execution.
+    type(variable_type), intent(in) :: var
+    integer(int64), intent(out) :: n
+    type(error_type), intent(out) :: err
+    integer, intent(in), optional :: dim
+  end subroutine compute_size
+
   pure module function get_shape(var) result(extents)
     !! Query and return requested NetCDF metadata.
     type(variable_type), intent(in) :: var
@@ -821,14 +840,20 @@ interface
     !! Result produced by this operation.
   end function sum_vars
 
-  pure module function buffer_size(dtype, len, context) result(nbytes)
+  pure module subroutine compute_buffer_size(dtype, len, nbytes, err)
+    !! Return a byte count or an error without terminating execution.
+    integer(data_type), intent(in) :: dtype
+    integer(int64), intent(in) :: len
+    integer, intent(out) :: nbytes
+    type(error_type), intent(out) :: err
+  end subroutine compute_buffer_size
+
+  pure module function buffer_size(dtype, len) result(nbytes)
     !! Compute the byte count for a NetCDF type and element count, checking overflow.
     integer(data_type), intent(in) :: dtype
     !! NetCDF data-type code used to determine the stored element representation.
     integer(int64), intent(in) :: len
     !! Number of stored data elements.
-    character(len=*), intent(in), optional :: context
-    !! Operation name for diagnostics, without brackets.
     integer :: nbytes
     !! Result produced by this operation.
   end function buffer_size

@@ -125,7 +125,8 @@ function nc_inq_grpname_len(ncid, lenp) bind(c, name="nc_inq_grpname_len")
   integer(c_int), value :: ncid
   !! Open file or group identifier.
   integer(c_size_t), intent(out) :: lenp
-  !! Returned full-path length excluding NUL; allocate lenp + 1 for nc_inq_grpname_full().
+  !! Returned full-path length excluding NUL; allocate lenp + 1 for
+  !! nc_inq_grpname_full().
   integer(c_int) :: nc_inq_grpname_len
   !! **Options:**
   !! - NC_NOERR No error.
@@ -151,9 +152,10 @@ end function nc_rename_grp
 
 ! Additional serial C API, including legacy and extension interfaces.
 
-function nc_inq_grp_ncid(ncid, grp_name, grp_ncid) bind(c, name="nc_inq_grp_ncid")
-  !! Find a group by name; equivalent to nc_inq_ncid().
-  !! C declaration: int nc_inq_grp_ncid(int ncid, const char *grp_name, int *grp_ncid);
+function nc_inq_grp_ncid(ncid, grp_name, grp_ncid) &
+  & bind(c, name="nc_inq_grp_ncid")
+  !! Find a group by name; equivalent to nc_inq_ncid(). C declaration: int
+  !! nc_inq_grp_ncid(int ncid, const char *grp_name, int *grp_ncid);
   import :: c_int, c_char
   integer(c_int), value :: ncid
   !! Open dataset or group identifier.

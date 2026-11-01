@@ -136,7 +136,7 @@ can still have local restrictions such as `ALIAS`, `ADDR`, or `STOP`.
 | [src/c_interface/nc4f_c_interface_group.inc](../src/c_interface/nc4f_c_interface_group.inc) | 10 | 0 |
 | [src/c_interface/nc4f_c_interface_io.inc](../src/c_interface/nc4f_c_interface_io.inc) | 127 | 0 |
 | [src/c_interface/nc4f_c_interface_variable.inc](../src/c_interface/nc4f_c_interface_variable.inc) | 71 | 0 |
-| [src/data_structure/nc4f_ds_access.f90](../src/data_structure/nc4f_ds_access.f90) | 6 | 3 |
+| [src/data_structure/nc4f_ds_validate.f90](../src/data_structure/nc4f_ds_validate.f90) | 6 | 3 |
 | [src/data_structure/nc4f_ds_arithmetic.f90](../src/data_structure/nc4f_ds_arithmetic.f90) | 1 | 0 |
 | [src/data_structure/nc4f_ds_attribute.f90](../src/data_structure/nc4f_ds_attribute.f90) | 7 | 6 |
 | [src/data_structure/nc4f_ds_attribute_constructor.f90](../src/data_structure/nc4f_ds_attribute_constructor.f90) | 13 | 13 |
@@ -176,8 +176,8 @@ arange [P] @ example/mandelbrot.f90:50
 
 neq_att [E] @ src/data_structure/nc4f_ds_attribute.f90:153
 └── eq_att [E] @ src/data_structure/nc4f_ds_attribute.f90:109
-    └── validate_att [P] @ src/data_structure/nc4f_ds_access.f90:6
-        └── validate_ [P] @ src/data_structure/nc4f_ds_access.f90:51
+    └── validate_att [P] @ src/data_structure/nc4f_ds_validate.f90:6
+        └── validate_ [P] @ src/data_structure/nc4f_ds_validate.f90:51
             └── buffer_size [P] @ src/data_structure/nc4f_ds_group.f90:324
 
 new_dim_arg_int64 [E] @ src/data_structure/nc4f_ds_dimension.f90:18
@@ -188,8 +188,8 @@ neq_dim [E] @ src/data_structure/nc4f_ds_dimension.f90:83
 └── eq_dim [E] @ src/data_structure/nc4f_ds_dimension.f90:71
 
 extract_att_int8_vector [I] @ src/data_structure/nc4f_ds_extract.f90:5 | C_PTR: calls impure C_F_POINTER
-├── buffer2cptr_att [I] @ src/data_structure/nc4f_ds_access.f90:98 | DEP
-│   ├── buffer2cptr_ [I] @ src/data_structure/nc4f_ds_access.f90:120 | ADDR: C_LOC receives storage from an INTENT(IN) dummy
+├── buffer2cptr_att [I] @ src/data_structure/nc4f_ds_validate.f90:98 | DEP
+│   ├── buffer2cptr_ [I] @ src/data_structure/nc4f_ds_validate.f90:120 | ADDR: C_LOC receives storage from an INTENT(IN) dummy
 │   └── validate_att [P] => shared
 └── validate_att [P] => shared
 
@@ -234,9 +234,9 @@ extract_att_real64_scalar [I] @ src/data_structure/nc4f_ds_extract.f90:193 | C_P
 └── validate_att [P] => shared
 
 extract_var_int8_2d [I] @ src/data_structure/nc4f_ds_extract.f90:266 | C_PTR: calls impure C_F_POINTER
-├── buffer2cptr_var [I] @ src/data_structure/nc4f_ds_access.f90:109 | DEP
+├── buffer2cptr_var [I] @ src/data_structure/nc4f_ds_validate.f90:109 | DEP
 │   ├── buffer2cptr_ [I] => shared
-│   └── validate_var [P] @ src/data_structure/nc4f_ds_access.f90:22
+│   └── validate_var [P] @ src/data_structure/nc4f_ds_validate.f90:22
 │       ├── get_size [P] @ src/data_structure/nc4f_ds_variable.f90:104
 │       └── validate_ [P] => shared
 ├── get_shape [P] @ src/data_structure/nc4f_ds_variable.f90:140
@@ -2630,7 +2630,7 @@ from `pure_dim_calls`; their assertion helper `chk_dim` is pure as well.
 ## Structured error diagnostics follow-up
 
 `error_type` now separates `fname` and `msg`. Its checked constructor
-`make_err`, validator `check_err`, and public formatter `error_msg` are pure.
+`make_err`, validator `validate_err`, and public formatter `error_msg` are pure.
 `return_err` validates both returned and terminating failures; the latter
 uses `error_msg` for the `error stop` text. `write_frmt_err` uses the same
 formatter but remains impure because it performs external I/O.

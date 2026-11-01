@@ -206,11 +206,21 @@ module subroutine rename_grp_errors(passed)
     call rename_attribute(att, invalid(i), expected)
     call chk_grp(err%code == expected%code .and. err%code /= NC_NOERR, "shared name validation")
     call chk_grp(grp%name == "old", "invalid model name preserves group")
+    call rename_group(unnamed, "old", invalid(i), err)
+    call chk_grp(err%code == expected%code, &
+      & "invalid destination precedes absent child collection")
+    call chk_grp(.not. associated(unnamed%grps), &
+      & "invalid destination preserves absent child collection")
   end do
   kids(1)%name = "old"
   kids(2)%name = "other"
   source%name = "/"
   source%grps => kids
+  call rename_group(source, "missing", "bad/name", err)
+  call chk_grp(err%code == NC_EBADNAME, &
+    & "invalid destination precedes missing child")
+  call chk_grp(kids(1)%name == "old" .and. kids(2)%name == "other", &
+    & "invalid destination preserves child names")
   call to_netcdf(file, source)
   nc = open_netcdf(file, "r")
   cache = kids

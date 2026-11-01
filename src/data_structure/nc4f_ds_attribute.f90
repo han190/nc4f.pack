@@ -43,8 +43,8 @@ pure subroutine del_atts_(atts, name, err)
   type(attribute_type), allocatable :: kept(:)
   integer :: i, j, pos, matches, stat
 
-  call check_nc_name(name, err, "delete_attribute")
-  if (err%code /= NC_NOERR) return
+  call validate(name, context="delete_attribute", err=err)
+  if (.exists. err) return
   matches = 0
   pos = 0
   if (allocated(atts)) then
@@ -95,11 +95,13 @@ pure module subroutine rename_att_att(att, new_name, err)
   type(error_type) :: op_err
   character(len=:), allocatable :: name
 
-  call check_nc_name(new_name, op_err, "rename_attribute")
-  if (op_err%code == NC_NOERR) then
-    name = trim(new_name)
-    call move_alloc(name, att%name)
+  call validate(new_name, context="rename_attribute", err=op_err)
+  if (.exists. op_err) then
+    call return_err(op_err, err)
+    return
   end if
+  name = trim(new_name)
+  call move_alloc(name, att%name)
   call return_err(op_err, err)
 end subroutine rename_att_att
 
@@ -144,10 +146,10 @@ pure subroutine rename_atts_(atts, old_name, new_name, err)
   !! Receives the operation status and diagnostic message.
   integer :: i, pos
 
-  call check_nc_name(old_name, err, "rename_attribute")
-  if (err%code /= NC_NOERR) return
-  call check_nc_name(new_name, err, "rename_attribute")
-  if (err%code /= NC_NOERR) return
+  call validate(old_name, context="rename_attribute", err=err)
+  if (.exists. err) return
+  call validate(new_name, context="rename_attribute", err=err)
+  if (.exists. err) return
   pos = 0
   if (allocated(atts)) then
     do i = 1, size(atts)

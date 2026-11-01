@@ -141,7 +141,8 @@ function nc_inq_dim(ncid, dimid, name, lenp) bind(c, name="nc_inq_dim")
   integer(c_int), value :: dimid
   !! Dimension identifier visible from ncid.
   character(kind=c_char), intent(out) :: name(*)
-  !! Caller-allocated buffer of at least NC_MAX_NAME + 1 characters; result is NUL-terminated.
+  !! Caller-allocated buffer of at least NC_MAX_NAME + 1 characters; result is
+  !! NUL-terminated.
   integer(c_size_t), intent(out) :: lenp
   !! Returned current dimension length, including records already written.
   integer(c_int) :: nc_inq_dim
@@ -174,10 +175,10 @@ end function nc_rename_dim
 ! Additional serial C API, including legacy and extension interfaces.
 
 function ncdimdef(ncid, name, len) bind(c, name="ncdimdef")
-  !! Legacy v2 API: Define a dimension and return its ID.
-  !! Uses v2 return/error conventions, not modern NC_NOERR status semantics.
-  !! Legacy process-global ncopts controls fatal errors and diagnostics; no accessor is provided.
-  !! C declaration: int ncdimdef(int ncid, const char *name, long len);
+  !! Legacy v2 API: Define a dimension and return its ID. Uses v2 return/error
+  !! conventions, not modern NC_NOERR status semantics. Legacy process-global
+  !! ncopts controls fatal errors and diagnostics; no accessor is provided. C
+  !! declaration: int ncdimdef(int ncid, const char *name, long len);
   import :: c_int, c_char, c_long
   integer(c_int), value :: ncid
   !! Open dataset or group identifier.
@@ -186,46 +187,50 @@ function ncdimdef(ncid, name, len) bind(c, name="ncdimdef")
   integer(c_long), value :: len
   !! Element count (not bytes except for byte/text types).
   integer(c_int) :: ncdimdef
-  !! V2 result (ID, size, previous setting, or success value); -1 indicates failure.
+  !! V2 result (ID, size, previous setting, or success value); -1 indicates
+  !! failure.
 end function ncdimdef
 
 function ncdimid(ncid, name) bind(c, name="ncdimid")
-  !! Legacy v2 API: Find a dimension ID by name.
-  !! Uses v2 return/error conventions, not modern NC_NOERR status semantics.
-  !! Legacy process-global ncopts controls fatal errors and diagnostics; no accessor is provided.
-  !! C declaration: int ncdimid(int ncid, const char *name);
+  !! Legacy v2 API: Find a dimension ID by name. Uses v2 return/error
+  !! conventions, not modern NC_NOERR status semantics. Legacy process-global
+  !! ncopts controls fatal errors and diagnostics; no accessor is provided. C
+  !! declaration: int ncdimid(int ncid, const char *name);
   import :: c_int, c_char
   integer(c_int), value :: ncid
   !! Open dataset or group identifier.
   character(kind=c_char), intent(in) :: name(*)
   !! NUL-terminated C string.
   integer(c_int) :: ncdimid
-  !! V2 result (ID, size, previous setting, or success value); -1 indicates failure.
+  !! V2 result (ID, size, previous setting, or success value); -1 indicates
+  !! failure.
 end function ncdimid
 
 function ncdiminq(ncid, dimid, name, lenp) bind(c, name="ncdiminq")
-  !! Legacy v2 API: Query dimension name and length.
-  !! Uses v2 return/error conventions, not modern NC_NOERR status semantics.
-  !! Legacy process-global ncopts controls fatal errors and diagnostics; no accessor is provided.
-  !! C declaration: int ncdiminq(int ncid, int dimid, char *name, long *lenp);
+  !! Legacy v2 API: Query dimension name and length. Uses v2 return/error
+  !! conventions, not modern NC_NOERR status semantics. Legacy process-global
+  !! ncopts controls fatal errors and diagnostics; no accessor is provided. C
+  !! declaration: int ncdiminq(int ncid, int dimid, char *name, long *lenp);
   import :: c_int, c_ptr, c_long
   integer(c_int), value :: ncid
   !! Open dataset or group identifier.
   integer(c_int), value :: dimid
   !! Dimension identifier.
   type(c_ptr), value :: name
-  !! Pointer to caller-provided C character output storage (NC_MAX_NAME + 1 for names).
+  !! Pointer to caller-provided C character output storage (NC_MAX_NAME + 1 for
+  !! names).
   integer(c_long), intent(out) :: lenp
   !! Returned lenp value (C long).
   integer(c_int) :: ncdiminq
-  !! V2 result (ID, size, previous setting, or success value); -1 indicates failure.
+  !! V2 result (ID, size, previous setting, or success value); -1 indicates
+  !! failure.
 end function ncdiminq
 
 function ncdimrename(ncid, dimid, name) bind(c, name="ncdimrename")
-  !! Legacy v2 API: Rename a dimension.
-  !! Uses v2 return/error conventions, not modern NC_NOERR status semantics.
-  !! Legacy process-global ncopts controls fatal errors and diagnostics; no accessor is provided.
-  !! C declaration: int ncdimrename(int ncid, int dimid, const char *name);
+  !! Legacy v2 API: Rename a dimension. Uses v2 return/error conventions, not
+  !! modern NC_NOERR status semantics. Legacy process-global ncopts controls
+  !! fatal errors and diagnostics; no accessor is provided. C declaration: int
+  !! ncdimrename(int ncid, int dimid, const char *name);
   import :: c_int, c_char
   integer(c_int), value :: ncid
   !! Open dataset or group identifier.
@@ -234,5 +239,6 @@ function ncdimrename(ncid, dimid, name) bind(c, name="ncdimrename")
   character(kind=c_char), intent(in) :: name(*)
   !! NUL-terminated C string.
   integer(c_int) :: ncdimrename
-  !! V2 result (ID, size, previous setting, or success value); -1 indicates failure.
+  !! V2 result (ID, size, previous setting, or success value); -1 indicates
+  !! failure.
 end function ncdimrename

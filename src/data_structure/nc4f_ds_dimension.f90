@@ -13,11 +13,13 @@ pure module subroutine rename_dim_dim(dim, new_name, err)
   type(error_type) :: op_err
   character(len=:), allocatable :: name
 
-  call check_nc_name(new_name, op_err, "rename_dimension")
-  if (op_err%code == NC_NOERR) then
-    name = trim(new_name)
-    call move_alloc(name, dim%name)
+  call validate(new_name, context="rename_dimension", err=op_err)
+  if (.exists. op_err) then
+    call return_err(op_err, err)
+    return
   end if
+  name = trim(new_name)
+  call move_alloc(name, dim%name)
   call return_err(op_err, err)
 end subroutine rename_dim_dim
 
@@ -40,14 +42,16 @@ pure module subroutine rename_dim_var(var, old_name, new_name, err)
     allocate (staged(0))
   end if
   call rename_dims_(staged, old_name, new_name, op_err)
-  if (op_err%code == NC_NOERR) then
-    lo = lbound(var%dims, 1)
-    do i = 1, size(staged)
-      if (.not. allocated(staged(i)%name)) cycle
-      if (staged(i)%name /= trim(new_name)) cycle
-      call move_alloc(staged(i)%name, var%dims(lo + i - 1)%name)
-    end do
+  if (.exists. op_err) then
+    call return_err(op_err, err)
+    return
   end if
+  lo = lbound(var%dims, 1)
+  do i = 1, size(staged)
+    if (.not. allocated(staged(i)%name)) cycle
+    if (staged(i)%name /= trim(new_name)) cycle
+    call move_alloc(staged(i)%name, var%dims(lo + i - 1)%name)
+  end do
   call return_err(op_err, err)
 end subroutine rename_dim_var
 
@@ -63,9 +67,13 @@ pure module subroutine rename_dim_grp(grp, old_name, new_name, err)
   type(dimension_type), allocatable :: staged(:)
   integer :: n, i, j, k, matches
 
-  call check_nc_name(old_name, op_err, "rename_dimension")
-  if (op_err%code == NC_NOERR) call check_nc_name(new_name, op_err, "rename_dimension")
-  if (op_err%code /= NC_NOERR) then
+  call validate(old_name, context="rename_dimension", err=op_err)
+  if (.exists. op_err) then
+    call return_err(op_err, err)
+    return
+  end if
+  call validate(new_name, context="rename_dimension", err=op_err)
+  if (.exists. op_err) then
     call return_err(op_err, err)
     return
   end if
@@ -84,7 +92,7 @@ pure module subroutine rename_dim_grp(grp, old_name, new_name, err)
       op_err = error_type(NC_EINVAL, "rename_dimension", &
         & "Duplicate local dimension: "//trim(old_name))
     end if
-    if (op_err%code /= NC_NOERR) then
+    if (.exists. op_err) then
       call return_err(op_err, err)
       return
     end if
@@ -109,26 +117,31 @@ pure module subroutine rename_dim_grp(grp, old_name, new_name, err)
     end do
   end if
   call rename_dims_(staged, old_name, new_name, op_err)
-  if (op_err%code == NC_NOERR) then
-    k = 0
-    if (allocated(grp%dims)) then
-      do i = lbound(grp%dims, 1), ubound(grp%dims, 1)
+  if (.exists. op_err) then
+    call return_err(op_err, err)
+    return
+  end if
+  k = 0
+  if (allocated(grp%dims)) then
+    do i = lbound(grp%dims, 1), ubound(grp%dims, 1)
+      k = k + 1
+      if (.not. allocated(grp%dims(i)%name)) cycle
+      if (grp%dims(i)%name == trim(old_name)) then
+        call move_alloc(staged(k)%name, grp%dims(i)%name)
+      end if
+    end do
+  end if
+  if (allocated(grp%vars)) then
+    do i = lbound(grp%vars, 1), ubound(grp%vars, 1)
+      if (.not. allocated(grp%vars(i)%dims)) cycle
+      do j = lbound(grp%vars(i)%dims, 1), ubound(grp%vars(i)%dims, 1)
         k = k + 1
-        if (.not. allocated(grp%dims(i)%name)) cycle
-        if (grp%dims(i)%name == trim(old_name)) call move_alloc(staged(k)%name, grp%dims(i)%name)
+        if (.not. allocated(grp%vars(i)%dims(j)%name)) cycle
+        if (grp%vars(i)%dims(j)%name == trim(old_name)) then
+          call move_alloc(staged(k)%name, grp%vars(i)%dims(j)%name)
+        end if
       end do
-    end if
-    if (allocated(grp%vars)) then
-      do i = lbound(grp%vars, 1), ubound(grp%vars, 1)
-        if (.not. allocated(grp%vars(i)%dims)) cycle
-        do j = lbound(grp%vars(i)%dims, 1), ubound(grp%vars(i)%dims, 1)
-          k = k + 1
-          if (.not. allocated(grp%vars(i)%dims(j)%name)) cycle
-          if (grp%vars(i)%dims(j)%name == trim(old_name)) &
-            & call move_alloc(staged(k)%name, grp%vars(i)%dims(j)%name)
-        end do
-      end do
-    end if
+    end do
   end if
   call return_err(op_err, err)
 end subroutine rename_dim_grp
@@ -144,10 +157,10 @@ pure subroutine rename_dims_(dims, old_name, new_name, err)
   integer :: i, first
   integer(c_int) :: known_id
 
-  call check_nc_name(old_name, err, "rename_dimension")
-  if (err%code /= NC_NOERR) return
-  call check_nc_name(new_name, err, "rename_dimension")
-  if (err%code /= NC_NOERR) return
+  call validate(old_name, context="rename_dimension", err=err)
+  if (.exists. err) return
+  call validate(new_name, context="rename_dimension", err=err)
+  if (.exists. err) return
   first = 0
   known_id = -1
   do i = 1, size(dims)
@@ -162,7 +175,8 @@ pure subroutine rename_dims_(dims, old_name, new_name, err)
       end if
       known_id = dims(i)%id
     end if
-    if (dims(i)%len /= dims(first)%len .or. (dims(i)%is_unlim .neqv. dims(first)%is_unlim)) then
+    if (dims(i)%len /= dims(first)%len .or. &
+      & (dims(i)%is_unlim .neqv. dims(first)%is_unlim)) then
       err = error_type(NC_EINVAL, "rename_dimension", &
         & "Conflicting dimension metadata: "//trim(old_name))
       return

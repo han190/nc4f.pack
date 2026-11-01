@@ -26,12 +26,17 @@ pure module subroutine rename_grp_grp(grp, new_name, err)
       end if
     end if
   end select
-  if (op_err%code == NC_NOERR) &
-    & call check_nc_name(new_name, op_err, "rename_group")
-  if (op_err%code == NC_NOERR) then
-    name = trim(new_name)
-    call move_alloc(name, grp%name)
+  if (.exists. op_err) then
+    call return_err(op_err, err)
+    return
   end if
+  call validate(new_name, context="rename_group", err=op_err)
+  if (.exists. op_err) then
+    call return_err(op_err, err)
+    return
+  end if
+  name = trim(new_name)
+  call move_alloc(name, grp%name)
   call return_err(op_err, err)
 end subroutine rename_grp_grp
 
@@ -46,15 +51,21 @@ pure module subroutine rename_grp_par(parent, old_name, new_name, err)
   !! Receives the status and diagnostic; failures stop execution when omitted.
   type(error_type) :: op_err
 
-  call check_nc_name(old_name, op_err, "rename_group")
-  if (op_err%code == NC_NOERR) then
-    call check_nc_name(new_name, op_err, "rename_group")
-    if (associated(parent%grps)) then
-      call rename_grps_(parent%grps, old_name, new_name, op_err)
-    else
-      op_err = error_type(NC_ENOGRP, "rename_group", &
-        & "Group not found: "//trim(old_name))
-    end if
+  call validate(old_name, context="rename_group", err=op_err)
+  if (.exists. op_err) then
+    call return_err(op_err, err)
+    return
+  end if
+  call validate(new_name, context="rename_group", err=op_err)
+  if (.exists. op_err) then
+    call return_err(op_err, err)
+    return
+  end if
+  if (associated(parent%grps)) then
+    call rename_grps_(parent%grps, old_name, new_name, op_err)
+  else
+    op_err = error_type(NC_ENOGRP, "rename_group", &
+      & "Group not found: "//trim(old_name))
   end if
   call return_err(op_err, err)
 end subroutine rename_grp_par
@@ -337,50 +348,5 @@ pure function collect_dims_(vars) result(dims)
   end do
   dims = collected(:n)
 end function collect_dims_
-
-pure module function buffer_size(dtype, len, context) result(nbytes)
-  !! Compute the byte count for a NetCDF type and element count, checking overflow.
-  integer(data_type), intent(in) :: dtype
-  !! Dataset data type code to validate or translate.
-  integer(int64), intent(in) :: len
-  !! Length of the dimension or attribute.
-  character(len=*), intent(in), optional :: context
-  !! Context included in a validation or error message.
-  integer :: nbytes
-  !! Result produced by this operation.
-  integer(int64) :: item_bytes
-
-  if (len < 0) then
-    if (present(context)) then
-      error stop trim(context)//" Negative element count."
-    else
-      error stop "[buffer_size] Negative element count."
-    end if
-  end if
-  select case (dtype)
-  case (BYTE_TYPE, CHAR_TYPE)
-    item_bytes = 1
-  case (SHORT_TYPE)
-    item_bytes = storage_size(0_int16)/storage_size(0_int8)
-  case (INT_TYPE, FLOAT_TYPE)
-    item_bytes = storage_size(0_int32)/storage_size(0_int8)
-  case (INT64_TYPE, DOUBLE_TYPE)
-    item_bytes = storage_size(0_int64)/storage_size(0_int8)
-  case default
-    if (present(context)) then
-      error stop trim(context)//" Unsupported NetCDF data type."
-    else
-      error stop "[buffer_size] Unsupported NetCDF data type."
-    end if
-  end select
-  if (len > int(huge(nbytes), int64)/item_bytes) then
-    if (present(context)) then
-      error stop trim(context)//" Byte-size overflow."
-    else
-      error stop "[buffer_size] Byte-size overflow."
-    end if
-  end if
-  nbytes = int(len*item_bytes)
-end function buffer_size
 
 end submodule nc4f_ds_group

@@ -1,9 +1,52 @@
 # Functions and Subroutines
 
-This page documents the public procedures re-exported by `nc4f`. Optional
+This page documents the public procedures re-exported by `nc4f` and the
+lower-level validation helpers available from `nc4f_ds`. Optional
 `err` arguments receive an `error_type`; when omitted, an operation failure
 follows the library's fail-fast policy. See [Exposed NC
 Constants](exposed-nc-constants.md) for constants used with `error_type`.
+
+## Validation (`nc4f_ds`)
+
+Import these pure procedures directly from `nc4f_ds`; they are not
+re-exported by `nc4f`.
+
+| Synopsis | Purpose |
+|:--|:--|
+| `CALL VALIDATE(NAME, CONTEXT=CONTEXT [, ERR=ERR])` | Check a character string for valid NetCDF local-name syntax and length. |
+| `CALL VALIDATE(ATT, [DTYPE,] CONTEXT=CONTEXT [, ERR=ERR])` | Check attribute type, length, and active byte storage. |
+| `CALL VALIDATE(VAR, [DTYPE,] [RANK,] CONTEXT=CONTEXT [, ERR=ERR])` | Also check dimensions and their product against the stored length. |
+| `CALL COMPUTE_BUFFER_SIZE(DTYPE, LEN, NBYTES, ERR)` | Compute a default-integer byte count from an `integer(int64)` element count, checking nonnegative length, type support, and overflow. |
+| `NBYTES = BUFFER_SIZE(DTYPE, LEN)` | Compute the same checked byte count, terminating execution on failure. |
+| `CALL COMPUTE_SIZE(VAR, N, ERR [, DIM])` | Compute an `integer(int64)` element count using the same dimension-index convention as `SIZE(VAR [, DIM])`. |
+
+`ERR` is `type(error_type), intent(out)`. Storage-validation failures return
+`NC_EINVAL` with an operation name and diagnostic. Success clears any previous
+error. The checked size helpers require `ERR` and set their count output to zero
+on failure. Existing `SIZE` and `BUFFER_SIZE` functions remain pure and fail-fast.
+
+`COMPUTE_BUFFER_SIZE` replaces `CHECK_BUFFER_SIZE`. Both it and the
+`BUFFER_SIZE` wrapper are implemented in `nc4f_ds_utility`. `BUFFER_SIZE`
+accepts only `DTYPE` and `LEN`; its former optional `CONTEXT` argument has been
+removed. Use `COMPUTE_BUFFER_SIZE` when the caller needs to handle an error.
+
+The name overload returns `NC_EBADNAME` for invalid names or `NC_EMAXNAME`
+when the name exceeds `NC_MAX_NAME` bytes. Trailing Fortran blank padding is
+ignored. UTF-8 sequences are validated, but callers must supply NFC-normalized
+Unicode names. Name validation is independent: the attribute and variable
+overloads check storage and metadata, not the object's name.
+
+For `VALIDATE`, `DTYPE` optionally checks the expected NetCDF type. A supplied
+`RANK` greater than one must match the number of dimensions; rank one retains
+the existing flat-extraction behavior. `CONTEXT` names the calling operation,
+preferably without brackets; existing bracketed contexts remain supported.
+Omitting `ERR` retains fail-fast behavior through `RETURN_ERR`.
+
+Validation does not change metadata, allocate payload storage, or change buffer
+ownership. Empty values may have no backing storage. `BUFFER2CPTR` remains
+fail-fast, while error-aware NetCDF I/O validates storage before obtaining a
+C pointer and propagates failures through its `ERR` result. A failed write can
+leave a partial file; this is not a transactional write API.
 
 
 ## `ERROR_MSG` -- Format an Operation Result

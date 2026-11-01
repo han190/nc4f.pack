@@ -151,7 +151,7 @@ function get_var_(nc, name, start, count, stride, err) result(var)
   character(len=MAX_CHAR_LEN) :: msg
   integer, allocatable :: start_(:), count_(:), stride_(:)
   integer :: i, j, ndims
-  integer(int64) :: f_start, f_count, f_stride
+  integer(int64) :: f_start, f_count, f_stride, nelems
 
   err = error_type()
   var = inq_var_(nc, name, err)
@@ -165,7 +165,7 @@ function get_var_(nc, name, start, count, stride, err) result(var)
   end if
 
   if (var%len == 0 .and. .not. present(start)) then
-    call validate(var, context="[get_variable]")
+    call validate(var, context="get_variable", err=err)
     return
   end if
 
@@ -229,15 +229,19 @@ function get_var_(nc, name, start, count, stride, err) result(var)
     end if
     var%dims(i)%len = f_count
   end do
-  var%len = size(var)
+  call compute_size(var, nelems, err)
+  if (.exists. err) return
+  var%len = nelems
 
   if (var%len == 0) then
-    call validate(var, context="[get_variable]")
+    call validate(var, context="get_variable", err=err)
     return
   end if
 
-  call initialize(var)
-  call validate(var, context="[get_variable]")
+  call initialize(var, err)
+  if (.exists. err) return
+  call validate(var, context="get_variable", err=err)
+  if (.exists. err) return
   allocate (c_start(ndims), c_count(ndims), c_stride(ndims))
   do i = 1, ndims
     j = ndims - i + 1
@@ -287,6 +291,7 @@ function inq_var_(nc, name, err) result(var)
   type(variable_type) :: var
   !! Result produced by this operation.
   integer(c_int) :: stat
+  integer(int64) :: nelems
   character(len=MAX_CHAR_LEN) :: msg
 
   err = error_type()
@@ -301,7 +306,9 @@ function inq_var_(nc, name, err) result(var)
   if (has_err(err)) return
   var%dims = inq_dims_var(nc, var, err=err)
   if (has_err(err)) return
-  var%len = size(var)
+  call compute_size(var, nelems, err)
+  if (.exists. err) return
+  var%len = nelems
 end function inq_var_
 
 function inq_vartype_(ncid, varid, err) result(vartype)
@@ -355,7 +362,9 @@ module subroutine put_vara(nc, var, start, count, err)
       & "start and count must have one entry per dimension.")
     return
   end if
-  if (.not. allocated(var%dims) .or. size(var%dims) /= ndims) then
+  call validate(var, context="put_vara", err=err)
+  if (.exists. err) return
+  if (size(var%dims) /= ndims) then
     err = error_type(NC_EINVAL, "put_vara", &
       & "Source rank must match the destination variable.")
     return
@@ -366,7 +375,6 @@ module subroutine put_vara(nc, var, start, count, err)
     return
   end if
 
-  call validate(var, context="[put_vara]")
   allocate (c_start(ndims), c_count(ndims))
   do i = 1, ndims
     f_start = int(start(i), int64)
@@ -429,7 +437,8 @@ module subroutine put_var(nc, var, err)
   integer :: i, j, ndims
 
   err = error_type()
-  call validate(var, context="[put_var]")
+  call validate(var, context="put_var", err=err)
+  if (.exists. err) return
   tmp = def_var(nc, var, err)
   if (has_err(err)) return
   if (allocated(var%atts)) then

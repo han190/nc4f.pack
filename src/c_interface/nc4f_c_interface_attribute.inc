@@ -35,8 +35,8 @@ function nc_inq_att(ncid, varid, name, xtypep, lenp) &
 end function nc_inq_att
 
 function nc_get_att(ncid, varid, name, value) bind(c, name="nc_get_att")
-  !! Get an attribute of any type.
-  !! The memory type must match the file type; no numeric conversion is performed.
+  !! Get an attribute of any type. The memory type must match the file type; no
+  !! numeric conversion is performed.
   import :: c_int, c_char, c_ptr
   integer(c_int), value :: ncid
   !! NetCDF file or group ID.
@@ -150,7 +150,8 @@ function nc_inq_attid(ncid, varid, name, idp) bind(c, name="nc_inq_attid")
   !! - NC_ENOTATT Attribute not found.
 end function nc_inq_attid
 
-function nc_inq_atttype(ncid, varid, name, xtypep) bind(c, name="nc_inq_atttype")
+function nc_inq_atttype(ncid, varid, name, xtypep) &
+  & bind(c, name="nc_inq_atttype")
   !! Return the NetCDF attribute type.
   import :: c_int, c_char
   integer(c_int), value :: ncid
@@ -188,9 +189,10 @@ function nc_inq_attlen(ncid, varid, name, lenp) bind(c, name="nc_inq_attlen")
   !! - NC_ENOTATT Attribute not found.
 end function nc_inq_attlen
 
-function nc_copy_att(ncid_in, varid_in, name, ncid_out, varid_out) bind(c, name="nc_copy_att")
-  !! Copy an attribute, preserving its type and values.
-  !! A new or enlarged attribute in a classic file requires destination define mode.
+function nc_copy_att(ncid_in, varid_in, name, ncid_out, varid_out) &
+  & bind(c, name="nc_copy_att")
+  !! Copy an attribute, preserving its type and values. A new or enlarged
+  !! attribute in a classic file requires destination define mode.
   import :: c_int, c_char
   integer(c_int), value :: ncid_in
   !! Source file or group identifier.
@@ -234,8 +236,8 @@ function nc_rename_att(ncid, varid, name, newname) bind(c, name="nc_rename_att")
 end function nc_rename_att
 
 function nc_del_att(ncid, varid, name) bind(c, name="nc_del_att")
-  !! Delete an attribute.
-  !! Classic files must be in define mode; NetCDF-4 attributes may be deleted in data mode.
+  !! Delete an attribute. Classic files must be in define mode; NetCDF-4
+  !! attributes may be deleted in data mode.
   import :: c_int, c_char
   integer(c_int), value :: ncid
   !! Open file or group identifier.
@@ -253,10 +255,11 @@ function nc_del_att(ncid, varid, name) bind(c, name="nc_del_att")
   !! - NC_ENOTINDEFINE Classic file is not in define mode.
 end function nc_del_att
 
-function nc_get_att_schar(ncid, varid, name, ip) bind(c, name="nc_get_att_schar")
-  !! Read an attribute using schar memory storage.
-  !! The suffix selects the memory type; NetCDF converts to or from the file's numeric type.
-  !! Allocate enough storage for the count returned by nc_inq_attlen().
+function nc_get_att_schar(ncid, varid, name, ip) &
+  & bind(c, name="nc_get_att_schar")
+  !! Read an attribute using schar memory storage. The suffix selects the memory
+  !! type; NetCDF converts to or from the file's numeric type. Allocate enough
+  !! storage for the count returned by nc_inq_attlen().
   import :: c_int, c_char, c_ptr
   integer(c_int), value :: ncid
   !! Open file or group identifier.
@@ -275,10 +278,11 @@ function nc_get_att_schar(ncid, varid, name, ip) bind(c, name="nc_get_att_schar"
   !! - NC_ERANGE Numeric conversion exceeds the destination range.
 end function nc_get_att_schar
 
-function nc_put_att_schar(ncid, varid, name, xtype, len, op) bind(c, name="nc_put_att_schar")
-  !! Write an attribute using schar memory storage.
-  !! The suffix selects the memory type; NetCDF converts to or from the file's numeric type.
-  !! New or enlarged attributes in classic files require define mode.
+function nc_put_att_schar(ncid, varid, name, xtype, len, op) &
+  & bind(c, name="nc_put_att_schar")
+  !! Write an attribute using schar memory storage. The suffix selects the
+  !! memory type; NetCDF converts to or from the file's numeric type. New or
+  !! enlarged attributes in classic files require define mode.
   import :: c_int, c_char, c_size_t, c_ptr
   integer(c_int), value :: ncid
   !! Open file or group identifier.
@@ -289,7 +293,8 @@ function nc_put_att_schar(ncid, varid, name, xtype, len, op) bind(c, name="nc_pu
   integer(c_int), value :: xtype
   !! Destination NetCDF numeric type; the suffix selects the source memory type.
   integer(c_size_t), value :: len
-  !! Number of attribute elements (characters for NC_CHAR, strings for NC_STRING).
+  !! Number of attribute elements (characters for NC_CHAR, strings for
+  !! NC_STRING).
   type(c_ptr), value :: op
   !! Pointer to contiguous integer(c_signed_char) storage.
   integer(c_int) :: nc_put_att_schar
@@ -301,10 +306,11 @@ function nc_put_att_schar(ncid, varid, name, xtype, len, op) bind(c, name="nc_pu
   !! - NC_ERANGE Numeric conversion exceeds the destination range.
 end function nc_put_att_schar
 
-function nc_get_att_short(ncid, varid, name, ip) bind(c, name="nc_get_att_short")
-  !! Read an attribute using short memory storage.
-  !! The suffix selects the memory type; NetCDF converts to or from the file's numeric type.
-  !! Allocate enough storage for the count returned by nc_inq_attlen().
+function nc_get_att_short(ncid, varid, name, ip) &
+  & bind(c, name="nc_get_att_short")
+  !! Read an attribute using short memory storage. The suffix selects the memory
+  !! type; NetCDF converts to or from the file's numeric type. Allocate enough
+  !! storage for the count returned by nc_inq_attlen().
   import :: c_int, c_char, c_ptr
   integer(c_int), value :: ncid
   !! Open file or group identifier.
@@ -323,10 +329,11 @@ function nc_get_att_short(ncid, varid, name, ip) bind(c, name="nc_get_att_short"
   !! - NC_ERANGE Numeric conversion exceeds the destination range.
 end function nc_get_att_short
 
-function nc_put_att_short(ncid, varid, name, xtype, len, op) bind(c, name="nc_put_att_short")
-  !! Write an attribute using short memory storage.
-  !! The suffix selects the memory type; NetCDF converts to or from the file's numeric type.
-  !! New or enlarged attributes in classic files require define mode.
+function nc_put_att_short(ncid, varid, name, xtype, len, op) &
+  & bind(c, name="nc_put_att_short")
+  !! Write an attribute using short memory storage. The suffix selects the
+  !! memory type; NetCDF converts to or from the file's numeric type. New or
+  !! enlarged attributes in classic files require define mode.
   import :: c_int, c_char, c_size_t, c_ptr
   integer(c_int), value :: ncid
   !! Open file or group identifier.
@@ -337,7 +344,8 @@ function nc_put_att_short(ncid, varid, name, xtype, len, op) bind(c, name="nc_pu
   integer(c_int), value :: xtype
   !! Destination NetCDF numeric type; the suffix selects the source memory type.
   integer(c_size_t), value :: len
-  !! Number of attribute elements (characters for NC_CHAR, strings for NC_STRING).
+  !! Number of attribute elements (characters for NC_CHAR, strings for
+  !! NC_STRING).
   type(c_ptr), value :: op
   !! Pointer to contiguous integer(c_short) storage.
   integer(c_int) :: nc_put_att_short
@@ -350,9 +358,9 @@ function nc_put_att_short(ncid, varid, name, xtype, len, op) bind(c, name="nc_pu
 end function nc_put_att_short
 
 function nc_get_att_int(ncid, varid, name, ip) bind(c, name="nc_get_att_int")
-  !! Read an attribute using int memory storage.
-  !! The suffix selects the memory type; NetCDF converts to or from the file's numeric type.
-  !! Allocate enough storage for the count returned by nc_inq_attlen().
+  !! Read an attribute using int memory storage. The suffix selects the memory
+  !! type; NetCDF converts to or from the file's numeric type. Allocate enough
+  !! storage for the count returned by nc_inq_attlen().
   import :: c_int, c_char, c_ptr
   integer(c_int), value :: ncid
   !! Open file or group identifier.
@@ -371,10 +379,11 @@ function nc_get_att_int(ncid, varid, name, ip) bind(c, name="nc_get_att_int")
   !! - NC_ERANGE Numeric conversion exceeds the destination range.
 end function nc_get_att_int
 
-function nc_put_att_int(ncid, varid, name, xtype, len, op) bind(c, name="nc_put_att_int")
-  !! Write an attribute using int memory storage.
-  !! The suffix selects the memory type; NetCDF converts to or from the file's numeric type.
-  !! New or enlarged attributes in classic files require define mode.
+function nc_put_att_int(ncid, varid, name, xtype, len, op) &
+  & bind(c, name="nc_put_att_int")
+  !! Write an attribute using int memory storage. The suffix selects the memory
+  !! type; NetCDF converts to or from the file's numeric type. New or enlarged
+  !! attributes in classic files require define mode.
   import :: c_int, c_char, c_size_t, c_ptr
   integer(c_int), value :: ncid
   !! Open file or group identifier.
@@ -385,7 +394,8 @@ function nc_put_att_int(ncid, varid, name, xtype, len, op) bind(c, name="nc_put_
   integer(c_int), value :: xtype
   !! Destination NetCDF numeric type; the suffix selects the source memory type.
   integer(c_size_t), value :: len
-  !! Number of attribute elements (characters for NC_CHAR, strings for NC_STRING).
+  !! Number of attribute elements (characters for NC_CHAR, strings for
+  !! NC_STRING).
   type(c_ptr), value :: op
   !! Pointer to contiguous integer(c_int) storage.
   integer(c_int) :: nc_put_att_int
@@ -398,9 +408,9 @@ function nc_put_att_int(ncid, varid, name, xtype, len, op) bind(c, name="nc_put_
 end function nc_put_att_int
 
 function nc_get_att_long(ncid, varid, name, ip) bind(c, name="nc_get_att_long")
-  !! Read an attribute using long memory storage.
-  !! The suffix selects the memory type; NetCDF converts to or from the file's numeric type.
-  !! Allocate enough storage for the count returned by nc_inq_attlen().
+  !! Read an attribute using long memory storage. The suffix selects the memory
+  !! type; NetCDF converts to or from the file's numeric type. Allocate enough
+  !! storage for the count returned by nc_inq_attlen().
   import :: c_int, c_char, c_ptr
   integer(c_int), value :: ncid
   !! Open file or group identifier.
@@ -419,10 +429,11 @@ function nc_get_att_long(ncid, varid, name, ip) bind(c, name="nc_get_att_long")
   !! - NC_ERANGE Numeric conversion exceeds the destination range.
 end function nc_get_att_long
 
-function nc_put_att_long(ncid, varid, name, xtype, len, op) bind(c, name="nc_put_att_long")
-  !! Write an attribute using long memory storage.
-  !! The suffix selects the memory type; NetCDF converts to or from the file's numeric type.
-  !! New or enlarged attributes in classic files require define mode.
+function nc_put_att_long(ncid, varid, name, xtype, len, op) &
+  & bind(c, name="nc_put_att_long")
+  !! Write an attribute using long memory storage. The suffix selects the memory
+  !! type; NetCDF converts to or from the file's numeric type. New or enlarged
+  !! attributes in classic files require define mode.
   import :: c_int, c_char, c_size_t, c_ptr
   integer(c_int), value :: ncid
   !! Open file or group identifier.
@@ -433,7 +444,8 @@ function nc_put_att_long(ncid, varid, name, xtype, len, op) bind(c, name="nc_put
   integer(c_int), value :: xtype
   !! Destination NetCDF numeric type; the suffix selects the source memory type.
   integer(c_size_t), value :: len
-  !! Number of attribute elements (characters for NC_CHAR, strings for NC_STRING).
+  !! Number of attribute elements (characters for NC_CHAR, strings for
+  !! NC_STRING).
   type(c_ptr), value :: op
   !! Pointer to contiguous integer(c_long) storage.
   integer(c_int) :: nc_put_att_long
@@ -445,10 +457,11 @@ function nc_put_att_long(ncid, varid, name, xtype, len, op) bind(c, name="nc_put
   !! - NC_ERANGE Numeric conversion exceeds the destination range.
 end function nc_put_att_long
 
-function nc_get_att_longlong(ncid, varid, name, ip) bind(c, name="nc_get_att_longlong")
-  !! Read an attribute using longlong memory storage.
-  !! The suffix selects the memory type; NetCDF converts to or from the file's numeric type.
-  !! Allocate enough storage for the count returned by nc_inq_attlen().
+function nc_get_att_longlong(ncid, varid, name, ip) &
+  & bind(c, name="nc_get_att_longlong")
+  !! Read an attribute using longlong memory storage. The suffix selects the
+  !! memory type; NetCDF converts to or from the file's numeric type. Allocate
+  !! enough storage for the count returned by nc_inq_attlen().
   import :: c_int, c_char, c_ptr
   integer(c_int), value :: ncid
   !! Open file or group identifier.
@@ -467,10 +480,11 @@ function nc_get_att_longlong(ncid, varid, name, ip) bind(c, name="nc_get_att_lon
   !! - NC_ERANGE Numeric conversion exceeds the destination range.
 end function nc_get_att_longlong
 
-function nc_put_att_longlong(ncid, varid, name, xtype, len, op) bind(c, name="nc_put_att_longlong")
-  !! Write an attribute using longlong memory storage.
-  !! The suffix selects the memory type; NetCDF converts to or from the file's numeric type.
-  !! New or enlarged attributes in classic files require define mode.
+function nc_put_att_longlong(ncid, varid, name, xtype, len, op) &
+  & bind(c, name="nc_put_att_longlong")
+  !! Write an attribute using longlong memory storage. The suffix selects the
+  !! memory type; NetCDF converts to or from the file's numeric type. New or
+  !! enlarged attributes in classic files require define mode.
   import :: c_int, c_char, c_size_t, c_ptr
   integer(c_int), value :: ncid
   !! Open file or group identifier.
@@ -481,7 +495,8 @@ function nc_put_att_longlong(ncid, varid, name, xtype, len, op) bind(c, name="nc
   integer(c_int), value :: xtype
   !! Destination NetCDF numeric type; the suffix selects the source memory type.
   integer(c_size_t), value :: len
-  !! Number of attribute elements (characters for NC_CHAR, strings for NC_STRING).
+  !! Number of attribute elements (characters for NC_CHAR, strings for
+  !! NC_STRING).
   type(c_ptr), value :: op
   !! Pointer to contiguous integer(c_long_long) storage.
   integer(c_int) :: nc_put_att_longlong
@@ -493,10 +508,11 @@ function nc_put_att_longlong(ncid, varid, name, xtype, len, op) bind(c, name="nc
   !! - NC_ERANGE Numeric conversion exceeds the destination range.
 end function nc_put_att_longlong
 
-function nc_get_att_float(ncid, varid, name, ip) bind(c, name="nc_get_att_float")
-  !! Read an attribute using float memory storage.
-  !! The suffix selects the memory type; NetCDF converts to or from the file's numeric type.
-  !! Allocate enough storage for the count returned by nc_inq_attlen().
+function nc_get_att_float(ncid, varid, name, ip) &
+  & bind(c, name="nc_get_att_float")
+  !! Read an attribute using float memory storage. The suffix selects the memory
+  !! type; NetCDF converts to or from the file's numeric type. Allocate enough
+  !! storage for the count returned by nc_inq_attlen().
   import :: c_int, c_char, c_ptr
   integer(c_int), value :: ncid
   !! Open file or group identifier.
@@ -515,10 +531,11 @@ function nc_get_att_float(ncid, varid, name, ip) bind(c, name="nc_get_att_float"
   !! - NC_ERANGE Numeric conversion exceeds the destination range.
 end function nc_get_att_float
 
-function nc_put_att_float(ncid, varid, name, xtype, len, op) bind(c, name="nc_put_att_float")
-  !! Write an attribute using float memory storage.
-  !! The suffix selects the memory type; NetCDF converts to or from the file's numeric type.
-  !! New or enlarged attributes in classic files require define mode.
+function nc_put_att_float(ncid, varid, name, xtype, len, op) &
+  & bind(c, name="nc_put_att_float")
+  !! Write an attribute using float memory storage. The suffix selects the
+  !! memory type; NetCDF converts to or from the file's numeric type. New or
+  !! enlarged attributes in classic files require define mode.
   import :: c_int, c_char, c_size_t, c_ptr
   integer(c_int), value :: ncid
   !! Open file or group identifier.
@@ -529,7 +546,8 @@ function nc_put_att_float(ncid, varid, name, xtype, len, op) bind(c, name="nc_pu
   integer(c_int), value :: xtype
   !! Destination NetCDF numeric type; the suffix selects the source memory type.
   integer(c_size_t), value :: len
-  !! Number of attribute elements (characters for NC_CHAR, strings for NC_STRING).
+  !! Number of attribute elements (characters for NC_CHAR, strings for
+  !! NC_STRING).
   type(c_ptr), value :: op
   !! Pointer to contiguous real(c_float) storage.
   integer(c_int) :: nc_put_att_float
@@ -541,10 +559,11 @@ function nc_put_att_float(ncid, varid, name, xtype, len, op) bind(c, name="nc_pu
   !! - NC_ERANGE Numeric conversion exceeds the destination range.
 end function nc_put_att_float
 
-function nc_get_att_double(ncid, varid, name, ip) bind(c, name="nc_get_att_double")
-  !! Read an attribute using double memory storage.
-  !! The suffix selects the memory type; NetCDF converts to or from the file's numeric type.
-  !! Allocate enough storage for the count returned by nc_inq_attlen().
+function nc_get_att_double(ncid, varid, name, ip) &
+  & bind(c, name="nc_get_att_double")
+  !! Read an attribute using double memory storage. The suffix selects the
+  !! memory type; NetCDF converts to or from the file's numeric type. Allocate
+  !! enough storage for the count returned by nc_inq_attlen().
   import :: c_int, c_char, c_ptr
   integer(c_int), value :: ncid
   !! Open file or group identifier.
@@ -563,10 +582,11 @@ function nc_get_att_double(ncid, varid, name, ip) bind(c, name="nc_get_att_doubl
   !! - NC_ERANGE Numeric conversion exceeds the destination range.
 end function nc_get_att_double
 
-function nc_put_att_double(ncid, varid, name, xtype, len, op) bind(c, name="nc_put_att_double")
-  !! Write an attribute using double memory storage.
-  !! The suffix selects the memory type; NetCDF converts to or from the file's numeric type.
-  !! New or enlarged attributes in classic files require define mode.
+function nc_put_att_double(ncid, varid, name, xtype, len, op) &
+  & bind(c, name="nc_put_att_double")
+  !! Write an attribute using double memory storage. The suffix selects the
+  !! memory type; NetCDF converts to or from the file's numeric type. New or
+  !! enlarged attributes in classic files require define mode.
   import :: c_int, c_char, c_size_t, c_ptr
   integer(c_int), value :: ncid
   !! Open file or group identifier.
@@ -577,7 +597,8 @@ function nc_put_att_double(ncid, varid, name, xtype, len, op) bind(c, name="nc_p
   integer(c_int), value :: xtype
   !! Destination NetCDF numeric type; the suffix selects the source memory type.
   integer(c_size_t), value :: len
-  !! Number of attribute elements (characters for NC_CHAR, strings for NC_STRING).
+  !! Number of attribute elements (characters for NC_CHAR, strings for
+  !! NC_STRING).
   type(c_ptr), value :: op
   !! Pointer to contiguous real(c_double) storage.
   integer(c_int) :: nc_put_att_double
@@ -601,7 +622,8 @@ function nc_get_att_text(ncid, varid, name, ip) bind(c, name="nc_get_att_text")
   character(kind=c_char), intent(in) :: name(*)
   !! NUL-terminated object name.
   type(c_ptr), value :: ip
-  !! Pointer to contiguous character(kind=c_char) storage; text data need not be NUL-terminated.
+  !! Pointer to contiguous character(kind=c_char) storage; text data need not be
+  !! NUL-terminated.
   integer(c_int) :: nc_get_att_text
   !! **Options:**
   !! - NC_NOERR No error.
@@ -610,7 +632,8 @@ function nc_get_att_text(ncid, varid, name, ip) bind(c, name="nc_get_att_text")
   !! - NC_ENOTATT Attribute not found.
 end function nc_get_att_text
 
-function nc_put_att_text(ncid, varid, name, len, op) bind(c, name="nc_put_att_text")
+function nc_put_att_text(ncid, varid, name, len, op) &
+  & bind(c, name="nc_put_att_text")
   !! Write an attribute using text memory storage.
   !! Transfers NC_CHAR values; numeric conversion is not supported.
   !! New or enlarged attributes in classic files require define mode.
@@ -622,9 +645,11 @@ function nc_put_att_text(ncid, varid, name, len, op) bind(c, name="nc_put_att_te
   character(kind=c_char), intent(in) :: name(*)
   !! NUL-terminated object name.
   integer(c_size_t), value :: len
-  !! Number of attribute elements (characters for NC_CHAR, strings for NC_STRING).
+  !! Number of attribute elements (characters for NC_CHAR, strings for
+  !! NC_STRING).
   type(c_ptr), value :: op
-  !! Pointer to contiguous character(kind=c_char) storage; text data need not be NUL-terminated.
+  !! Pointer to contiguous character(kind=c_char) storage; text data need not be
+  !! NUL-terminated.
   integer(c_int) :: nc_put_att_text
   !! **Options:**
   !! - NC_NOERR No error.
@@ -633,7 +658,8 @@ function nc_put_att_text(ncid, varid, name, len, op) bind(c, name="nc_put_att_te
   !! - NC_EPERM Dataset is read-only.
 end function nc_put_att_text
 
-function nc_get_att_string(ncid, varid, name, ip) bind(c, name="nc_get_att_string")
+function nc_get_att_string(ncid, varid, name, ip) &
+  & bind(c, name="nc_get_att_string")
   !! Read an attribute using string memory storage.
   !! Transfers NC_STRING values; no conversion to NC_CHAR is performed.
   !! Allocate enough storage for the count returned by nc_inq_attlen().
@@ -655,7 +681,8 @@ function nc_get_att_string(ncid, varid, name, ip) bind(c, name="nc_get_att_strin
   !! - NC_ENOTATT Attribute not found.
 end function nc_get_att_string
 
-function nc_put_att_string(ncid, varid, name, len, op) bind(c, name="nc_put_att_string")
+function nc_put_att_string(ncid, varid, name, len, op) &
+  & bind(c, name="nc_put_att_string")
   !! Write an attribute using string memory storage.
   !! Transfers NC_STRING values; no conversion to NC_CHAR is performed.
   !! New or enlarged attributes in classic files require define mode.
@@ -667,7 +694,8 @@ function nc_put_att_string(ncid, varid, name, len, op) bind(c, name="nc_put_att_
   character(kind=c_char), intent(in) :: name(*)
   !! NUL-terminated object name.
   integer(c_size_t), value :: len
-  !! Number of attribute elements (characters for NC_CHAR, strings for NC_STRING).
+  !! Number of attribute elements (characters for NC_CHAR, strings for
+  !! NC_STRING).
   type(c_ptr), value :: op
   !! Pointer to an array of c_ptr values referencing NUL-terminated strings.
   !! The caller retains ownership of the pointer array and strings.
@@ -682,11 +710,11 @@ end function nc_put_att_string
 ! Additional serial C API, including legacy and extension interfaces.
 
 function ncattput(ncid, varid, name, xtype, len, op) bind(c, name="ncattput")
-  !! Legacy v2 API: Write an attribute.
-  !! Uses v2 return/error conventions, not modern NC_NOERR status semantics.
-  !! Legacy process-global ncopts controls fatal errors and diagnostics; no accessor is provided.
-  !! C declaration: int ncattput(int ncid, int varid, const char *name, nc_type xtype, int len, const void
-  !! *op);
+  !! Legacy v2 API: Write an attribute. Uses v2 return/error conventions, not
+  !! modern NC_NOERR status semantics. Legacy process-global ncopts controls
+  !! fatal errors and diagnostics; no accessor is provided. C declaration: int
+  !! ncattput(int ncid, int varid, const char *name, nc_type xtype, int len,
+  !! const void *op);
   import :: c_int, c_char, c_ptr
   integer(c_int), value :: ncid
   !! Open dataset or group identifier.
@@ -701,14 +729,16 @@ function ncattput(ncid, varid, name, xtype, len, op) bind(c, name="ncattput")
   type(c_ptr), value :: op
   !! Pointer to C-compatible storage. C pointee: const void *.
   integer(c_int) :: ncattput
-  !! V2 result (ID, size, previous setting, or success value); -1 indicates failure.
+  !! V2 result (ID, size, previous setting, or success value); -1 indicates
+  !! failure.
 end function ncattput
 
 function ncattinq(ncid, varid, name, xtypep, lenp) bind(c, name="ncattinq")
-  !! Legacy v2 API: Query attribute type and length.
-  !! Uses v2 return/error conventions, not modern NC_NOERR status semantics.
-  !! Legacy process-global ncopts controls fatal errors and diagnostics; no accessor is provided.
-  !! C declaration: int ncattinq(int ncid, int varid, const char *name, nc_type *xtypep, int *lenp);
+  !! Legacy v2 API: Query attribute type and length. Uses v2 return/error
+  !! conventions, not modern NC_NOERR status semantics. Legacy process-global
+  !! ncopts controls fatal errors and diagnostics; no accessor is provided. C
+  !! declaration: int ncattinq(int ncid, int varid, const char *name, nc_type
+  !! *xtypep, int *lenp);
   import :: c_int, c_char
   integer(c_int), value :: ncid
   !! Open dataset or group identifier.
@@ -721,14 +751,15 @@ function ncattinq(ncid, varid, name, xtypep, lenp) bind(c, name="ncattinq")
   integer(c_int), intent(out) :: lenp
   !! Returned lenp value (C int).
   integer(c_int) :: ncattinq
-  !! V2 result (ID, size, previous setting, or success value); -1 indicates failure.
+  !! V2 result (ID, size, previous setting, or success value); -1 indicates
+  !! failure.
 end function ncattinq
 
 function ncattget(ncid, varid, name, ip) bind(c, name="ncattget")
-  !! Legacy v2 API: Read an attribute.
-  !! Uses v2 return/error conventions, not modern NC_NOERR status semantics.
-  !! Legacy process-global ncopts controls fatal errors and diagnostics; no accessor is provided.
-  !! C declaration: int ncattget(int ncid, int varid, const char *name, void *ip);
+  !! Legacy v2 API: Read an attribute. Uses v2 return/error conventions, not
+  !! modern NC_NOERR status semantics. Legacy process-global ncopts controls
+  !! fatal errors and diagnostics; no accessor is provided. C declaration: int
+  !! ncattget(int ncid, int varid, const char *name, void *ip);
   import :: c_int, c_char, c_ptr
   integer(c_int), value :: ncid
   !! Open dataset or group identifier.
@@ -739,14 +770,17 @@ function ncattget(ncid, varid, name, ip) bind(c, name="ncattget")
   type(c_ptr), value :: ip
   !! Pointer to C-compatible storage. C pointee: void *.
   integer(c_int) :: ncattget
-  !! V2 result (ID, size, previous setting, or success value); -1 indicates failure.
+  !! V2 result (ID, size, previous setting, or success value); -1 indicates
+  !! failure.
 end function ncattget
 
-function ncattcopy(ncid_in, varid_in, name, ncid_out, varid_out) bind(c, name="ncattcopy")
-  !! Legacy v2 API: Copy an attribute.
-  !! Uses v2 return/error conventions, not modern NC_NOERR status semantics.
-  !! Legacy process-global ncopts controls fatal errors and diagnostics; no accessor is provided.
-  !! C declaration: int ncattcopy(int ncid_in, int varid_in, const char *name, int ncid_out, int varid_out);
+function ncattcopy(ncid_in, varid_in, name, ncid_out, varid_out) &
+  & bind(c, name="ncattcopy")
+  !! Legacy v2 API: Copy an attribute. Uses v2 return/error conventions, not
+  !! modern NC_NOERR status semantics. Legacy process-global ncopts controls
+  !! fatal errors and diagnostics; no accessor is provided. C declaration: int
+  !! ncattcopy(int ncid_in, int varid_in, const char *name, int ncid_out, int
+  !! varid_out);
   import :: c_int, c_char
   integer(c_int), value :: ncid_in
   !! Source dataset/group identifier.
@@ -759,14 +793,15 @@ function ncattcopy(ncid_in, varid_in, name, ncid_out, varid_out) bind(c, name="n
   integer(c_int), value :: varid_out
   !! Destination variable identifier, or NC_GLOBAL.
   integer(c_int) :: ncattcopy
-  !! V2 result (ID, size, previous setting, or success value); -1 indicates failure.
+  !! V2 result (ID, size, previous setting, or success value); -1 indicates
+  !! failure.
 end function ncattcopy
 
 function ncattname(ncid, varid, attnum, name) bind(c, name="ncattname")
-  !! Legacy v2 API: Find an attribute name by index.
-  !! Uses v2 return/error conventions, not modern NC_NOERR status semantics.
-  !! Legacy process-global ncopts controls fatal errors and diagnostics; no accessor is provided.
-  !! C declaration: int ncattname(int ncid, int varid, int attnum, char *name);
+  !! Legacy v2 API: Find an attribute name by index. Uses v2 return/error
+  !! conventions, not modern NC_NOERR status semantics. Legacy process-global
+  !! ncopts controls fatal errors and diagnostics; no accessor is provided. C
+  !! declaration: int ncattname(int ncid, int varid, int attnum, char *name);
   import :: c_int, c_ptr
   integer(c_int), value :: ncid
   !! Open dataset or group identifier.
@@ -775,16 +810,18 @@ function ncattname(ncid, varid, attnum, name) bind(c, name="ncattname")
   integer(c_int), value :: attnum
   !! C int argument attnum.
   type(c_ptr), value :: name
-  !! Pointer to caller-provided C character output storage (NC_MAX_NAME + 1 for names).
+  !! Pointer to caller-provided C character output storage (NC_MAX_NAME + 1 for
+  !! names).
   integer(c_int) :: ncattname
-  !! V2 result (ID, size, previous setting, or success value); -1 indicates failure.
+  !! V2 result (ID, size, previous setting, or success value); -1 indicates
+  !! failure.
 end function ncattname
 
 function ncattrename(ncid, varid, name, newname) bind(c, name="ncattrename")
-  !! Legacy v2 API: Rename an attribute.
-  !! Uses v2 return/error conventions, not modern NC_NOERR status semantics.
-  !! Legacy process-global ncopts controls fatal errors and diagnostics; no accessor is provided.
-  !! C declaration: int ncattrename(int ncid, int varid, const char *name, const char *newname);
+  !! Legacy v2 API: Rename an attribute. Uses v2 return/error conventions, not
+  !! modern NC_NOERR status semantics. Legacy process-global ncopts controls
+  !! fatal errors and diagnostics; no accessor is provided. C declaration: int
+  !! ncattrename(int ncid, int varid, const char *name, const char *newname);
   import :: c_int, c_char
   integer(c_int), value :: ncid
   !! Open dataset or group identifier.
@@ -795,14 +832,15 @@ function ncattrename(ncid, varid, name, newname) bind(c, name="ncattrename")
   character(kind=c_char), intent(in) :: newname(*)
   !! NUL-terminated C string.
   integer(c_int) :: ncattrename
-  !! V2 result (ID, size, previous setting, or success value); -1 indicates failure.
+  !! V2 result (ID, size, previous setting, or success value); -1 indicates
+  !! failure.
 end function ncattrename
 
 function ncattdel(ncid, varid, name) bind(c, name="ncattdel")
-  !! Legacy v2 API: Delete an attribute.
-  !! Uses v2 return/error conventions, not modern NC_NOERR status semantics.
-  !! Legacy process-global ncopts controls fatal errors and diagnostics; no accessor is provided.
-  !! C declaration: int ncattdel(int ncid, int varid, const char *name);
+  !! Legacy v2 API: Delete an attribute. Uses v2 return/error conventions, not
+  !! modern NC_NOERR status semantics. Legacy process-global ncopts controls
+  !! fatal errors and diagnostics; no accessor is provided. C declaration: int
+  !! ncattdel(int ncid, int varid, const char *name);
   import :: c_int, c_char
   integer(c_int), value :: ncid
   !! Open dataset or group identifier.
@@ -811,5 +849,6 @@ function ncattdel(ncid, varid, name) bind(c, name="ncattdel")
   character(kind=c_char), intent(in) :: name(*)
   !! NUL-terminated C string.
   integer(c_int) :: ncattdel
-  !! V2 result (ID, size, previous setting, or success value); -1 indicates failure.
+  !! V2 result (ID, size, previous setting, or success value); -1 indicates
+  !! failure.
 end function ncattdel

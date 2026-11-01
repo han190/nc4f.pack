@@ -2,14 +2,6 @@ submodule(nc4f_nc) nc4f_nc_error
 implicit none (type, external)
 contains
 
-logical elemental module function has_err(err) result(is_err)
-  !! Return true when `err` represents a failed operation.
-  type(error_type), intent(in) :: err
-  !! Completed result of an nc4f operation.
-
-  is_err = err%code /= NC_NOERR
-end function has_err
-
 module function netcdf_err(status, fname, context) result(err)
   !! Convert a NetCDF C status into nc4f's normal error result.
   integer(c_int), intent(in) :: status

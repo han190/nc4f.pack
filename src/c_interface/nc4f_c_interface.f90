@@ -1,13 +1,14 @@
 module nc4f_c_interface
-!! Low-level ISO_C_BINDING interfaces to the NetCDF C library.
-!! These bindings retain C indexing, dimension order, string termination,
-!! memory ownership, and status-code semantics. They do not apply CF decoding.
-!! Include fragments share this module's public namespace and interface block.
-!! Buffer pointers must reference correctly typed, contiguous, live storage.
-!! Only arguments declared as type(c_ptr), value accept c_null_ptr.
-!! Unsigned-integer APIs and entry points requiring C adapters are omitted.
-!! Legacy result conventions and direct symbol aliases are documented individually.
-use, intrinsic :: iso_c_binding, only: c_int, c_ptr, c_char, c_size_t, c_long, c_float, c_long_long, c_double
+!! Low-level ISO_C_BINDING interfaces to the NetCDF C library. These bindings
+!! retain C indexing, dimension order, string termination, memory ownership, and
+!! status-code semantics. They do not apply CF decoding. Include fragments share
+!! this module's public namespace and interface block. Buffer pointers must
+!! reference correctly typed, contiguous, live storage. Only arguments declared
+!! as type(c_ptr), value accept c_null_ptr. Unsigned-integer APIs and entry
+!! points requiring C adapters are omitted. Legacy result conventions and direct
+!! symbol aliases are documented  individually.
+use, intrinsic :: iso_c_binding, only: &
+  & c_int, c_ptr, c_char, c_size_t, c_long, c_float, c_long_long, c_double
 implicit none (type, external)
 public
 
@@ -148,7 +149,8 @@ integer(c_int), parameter :: NC_MIN_DEFLATE_LEVEL = 0_c_int
 integer(c_int), parameter :: NC_MAX_DEFLATE_LEVEL = 9_c_int
 !! Maximum zlib compression level.
 integer(c_int), parameter :: NC_MAX_VAR_DIMS = 1024_c_int
-!! Maximum variable rank advertised by the C API; backends may impose lower limits.
+!! Maximum variable rank advertised by the C API; backends may impose lower
+!! limits.
 integer(c_int), parameter :: NC_ENFILE = -34_c_int
 !! Too many files open.
 integer(c_int), parameter :: NC_EEXIST = -35_c_int
@@ -441,9 +443,11 @@ integer(c_int), parameter :: NCAUX_ALIGN_C = 0_c_int
 integer(c_int), parameter :: NC_DISPATCH_VERSION = 5_c_int
 !! Dispatch table ABI version for the NetCDF-C 4.10.1 baseline.
 
-! C ABI descriptor layouts. Pointer components are C pointers, not Fortran pointers.
+! C ABI descriptor layouts. Pointer components are C pointers, not Fortran
+! pointers.
 type, bind(c) :: nc_vlen_t
-  !! Variable-length sequence descriptor. Read payloads require explicit reclamation.
+  !! Variable-length sequence descriptor. Read payloads require explicit
+  !! reclamation.
   integer(c_size_t) :: len
   !! Number of base-type elements.
   type(c_ptr) :: p
@@ -457,11 +461,13 @@ type, bind(c) :: NC_memio
   type(c_ptr) :: memory
   !! Image address; ownership depends on flags and the open/close operation.
   integer(c_int) :: flags
-  !! NC_MEMIO_LOCKED prevents the library from reallocating or freeing caller storage.
+  !! NC_MEMIO_LOCKED prevents the library from reallocating or freeing caller
+  !! storage.
 end type NC_memio
 
 type, bind(c) :: NCPluginList
-  !! Plugin path list from netcdf_filter.h; initialize dirs to c_null_ptr before allocating calls.
+  !! Plugin path list from netcdf_filter.h; initialize dirs to c_null_ptr before
+  !! allocating calls.
   integer(c_size_t) :: ndirs
   !! Number of directory strings.
   type(c_ptr) :: dirs

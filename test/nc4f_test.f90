@@ -116,12 +116,34 @@ end subroutine invalid_file_dim_rename
 
 subroutine invalid_error()
   !! Exercise diagnostic validation and fail-fast formatting in a child.
-  use nc4f_ds, only: return_err
+  use nc4f_ds, only: return_err, validate, buffer_size
+  use nc4f_c_interface, only: NC_BYTE, NC_DOUBLE, NC_MAX_NAME
+  use, intrinsic :: iso_fortran_env, only: int64
   type(error_type) :: err, returned
+  type(variable_type) :: var
+  type(attribute_type) :: att
   character(len=64) :: mode, text
 
   call get_command_argument(2, mode)
   select case (trim(mode))
+  case ("validate-name")
+    call validate("bad/name", context="[test_validation]")
+  case ("validate-name-long")
+    call validate(repeat("a", NC_MAX_NAME + 1), context="test_validation")
+  case ("validate-var")
+    call validate(var, context="[test_validation]")
+  case ("validate-att")
+    att%dtype = NC_BYTE
+    att%len = 1
+    call validate(att, context="test_validation")
+  case ("buffer-size")
+    print *, buffer_size(NC_DOUBLE, huge(0_int64))
+  case ("variable-size")
+    allocate (var%dims(1))
+    var%dims(1)%len = -1
+    print *, size(var)
+  case ("write-storage")
+    call to_netcdf("build/test-results/fail-fast-storage.nc", var)
   case ("construct-no-fname")
     err = error_type(code=NC_EINVAL, msg="Diagnostic.")
   case ("construct-no-msg")

@@ -129,9 +129,11 @@ function nc_abort(ncid) bind(c, name="nc_abort")
   !! - NC_EBADID Invalid file or group identifier.
 end function nc_abort
 
-function nc_inq(ncid, ndimsp, nvarsp, nattsp, unlimdimidp) bind(c, name="nc_inq")
-  !! Inquire about local dimensions, variables, attributes, and an unlimited dimension.
-  !! Use nc_inq_unlimdims() to discover all unlimited dimensions in NetCDF-4 files.
+function nc_inq(ncid, ndimsp, nvarsp, nattsp, unlimdimidp) &
+  & bind(c, name="nc_inq")
+  !! Inquire about local dimensions, variables, attributes, and an unlimited
+  !! dimension. Use nc_inq_unlimdims() to discover all unlimited dimensions in
+  !! NetCDF-4 files.
   import :: c_int
   integer(c_int), value :: ncid
   !! Open file or group identifier.
@@ -188,7 +190,8 @@ function nc_inq_format(ncid, formatp) bind(c, name="nc_inq_format")
   !! - NC_EBADID Invalid file or group identifier.
 end function nc_inq_format
 
-function nc_inq_format_extended(ncid, formatp, modep) bind(c, name="nc_inq_format_extended")
+function nc_inq_format_extended(ncid, formatp, modep) &
+  & bind(c, name="nc_inq_format_extended")
   !! Return the underlying backend and effective mode flags.
   import :: c_int
   integer(c_int), value :: ncid
@@ -237,9 +240,10 @@ function nc_set_fill(ncid, fillmode, old_modep) bind(c, name="nc_set_fill")
   !! - NC_EPERM Dataset is read-only.
 end function nc_set_fill
 
-function nc_set_chunk_cache(size, nelems, preemption) bind(c, name="nc_set_chunk_cache")
-  !! Set the default chunk cache settings.
-  !! Default settings apply to subsequently opened or created NetCDF-4/HDF5 files.
+function nc_set_chunk_cache(size, nelems, preemption) &
+  & bind(c, name="nc_set_chunk_cache")
+  !! Set the default chunk cache settings. Default settings apply to
+  !! subsequently opened or created NetCDF-4/HDF5 files.
   import :: c_int, c_size_t, c_float
   integer(c_size_t), value :: size
   !! Chunk cache capacity in bytes.
@@ -253,9 +257,10 @@ function nc_set_chunk_cache(size, nelems, preemption) bind(c, name="nc_set_chunk
   !! - NC_EINVAL Invalid cache settings.
 end function nc_set_chunk_cache
 
-function nc_get_chunk_cache(sizep, nelemsp, preemptionp) bind(c, name="nc_get_chunk_cache")
-  !! Query the default chunk cache settings.
-  !! Default settings apply to subsequently opened or created NetCDF-4/HDF5 files.
+function nc_get_chunk_cache(sizep, nelemsp, preemptionp) &
+  & bind(c, name="nc_get_chunk_cache")
+  !! Query the default chunk cache settings. Default settings apply to
+  !! subsequently opened or created NetCDF-4/HDF5 files.
   import :: c_int, c_size_t, c_float
   integer(c_size_t), intent(out) :: sizep
   !! Chunk cache capacity in bytes.
@@ -270,17 +275,20 @@ end function nc_get_chunk_cache
 
 ! Additional serial C API, including legacy and extension interfaces.
 
-function nc_def_user_format(mode_flag, dispatch_table, magic_number) bind(c, name="nc_def_user_format")
-  !! Register a user-defined backend dispatch table and magic signature.
-  !! The dispatch_table is an opaque pointer to a live NC_Dispatch built against the linked C library.
-  !! Its callbacks and storage must outlive all datasets using it; this does not register MPI access.
-  !! C declaration: int nc_def_user_format(int mode_flag, NC_Dispatch *dispatch_table, char *magic_number);
+function nc_def_user_format(mode_flag, dispatch_table, magic_number) &
+  & bind(c, name="nc_def_user_format")
+  !! Register a user-defined backend dispatch table and magic signature. The
+  !! dispatch_table is an opaque pointer to a live NC_Dispatch built against the
+  !! linked C library. Its callbacks and storage must outlive all datasets using
+  !! it; this does not register MPI access. C declaration: int
+  !! nc_def_user_format(int mode_flag, NC_Dispatch *dispatch_table, char
+  !! *magic_number);
   import :: c_int, c_ptr
   integer(c_int), value :: mode_flag
   !! NC_UDF* mode flag.
   type(c_ptr), value :: dispatch_table
-  !! Address of an NC_Dispatch table; callbacks and table storage must remain alive. C pointee: NC_Dispatch
-  !! *.
+  !! Address of an NC_Dispatch table; callbacks and table storage must remain
+  !! alive. C pointee: NC_Dispatch *.
   type(c_ptr), value :: magic_number
   !! Magic signature buffer (NC_MAX_MAGIC_NUMBER_LEN + 1 bytes).
   integer(c_int) :: nc_def_user_format
@@ -289,10 +297,12 @@ function nc_def_user_format(mode_flag, dispatch_table, magic_number) bind(c, nam
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function nc_def_user_format
 
-function nc_inq_user_format(mode_flag, dispatch_table, magic_number) bind(c, name="nc_inq_user_format")
+function nc_inq_user_format(mode_flag, dispatch_table, magic_number) &
+  & bind(c, name="nc_inq_user_format")
   !! Query the dispatch table and magic signature for a user-defined backend.
-  !! Returned dispatch storage remains library/backend owned; do not free it.
-  !! C declaration: int nc_inq_user_format(int mode_flag, NC_Dispatch **dispatch_table, char *magic_number);
+  !! Returned dispatch storage remains library/backend owned; do not free it. C
+  !! declaration: int nc_inq_user_format(int mode_flag, NC_Dispatch
+  !! **dispatch_table, char *magic_number);
   import :: c_int, c_ptr
   integer(c_int), value :: mode_flag
   !! NC_UDF* mode flag.
@@ -320,7 +330,8 @@ function nc_set_alignment(threshold, alignment) bind(c, name="nc_set_alignment")
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function nc_set_alignment
 
-function nc_get_alignment(thresholdp, alignmentp) bind(c, name="nc_get_alignment")
+function nc_get_alignment(thresholdp, alignmentp) &
+  & bind(c, name="nc_get_alignment")
   !! Query global HDF5 allocation threshold and alignment.
   !! C declaration: int nc_get_alignment(int* thresholdp, int* alignmentp);
   import :: c_int
@@ -358,10 +369,11 @@ function nc_get_meta_block_size(sizep) bind(c, name="nc_get_meta_block_size")
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function nc_get_meta_block_size
 
-function nc__create(path, cmode, initialsz, chunksizehintp, ncidp) bind(c, name="nc__create")
-  !! Create a dataset with initial-size and I/O-buffer hints.
-  !! C declaration: int nc__create(const char *path, int cmode, size_t initialsz, size_t *chunksizehintp, int
-  !! *ncidp);
+function nc__create(path, cmode, initialsz, chunksizehintp, ncidp) &
+  & bind(c, name="nc__create")
+  !! Create a dataset with initial-size and I/O-buffer hints. C declaration: int
+  !! nc__create(const char *path, int cmode, size_t initialsz, size_t
+  !! *chunksizehintp, int *ncidp);
   import :: c_int, c_char, c_size_t
   character(kind=c_char), intent(in) :: path(*)
   !! NUL-terminated C string.
@@ -380,8 +392,8 @@ function nc__create(path, cmode, initialsz, chunksizehintp, ncidp) bind(c, name=
 end function nc__create
 
 function nc__open(path, mode, chunksizehintp, ncidp) bind(c, name="nc__open")
-  !! Open a dataset with an I/O-buffer hint.
-  !! C declaration: int nc__open(const char *path, int mode, size_t *chunksizehintp, int *ncidp);
+  !! Open a dataset with an I/O-buffer hint. C declaration: int nc__open(const
+  !! char *path, int mode, size_t *chunksizehintp, int *ncidp);
   import :: c_int, c_char, c_size_t
   character(kind=c_char), intent(in) :: path(*)
   !! NUL-terminated C string.
@@ -397,7 +409,8 @@ function nc__open(path, mode, chunksizehintp, ncidp) bind(c, name="nc__open")
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function nc__open
 
-function nc_set_default_format(format, old_formatp) bind(c, name="nc_set_default_format")
+function nc_set_default_format(format, old_formatp) &
+  & bind(c, name="nc_set_default_format")
   !! Set the process-wide default format used by subsequent creates.
   !! C declaration: int nc_set_default_format(int format, int *old_formatp);
   import :: c_int
@@ -411,10 +424,11 @@ function nc_set_default_format(format, old_formatp) bind(c, name="nc_set_default
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function nc_set_default_format
 
-function nc__enddef(ncid, h_minfree, v_align, v_minfree, r_align) bind(c, name="nc__enddef")
-  !! Leave classic define mode with header-space and alignment controls.
-  !! C declaration: int nc__enddef(int ncid, size_t h_minfree, size_t v_align, size_t v_minfree, size_t
-  !! r_align);
+function nc__enddef(ncid, h_minfree, v_align, v_minfree, r_align) &
+  & bind(c, name="nc__enddef")
+  !! Leave classic define mode with header-space and alignment controls. C
+  !! declaration: int nc__enddef(int ncid, size_t h_minfree, size_t v_align,
+  !! size_t v_minfree, size_t r_align);
   import :: c_int, c_size_t
   integer(c_int), value :: ncid
   !! Open dataset or group identifier.
@@ -457,112 +471,122 @@ function nc_delete(path) bind(c, name="nc_delete")
 end function nc_delete
 
 function nccreate(path, cmode) bind(c, name="nccreate")
-  !! Legacy v2 API: Create a classic dataset and return its ID.
-  !! Uses v2 return/error conventions, not modern NC_NOERR status semantics.
-  !! Legacy process-global ncopts controls fatal errors and diagnostics; no accessor is provided.
-  !! C declaration: int nccreate(const char* path, int cmode);
+  !! Legacy v2 API: Create a classic dataset and return its ID. Uses v2
+  !! return/error conventions, not modern NC_NOERR status semantics. Legacy
+  !! process-global ncopts controls fatal errors and diagnostics; no accessor is
+  !! provided. C declaration: int nccreate(const char* path, int cmode);
   import :: c_int, c_char
   character(kind=c_char), intent(in) :: path(*)
   !! NUL-terminated C string.
   integer(c_int), value :: cmode
   !! Creation mode bit mask.
   integer(c_int) :: nccreate
-  !! V2 result (ID, size, previous setting, or success value); -1 indicates failure.
+  !! V2 result (ID, size, previous setting, or success value); -1 indicates
+  !! failure.
 end function nccreate
 
 function ncopen(path, mode) bind(c, name="ncopen")
-  !! Legacy v2 API: Open a dataset and return its ID.
-  !! Uses v2 return/error conventions, not modern NC_NOERR status semantics.
-  !! Legacy process-global ncopts controls fatal errors and diagnostics; no accessor is provided.
-  !! C declaration: int ncopen(const char* path, int mode);
+  !! Legacy v2 API: Open a dataset and return its ID. Uses v2 return/error
+  !! conventions, not modern NC_NOERR status semantics. Legacy process-global
+  !! ncopts controls fatal errors and diagnostics; no accessor is provided. C
+  !! declaration: int ncopen(const char* path, int mode);
   import :: c_int, c_char
   character(kind=c_char), intent(in) :: path(*)
   !! NUL-terminated C string.
   integer(c_int), value :: mode
   !! Open/create mode bit mask.
   integer(c_int) :: ncopen
-  !! V2 result (ID, size, previous setting, or success value); -1 indicates failure.
+  !! V2 result (ID, size, previous setting, or success value); -1 indicates
+  !! failure.
 end function ncopen
 
 function ncsetfill(ncid, fillmode) bind(c, name="ncsetfill")
-  !! Legacy v2 API: Set the fill mode and return the previous mode.
-  !! Uses v2 return/error conventions, not modern NC_NOERR status semantics.
-  !! Legacy process-global ncopts controls fatal errors and diagnostics; no accessor is provided.
-  !! C declaration: int ncsetfill(int ncid, int fillmode);
+  !! Legacy v2 API: Set the fill mode and return the previous mode. Uses v2
+  !! return/error conventions, not modern NC_NOERR status semantics. Legacy
+  !! process-global ncopts controls fatal errors and diagnostics; no accessor is
+  !! provided. C declaration: int ncsetfill(int ncid, int fillmode);
   import :: c_int
   integer(c_int), value :: ncid
   !! Open dataset or group identifier.
   integer(c_int), value :: fillmode
   !! C int argument fillmode.
   integer(c_int) :: ncsetfill
-  !! V2 result (ID, size, previous setting, or success value); -1 indicates failure.
+  !! V2 result (ID, size, previous setting, or success value); -1 indicates
+  !! failure.
 end function ncsetfill
 
 function ncredef(ncid) bind(c, name="ncredef")
-  !! Legacy v2 API: Enter define mode.
-  !! Uses v2 return/error conventions, not modern NC_NOERR status semantics.
-  !! Legacy process-global ncopts controls fatal errors and diagnostics; no accessor is provided.
-  !! C declaration: int ncredef(int ncid);
+  !! Legacy v2 API: Enter define mode. Uses v2 return/error conventions, not
+  !! modern NC_NOERR status semantics. Legacy process-global ncopts controls
+  !! fatal errors and diagnostics; no accessor is provided. C declaration: int
+  !! ncredef(int ncid);
   import :: c_int
   integer(c_int), value :: ncid
   !! Open dataset or group identifier.
   integer(c_int) :: ncredef
-  !! V2 result (ID, size, previous setting, or success value); -1 indicates failure.
+  !! V2 result (ID, size, previous setting, or success value); -1 indicates
+  !! failure.
 end function ncredef
 
 function ncendef(ncid) bind(c, name="ncendef")
-  !! Legacy v2 API: Leave define mode.
-  !! Uses v2 return/error conventions, not modern NC_NOERR status semantics.
-  !! Legacy process-global ncopts controls fatal errors and diagnostics; no accessor is provided.
-  !! C declaration: int ncendef(int ncid);
+  !! Legacy v2 API: Leave define mode. Uses v2 return/error conventions, not
+  !! modern NC_NOERR status semantics. Legacy process-global ncopts controls
+  !! fatal errors and diagnostics; no accessor is provided. C declaration: int
+  !! ncendef(int ncid);
   import :: c_int
   integer(c_int), value :: ncid
   !! Open dataset or group identifier.
   integer(c_int) :: ncendef
-  !! V2 result (ID, size, previous setting, or success value); -1 indicates failure.
+  !! V2 result (ID, size, previous setting, or success value); -1 indicates
+  !! failure.
 end function ncendef
 
 function ncsync(ncid) bind(c, name="ncsync")
-  !! Legacy v2 API: Synchronize dataset contents.
-  !! Uses v2 return/error conventions, not modern NC_NOERR status semantics.
-  !! Legacy process-global ncopts controls fatal errors and diagnostics; no accessor is provided.
-  !! C declaration: int ncsync(int ncid);
+  !! Legacy v2 API: Synchronize dataset contents. Uses v2 return/error
+  !! conventions, not modern NC_NOERR status semantics. Legacy process-global
+  !! ncopts controls fatal errors and diagnostics; no accessor is provided. C
+  !! declaration: int ncsync(int ncid);
   import :: c_int
   integer(c_int), value :: ncid
   !! Open dataset or group identifier.
   integer(c_int) :: ncsync
-  !! V2 result (ID, size, previous setting, or success value); -1 indicates failure.
+  !! V2 result (ID, size, previous setting, or success value); -1 indicates
+  !! failure.
 end function ncsync
 
 function ncabort(ncid) bind(c, name="ncabort")
-  !! Legacy v2 API: Abort an unfinished definition and close the dataset.
-  !! Uses v2 return/error conventions, not modern NC_NOERR status semantics.
-  !! Legacy process-global ncopts controls fatal errors and diagnostics; no accessor is provided.
-  !! C declaration: int ncabort(int ncid);
+  !! Legacy v2 API: Abort an unfinished definition and close the dataset. Uses
+  !! v2 return/error conventions, not modern NC_NOERR status semantics. Legacy
+  !! process-global ncopts controls fatal errors and diagnostics; no accessor is
+  !! provided. C declaration: int ncabort(int ncid);
   import :: c_int
   integer(c_int), value :: ncid
   !! Open dataset or group identifier.
   integer(c_int) :: ncabort
-  !! V2 result (ID, size, previous setting, or success value); -1 indicates failure.
+  !! V2 result (ID, size, previous setting, or success value); -1 indicates
+  !! failure.
 end function ncabort
 
 function ncclose(ncid) bind(c, name="ncclose")
-  !! Legacy v2 API: Close a dataset.
-  !! Uses v2 return/error conventions, not modern NC_NOERR status semantics.
-  !! Legacy process-global ncopts controls fatal errors and diagnostics; no accessor is provided.
-  !! C declaration: int ncclose(int ncid);
+  !! Legacy v2 API: Close a dataset. Uses v2 return/error conventions, not
+  !! modern NC_NOERR status semantics. Legacy process-global ncopts controls
+  !! fatal errors and diagnostics; no accessor is provided. C declaration: int
+  !! ncclose(int ncid);
   import :: c_int
   integer(c_int), value :: ncid
   !! Open dataset or group identifier.
   integer(c_int) :: ncclose
-  !! V2 result (ID, size, previous setting, or success value); -1 indicates failure.
+  !! V2 result (ID, size, previous setting, or success value); -1 indicates
+  !! failure.
 end function ncclose
 
-function ncinquire(ncid, ndimsp, nvarsp, nattsp, unlimdimp) bind(c, name="ncinquire")
-  !! Legacy v2 API: Query dataset counts and its unlimited dimension.
-  !! Uses v2 return/error conventions, not modern NC_NOERR status semantics.
-  !! Legacy process-global ncopts controls fatal errors and diagnostics; no accessor is provided.
-  !! C declaration: int ncinquire(int ncid, int *ndimsp, int *nvarsp, int *nattsp, int *unlimdimp);
+function ncinquire(ncid, ndimsp, nvarsp, nattsp, unlimdimp) &
+  & bind(c, name="ncinquire")
+  !! Legacy v2 API: Query dataset counts and its unlimited dimension. Uses v2
+  !! return/error conventions, not modern NC_NOERR status semantics. Legacy
+  !! process-global ncopts controls fatal errors and diagnostics; no accessor is
+  !! provided. C declaration: int ncinquire(int ncid, int *ndimsp, int *nvarsp,
+  !! int *nattsp, int *unlimdimp);
   import :: c_int
   integer(c_int), value :: ncid
   !! Open dataset or group identifier.
@@ -575,7 +599,8 @@ function ncinquire(ncid, ndimsp, nvarsp, nattsp, unlimdimp) bind(c, name="ncinqu
   integer(c_int), intent(out) :: unlimdimp
   !! Returned unlimdimp value (C int).
   integer(c_int) :: ncinquire
-  !! V2 result (ID, size, previous setting, or success value); -1 indicates failure.
+  !! V2 result (ID, size, previous setting, or success value); -1 indicates
+  !! failure.
 end function ncinquire
 
 function nc_initialize() bind(c, name="nc_initialize")
@@ -601,9 +626,9 @@ function nc_finalize() bind(c, name="nc_finalize")
 end function nc_finalize
 
 function nc_rc_get(key) bind(c, name="nc_rc_get")
-  !! Look up a value in the NetCDF runtime configuration table.
-  !! Returns c_null_ptr if absent; otherwise the caller must release the result with c_free().
-  !! C declaration: char* nc_rc_get(const char* key);
+  !! Look up a value in the NetCDF runtime configuration table. Returns
+  !! c_null_ptr if absent; otherwise the caller must release the result with
+  !! c_free(). C declaration: char* nc_rc_get(const char* key);
   import :: c_ptr, c_char
   character(kind=c_char), intent(in) :: key(*)
   !! NUL-terminated C string.
@@ -625,10 +650,12 @@ function nc_rc_set(key, value) bind(c, name="nc_rc_set")
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function nc_rc_set
 
-function nc_open_mem(path, mode, size, memory, ncidp) bind(c, name="nc_open_mem")
-  !! Open a caller-owned memory image as a read-only dataset.
-  !! Keep the input image alive until the dataset is closed; NetCDF does not own it.
-  !! C declaration: int nc_open_mem(const char* path, int mode, size_t size, void* memory, int* ncidp);
+function nc_open_mem(path, mode, size, memory, ncidp) &
+  & bind(c, name="nc_open_mem")
+  !! Open a caller-owned memory image as a read-only dataset. Keep the input
+  !! image alive until the dataset is closed; NetCDF does not own it. C
+  !! declaration: int nc_open_mem(const char* path, int mode, size_t size, void*
+  !! memory, int* ncidp);
   import :: c_int, c_char, c_size_t, c_ptr
   character(kind=c_char), intent(in) :: path(*)
   !! NUL-terminated C string.
@@ -646,9 +673,10 @@ function nc_open_mem(path, mode, size, memory, ncidp) bind(c, name="nc_open_mem"
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function nc_open_mem
 
-function nc_create_mem(path, mode, initialsize, ncidp) bind(c, name="nc_create_mem")
-  !! Create a dataset backed by a growable memory image.
-  !! C declaration: int nc_create_mem(const char* path, int mode, size_t initialsize, int* ncidp);
+function nc_create_mem(path, mode, initialsize, ncidp) &
+  & bind(c, name="nc_create_mem")
+  !! Create a dataset backed by a growable memory image. C declaration: int
+  !! nc_create_mem(const char* path, int mode, size_t initialsize, int* ncidp);
   import :: c_int, c_char, c_size_t
   character(kind=c_char), intent(in) :: path(*)
   !! NUL-terminated C string.
@@ -665,10 +693,11 @@ function nc_create_mem(path, mode, initialsize, ncidp) bind(c, name="nc_create_m
 end function nc_create_mem
 
 function nc_open_memio(path, mode, info, ncidp) bind(c, name="nc_open_memio")
-  !! Open a memory image with explicit allocation and ownership flags.
-  !! With NC_MEMIO_LOCKED, the caller retains the fixed buffer until close.
-  !! Without it, supply C-allocated storage that NetCDF may resize or free.
-  !! C declaration: int nc_open_memio(const char* path, int mode, NC_memio* info, int* ncidp);
+  !! Open a memory image with explicit allocation and ownership flags. With
+  !! NC_MEMIO_LOCKED, the caller retains the fixed buffer until close. Without
+  !! it, supply C-allocated storage that NetCDF may resize or free. C
+  !! declaration: int nc_open_memio(const char* path, int mode, NC_memio* info,
+  !! int* ncidp);
   import :: c_int, c_char, c_ptr
   character(kind=c_char), intent(in) :: path(*)
   !! NUL-terminated C string.
@@ -685,9 +714,9 @@ function nc_open_memio(path, mode, info, ncidp) bind(c, name="nc_open_memio")
 end function nc_open_memio
 
 function nc_close_memio(ncid, info) bind(c, name="nc_close_memio")
-  !! Close a memory dataset and return its final memory image.
-  !! Free a returned unlocked memory image with c_free(); never free a locked Fortran buffer.
-  !! C declaration: int nc_close_memio(int ncid, NC_memio* info);
+  !! Close a memory dataset and return its final memory image. Free a returned
+  !! unlocked memory image with c_free(); never free a locked Fortran buffer. C
+  !! declaration: int nc_close_memio(int ncid, NC_memio* info);
   import :: c_int, c_ptr
   integer(c_int), value :: ncid
   !! Open dataset or group identifier.
@@ -712,10 +741,10 @@ function nc_plugin_path_ndirs(ndirsp) bind(c, name="nc_plugin_path_ndirs")
 end function nc_plugin_path_ndirs
 
 function nc_plugin_path_get(dirs) bind(c, name="nc_plugin_path_get")
-  !! Copy the current plugin search path into an NCPluginList.
-  !! Initialize dirs%dirs to c_null_ptr to request allocation.
-  !! Release copied paths with ncaux_plugin_path_clear() for a Fortran-owned structure.
-  !! C declaration: int nc_plugin_path_get(NCPluginList* dirs);
+  !! Copy the current plugin search path into an NCPluginList. Initialize
+  !! dirs%dirs to c_null_ptr to request allocation. Release copied paths with
+  !! ncaux_plugin_path_clear() for a Fortran-owned structure. C declaration: int
+  !! nc_plugin_path_get(NCPluginList* dirs);
   import :: c_int, c_ptr
   type(c_ptr), value :: dirs
   !! Address of an NCPluginList structure. C pointee: NCPluginList*.
@@ -737,10 +766,11 @@ function nc_plugin_path_set(dirs) bind(c, name="nc_plugin_path_set")
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function nc_plugin_path_set
 
-function ncaux_plugin_path_parsen(pathlen, pathlist, sep, dirs) bind(c, name="ncaux_plugin_path_parsen")
-  !! Parse a counted plugin search path into an NCPluginList.
-  !! C declaration: int ncaux_plugin_path_parsen(size_t pathlen, const char* pathlist, char sep, struct
-  !! NCPluginList* dirs);
+function ncaux_plugin_path_parsen(pathlen, pathlist, sep, dirs) &
+  & bind(c, name="ncaux_plugin_path_parsen")
+  !! Parse a counted plugin search path into an NCPluginList. C declaration: int
+  !! ncaux_plugin_path_parsen(size_t pathlen, const char* pathlist, char sep,
+  !! struct NCPluginList* dirs);
   import :: c_int, c_size_t, c_char, c_ptr
   integer(c_size_t), value :: pathlen
   !! C size_t argument pathlen.
@@ -756,9 +786,11 @@ function ncaux_plugin_path_parsen(pathlen, pathlist, sep, dirs) bind(c, name="nc
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function ncaux_plugin_path_parsen
 
-function ncaux_plugin_path_parse(pathlist, sep, dirs) bind(c, name="ncaux_plugin_path_parse")
-  !! Parse a NUL-terminated plugin search path into an NCPluginList.
-  !! C declaration: int ncaux_plugin_path_parse(const char* pathlist, char sep, struct NCPluginList* dirs);
+function ncaux_plugin_path_parse(pathlist, sep, dirs) &
+  & bind(c, name="ncaux_plugin_path_parse")
+  !! Parse a NUL-terminated plugin search path into an NCPluginList. C
+  !! declaration: int ncaux_plugin_path_parse(const char* pathlist, char sep,
+  !! struct NCPluginList* dirs);
   import :: c_int, c_char, c_ptr
   character(kind=c_char), intent(in) :: pathlist(*)
   !! NUL-terminated C string.
@@ -772,13 +804,16 @@ function ncaux_plugin_path_parse(pathlist, sep, dirs) bind(c, name="ncaux_plugin
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function ncaux_plugin_path_parse
 
-function ncaux_plugin_path_tostring(dirs, sep, catp) bind(c, name="ncaux_plugin_path_tostring")
-  !! Join a plugin directory list into an allocated C string.
-  !! Release the returned string with c_free().
-  !! C declaration: int ncaux_plugin_path_tostring(const struct NCPluginList* dirs, char sep, char** catp);
+function ncaux_plugin_path_tostring(dirs, sep, catp) &
+  & bind(c, name="ncaux_plugin_path_tostring")
+  !! Join a plugin directory list into an allocated C string. Release the
+  !! returned string with c_free(). C declaration: int
+  !! ncaux_plugin_path_tostring(const struct NCPluginList* dirs, char sep,
+  !! char** catp);
   import :: c_int, c_ptr, c_char
   type(c_ptr), value :: dirs
-  !! Address of an NCPluginList structure. C pointee: const struct NCPluginList*.
+  !! Address of an NCPluginList structure. C pointee: const struct
+  !! NCPluginList*.
   character(kind=c_char), value :: sep
   !! Single separator byte; NUL selects the platform default.
   type(c_ptr), intent(out) :: catp
@@ -801,10 +836,12 @@ function ncaux_plugin_path_clear(dirs) bind(c, name="ncaux_plugin_path_clear")
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function ncaux_plugin_path_clear
 
-function ncaux_plugin_path_reclaim(dirs) bind(c, name="ncaux_plugin_path_reclaim")
-  !! Free a C-allocated plugin list structure and its contents.
-  !! Use only for a C-allocated structure; use ncaux_plugin_path_clear() for Fortran-owned structures.
-  !! C declaration: int ncaux_plugin_path_reclaim(struct NCPluginList* dirs);
+function ncaux_plugin_path_reclaim(dirs) &
+  & bind(c, name="ncaux_plugin_path_reclaim")
+  !! Free a C-allocated plugin list structure and its contents. Use only for a
+  !! C-allocated structure; use ncaux_plugin_path_clear() for Fortran-owned
+  !! structures. C declaration: int ncaux_plugin_path_reclaim(struct
+  !! NCPluginList* dirs);
   import :: c_int, c_ptr
   type(c_ptr), value :: dirs
   !! Address of an NCPluginList structure. C pointee: struct NCPluginList*.
@@ -814,9 +851,10 @@ function ncaux_plugin_path_reclaim(dirs) bind(c, name="ncaux_plugin_path_reclaim
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function ncaux_plugin_path_reclaim
 
-function ncaux_plugin_path_append(dirs, dir) bind(c, name="ncaux_plugin_path_append")
-  !! Append a directory to a plugin list.
-  !! C declaration: int ncaux_plugin_path_append(struct NCPluginList* dirs, const char* dir);
+function ncaux_plugin_path_append(dirs, dir) &
+  & bind(c, name="ncaux_plugin_path_append")
+  !! Append a directory to a plugin list. C declaration: int
+  !! ncaux_plugin_path_append(struct NCPluginList* dirs, const char* dir);
   import :: c_int, c_ptr, c_char
   type(c_ptr), value :: dirs
   !! Address of an NCPluginList structure. C pointee: struct NCPluginList*.
@@ -828,9 +866,10 @@ function ncaux_plugin_path_append(dirs, dir) bind(c, name="ncaux_plugin_path_app
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function ncaux_plugin_path_append
 
-function ncaux_plugin_path_prepend(dirs, dir) bind(c, name="ncaux_plugin_path_prepend")
-  !! Prepend a directory to a plugin list.
-  !! C declaration: int ncaux_plugin_path_prepend(struct NCPluginList* dirs, const char* dir);
+function ncaux_plugin_path_prepend(dirs, dir) &
+  & bind(c, name="ncaux_plugin_path_prepend")
+  !! Prepend a directory to a plugin list. C declaration: int
+  !! ncaux_plugin_path_prepend(struct NCPluginList* dirs, const char* dir);
   import :: c_int, c_ptr, c_char
   type(c_ptr), value :: dirs
   !! Address of an NCPluginList structure. C pointee: struct NCPluginList*.
@@ -842,7 +881,8 @@ function ncaux_plugin_path_prepend(dirs, dir) bind(c, name="ncaux_plugin_path_pr
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function ncaux_plugin_path_prepend
 
-function ncaux_plugin_path_stringlen() bind(c, name="ncaux_plugin_path_stringlen")
+function ncaux_plugin_path_stringlen() &
+  & bind(c, name="ncaux_plugin_path_stringlen")
   !! Return the encoded length of the current plugin search path.
   !! C declaration: int ncaux_plugin_path_stringlen(void);
   import :: c_int
@@ -850,23 +890,27 @@ function ncaux_plugin_path_stringlen() bind(c, name="ncaux_plugin_path_stringlen
   !! Encoded path length, or a negative error result.
 end function ncaux_plugin_path_stringlen
 
-function ncaux_plugin_path_stringget(pathlen, path) bind(c, name="ncaux_plugin_path_stringget")
+function ncaux_plugin_path_stringget(pathlen, path) &
+  & bind(c, name="ncaux_plugin_path_stringget")
   !! Return the current plugin search path as a semicolon-separated string.
   !! C declaration: int ncaux_plugin_path_stringget(int pathlen, char* path);
   import :: c_int, c_ptr
   integer(c_int), value :: pathlen
   !! C int argument pathlen.
   type(c_ptr), value :: path
-  !! Pointer to caller-provided C character output storage (NC_MAX_NAME + 1 for names).
+  !! Pointer to caller-provided C character output storage (NC_MAX_NAME + 1 for
+  !! names).
   integer(c_int) :: ncaux_plugin_path_stringget
   !! **Options:**
   !! - NC_NOERR Success.
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function ncaux_plugin_path_stringget
 
-function ncaux_plugin_path_stringset(pathlen, path) bind(c, name="ncaux_plugin_path_stringset")
-  !! Replace the plugin search path from a semicolon-separated string.
-  !! C declaration: int ncaux_plugin_path_stringset(int pathlen, const char* path);
+function ncaux_plugin_path_stringset(pathlen, path) &
+  & bind(c, name="ncaux_plugin_path_stringset")
+  !! Replace the plugin search path from a semicolon-separated string. C
+  !! declaration: int ncaux_plugin_path_stringset(int pathlen, const char*
+  !! path);
   import :: c_int, c_char
   integer(c_int), value :: pathlen
   !! C int argument pathlen.
@@ -878,10 +922,12 @@ function ncaux_plugin_path_stringset(pathlen, path) bind(c, name="ncaux_plugin_p
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function ncaux_plugin_path_stringset
 
-function ncaux_parse_provenance(ncprop, pairsp) bind(c, name="ncaux_parse_provenance")
+function ncaux_parse_provenance(ncprop, pairsp) &
+  & bind(c, name="ncaux_parse_provenance")
   !! Parse _NCProperties into an allocated NULL-terminated key/value vector.
-  !! Free each returned string with c_free(), then free the pointer vector.
-  !! C declaration: int ncaux_parse_provenance(const char* ncprop, char*** pairsp);
+  !! Free each returned string with c_free(), then free the pointer vector. C
+  !! declaration: int ncaux_parse_provenance(const char* ncprop, char***
+  !! pairsp);
   import :: c_int, c_char, c_ptr
   character(kind=c_char), intent(in) :: ncprop(*)
   !! NUL-terminated C string.
@@ -893,12 +939,13 @@ function ncaux_parse_provenance(ncprop, pairsp) bind(c, name="ncaux_parse_proven
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function ncaux_parse_provenance
 
-function NC_RO_create(path, cmode, initialsz, basepe, chunksizehintp, parameters, arg7, arg8) &
-  & bind(c, name="NC_RO_create")
-  !! Backend dispatch helper: reject a write to a read-only backend.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_RO_create(const char *path, int cmode, size_t initialsz, int basepe, size_t
-  !! *chunksizehintp, void* parameters, const NC_Dispatch*, int);
+function NC_RO_create(path, cmode, initialsz, basepe, &
+  & chunksizehintp, parameters, arg7, arg8) bind(c, name="NC_RO_create")
+  !! Backend dispatch helper: reject a write to a read-only backend. Intended
+  !! for custom backend implementers; arguments retain the C dispatch-table ABI.
+  !! C declaration: int NC_RO_create(const char *path, int cmode, size_t
+  !! initialsz, int basepe, size_t *chunksizehintp, void* parameters, const
+  !! NC_Dispatch*, int);
   import :: c_int, c_char, c_size_t, c_ptr
   character(kind=c_char), intent(in) :: path(*)
   !! NUL-terminated C string.
@@ -923,8 +970,8 @@ function NC_RO_create(path, cmode, initialsz, basepe, chunksizehintp, parameters
 end function NC_RO_create
 
 function NC_RO_redef(ncid) bind(c, name="NC_RO_redef")
-  !! Backend dispatch helper: reject a write to a read-only backend.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
+  !! Backend dispatch helper: reject a write to a read-only backend. Intended
+  !! for custom backend implementers; arguments retain the C dispatch-table ABI.
   !! C declaration: int NC_RO_redef(int ncid);
   import :: c_int
   integer(c_int), value :: ncid
@@ -935,11 +982,12 @@ function NC_RO_redef(ncid) bind(c, name="NC_RO_redef")
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function NC_RO_redef
 
-function NC_RO__enddef(ncid, h_minfree, v_align, v_minfree, r_align) bind(c, name="NC_RO__enddef")
-  !! Backend dispatch helper: reject a write to a read-only backend.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_RO__enddef(int ncid, size_t h_minfree, size_t v_align, size_t v_minfree, size_t
-  !! r_align);
+function NC_RO__enddef(ncid, h_minfree, v_align, v_minfree, r_align) &
+  & bind(c, name="NC_RO__enddef")
+  !! Backend dispatch helper: reject a write to a read-only backend. Intended
+  !! for custom backend implementers; arguments retain the C dispatch-table ABI.
+  !! C declaration: int NC_RO__enddef(int ncid, size_t h_minfree, size_t
+  !! v_align, size_t v_minfree, size_t r_align);
   import :: c_int, c_size_t
   integer(c_int), value :: ncid
   !! Open dataset or group identifier.
@@ -958,8 +1006,8 @@ function NC_RO__enddef(ncid, h_minfree, v_align, v_minfree, r_align) bind(c, nam
 end function NC_RO__enddef
 
 function NC_RO_sync(ncid) bind(c, name="NC_RO_sync")
-  !! Backend dispatch helper: reject a write to a read-only backend.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
+  !! Backend dispatch helper: reject a write to a read-only backend. Intended
+  !! for custom backend implementers; arguments retain the C dispatch-table ABI.
   !! C declaration: int NC_RO_sync(int ncid);
   import :: c_int
   integer(c_int), value :: ncid
@@ -970,9 +1018,10 @@ function NC_RO_sync(ncid) bind(c, name="NC_RO_sync")
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function NC_RO_sync
 
-function NC_RO_def_var_fill(arg1, arg2, arg3, arg4) bind(c, name="NC_RO_def_var_fill")
-  !! Backend dispatch helper: reject a write to a read-only backend.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
+function NC_RO_def_var_fill(arg1, arg2, arg3, arg4) &
+  & bind(c, name="NC_RO_def_var_fill")
+  !! Backend dispatch helper: reject a write to a read-only backend. Intended
+  !! for custom backend implementers; arguments retain the C dispatch-table ABI.
   !! C declaration: int NC_RO_def_var_fill(int, int, int, const void *);
   import :: c_int, c_ptr
   integer(c_int), value :: arg1
@@ -989,10 +1038,12 @@ function NC_RO_def_var_fill(arg1, arg2, arg3, arg4) bind(c, name="NC_RO_def_var_
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function NC_RO_def_var_fill
 
-function NC_RO_rename_att(ncid, varid, name, newname) bind(c, name="NC_RO_rename_att")
-  !! Backend dispatch helper: reject a write to a read-only backend.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_RO_rename_att(int ncid, int varid, const char *name, const char *newname);
+function NC_RO_rename_att(ncid, varid, name, newname) &
+  & bind(c, name="NC_RO_rename_att")
+  !! Backend dispatch helper: reject a write to a read-only backend. Intended
+  !! for custom backend implementers; arguments retain the C dispatch-table ABI.
+  !! C declaration: int NC_RO_rename_att(int ncid, int varid, const char *name,
+  !! const char *newname);
   import :: c_int, c_char
   integer(c_int), value :: ncid
   !! Open dataset or group identifier.
@@ -1009,8 +1060,8 @@ function NC_RO_rename_att(ncid, varid, name, newname) bind(c, name="NC_RO_rename
 end function NC_RO_rename_att
 
 function NC_RO_del_att(ncid, varid, arg3) bind(c, name="NC_RO_del_att")
-  !! Backend dispatch helper: reject a write to a read-only backend.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
+  !! Backend dispatch helper: reject a write to a read-only backend. Intended
+  !! for custom backend implementers; arguments retain the C dispatch-table ABI.
   !! C declaration: int NC_RO_del_att(int ncid, int varid, const char*);
   import :: c_int, c_char
   integer(c_int), value :: ncid
@@ -1025,11 +1076,12 @@ function NC_RO_del_att(ncid, varid, arg3) bind(c, name="NC_RO_del_att")
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function NC_RO_del_att
 
-function NC_RO_put_att(ncid, varid, name, datatype, len, value, arg7) bind(c, name="NC_RO_put_att")
-  !! Backend dispatch helper: reject a write to a read-only backend.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_RO_put_att(int ncid, int varid, const char *name, nc_type datatype, size_t len,
-  !! const void *value, nc_type);
+function NC_RO_put_att(ncid, varid, name, datatype, len, value, arg7) &
+  & bind(c, name="NC_RO_put_att")
+  !! Backend dispatch helper: reject a write to a read-only backend. Intended
+  !! for custom backend implementers; arguments retain the C dispatch-table ABI.
+  !! C declaration: int NC_RO_put_att(int ncid, int varid, const char *name,
+  !! nc_type datatype, size_t len, const void *value, nc_type);
   import :: c_int, c_char, c_size_t, c_ptr
   integer(c_int), value :: ncid
   !! Open dataset or group identifier.
@@ -1051,11 +1103,12 @@ function NC_RO_put_att(ncid, varid, name, datatype, len, value, arg7) bind(c, na
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function NC_RO_put_att
 
-function NC_RO_def_var(ncid, name, xtype, ndims, dimidsp, varidp) bind(c, name="NC_RO_def_var")
-  !! Backend dispatch helper: reject a write to a read-only backend.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_RO_def_var(int ncid, const char *name, nc_type xtype, int ndims, const int
-  !! *dimidsp, int *varidp);
+function NC_RO_def_var(ncid, name, xtype, ndims, dimidsp, varidp) &
+  & bind(c, name="NC_RO_def_var")
+  !! Backend dispatch helper: reject a write to a read-only backend. Intended
+  !! for custom backend implementers; arguments retain the C dispatch-table ABI.
+  !! C declaration: int NC_RO_def_var(int ncid, const char *name, nc_type xtype,
+  !! int ndims, const int *dimidsp, int *varidp);
   import :: c_int, c_char, c_ptr
   integer(c_int), value :: ncid
   !! Open dataset or group identifier.
@@ -1076,8 +1129,8 @@ function NC_RO_def_var(ncid, name, xtype, ndims, dimidsp, varidp) bind(c, name="
 end function NC_RO_def_var
 
 function NC_RO_rename_var(ncid, varid, name) bind(c, name="NC_RO_rename_var")
-  !! Backend dispatch helper: reject a write to a read-only backend.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
+  !! Backend dispatch helper: reject a write to a read-only backend. Intended
+  !! for custom backend implementers; arguments retain the C dispatch-table ABI.
   !! C declaration: int NC_RO_rename_var(int ncid, int varid, const char *name);
   import :: c_int, c_char
   integer(c_int), value :: ncid
@@ -1092,11 +1145,12 @@ function NC_RO_rename_var(ncid, varid, name) bind(c, name="NC_RO_rename_var")
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function NC_RO_rename_var
 
-function NC_RO_put_vara(ncid, varid, start, count, value, arg6) bind(c, name="NC_RO_put_vara")
-  !! Backend dispatch helper: reject a write to a read-only backend.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_RO_put_vara(int ncid, int varid, const size_t *start, const size_t *count, const
-  !! void *value, nc_type);
+function NC_RO_put_vara(ncid, varid, start, count, value, arg6) &
+  & bind(c, name="NC_RO_put_vara")
+  !! Backend dispatch helper: reject a write to a read-only backend. Intended
+  !! for custom backend implementers; arguments retain the C dispatch-table ABI.
+  !! C declaration: int NC_RO_put_vara(int ncid, int varid, const size_t *start,
+  !! const size_t *count, const void *value, nc_type);
   import :: c_int, c_ptr
   integer(c_int), value :: ncid
   !! Open dataset or group identifier.
@@ -1117,9 +1171,10 @@ function NC_RO_put_vara(ncid, varid, start, count, value, arg6) bind(c, name="NC
 end function NC_RO_put_vara
 
 function NC_RO_def_dim(ncid, name, len, idp) bind(c, name="NC_RO_def_dim")
-  !! Backend dispatch helper: reject a write to a read-only backend.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_RO_def_dim(int ncid, const char *name, size_t len, int *idp);
+  !! Backend dispatch helper: reject a write to a read-only backend. Intended
+  !! for custom backend implementers; arguments retain the C dispatch-table ABI.
+  !! C declaration: int NC_RO_def_dim(int ncid, const char *name, size_t len,
+  !! int *idp);
   import :: c_int, c_char, c_size_t, c_ptr
   integer(c_int), value :: ncid
   !! Open dataset or group identifier.
@@ -1136,8 +1191,8 @@ function NC_RO_def_dim(ncid, name, len, idp) bind(c, name="NC_RO_def_dim")
 end function NC_RO_def_dim
 
 function NC_RO_rename_dim(ncid, dimid, name) bind(c, name="NC_RO_rename_dim")
-  !! Backend dispatch helper: reject a write to a read-only backend.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
+  !! Backend dispatch helper: reject a write to a read-only backend. Intended
+  !! for custom backend implementers; arguments retain the C dispatch-table ABI.
   !! C declaration: int NC_RO_rename_dim(int ncid, int dimid, const char *name);
   import :: c_int, c_char
   integer(c_int), value :: ncid
@@ -1152,9 +1207,10 @@ function NC_RO_rename_dim(ncid, dimid, name) bind(c, name="NC_RO_rename_dim")
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function NC_RO_rename_dim
 
-function NC_RO_set_fill(ncid, fillmode, old_modep) bind(c, name="NC_RO_set_fill")
-  !! Backend dispatch helper: reject a write to a read-only backend.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
+function NC_RO_set_fill(ncid, fillmode, old_modep) &
+  & bind(c, name="NC_RO_set_fill")
+  !! Backend dispatch helper: reject a write to a read-only backend. Intended
+  !! for custom backend implementers; arguments retain the C dispatch-table ABI.
   !! C declaration: int NC_RO_set_fill(int ncid, int fillmode, int *old_modep);
   import :: c_int, c_ptr
   integer(c_int), value :: ncid
@@ -1171,8 +1227,9 @@ end function NC_RO_set_fill
 
 function NC_NOTNC4_def_grp(arg1, arg2, arg3) bind(c, name="NC_NOTNC4_def_grp")
   !! Backend dispatch helper: report an unsupported enhanced-model operation.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_NOTNC4_def_grp(int, const char *, int *);
+  !! Intended for custom backend implementers; arguments retain the C
+  !! dispatch-table ABI. C declaration: int NC_NOTNC4_def_grp(int, const char *,
+  !! int *);
   import :: c_int, c_char, c_ptr
   integer(c_int), value :: arg1
   !! C int argument arg1.
@@ -1188,8 +1245,9 @@ end function NC_NOTNC4_def_grp
 
 function NC_NOTNC4_rename_grp(arg1, arg2) bind(c, name="NC_NOTNC4_rename_grp")
   !! Backend dispatch helper: report an unsupported enhanced-model operation.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_NOTNC4_rename_grp(int, const char *);
+  !! Intended for custom backend implementers; arguments retain the C
+  !! dispatch-table ABI. C declaration: int NC_NOTNC4_rename_grp(int, const char
+  !! *);
   import :: c_int, c_char
   integer(c_int), value :: arg1
   !! C int argument arg1.
@@ -1201,10 +1259,12 @@ function NC_NOTNC4_rename_grp(arg1, arg2) bind(c, name="NC_NOTNC4_rename_grp")
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function NC_NOTNC4_rename_grp
 
-function NC_NOTNC4_def_compound(arg1, arg2, arg3, arg4) bind(c, name="NC_NOTNC4_def_compound")
+function NC_NOTNC4_def_compound(arg1, arg2, arg3, arg4) &
+  & bind(c, name="NC_NOTNC4_def_compound")
   !! Backend dispatch helper: report an unsupported enhanced-model operation.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_NOTNC4_def_compound(int, size_t, const char *, nc_type *);
+  !! Intended for custom backend implementers; arguments retain the C
+  !! dispatch-table ABI. C declaration: int NC_NOTNC4_def_compound(int, size_t,
+  !! const char *, nc_type *);
   import :: c_int, c_size_t, c_char, c_ptr
   integer(c_int), value :: arg1
   !! C int argument arg1.
@@ -1220,10 +1280,12 @@ function NC_NOTNC4_def_compound(arg1, arg2, arg3, arg4) bind(c, name="NC_NOTNC4_
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function NC_NOTNC4_def_compound
 
-function NC_NOTNC4_insert_compound(arg1, arg2, arg3, arg4, arg5) bind(c, name="NC_NOTNC4_insert_compound")
+function NC_NOTNC4_insert_compound(arg1, arg2, arg3, arg4, arg5) &
+  & bind(c, name="NC_NOTNC4_insert_compound")
   !! Backend dispatch helper: report an unsupported enhanced-model operation.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_NOTNC4_insert_compound(int, nc_type, const char *, size_t, nc_type);
+  !! Intended for custom backend implementers; arguments retain the C
+  !! dispatch-table ABI. C declaration: int NC_NOTNC4_insert_compound(int,
+  !! nc_type, const char *, size_t, nc_type);
   import :: c_int, c_char, c_size_t
   integer(c_int), value :: arg1
   !! C int argument arg1.
@@ -1241,12 +1303,12 @@ function NC_NOTNC4_insert_compound(arg1, arg2, arg3, arg4, arg5) bind(c, name="N
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function NC_NOTNC4_insert_compound
 
-function NC_NOTNC4_insert_array_compound(arg1, arg2, arg3, arg4, arg5, arg6, arg7) &
-  & bind(c, name="NC_NOTNC4_insert_array_compound")
+function NC_NOTNC4_insert_array_compound(arg1, arg2, arg3, arg4, arg5, arg6, &
+  & arg7) bind(c, name="NC_NOTNC4_insert_array_compound")
   !! Backend dispatch helper: report an unsupported enhanced-model operation.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_NOTNC4_insert_array_compound(int, nc_type, const char *, size_t, nc_type, int,
-  !! const int *);
+  !! Intended for custom backend implementers; arguments retain the C
+  !! dispatch-table ABI. C declaration: int NC_NOTNC4_insert_array_compound(int,
+  !! nc_type, const char *, size_t, nc_type, int, const int *);
   import :: c_int, c_char, c_size_t, c_ptr
   integer(c_int), value :: arg1
   !! C int argument arg1.
@@ -1268,10 +1330,12 @@ function NC_NOTNC4_insert_array_compound(arg1, arg2, arg3, arg4, arg5, arg6, arg
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function NC_NOTNC4_insert_array_compound
 
-function NC_NOTNC4_inq_typeid(arg1, arg2, arg3) bind(c, name="NC_NOTNC4_inq_typeid")
+function NC_NOTNC4_inq_typeid(arg1, arg2, arg3) &
+  & bind(c, name="NC_NOTNC4_inq_typeid")
   !! Backend dispatch helper: report an unsupported enhanced-model operation.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_NOTNC4_inq_typeid(int, const char *, nc_type *);
+  !! Intended for custom backend implementers; arguments retain the C
+  !! dispatch-table ABI. C declaration: int NC_NOTNC4_inq_typeid(int, const char
+  !! *, nc_type *);
   import :: c_int, c_char, c_ptr
   integer(c_int), value :: arg1
   !! C int argument arg1.
@@ -1285,12 +1349,12 @@ function NC_NOTNC4_inq_typeid(arg1, arg2, arg3) bind(c, name="NC_NOTNC4_inq_type
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function NC_NOTNC4_inq_typeid
 
-function NC_NOTNC4_inq_compound_field(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) &
-  & bind(c, name="NC_NOTNC4_inq_compound_field")
+function NC_NOTNC4_inq_compound_field(arg1, arg2, arg3, arg4, arg5, arg6, &
+  & arg7, arg8) bind(c, name="NC_NOTNC4_inq_compound_field")
   !! Backend dispatch helper: report an unsupported enhanced-model operation.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_NOTNC4_inq_compound_field(int, nc_type, int, char *, size_t *, nc_type *, int *,
-  !! int *);
+  !! Intended for custom backend implementers; arguments retain the C
+  !! dispatch-table ABI. C declaration: int NC_NOTNC4_inq_compound_field(int,
+  !! nc_type, int, char *, size_t *, nc_type *, int *, int *);
   import :: c_int, c_ptr
   integer(c_int), value :: arg1
   !! C int argument arg1.
@@ -1299,7 +1363,8 @@ function NC_NOTNC4_inq_compound_field(arg1, arg2, arg3, arg4, arg5, arg6, arg7, 
   integer(c_int), value :: arg3
   !! C int argument arg3.
   type(c_ptr), value :: arg4
-  !! Pointer to caller-provided C character output storage (NC_MAX_NAME + 1 for names).
+  !! Pointer to caller-provided C character output storage (NC_MAX_NAME + 1 for
+  !! names).
   type(c_ptr), value :: arg5
   !! Pointer to C-compatible storage. C pointee: size_t *.
   type(c_ptr), value :: arg6
@@ -1317,8 +1382,9 @@ end function NC_NOTNC4_inq_compound_field
 function NC_NOTNC4_inq_compound_fieldindex(arg1, arg2, arg3, arg4) &
   & bind(c, name="NC_NOTNC4_inq_compound_fieldindex")
   !! Backend dispatch helper: report an unsupported enhanced-model operation.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_NOTNC4_inq_compound_fieldindex(int, nc_type, const char *, int *);
+  !! Intended for custom backend implementers; arguments retain the C
+  !! dispatch-table ABI. C declaration: int
+  !! NC_NOTNC4_inq_compound_fieldindex(int, nc_type, const char *, int *);
   import :: c_int, c_char, c_ptr
   integer(c_int), value :: arg1
   !! C int argument arg1.
@@ -1334,10 +1400,12 @@ function NC_NOTNC4_inq_compound_fieldindex(arg1, arg2, arg3, arg4) &
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function NC_NOTNC4_inq_compound_fieldindex
 
-function NC_NOTNC4_def_vlen(arg1, arg2, base_typeid, arg4) bind(c, name="NC_NOTNC4_def_vlen")
+function NC_NOTNC4_def_vlen(arg1, arg2, base_typeid, arg4) &
+  & bind(c, name="NC_NOTNC4_def_vlen")
   !! Backend dispatch helper: report an unsupported enhanced-model operation.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_NOTNC4_def_vlen(int, const char *, nc_type base_typeid, nc_type *);
+  !! Intended for custom backend implementers; arguments retain the C
+  !! dispatch-table ABI. C declaration: int NC_NOTNC4_def_vlen(int, const char
+  !! *, nc_type base_typeid, nc_type *);
   import :: c_int, c_char, c_ptr
   integer(c_int), value :: arg1
   !! C int argument arg1.
@@ -1353,10 +1421,12 @@ function NC_NOTNC4_def_vlen(arg1, arg2, base_typeid, arg4) bind(c, name="NC_NOTN
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function NC_NOTNC4_def_vlen
 
-function NC_NOTNC4_put_vlen_element(arg1, arg2, arg3, arg4, arg5) bind(c, name="NC_NOTNC4_put_vlen_element")
+function NC_NOTNC4_put_vlen_element(arg1, arg2, arg3, arg4, arg5) &
+  & bind(c, name="NC_NOTNC4_put_vlen_element")
   !! Backend dispatch helper: report an unsupported enhanced-model operation.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_NOTNC4_put_vlen_element(int, int, void *, size_t, const void *);
+  !! Intended for custom backend implementers; arguments retain the C
+  !! dispatch-table ABI. C declaration: int NC_NOTNC4_put_vlen_element(int, int,
+  !! void *, size_t, const void *);
   import :: c_int, c_ptr, c_size_t
   integer(c_int), value :: arg1
   !! C int argument arg1.
@@ -1374,10 +1444,12 @@ function NC_NOTNC4_put_vlen_element(arg1, arg2, arg3, arg4, arg5) bind(c, name="
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function NC_NOTNC4_put_vlen_element
 
-function NC_NOTNC4_get_vlen_element(arg1, arg2, arg3, arg4, arg5) bind(c, name="NC_NOTNC4_get_vlen_element")
+function NC_NOTNC4_get_vlen_element(arg1, arg2, arg3, arg4, arg5) &
+  & bind(c, name="NC_NOTNC4_get_vlen_element")
   !! Backend dispatch helper: report an unsupported enhanced-model operation.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_NOTNC4_get_vlen_element(int, int, const void *, size_t *, void *);
+  !! Intended for custom backend implementers; arguments retain the C
+  !! dispatch-table ABI. C declaration: int NC_NOTNC4_get_vlen_element(int, int,
+  !! const void *, size_t *, void *);
   import :: c_int, c_ptr
   integer(c_int), value :: arg1
   !! C int argument arg1.
@@ -1395,10 +1467,12 @@ function NC_NOTNC4_get_vlen_element(arg1, arg2, arg3, arg4, arg5) bind(c, name="
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function NC_NOTNC4_get_vlen_element
 
-function NC_NOTNC4_def_enum(arg1, arg2, arg3, arg4) bind(c, name="NC_NOTNC4_def_enum")
+function NC_NOTNC4_def_enum(arg1, arg2, arg3, arg4) &
+  & bind(c, name="NC_NOTNC4_def_enum")
   !! Backend dispatch helper: report an unsupported enhanced-model operation.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_NOTNC4_def_enum(int, nc_type, const char *, nc_type *);
+  !! Intended for custom backend implementers; arguments retain the C
+  !! dispatch-table ABI. C declaration: int NC_NOTNC4_def_enum(int, nc_type,
+  !! const char *, nc_type *);
   import :: c_int, c_char, c_ptr
   integer(c_int), value :: arg1
   !! C int argument arg1.
@@ -1414,10 +1488,12 @@ function NC_NOTNC4_def_enum(arg1, arg2, arg3, arg4) bind(c, name="NC_NOTNC4_def_
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function NC_NOTNC4_def_enum
 
-function NC_NOTNC4_insert_enum(arg1, arg2, arg3, arg4) bind(c, name="NC_NOTNC4_insert_enum")
+function NC_NOTNC4_insert_enum(arg1, arg2, arg3, arg4) &
+  & bind(c, name="NC_NOTNC4_insert_enum")
   !! Backend dispatch helper: report an unsupported enhanced-model operation.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_NOTNC4_insert_enum(int, nc_type, const char *, const void *);
+  !! Intended for custom backend implementers; arguments retain the C
+  !! dispatch-table ABI. C declaration: int NC_NOTNC4_insert_enum(int, nc_type,
+  !! const char *, const void *);
   import :: c_int, c_char, c_ptr
   integer(c_int), value :: arg1
   !! C int argument arg1.
@@ -1433,10 +1509,12 @@ function NC_NOTNC4_insert_enum(arg1, arg2, arg3, arg4) bind(c, name="NC_NOTNC4_i
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function NC_NOTNC4_insert_enum
 
-function NC_NOTNC4_inq_enum_member(arg1, arg2, arg3, arg4, arg5) bind(c, name="NC_NOTNC4_inq_enum_member")
+function NC_NOTNC4_inq_enum_member(arg1, arg2, arg3, arg4, arg5) &
+  & bind(c, name="NC_NOTNC4_inq_enum_member")
   !! Backend dispatch helper: report an unsupported enhanced-model operation.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_NOTNC4_inq_enum_member(int, nc_type, int, char *, void *);
+  !! Intended for custom backend implementers; arguments retain the C
+  !! dispatch-table ABI. C declaration: int NC_NOTNC4_inq_enum_member(int,
+  !! nc_type, int, char *, void *);
   import :: c_int, c_ptr
   integer(c_int), value :: arg1
   !! C int argument arg1.
@@ -1445,7 +1523,8 @@ function NC_NOTNC4_inq_enum_member(arg1, arg2, arg3, arg4, arg5) bind(c, name="N
   integer(c_int), value :: arg3
   !! C int argument arg3.
   type(c_ptr), value :: arg4
-  !! Pointer to caller-provided C character output storage (NC_MAX_NAME + 1 for names).
+  !! Pointer to caller-provided C character output storage (NC_MAX_NAME + 1 for
+  !! names).
   type(c_ptr), value :: arg5
   !! Pointer to C-compatible storage. C pointee: void *.
   integer(c_int) :: NC_NOTNC4_inq_enum_member
@@ -1454,10 +1533,12 @@ function NC_NOTNC4_inq_enum_member(arg1, arg2, arg3, arg4, arg5) bind(c, name="N
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function NC_NOTNC4_inq_enum_member
 
-function NC_NOTNC4_inq_enum_ident(arg1, arg2, arg3, arg4) bind(c, name="NC_NOTNC4_inq_enum_ident")
+function NC_NOTNC4_inq_enum_ident(arg1, arg2, arg3, arg4) &
+  & bind(c, name="NC_NOTNC4_inq_enum_ident")
   !! Backend dispatch helper: report an unsupported enhanced-model operation.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_NOTNC4_inq_enum_ident(int, nc_type, long long, char *);
+  !! Intended for custom backend implementers; arguments retain the C
+  !! dispatch-table ABI. C declaration: int NC_NOTNC4_inq_enum_ident(int,
+  !! nc_type, long long, char *);
   import :: c_int, c_long_long, c_ptr
   integer(c_int), value :: arg1
   !! C int argument arg1.
@@ -1466,17 +1547,20 @@ function NC_NOTNC4_inq_enum_ident(arg1, arg2, arg3, arg4) bind(c, name="NC_NOTNC
   integer(c_long_long), value :: arg3
   !! C long long argument arg3.
   type(c_ptr), value :: arg4
-  !! Pointer to caller-provided C character output storage (NC_MAX_NAME + 1 for names).
+  !! Pointer to caller-provided C character output storage (NC_MAX_NAME + 1 for
+  !! names).
   integer(c_int) :: NC_NOTNC4_inq_enum_ident
   !! **Options:**
   !! - NC_NOERR Success.
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function NC_NOTNC4_inq_enum_ident
 
-function NC_NOTNC4_def_opaque(arg1, arg2, arg3, arg4) bind(c, name="NC_NOTNC4_def_opaque")
+function NC_NOTNC4_def_opaque(arg1, arg2, arg3, arg4) &
+  & bind(c, name="NC_NOTNC4_def_opaque")
   !! Backend dispatch helper: report an unsupported enhanced-model operation.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_NOTNC4_def_opaque(int, size_t, const char *, nc_type *);
+  !! Intended for custom backend implementers; arguments retain the C
+  !! dispatch-table ABI. C declaration: int NC_NOTNC4_def_opaque(int, size_t,
+  !! const char *, nc_type *);
   import :: c_int, c_size_t, c_char, c_ptr
   integer(c_int), value :: arg1
   !! C int argument arg1.
@@ -1492,10 +1576,12 @@ function NC_NOTNC4_def_opaque(arg1, arg2, arg3, arg4) bind(c, name="NC_NOTNC4_de
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function NC_NOTNC4_def_opaque
 
-function NC_NOTNC4_def_var_deflate(arg1, arg2, arg3, arg4, arg5) bind(c, name="NC_NOTNC4_def_var_deflate")
+function NC_NOTNC4_def_var_deflate(arg1, arg2, arg3, arg4, arg5) &
+  & bind(c, name="NC_NOTNC4_def_var_deflate")
   !! Backend dispatch helper: report an unsupported enhanced-model operation.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_NOTNC4_def_var_deflate(int, int, int, int, int);
+  !! Intended for custom backend implementers; arguments retain the C
+  !! dispatch-table ABI. C declaration: int NC_NOTNC4_def_var_deflate(int, int,
+  !! int, int, int);
   import :: c_int
   integer(c_int), value :: arg1
   !! C int argument arg1.
@@ -1513,10 +1599,12 @@ function NC_NOTNC4_def_var_deflate(arg1, arg2, arg3, arg4, arg5) bind(c, name="N
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function NC_NOTNC4_def_var_deflate
 
-function NC_NOTNC4_def_var_fletcher32(arg1, arg2, arg3) bind(c, name="NC_NOTNC4_def_var_fletcher32")
+function NC_NOTNC4_def_var_fletcher32(arg1, arg2, arg3) &
+  & bind(c, name="NC_NOTNC4_def_var_fletcher32")
   !! Backend dispatch helper: report an unsupported enhanced-model operation.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_NOTNC4_def_var_fletcher32(int, int, int);
+  !! Intended for custom backend implementers; arguments retain the C
+  !! dispatch-table ABI. C declaration: int NC_NOTNC4_def_var_fletcher32(int,
+  !! int, int);
   import :: c_int
   integer(c_int), value :: arg1
   !! C int argument arg1.
@@ -1530,10 +1618,12 @@ function NC_NOTNC4_def_var_fletcher32(arg1, arg2, arg3) bind(c, name="NC_NOTNC4_
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function NC_NOTNC4_def_var_fletcher32
 
-function NC_NOTNC4_def_var_chunking(arg1, arg2, arg3, arg4) bind(c, name="NC_NOTNC4_def_var_chunking")
+function NC_NOTNC4_def_var_chunking(arg1, arg2, arg3, arg4) &
+  & bind(c, name="NC_NOTNC4_def_var_chunking")
   !! Backend dispatch helper: report an unsupported enhanced-model operation.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_NOTNC4_def_var_chunking(int, int, int, const size_t *);
+  !! Intended for custom backend implementers; arguments retain the C
+  !! dispatch-table ABI. C declaration: int NC_NOTNC4_def_var_chunking(int, int,
+  !! int, const size_t *);
   import :: c_int, c_ptr
   integer(c_int), value :: arg1
   !! C int argument arg1.
@@ -1549,10 +1639,12 @@ function NC_NOTNC4_def_var_chunking(arg1, arg2, arg3, arg4) bind(c, name="NC_NOT
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function NC_NOTNC4_def_var_chunking
 
-function NC_NOTNC4_def_var_endian(arg1, arg2, arg3) bind(c, name="NC_NOTNC4_def_var_endian")
+function NC_NOTNC4_def_var_endian(arg1, arg2, arg3) &
+  & bind(c, name="NC_NOTNC4_def_var_endian")
   !! Backend dispatch helper: report an unsupported enhanced-model operation.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_NOTNC4_def_var_endian(int, int, int);
+  !! Intended for custom backend implementers; arguments retain the C
+  !! dispatch-table ABI. C declaration: int NC_NOTNC4_def_var_endian(int, int,
+  !! int);
   import :: c_int
   integer(c_int), value :: arg1
   !! C int argument arg1.
@@ -1569,8 +1661,9 @@ end function NC_NOTNC4_def_var_endian
 function NC_NOTNC4_set_var_chunk_cache(arg1, arg2, arg3, arg4, arg5) &
   & bind(c, name="NC_NOTNC4_set_var_chunk_cache")
   !! Backend dispatch helper: report an unsupported enhanced-model operation.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_NOTNC4_set_var_chunk_cache(int, int, size_t, size_t, float);
+  !! Intended for custom backend implementers; arguments retain the C
+  !! dispatch-table ABI. C declaration: int NC_NOTNC4_set_var_chunk_cache(int,
+  !! int, size_t, size_t, float);
   import :: c_int, c_size_t, c_float
   integer(c_int), value :: arg1
   !! C int argument arg1.
@@ -1591,8 +1684,9 @@ end function NC_NOTNC4_set_var_chunk_cache
 function NC_NOTNC4_get_var_chunk_cache(arg1, arg2, arg3, arg4, arg5) &
   & bind(c, name="NC_NOTNC4_get_var_chunk_cache")
   !! Backend dispatch helper: report an unsupported enhanced-model operation.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_NOTNC4_get_var_chunk_cache(int, int, size_t *, size_t *, float *);
+  !! Intended for custom backend implementers; arguments retain the C
+  !! dispatch-table ABI. C declaration: int NC_NOTNC4_get_var_chunk_cache(int,
+  !! int, size_t *, size_t *, float *);
   import :: c_int, c_ptr
   integer(c_int), value :: arg1
   !! C int argument arg1.
@@ -1612,8 +1706,9 @@ end function NC_NOTNC4_get_var_chunk_cache
 
 function NC_NOTNC4_inq_ncid(arg1, arg2, arg3) bind(c, name="NC_NOTNC4_inq_ncid")
   !! Backend dispatch helper: report an unsupported enhanced-model operation.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_NOTNC4_inq_ncid(int, const char *, int *);
+  !! Intended for custom backend implementers; arguments retain the C
+  !! dispatch-table ABI. C declaration: int NC_NOTNC4_inq_ncid(int, const char
+  !! *, int *);
   import :: c_int, c_char, c_ptr
   integer(c_int), value :: arg1
   !! C int argument arg1.
@@ -1629,8 +1724,9 @@ end function NC_NOTNC4_inq_ncid
 
 function NC_NOTNC4_inq_grps(arg1, arg2, arg3) bind(c, name="NC_NOTNC4_inq_grps")
   !! Backend dispatch helper: report an unsupported enhanced-model operation.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_NOTNC4_inq_grps(int, int *, int *);
+  !! Intended for custom backend implementers; arguments retain the C
+  !! dispatch-table ABI. C declaration: int NC_NOTNC4_inq_grps(int, int *, int
+  !! *);
   import :: c_int, c_ptr
   integer(c_int), value :: arg1
   !! C int argument arg1.
@@ -1646,40 +1742,46 @@ end function NC_NOTNC4_inq_grps
 
 function NC_NOTNC4_inq_grpname(arg1, arg2) bind(c, name="NC_NOTNC4_inq_grpname")
   !! Backend dispatch helper: report an unsupported enhanced-model operation.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_NOTNC4_inq_grpname(int, char *);
+  !! Intended for custom backend implementers; arguments retain the C
+  !! dispatch-table ABI. C declaration: int NC_NOTNC4_inq_grpname(int, char *);
   import :: c_int, c_ptr
   integer(c_int), value :: arg1
   !! C int argument arg1.
   type(c_ptr), value :: arg2
-  !! Pointer to caller-provided C character output storage (NC_MAX_NAME + 1 for names).
+  !! Pointer to caller-provided C character output storage (NC_MAX_NAME + 1 for
+  !! names).
   integer(c_int) :: NC_NOTNC4_inq_grpname
   !! **Options:**
   !! - NC_NOERR Success.
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function NC_NOTNC4_inq_grpname
 
-function NC_NOTNC4_inq_grpname_full(arg1, arg2, arg3) bind(c, name="NC_NOTNC4_inq_grpname_full")
+function NC_NOTNC4_inq_grpname_full(arg1, arg2, arg3) &
+  & bind(c, name="NC_NOTNC4_inq_grpname_full")
   !! Backend dispatch helper: report an unsupported enhanced-model operation.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_NOTNC4_inq_grpname_full(int, size_t *, char *);
+  !! Intended for custom backend implementers; arguments retain the C
+  !! dispatch-table ABI. C declaration: int NC_NOTNC4_inq_grpname_full(int,
+  !! size_t *, char *);
   import :: c_int, c_ptr
   integer(c_int), value :: arg1
   !! C int argument arg1.
   type(c_ptr), value :: arg2
   !! Pointer to C-compatible storage. C pointee: size_t *.
   type(c_ptr), value :: arg3
-  !! Pointer to caller-provided C character output storage (NC_MAX_NAME + 1 for names).
+  !! Pointer to caller-provided C character output storage (NC_MAX_NAME + 1 for
+  !! names).
   integer(c_int) :: NC_NOTNC4_inq_grpname_full
   !! **Options:**
   !! - NC_NOERR Success.
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function NC_NOTNC4_inq_grpname_full
 
-function NC_NOTNC4_inq_grp_parent(arg1, arg2) bind(c, name="NC_NOTNC4_inq_grp_parent")
+function NC_NOTNC4_inq_grp_parent(arg1, arg2) &
+  & bind(c, name="NC_NOTNC4_inq_grp_parent")
   !! Backend dispatch helper: report an unsupported enhanced-model operation.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_NOTNC4_inq_grp_parent(int, int *);
+  !! Intended for custom backend implementers; arguments retain the C
+  !! dispatch-table ABI. C declaration: int NC_NOTNC4_inq_grp_parent(int, int
+  !! *);
   import :: c_int, c_ptr
   integer(c_int), value :: arg1
   !! C int argument arg1.
@@ -1691,10 +1793,12 @@ function NC_NOTNC4_inq_grp_parent(arg1, arg2) bind(c, name="NC_NOTNC4_inq_grp_pa
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function NC_NOTNC4_inq_grp_parent
 
-function NC_NOTNC4_inq_grp_full_ncid(arg1, arg2, arg3) bind(c, name="NC_NOTNC4_inq_grp_full_ncid")
+function NC_NOTNC4_inq_grp_full_ncid(arg1, arg2, arg3) &
+  & bind(c, name="NC_NOTNC4_inq_grp_full_ncid")
   !! Backend dispatch helper: report an unsupported enhanced-model operation.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_NOTNC4_inq_grp_full_ncid(int, const char *, int *);
+  !! Intended for custom backend implementers; arguments retain the C
+  !! dispatch-table ABI. C declaration: int NC_NOTNC4_inq_grp_full_ncid(int,
+  !! const char *, int *);
   import :: c_int, c_char, c_ptr
   integer(c_int), value :: arg1
   !! C int argument arg1.
@@ -1708,10 +1812,12 @@ function NC_NOTNC4_inq_grp_full_ncid(arg1, arg2, arg3) bind(c, name="NC_NOTNC4_i
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function NC_NOTNC4_inq_grp_full_ncid
 
-function NC_NOTNC4_inq_varids(arg1, arg2, arg3) bind(c, name="NC_NOTNC4_inq_varids")
+function NC_NOTNC4_inq_varids(arg1, arg2, arg3) &
+  & bind(c, name="NC_NOTNC4_inq_varids")
   !! Backend dispatch helper: report an unsupported enhanced-model operation.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_NOTNC4_inq_varids(int, int *, int *);
+  !! Intended for custom backend implementers; arguments retain the C
+  !! dispatch-table ABI. C declaration: int NC_NOTNC4_inq_varids(int, int *, int
+  !! *);
   import :: c_int, c_ptr
   integer(c_int), value :: arg1
   !! C int argument arg1.
@@ -1725,10 +1831,12 @@ function NC_NOTNC4_inq_varids(arg1, arg2, arg3) bind(c, name="NC_NOTNC4_inq_vari
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function NC_NOTNC4_inq_varids
 
-function NC_NOTNC4_inq_dimids(arg1, arg2, arg3, arg4) bind(c, name="NC_NOTNC4_inq_dimids")
+function NC_NOTNC4_inq_dimids(arg1, arg2, arg3, arg4) &
+  & bind(c, name="NC_NOTNC4_inq_dimids")
   !! Backend dispatch helper: report an unsupported enhanced-model operation.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_NOTNC4_inq_dimids(int, int *, int *, int);
+  !! Intended for custom backend implementers; arguments retain the C
+  !! dispatch-table ABI. C declaration: int NC_NOTNC4_inq_dimids(int, int *, int
+  !! *, int);
   import :: c_int, c_ptr
   integer(c_int), value :: arg1
   !! C int argument arg1.
@@ -1744,10 +1852,12 @@ function NC_NOTNC4_inq_dimids(arg1, arg2, arg3, arg4) bind(c, name="NC_NOTNC4_in
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function NC_NOTNC4_inq_dimids
 
-function NC_NOTNC4_inq_typeids(arg1, arg2, arg3) bind(c, name="NC_NOTNC4_inq_typeids")
+function NC_NOTNC4_inq_typeids(arg1, arg2, arg3) &
+  & bind(c, name="NC_NOTNC4_inq_typeids")
   !! Backend dispatch helper: report an unsupported enhanced-model operation.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_NOTNC4_inq_typeids(int, int *, int *);
+  !! Intended for custom backend implementers; arguments retain the C
+  !! dispatch-table ABI. C declaration: int NC_NOTNC4_inq_typeids(int, int *,
+  !! int *);
   import :: c_int, c_ptr
   integer(c_int), value :: arg1
   !! C int argument arg1.
@@ -1764,15 +1874,17 @@ end function NC_NOTNC4_inq_typeids
 function NC_NOTNC4_inq_user_type(arg1, arg2, arg3, arg4, arg5, arg6, arg7) &
   & bind(c, name="NC_NOTNC4_inq_user_type")
   !! Backend dispatch helper: report an unsupported enhanced-model operation.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_NOTNC4_inq_user_type(int, nc_type, char *, size_t *, nc_type *, size_t *, int *);
+  !! Intended for custom backend implementers; arguments retain the C
+  !! dispatch-table ABI. C declaration: int NC_NOTNC4_inq_user_type(int,
+  !! nc_type, char *, size_t *, nc_type *, size_t *, int *);
   import :: c_int, c_ptr
   integer(c_int), value :: arg1
   !! C int argument arg1.
   integer(c_int), value :: arg2
   !! C nc_type argument arg2.
   type(c_ptr), value :: arg3
-  !! Pointer to caller-provided C character output storage (NC_MAX_NAME + 1 for names).
+  !! Pointer to caller-provided C character output storage (NC_MAX_NAME + 1 for
+  !! names).
   type(c_ptr), value :: arg4
   !! Pointer to C-compatible storage. C pointee: size_t *.
   type(c_ptr), value :: arg5
@@ -1787,10 +1899,12 @@ function NC_NOTNC4_inq_user_type(arg1, arg2, arg3, arg4, arg5, arg6, arg7) &
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function NC_NOTNC4_inq_user_type
 
-function NC_NOTNC4_def_var_quantize(arg1, arg2, arg3, arg4) bind(c, name="NC_NOTNC4_def_var_quantize")
+function NC_NOTNC4_def_var_quantize(arg1, arg2, arg3, arg4) &
+  & bind(c, name="NC_NOTNC4_def_var_quantize")
   !! Backend dispatch helper: report an unsupported enhanced-model operation.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_NOTNC4_def_var_quantize(int, int, int, int);
+  !! Intended for custom backend implementers; arguments retain the C
+  !! dispatch-table ABI. C declaration: int NC_NOTNC4_def_var_quantize(int, int,
+  !! int, int);
   import :: c_int
   integer(c_int), value :: arg1
   !! C int argument arg1.
@@ -1806,10 +1920,12 @@ function NC_NOTNC4_def_var_quantize(arg1, arg2, arg3, arg4) bind(c, name="NC_NOT
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function NC_NOTNC4_def_var_quantize
 
-function NC_NOTNC4_inq_var_quantize(arg1, arg2, arg3, arg4) bind(c, name="NC_NOTNC4_inq_var_quantize")
+function NC_NOTNC4_inq_var_quantize(arg1, arg2, arg3, arg4) &
+  & bind(c, name="NC_NOTNC4_inq_var_quantize")
   !! Backend dispatch helper: report an unsupported enhanced-model operation.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_NOTNC4_inq_var_quantize(int, int, int *, int *);
+  !! Intended for custom backend implementers; arguments retain the C
+  !! dispatch-table ABI. C declaration: int NC_NOTNC4_inq_var_quantize(int, int,
+  !! int *, int *);
   import :: c_int, c_ptr
   integer(c_int), value :: arg1
   !! C int argument arg1.
@@ -1825,12 +1941,13 @@ function NC_NOTNC4_inq_var_quantize(arg1, arg2, arg3, arg4) bind(c, name="NC_NOT
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function NC_NOTNC4_inq_var_quantize
 
-function NC_NOTNC3_get_varm(ncid, varid, start, edges, stride, imapp, value0, memtype) &
-  & bind(c, name="NC_NOTNC3_get_varm")
-  !! Backend dispatch helper: report unsupported mapped access.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_NOTNC3_get_varm(int ncid, int varid, const size_t *start, const size_t *edges,
-  !! const ptrdiff_t *stride, const ptrdiff_t *imapp, void *value0, nc_type memtype);
+function NC_NOTNC3_get_varm(ncid, varid, start, edges, stride, imapp, value0, &
+  & memtype) bind(c, name="NC_NOTNC3_get_varm")
+  !! Backend dispatch helper: report unsupported mapped access. Intended for
+  !! custom backend implementers; arguments retain the C dispatch-table ABI. C
+  !! declaration: int NC_NOTNC3_get_varm(int ncid, int varid, const size_t
+  !! *start, const size_t *edges, const ptrdiff_t *stride, const ptrdiff_t
+  !! *imapp, void *value0, nc_type memtype);
   import :: c_int, c_ptr
   integer(c_int), value :: ncid
   !! Open dataset or group identifier.
@@ -1843,8 +1960,8 @@ function NC_NOTNC3_get_varm(ncid, varid, start, edges, stride, imapp, value0, me
   type(c_ptr), value :: stride
   !! Pointer to C-compatible storage. C pointee: const ptrdiff_t *.
   type(c_ptr), value :: imapp
-  !! Memory strides in C dimension order, measured in elements for modern typed APIs. C pointee: const
-  !! ptrdiff_t *.
+  !! Memory strides in C dimension order, measured in elements for modern typed
+  !! APIs. C pointee: const ptrdiff_t *.
   type(c_ptr), value :: value0
   !! Pointer to C-compatible storage. C pointee: void *.
   integer(c_int), value :: memtype
@@ -1855,12 +1972,13 @@ function NC_NOTNC3_get_varm(ncid, varid, start, edges, stride, imapp, value0, me
   !! - A NetCDF error code on failure; backend and feature errors are preserved.
 end function NC_NOTNC3_get_varm
 
-function NC_NOTNC3_put_varm(ncid, varid, start, edges, stride, imapp, value0, memtype) &
-  & bind(c, name="NC_NOTNC3_put_varm")
-  !! Backend dispatch helper: report unsupported mapped access.
-  !! Intended for custom backend implementers; arguments retain the C dispatch-table ABI.
-  !! C declaration: int NC_NOTNC3_put_varm(int ncid, int varid, const size_t * start, const size_t *edges,
-  !! const ptrdiff_t *stride, const ptrdiff_t *imapp, const void *value0, nc_type memtype);
+function NC_NOTNC3_put_varm(ncid, varid, start, edges, stride, imapp, value0, &
+  & memtype) bind(c, name="NC_NOTNC3_put_varm")
+  !! Backend dispatch helper: report unsupported mapped access. Intended for
+  !! custom backend implementers; arguments retain the C dispatch-table ABI. C
+  !! declaration: int NC_NOTNC3_put_varm(int ncid, int varid, const size_t *
+  !! start, const size_t *edges, const ptrdiff_t *stride, const ptrdiff_t
+  !! *imapp, const void *value0, nc_type memtype);
   import :: c_int, c_ptr
   integer(c_int), value :: ncid
   !! Open dataset or group identifier.
@@ -1873,8 +1991,8 @@ function NC_NOTNC3_put_varm(ncid, varid, start, edges, stride, imapp, value0, me
   type(c_ptr), value :: stride
   !! Pointer to C-compatible storage. C pointee: const ptrdiff_t *.
   type(c_ptr), value :: imapp
-  !! Memory strides in C dimension order, measured in elements for modern typed APIs. C pointee: const
-  !! ptrdiff_t *.
+  !! Memory strides in C dimension order, measured in elements for modern typed
+  !! APIs. C pointee: const ptrdiff_t *.
   type(c_ptr), value :: value0
   !! Pointer to C-compatible storage. C pointee: const void *.
   integer(c_int), value :: memtype
