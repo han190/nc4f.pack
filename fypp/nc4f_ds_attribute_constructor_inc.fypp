@@ -36,7 +36,7 @@ interface
     !! Attribute name.
     character(len=*), intent(in) :: value
     !! Attribute value (character).
-    type(attribute_type), target :: att
+    type(attribute_type) :: att
     !! Returned Attribute.
   end function new_att_character
 end interface
