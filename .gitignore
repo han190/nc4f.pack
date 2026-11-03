@@ -4,5 +4,6 @@ data/
 *.log
 *.txt
 !requirements-docs.txt
+!CMakeLists.txt
 site/
 .DS_store

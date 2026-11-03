@@ -27,6 +27,7 @@ EXAMPLE_NAMES := write_netcdf read_netcdf $(filter-out write_netcdf read_netcdf,
 EXAMPLE_TARGETS := $(addprefix $(EXAMPLE_BUILD_DIR)/,$(EXAMPLE_NAMES))
 NC_CFLAGS := $(shell pkg-config --cflags netcdf)
 NC_LIBS := $(shell pkg-config --libs netcdf)
+MODULE_OUTPUT_FLAG := -J$(BUILD_DIR)
 
 ifneq (,$(findstring gfortran,$(COMPILER_NAME)))
   COMPILER_FFLAGS := -fmax-errors=1 -fcoarray=single
@@ -36,6 +37,11 @@ else ifneq (,$(findstring flang,$(COMPILER_NAME)))
   COMPILER_FFLAGS := -funroll-loops -fimplicit-none
   DEBUG_FFLAGS := -O0 -g
   RELEASE_FFLAGS := -O3
+else ifneq (,$(findstring ifx,$(COMPILER_NAME)))
+  COMPILER_FFLAGS := -standard-semantics -fp-model precise
+  DEBUG_FFLAGS := -O0 -g -warn all -check bounds -traceback
+  RELEASE_FFLAGS := -O3
+  MODULE_OUTPUT_FLAG := -module $(BUILD_DIR)
 endif
 ifeq ($(PROFILE),debug)
   PROFILE_FFLAGS := $(DEBUG_FFLAGS)
@@ -45,7 +51,7 @@ else
   $(error Unsupported PROFILE '$(PROFILE)'; choose debug or release)
 endif
 FFLAGS ?= -fPIC $(COMPILER_FFLAGS) $(PROFILE_FFLAGS)
-MODULE_FLAGS := -J$(BUILD_DIR) -I$(BUILD_DIR) $(addprefix -I,$(SOURCE_DIRS)) $(NC_CFLAGS)
+MODULE_FLAGS := $(MODULE_OUTPUT_FLAG) -I$(BUILD_DIR) $(addprefix -I,$(SOURCE_DIRS)) $(NC_CFLAGS)
 
 # All current templates generate data_structure sources; common.fypp is a helper.
 FYPP_INC := $(wildcard $(FYPP_DIR)/*_inc.fypp)

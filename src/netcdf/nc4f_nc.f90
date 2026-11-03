@@ -14,6 +14,9 @@ public :: open_netcdf, close_netcdf, to_netcdf, define_variable, &
   & inquire_subgroups, inquire_group, operator(.exists.)
 private
 
+integer, parameter :: MAX_CHAR_LEN = 1024
+!! Fixed scratch length for operation-context diagnostics.
+
 interface rename_dimension
   module procedure :: rename_dim_nc_dim, rename_dim_nc_grp
 end interface rename_dimension
@@ -34,19 +37,12 @@ interface rename_variable
   module procedure :: rename_var_nc_var, rename_var_nc_grp
 end interface rename_variable
 
-integer, parameter :: MAX_CHAR_LEN = 1024
-!! Fixed scratch length for operation-context diagnostics.
-
 interface get_attribute
-  module procedure :: get_atts_grp
-  module procedure :: get_att_grp !> Impure Elemental
-  module procedure :: get_atts_var
-  module procedure :: get_att_var !> Impure Elemental
+  module procedure :: get_atts_grp, get_att_grp, get_atts_var, get_att_var
 end interface get_attribute
 
 interface inquire_dimensions
-  module procedure :: inq_dims_grp
-  module procedure :: inq_dims_var
+  module procedure :: inq_dims_grp, inq_dims_var
 end interface inquire_dimensions
 
 interface define_variable
@@ -54,14 +50,11 @@ interface define_variable
 end interface define_variable
 
 interface to_netcdf
-  module procedure :: to_netcdf_var
-  module procedure :: to_netcdf_grp
+  module procedure :: to_netcdf_var, to_netcdf_grp
 end interface to_netcdf
 
 interface initialize
-  !! Allocate a fresh byte buffer for metadata read from the C API.
-  module procedure :: initialize_att
-  module procedure :: initialize_var
+  module procedure :: initialize_att, initialize_var
 end interface initialize
 
 interface

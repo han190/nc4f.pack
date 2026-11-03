@@ -85,6 +85,22 @@ fpm test --profile debug --flag "$(pkg-config --cflags --libs netcdf)"
 
 Generated NetCDF test artifacts are written to `build/test-results/`.
 
+### Build and test with CMake
+
+CMake 3.24 or newer, a C compiler, and a supported Fortran compiler are required.
+The default build uses the tracked generated sources; fypp is optional.
+
+```sh
+cmake -S . -B build/cmake -DCMAKE_Fortran_COMPILER=gfortran -DCMAKE_BUILD_TYPE=Release
+cmake --build build/cmake --parallel
+./scripts/download_test_data.sh
+ctest --test-dir build/cmake --output-on-failure
+```
+
+Build the standalone C bindings with `--target nc4f_c_interface`. For installation,
+examples, template regeneration, and downstream CMake usage, see
+[Build and Installation](docs/src/get-started/build-installation.md#build-with-cmake).
+
 ### Use NC4F as an fpm dependency
 
 Add `nc4f` to the consuming package's `fpm.toml`, then link the NetCDF C
