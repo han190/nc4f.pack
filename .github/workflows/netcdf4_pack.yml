@@ -96,6 +96,7 @@ jobs:
             netcdf-devel \
             perl-Digest-SHA \
             pkgconf-pkg-config \
+            procps-ng \
             python3-fypp
           cat > /etc/yum.repos.d/oneAPI.repo <<'EOF'
           [oneAPI]
