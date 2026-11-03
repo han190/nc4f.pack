@@ -12,6 +12,9 @@ an [xarray](https://xarray.dev/)-like programming style in modern Fortran that w
 
 - Build a [NetCDF data model](https://docs.unidata.ucar.edu/netcdf-c/4.10.0/netcdf_data_model.html) with `DATARRAY` and `DATASET`;
 - Write a data model to a NetCDF file with `TO_NETCDF`;
+- Define variables without allocating data using `DEFINE_VARIABLE`, then write
+  contiguous or strided selections with `PUT_VARIABLE`, including unlimited-dimension appends;
+- Update a single existing variable through `TO_NETCDF(..., mode="a", start=..., count=..., stride=...)`;
 - Open a NetCDF file and retrieve variables with `OPEN_NETCDF` and `GET_VARIABLE`;
 - Use {ref}`diskless access <open_netcdf--open-a-netcdf-file>`
   with `OPEN_NETCDF(..., diskless=.true.)`: `"r"` reads in RAM, `"a"`/`"an"`
@@ -62,7 +65,7 @@ model. It does NOT currently support:
 - NetCDF-4 storage controls, such as chunking, compression,
   shuffle/checksum filters, endianness, and custom fill values;
 - parallel I/O or importing/exporting caller-owned in-memory file images;
-- advanced variable access, such as mapped or multi-slab I/O and strided writes;
+- advanced variable access, such as mapped or multi-slab I/O;
   or metadata mutation operations, such as renaming or deleting dimensions,
   variables, groups, and attributes.
 

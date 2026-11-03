@@ -20,7 +20,7 @@ NetCDF format support is excluded from this assessment.
 | Rename variables | Low–medium | Complete | Four `rename_variable` overloads support pure model editing and explicit file updates, using the shared name checker. |
 | Rename groups | Low–medium | Complete | Four `rename_group` overloads support pure model editing and explicit file updates, with root protection and shared-child-cache semantics. |
 | Rename dimensions | Low–medium | Complete | Five `rename_dimension` overloads support pure model editing and explicit file updates, synchronizing direct caches and rejecting inherited file targets. |
-| Strided writes | Low–medium | Planned | Extend the private hyperslab writer with stride validation and expose a public write operation. |
+| Strided writes | Low–medium | Complete | Public `define_variable` and `put_variable` support explicit schema definition and contiguous/strided writes; `to_netcdf` supports single-variable selections in append mode. |
 | NetCDF-4 storage controls | Medium | Under consideration | Represent per-variable chunking, compression, shuffle/checksum, endianness, and fill settings; apply them before data writes and support inquiry and validation. |
 | Multi-slab I/O | Medium | Under consideration | Compose slab operations and define result ordering, shapes, and partial-failure behavior. |
 | Mapped I/O | Medium–high | Under consideration | Reconcile memory mappings with the contiguous buffer model; validate mappings and memory bounds. |
@@ -59,9 +59,9 @@ NetCDF format support is excluded from this assessment.
 - [x] Compile and run the regression suite with GNU Fortran and LLVM Flang in debug mode, including persistence and nonpersistent behavior.
 - [x] Document lifecycle behavior, positional-argument migration, and update the README limitation.
 
-`to_netcdf` remains disk-backed and path-based. There is no new high-level writer
-for open handles; creation-mode regression cases populate them through existing
-low-level bindings. Modifying extracted Fortran values does not write them back.
+`to_netcdf` remains disk-backed and path-based. Open handles, including diskless
+handles, can be populated with `define_variable` and `put_variable`. Modifying
+extracted Fortran values does not write them back without an explicit write.
 
 ### 3a. Variable renaming — Complete
 
@@ -88,13 +88,21 @@ low-level bindings. Modifying extracted Fortran values does not write them back.
 - [x] Test persistence after reopening, shared dimensions, and failure cases.
 - [x] Document the operations and update the README limitation.
 
-### 4. Strided writes
+### 4. Strided writes — Complete
 
-- [ ] Define a public write operation for an existing variable.
-- [ ] Extend the hyperslab writer with Fortran-order stride conversion and validation.
-- [ ] Preserve contiguous-write behavior and support unlimited-dimension growth.
-- [ ] Test multidimensional writes, untouched values, append behavior, and invalid selections.
-- [ ] Document the operation and update the README limitation.
+- [x] Expose `define_variable` for schema-only creation and `put_variable` for existing variables.
+- [x] Share hyperslab writing with Fortran-order stride conversion and validation.
+- [x] Validate reused fixed/unlimited dimensions, including inherited dimensions in subgroups.
+- [x] Preserve contiguous writes and support unlimited-dimension growth.
+- [x] Extend `to_netcdf` with explicit append mode and single-variable selections.
+- [x] Test multidimensional writes, untouched values, append behavior, and invalid selections.
+- [x] Run the full debug regression suite with GNU Fortran and LLVM Flang.
+- [x] Document the operations and update the README limitation.
+
+Selections require an existing destination variable. Variable arrays and groups
+retain whole-object serialization; group append/merge and per-variable selection
+lists are not supported. Writes preserve source objects and do not refresh loaded
+caches. Later I/O failures can leave partial results; no rollback is provided.
 
 A milestone is complete when its operations are available through `use nc4f`,
 the relevant tests pass, and the documentation describes the supported scope.
@@ -107,9 +115,9 @@ it should not remove limitations for related features that remain unsupported.
   C-binding tests already exercise storage controls, strings, user-defined
   types, mapped access, and in-memory file images. High-level integration still
   needs API and data-model decisions.
-- **Strided writes can reuse existing code.** The private `put_vara` routine
-  handles dimension reversal, type/rank checks, fixed bounds, and unlimited
-  dimensions. `get_variable` already implements stride conversion.
+- **Public writes share one selection writer.** `put_variable`, `to_netcdf`,
+  and group serialization reuse the validated contiguous/strided write path.
+  `define_variable` separates file schema from source-buffer shape.
 - **Custom fill values may already work through attributes.** The serializer
   writes variable attributes before data, so a scalar, matching-type
   `_FillValue` appears usable through the existing attribute path. Verify this

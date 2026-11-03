@@ -1,53 +1,9 @@
 # Functions and Subroutines
 
-This page documents the public procedures re-exported by `nc4f` and the
-lower-level validation helpers available from `nc4f_ds`. Optional
+This page documents the public procedures re-exported by `nc4f`. Optional
 `err` arguments receive an `error_type`; when omitted, an operation failure
 follows the library's fail-fast policy. See [Exposed NC
 Constants](exposed-nc-constants.md) for constants used with `error_type`.
-
-## Validation (`nc4f_ds`)
-
-Import these pure procedures directly from `nc4f_ds`; they are not
-re-exported by `nc4f`.
-
-| Synopsis | Purpose |
-|:--|:--|
-| `CALL VALIDATE(NAME, CONTEXT=CONTEXT [, ERR=ERR])` | Check a character string for valid NetCDF local-name syntax and length. |
-| `CALL VALIDATE(ATT, [DTYPE,] CONTEXT=CONTEXT [, ERR=ERR])` | Check attribute type, length, and active byte storage. |
-| `CALL VALIDATE(VAR, [DTYPE,] [RANK,] CONTEXT=CONTEXT [, ERR=ERR])` | Also check dimensions and their product against the stored length. |
-| `CALL COMPUTE_BUFFER_SIZE(DTYPE, LEN, NBYTES, ERR)` | Compute a default-integer byte count from an `integer(int64)` element count, checking nonnegative length, type support, and overflow. |
-| `NBYTES = BUFFER_SIZE(DTYPE, LEN)` | Compute the same checked byte count, terminating execution on failure. |
-| `CALL COMPUTE_SIZE(VAR, N, ERR [, DIM])` | Compute an `integer(int64)` element count using the same dimension-index convention as `SIZE(VAR [, DIM])`. |
-
-`ERR` is `type(error_type), intent(out)`. Storage-validation failures return
-`NC_EINVAL` with an operation name and diagnostic. Success clears any previous
-error. The checked size helpers require `ERR` and set their count output to zero
-on failure. Existing `SIZE` and `BUFFER_SIZE` functions remain pure and fail-fast.
-
-`COMPUTE_BUFFER_SIZE` replaces `CHECK_BUFFER_SIZE`. Both it and the
-`BUFFER_SIZE` wrapper are implemented in `nc4f_ds_utility`. `BUFFER_SIZE`
-accepts only `DTYPE` and `LEN`; its former optional `CONTEXT` argument has been
-removed. Use `COMPUTE_BUFFER_SIZE` when the caller needs to handle an error.
-
-The name overload returns `NC_EBADNAME` for invalid names or `NC_EMAXNAME`
-when the name exceeds `NC_MAX_NAME` bytes. Trailing Fortran blank padding is
-ignored. UTF-8 sequences are validated, but callers must supply NFC-normalized
-Unicode names. Name validation is independent: the attribute and variable
-overloads check storage and metadata, not the object's name.
-
-For `VALIDATE`, `DTYPE` optionally checks the expected NetCDF type. A supplied
-`RANK` greater than one must match the number of dimensions; rank one retains
-the existing flat-extraction behavior. `CONTEXT` names the calling operation,
-preferably without brackets; existing bracketed contexts remain supported.
-Omitting `ERR` retains fail-fast behavior through `RETURN_ERR`.
-
-Validation does not change metadata, allocate payload storage, or change buffer
-ownership. Empty values may have no backing storage. `BUFFER2CPTR` remains
-fail-fast, while error-aware NetCDF I/O validates storage before obtaining a
-C pointer and propagates failures through its `ERR` result. A failed write can
-leave a partial file; this is not a transactional write API.
-
 
 ## `ERROR_MSG` -- Format an Operation Result
 
@@ -1100,11 +1056,12 @@ if (.exists. err) print '(a)', error_msg(err)
     ```
 :::
 
-## `TO_NETCDF` -- Write a NetCDF File
+## `DEFINE_VARIABLE` -- Define a Variable Without Data
 
 | Synopsis |
 |:--|
-| <span class="ind3">`CALL TO_NETCDF(FILE, VARS[, ATTS, ERR])`</span><br><span class="ind3">`CALL TO_NETCDF(FILE, GRP[, ATTS, ERR])`</span> |
+| <span class="ind3">`CALL DEFINE_VARIABLE(NC, VAR[, ERR])`</span> |
+| <span class="ind3">`CALL DEFINE_VARIABLE(NC, NAME, DTYPE, DIMS[, ATTS, ERR])`</span> |
 
 | Class |
 |:--|
@@ -1112,15 +1069,29 @@ if (.exists. err) print '(a)', error_msg(err)
 
 | Description |
 |:--|
-| <span class="ind3">Write a scalar or rank-one array of variables, or a scalar or rank-one array of groups. A scalar group becomes the file root and its name is ignored. A group array becomes direct children of a new root; no first-level group may be named `/`.</span> |
+| <span class="ind3">Define a variable and its initial attributes in an open writable dataset or subgroup without allocating a variable-sized data buffer. Create missing dimensions and reuse compatible visible dimensions, including inherited dimensions. An existing variable name returns `NC_ENAMEINUSE`.</span> |
 
 | Arguments |
 |:--|
-| <span class="grid"><span>`FILE`</span><span>`character(len=*), INTENT(in)`</span></span><br><span class="ind6">Path of the output file.</span> |
-| <span class="grid"><span>`VARS`</span><span>`type(variable_type), scalar or dimension(:), INTENT(in)`</span></span><br><span class="ind6">Variables to write.</span> |
-| <span class="grid"><span>`GRP`</span><span>`type(group_type), scalar or dimension(:), INTENT(in)`</span></span><br><span class="ind6">Group model to write.</span> |
-| <span class="grid"><span>`ATTS`</span><span>`type(attribute_type), DIMENSION(:), OPTIONAL, INTENT(in)`</span></span><br><span class="ind6">Root attributes when writing variables or groups.</span> |
-| <span class="grid"><span>`ERR`</span><span>`type(error_type), OPTIONAL, INTENT(out)`</span></span><br><span class="ind6">Receives an operation error.</span> |
+| <span class="grid"><span>`NC`</span><span>`class(group_type), INTENT(in)`</span></span><br><span class="ind6">Open writable dataset (`netcdf_type`) or subgroup.</span> |
+| <span class="grid"><span>`VAR`</span><span>`type(variable_type), INTENT(in)`</span></span><br><span class="ind6">Source schema supplying the name, type, dimensions, and initial attributes. Its name and dimensions must be allocated; an empty dimension array defines a scalar. Attributes may be unallocated. Data storage, element count, and cached IDs are ignored; data is neither copied nor written, and the source remains unchanged.</span> |
+| <span class="grid"><span>`NAME`</span><span>`character(len=*), INTENT(in)`</span></span><br><span class="ind6">Local variable name. Trailing Fortran blank padding is ignored.</span> |
+| <span class="grid"><span>`DTYPE`</span><span>`integer(c_int), INTENT(in)`</span></span><br><span class="ind6">Supported NetCDF primitive type constant, such as `NC_FLOAT` or `NC_INT`.</span> |
+| <span class="grid"><span>`DIMS`</span><span>`type(dimension_type), DIMENSION(:), INTENT(in)`</span></span><br><span class="ind6">Destination dimensions in Fortran order. An empty array defines a scalar.</span> |
+| <span class="grid"><span>`ATTS`</span><span>`type(attribute_type), DIMENSION(:), OPTIONAL, INTENT(in)`</span></span><br><span class="ind6">Initial variable attributes, written before data.</span> |
+| <span class="grid"><span>`ERR`</span><span>`type(error_type), OPTIONAL, INTENT(out)`</span></span><br><span class="ind6">Receives an operation error. When omitted, failures terminate execution.</span> |
+
+| Schema Rules |
+|:--|
+| <span class="ind3">Both forms follow the same rules. The explicit arguments supply the corresponding `VAR` components described below; `ERR` is optional in both forms.</span> |
+| <span class="ind3">`VAR%NAME` is a local variable name; trailing Fortran blank padding is ignored. `VAR%DTYPE` must be a supported NetCDF primitive [type constant](exposed-nc-constants.md), such as `NC_FLOAT` or `NC_INT`.</span> |
+| <span class="ind3">`VAR%DIMS` lists destination dimensions in Fortran order. Fixed lengths must be positive; existing fixed lengths and unlimited status must agree. Existing unlimited dimensions retain their current file length, while new unlimited dimensions start empty regardless of the supplied length.</span> |
+| <span class="ind3">`VAR%ATTS` supplies initial attributes, written before data. `_FillValue`, when supplied, must contain exactly one value of the variable's type.</span> |
+
+| Notes |
+|:--|
+| <span class="ind3">Source objects and loaded caches remain unchanged. Use `INQUIRE_VARIABLE`, `INQUIRE_DIMENSIONS`, or `GET_VARIABLE` to obtain fresh metadata or data. Closing a dataset invalidates its handle; callers must also treat copied handles and subgroup snapshots as closed.</span> |
+| <span class="ind3">Validation precedes mutation where possible, but later failures can leave created metadata. The operation does not provide rollback. Variable storage controls such as compression are not part of this API.</span> |
 
 :::{list-table}
 :class: example-table
@@ -1133,12 +1104,139 @@ if (.exists. err) print '(a)', error_msg(err)
     ```fortran
     use, non_intrinsic :: nc4f
     implicit none (type, external)
-    
-    type(group_type) :: root
-    type(attribute_type) :: title
 
-    title = "title" .att. "Output"
-    call to_netcdf("output.nc", root, atts=[title])
+    type(netcdf_type) :: nc
+    type(variable_type) :: var
+    type(error_type) :: err
+
+    nc = open_netcdf("output.nc", "w")
+    var%name = "pressure"
+    var%dtype = NC_FLOAT
+    var%dims = ["station".dim.6]
+    var%atts = ["units".att."Pa"]
+    call define_variable(nc, var, err=err)
+    if (.exists. err) error stop error_msg(err)
+
+    call define_variable(nc, "temperature", NC_FLOAT, ["station".dim.6], &
+      & atts=["units".att."K"], err=err)
+    if (.exists. err) error stop error_msg(err)
+    call close_netcdf(nc)
     ```
 :::
 
+## `PUT_VARIABLE` -- Write Data to an Existing Variable
+
+| Synopsis |
+|:--|
+| <span class="ind3">`CALL PUT_VARIABLE(NC, VAR[, START, COUNT, STRIDE, ERR])`</span> |
+
+| Class |
+|:--|
+| <span class="ind3">Subroutine.</span> |
+
+| Description |
+|:--|
+| <span class="ind3">Write data to an existing variable in an open writable dataset or subgroup, optionally selecting destination indices. Resolve the destination by name and inquire its IDs and metadata from the file. Preserve existing attributes and schema; this procedure does not create dimensions or variables.</span> |
+
+| Arguments |
+|:--|
+| <span class="grid"><span>`NC`</span><span>`class(group_type), INTENT(in)`</span></span><br><span class="ind6">Open writable dataset (`netcdf_type`) or subgroup.</span> |
+| <span class="grid"><span>`VAR`</span><span>`type(variable_type), TARGET, INTENT(in)`</span></span><br><span class="ind6">Source variable whose name selects the destination and whose storage supplies the data. Its type, rank, and ordered dimension names must match the destination, and its shape must equal `COUNT`. Source dimension lengths describe the patch; source unlimited flags do not override the destination's flags. Source attributes are not written.</span> |
+| <span class="grid"><span>`START`</span><span>`integer, DIMENSION(:), OPTIONAL, INTENT(in)`</span></span><br><span class="ind6">Positive one-based destination indices in Fortran dimension order. Defaults to ones.</span> |
+| <span class="grid"><span>`COUNT`</span><span>`integer, DIMENSION(:), OPTIONAL, INTENT(in)`</span></span><br><span class="ind6">Number of source values along each dimension in Fortran order. Defaults to the source shape.</span> |
+| <span class="grid"><span>`STRIDE`</span><span>`integer, DIMENSION(:), OPTIONAL, INTENT(in)`</span></span><br><span class="ind6">Positive spacing between destination indices in Fortran dimension order. Defaults to ones.</span> |
+| <span class="grid"><span>`ERR`</span><span>`type(error_type), OPTIONAL, INTENT(out)`</span></span><br><span class="ind6">Receives an operation error. When omitted, failures terminate execution.</span> |
+
+| Selection Rules |
+|:--|
+| <span class="ind3">Selection arguments may be supplied independently. Each supplied vector must have one entry per destination dimension. There is no implicit type conversion, broadcasting, or mapping of noncontiguous memory.</span> |
+| <span class="ind3">Fixed dimensions cannot grow. Unlimited dimensions grow to include the last selected index. Unselected values remain unchanged; new unwritten areas follow the file's fill settings.</span> |
+| <span class="ind3">Empty whole-variable writes are accepted; explicit selections require positive counts. For a scalar, omit selection arguments or provide empty vectors. A scalar source can be constructed with `datarray("scalar", [value], [dimension_type ::])`.</span> |
+
+| Notes |
+|:--|
+| <span class="ind3">Source objects and loaded caches remain unchanged. Use `INQUIRE_VARIABLE`, `INQUIRE_DIMENSIONS`, or `GET_VARIABLE` to obtain fresh metadata or data. Closing a dataset invalidates its handle; callers must also treat copied handles and subgroup snapshots as closed.</span> |
+| <span class="ind3">Validation precedes mutation where possible, but later failures can leave partially written data. The operation does not provide rollback.</span> |
+
+:::{list-table}
+:class: example-table
+:header-rows: 1
+
+*
+  - Example
+*
+  -
+    ```fortran
+    use, non_intrinsic :: nc4f
+    implicit none (type, external)
+
+    type(netcdf_type) :: nc
+    type(variable_type) :: patch
+
+    nc = open_netcdf("output.nc", "w")
+    call define_variable(nc, &
+      & variable_type(name="temperature", dtype=NC_FLOAT, dims=["station".dim.6]))
+    patch = datarray("temperature", [10., 20., 30.], ["station".dim.3])
+    call put_variable(nc, patch, start=[2], count=[3], stride=[2])
+    call close_netcdf(nc)
+    ```
+:::
+
+## `TO_NETCDF` -- Create a File or Update Variables
+
+| Synopsis |
+|:--|
+| <span class="ind3">`CALL TO_NETCDF(FILE, VARS[, ATTS, ERR, MODE, START, COUNT, STRIDE])`</span> |
+| <span class="ind3">`CALL TO_NETCDF(FILE, GRP[, ATTS, ERR, MODE, START, COUNT, STRIDE])`</span> |
+
+| Class |
+|:--|
+| <span class="ind3">Generic subroutine.</span> |
+
+| Description |
+|:--|
+| <span class="ind3">Create a file from complete variables or groups, or update variables in an existing file. Open and close the file internally. Selections update a single existing variable in append mode using `PUT_VARIABLE` semantics.</span> |
+
+| Arguments |
+|:--|
+| <span class="grid"><span>`FILE`</span><span>`character(len=*), INTENT(in)`</span></span><br><span class="ind6">Path of the file to create or update. The same file must not already be open through another handle.</span> |
+| <span class="grid"><span>`VARS`</span><span>`type(variable_type), DIMENSION(..), INTENT(in)`</span></span><br><span class="ind6">Scalar variable or rank-one array of variables to write. Selection arguments are accepted only for a scalar variable, not an array of length one. Existing variable attributes are preserved during updates.</span> |
+| <span class="grid"><span>`GRP`</span><span>`type(group_type), DIMENSION(..), INTENT(in)`</span></span><br><span class="ind6">Scalar group or rank-one group array to write in overwrite mode. A scalar becomes the file root and its name is ignored. An array becomes direct children of a new root; no first-level group may be named `/`. Group append/merge and selection arguments are unsupported.</span> |
+| <span class="grid"><span>`ATTS`</span><span>`type(attribute_type), DIMENSION(:), OPTIONAL, INTENT(in)`</span></span><br><span class="ind6">Root/global attributes to write, including explicitly supplied updates in append mode. For a scalar group, entries replace attributes with matching names in `GRP%ATTS`.</span> |
+| <span class="grid"><span>`ERR`</span><span>`type(error_type), OPTIONAL, INTENT(out)`</span></span><br><span class="ind6">Receives an operation error. When omitted, failures terminate execution. Cleanup preserves the original operation error when a write fails.</span> |
+| <span class="grid"><span>`MODE`</span><span>`character(len=*), OPTIONAL, INTENT(in)`</span></span><br><span class="ind6">`"w"` or `"write"` (default) creates or replaces the file; `"a"` or `"append"` updates variables in an existing file.</span> |
+| <span class="grid"><span>`START`</span><span>`integer, DIMENSION(:), OPTIONAL, INTENT(in)`</span></span><br><span class="ind6">Positive one-based destination indices in Fortran dimension order. Defaults to ones. Requires a scalar variable in append mode.</span> |
+| <span class="grid"><span>`COUNT`</span><span>`integer, DIMENSION(:), OPTIONAL, INTENT(in)`</span></span><br><span class="ind6">Number of source values along each dimension in Fortran order. Defaults to the source shape. Requires a scalar variable in append mode.</span> |
+| <span class="grid"><span>`STRIDE`</span><span>`integer, DIMENSION(:), OPTIONAL, INTENT(in)`</span></span><br><span class="ind6">Positive spacing between destination indices in Fortran dimension order. Defaults to ones. Requires a scalar variable in append mode.</span> |
+
+| Mode Options |
+|:--|
+| <span class="grid"><span>`"w"`, `"write"`</span><span>Overwrite (default).</span></span><br><span class="ind6">Create or replace the file and serialize complete variables or groups. Selections are rejected.</span> |
+| <span class="grid"><span>`"a"`, `"append"`</span><span>Append.</span></span><br><span class="ind6">Require an existing file. Without a selection, define missing complete variables or write existing variables from index one using the source shape. With a selection, require an existing destination variable; create its schema first with `DEFINE_VARIABLE` if needed.</span> |
+
+| Notes |
+|:--|
+| <span class="ind3">The positional arguments `FILE, VARS/GRP, ATTS, ERR` retain their order. Unsupported modes, ranks, and selection combinations are rejected before opening in overwrite mode. Selection arguments follow all `PUT_VARIABLE` rules.</span> |
+| <span class="ind3">A failed operation may leave created metadata or partially written data. The operation does not provide rollback.</span> |
+
+:::{list-table}
+:class: example-table
+:header-rows: 1
+
+*
+  - Example
+*
+  -
+    ```fortran
+    use, non_intrinsic :: nc4f
+    implicit none (type, external)
+
+    type(variable_type) :: temperature, patch
+
+    temperature = datarray("temperature", [0., 0., 0., 0., 0., 0.], &
+      & ["station".dim.6])
+    call to_netcdf("output.nc", temperature)
+    patch = datarray("temperature", [11., 21., 31.], ["station".dim.3])
+    call to_netcdf("output.nc", patch, mode="a", start=[1], stride=[2])
+    ```
+:::

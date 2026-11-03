@@ -8,6 +8,7 @@ NETCDF_DIR := $(SRC_DIR)/netcdf
 SOURCE_DIRS := $(SRC_DIR) $(C_INTERFACE_DIR) $(DATA_STRUCTURE_DIR) $(NETCDF_DIR)
 FYPP_DIR := fypp
 TEST_DIR := test
+EXAMPLE_DIR := example
 FYPP ?= fypp
 PROFILE ?= debug
 ifeq ($(origin FC), default)
@@ -16,7 +17,14 @@ endif
 COMPILER_NAME := $(notdir $(FC))
 BUILD_DIR := build/makefile_$(COMPILER_NAME)_$(PROFILE)
 LIB := $(BUILD_DIR)/ncpack.a
+C_INTERFACE_LIB := $(BUILD_DIR)/libnc4f_c_interface.a
+C_INTERFACE_OBJ := $(BUILD_DIR)/nc4f_c_interface.o
 TEST_TARGET := $(BUILD_DIR)/test
+EXAMPLE_BUILD_DIR := $(BUILD_DIR)/examples
+# read_netcdf consumes example.nc produced by write_netcdf.
+EXAMPLE_NAMES := write_netcdf read_netcdf $(filter-out write_netcdf read_netcdf,\
+  $(basename $(notdir $(wildcard $(EXAMPLE_DIR)/*.f90))))
+EXAMPLE_TARGETS := $(addprefix $(EXAMPLE_BUILD_DIR)/,$(EXAMPLE_NAMES))
 NC_CFLAGS := $(shell pkg-config --cflags netcdf)
 NC_LIBS := $(shell pkg-config --libs netcdf)
 
@@ -53,9 +61,18 @@ OBJ := $(addprefix $(BUILD_DIR)/,$(notdir $(SRC:.f90=.o)))
 TEST_OBJS := $(addprefix $(BUILD_DIR)/,$(notdir $(TEST:.f90=.o)))
 vpath %.f90 $(SOURCE_DIRS) $(TEST_DIR)
 
-.PHONY: all build library preprocess download-test-data test clean
+.PHONY: all build library c-interface examples preprocess download-test-data test clean
 all library: $(LIB)
 build: $(OBJ)
+# The archive and nc4f_c_interface.mod are emitted into BUILD_DIR.
+# Consumers still need to link the upstream NetCDF C library ($(NC_LIBS)).
+c-interface: $(C_INTERFACE_LIB)
+examples: $(EXAMPLE_TARGETS)
+	@set -e; cd $(EXAMPLE_BUILD_DIR); \
+	for example in $(EXAMPLE_NAMES); do \
+	  printf "[example] run example: %s\n" "$$example"; \
+	  ./$$example; \
+	done
 preprocess: $(SRC_INC) $(SRC_F90)
 download-test-data:
 	@./scripts/download_test_data.sh
@@ -67,6 +84,15 @@ $(LIB): $(OBJ)
 	@printf "[link] create static library: $@\n"
 	@$(RM) $@
 	@$(AR) rcs $@ $(OBJ)
+
+$(C_INTERFACE_LIB): $(C_INTERFACE_OBJ)
+	@printf "[link] create static library: $@\n"
+	@$(RM) $@
+	@$(AR) rcs $@ $^
+
+$(EXAMPLE_BUILD_DIR)/%: $(EXAMPLE_DIR)/%.f90 $(LIB) makefile | $(EXAMPLE_BUILD_DIR)
+	@printf "[link] create example: $@\n"
+	@$(FC) $(FFLAGS) $(MODULE_FLAGS) $(LDFLAGS) -o $@ $< $(LIB) $(NC_LIBS) $(LDLIBS)
 
 $(TEST_TARGET): $(TEST_OBJS) $(LIB)
 	@printf "[link] create executable: $@\n"
@@ -101,7 +127,7 @@ $(SRC_F90): $(DATA_STRUCTURE_DIR)/%.f90: $(FYPP_DIR)/%.fypp $(FYPP_DIR)/common.f
 	@mkdir -p $(@D)
 	@$(FYPP) $< > $@
 
-$(BUILD_DIR):
+$(BUILD_DIR) $(EXAMPLE_BUILD_DIR):
 	@mkdir -p $@
 
 clean:

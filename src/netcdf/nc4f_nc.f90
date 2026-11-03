@@ -7,8 +7,8 @@ use, non_intrinsic :: nc4f_c_interface
 use, non_intrinsic :: nc4f_ds
 implicit none (type, external)
 
-public :: open_netcdf, close_netcdf, to_netcdf, &
-  & inquire_dimensions, inquire_variable, &
+public :: open_netcdf, close_netcdf, to_netcdf, define_variable, &
+  & put_variable, inquire_dimensions, inquire_variable, &
   & get_attribute, get_variable, get_group, delete_attribute, &
   & rename_attribute, rename_variable, rename_group, rename_dimension, &
   & inquire_subgroups, inquire_group, operator(.exists.)
@@ -49,6 +49,10 @@ interface inquire_dimensions
   module procedure :: inq_dims_var
 end interface inquire_dimensions
 
+interface define_variable
+  module procedure :: def_var, def_var_raw
+end interface define_variable
+
 interface to_netcdf
   module procedure :: to_netcdf_var
   module procedure :: to_netcdf_grp
@@ -61,6 +65,76 @@ interface initialize
 end interface initialize
 
 interface
+  module subroutine def_var(nc, var, err)
+    !! Define a variable from metadata without reading or copying its data storage.
+    class(group_type), intent(in) :: nc
+    !! Open writable dataset or subgroup; loaded caches remain unchanged.
+    type(variable_type), intent(in) :: var
+    !! Schema providing name, type, dimensions, and attributes; the source is unchanged.
+    type(error_type), intent(out), optional :: err
+    !! Optional operation result; failures terminate execution when omitted.
+  end subroutine def_var
+
+  module subroutine def_var_raw(nc, name, dtype, dims, atts, err)
+    !! Define a variable from explicit schema arguments without allocating data storage.
+    class(group_type), intent(in) :: nc
+    !! Open writable dataset or subgroup; loaded caches remain unchanged.
+    character(len=*), intent(in) :: name
+    !! Local variable name; trailing Fortran blank padding is ignored.
+    integer(c_int), intent(in) :: dtype
+    !! Supported NetCDF primitive type code, such as NC_FLOAT or NC_INT.
+    type(dimension_type), intent(in) :: dims(:)
+    !! Destination dimensions in Fortran order; an empty array defines a scalar.
+    type(attribute_type), intent(in), optional :: atts(:)
+    !! Optional initial attributes, written before any variable data.
+    type(error_type), intent(out), optional :: err
+    !! Optional operation result; failures terminate execution when omitted.
+  end subroutine def_var_raw
+
+  module subroutine put_variable(nc, var, start, count, stride, err)
+    !! Write an existing variable; selections use one-based Fortran dimension order.
+    class(group_type), intent(in) :: nc
+    !! Open destination dataset or subgroup; source objects and loaded caches are unchanged.
+    type(variable_type), target, intent(in) :: var
+    !! Source variable whose name selects the destination and whose storage supplies the data.
+    integer, intent(in), optional :: start(:)
+    !! Optional one-based Fortran-order starting indices; defaults to ones.
+    integer, intent(in), optional :: count(:)
+    !! Optional element counts in Fortran order; defaults to the source shape.
+    integer, intent(in), optional :: stride(:)
+    !! Optional positive destination strides in Fortran order; defaults to ones.
+    type(error_type), intent(out), optional :: err
+    !! Optional operation result; failures terminate execution when omitted.
+  end subroutine put_variable
+
+  pure module subroutine validate_definition(name, dtype, dims, atts, err)
+    !! Validate a definition independently of data storage and file mutation.
+    character(len=*), intent(in) :: name
+    !! Local name of the variable to define; trailing Fortran padding is ignored.
+    integer(c_int), intent(in) :: dtype
+    !! Supported NetCDF primitive type code, such as NC_FLOAT or NC_INT.
+    type(dimension_type), intent(in) :: dims(:)
+    !! Destination dimensions in Fortran order; an empty array defines a scalar.
+    type(attribute_type), intent(in), optional :: atts(:)
+    !! Optional attributes to validate, including the scalar matching-type _FillValue.
+    type(error_type), intent(out) :: err
+    !! Completed operation result; contains a diagnostic when the operation fails.
+  end subroutine validate_definition
+
+  module subroutine resolve_dim(nc, dim, found, actual, err)
+    !! Resolve a visible dimension and check schema compatibility without creating it.
+    class(group_type), intent(in) :: nc
+    !! Open destination dataset or subgroup; source objects and loaded caches are unchanged.
+    type(dimension_type), intent(in) :: dim
+    !! Requested dimension name, length, and unlimited status.
+    logical, intent(out) :: found
+    !! True when a visible dimension with the requested name exists.
+    type(dimension_type), intent(out) :: actual
+    !! Resolved file metadata; valid only when found is true and err indicates success.
+    type(error_type), intent(out) :: err
+    !! Completed operation result; contains a diagnostic when the operation fails.
+  end subroutine resolve_dim
+
   module subroutine rename_dim_nc_dim(grp, dim, new_name, update_file, err)
     !! Rename a locally defined file dimension and only the supplied dimension object.
     class(group_type), intent(in) :: grp
@@ -170,11 +244,9 @@ interface
     !! Receives status and diagnostic; failures stop execution when omitted.
   end subroutine del_att_nc_grp
 
-  module subroutine rename_att_nc_var(grp, var, old_name, new_name, &
-      update_file, err)
+  module subroutine rename_att_nc_var(grp, var, old_name, new_name, update_file, err)
     !! Rename a variable attribute; optionally update the file and supplied
-    !! cache.
-    !! Other variable copies, including grp%vars, are not synchronized.
+    !! cache. Other variable copies, including grp%vars, are not synchronized.
     class(group_type), intent(in) :: grp
     !! Open group containing the supplied variable when a file update is requested.
     type(variable_type), intent(inout) :: var
@@ -330,8 +402,8 @@ interface
     !! Optional error result. When absent, failures stop the program.
   end subroutine close_netcdf
 
-  module subroutine to_netcdf_var(file, vars, atts, err)
-    !! Create a netCDF file from one variable or a rank-one variable array.
+  module subroutine to_netcdf_var(file, vars, atts, err, mode, start, count, stride)
+    !! Create a file or update variables; selections require a single variable in append mode.
     character(len=*), intent(in) :: file
     !! Output file to create.
     type(variable_type), intent(in) :: vars(..)
@@ -340,9 +412,17 @@ interface
     !! Optional array of global attributes to attach to the dataset.
     type(error_type), intent(out), optional :: err
     !! Optional error result. When absent, failures stop the program.
+    character(len=*), intent(in), optional :: mode
+    !! w/write (default) replaces the file; a/append updates variables in an existing file.
+    integer, intent(in), optional :: start(:)
+    !! Optional one-based Fortran-order starting indices; defaults to ones.
+    integer, intent(in), optional :: count(:)
+    !! Optional element counts in Fortran order; defaults to the source shape.
+    integer, intent(in), optional :: stride(:)
+    !! Optional positive destination strides in Fortran order; defaults to ones.
   end subroutine to_netcdf_var
 
-  module subroutine to_netcdf_grp(file, grp, atts, err)
+  module subroutine to_netcdf_grp(file, grp, atts, err, mode, start, count, stride)
     !! Create a netCDF file from one group or a rank-one group array.
     character(len=*), intent(in) :: file
     !! Output file to create.
@@ -354,6 +434,14 @@ interface
     !! present in `grp%atts` replace those attributes.
     type(error_type), intent(out), optional :: err
     !! Optional error result. When absent, failures stop the program.
+    character(len=*), intent(in), optional :: mode
+    !! Groups support w/write (default) only; append/merge is rejected.
+    integer, intent(in), optional :: start(:)
+    !! Unsupported for groups; presence is rejected before opening the file.
+    integer, intent(in), optional :: count(:)
+    !! Unsupported for groups; presence is rejected before opening the file.
+    integer, intent(in), optional :: stride(:)
+    !! Unsupported for groups; presence is rejected before opening the file.
   end subroutine to_netcdf_grp
 
   module function inq_dims_grp(nc, err) result(dims)
@@ -472,42 +560,6 @@ interface
     type(dimension_type) :: new_dim
     !! Dimension metadata with its NetCDF identifier.
   end function def_dim
-
-  module function def_var(nc, var, err) result(new_var)
-    !! Define variable metadata without transferring its data buffer.
-    class(group_type), intent(in) :: nc
-    !! Open NetCDF dataset handle.
-    type(variable_type), intent(in) :: var
-    !! Variable to process.
-    type(error_type), intent(out) :: err
-    !! Error object updated if the operation fails.
-    type(variable_type) :: new_var
-    !! Result produced by this operation.
-  end function def_var
-
-  module subroutine put_var(nc, var, err)
-    !! Write one complete variable while serializing an in-memory model.
-    class(group_type), intent(in) :: nc
-    !! Open dataset or group.
-    type(variable_type), target, intent(in) :: var
-    !! Variable whose metadata and data are written.
-    type(error_type), intent(out) :: err
-    !! Operation error.
-  end subroutine put_var
-
-  module subroutine put_vara(nc, var, start, count, err)
-    !! Write one Fortran-order hyperslab while serializing an in-memory model.
-    class(group_type), intent(in) :: nc
-    !! Open dataset or group.
-    type(variable_type), target, intent(in) :: var
-    !! Data buffer whose dimensions equal `count`.
-    integer, intent(in) :: start(:)
-    !! One-based Fortran-order start indices.
-    integer, intent(in) :: count(:)
-    !! Fortran-order edge lengths to write.
-    type(error_type), intent(out) :: err
-    !! Operation error.
-  end subroutine put_vara
 
   module subroutine put_att_var(nc, var, err)
     !! Write all attributes belonging to one variable during serialization.

@@ -40,6 +40,11 @@ case ("--rename-dim-invalid-file")
   call invalid_file_dim_rename()
 case default
   tests = [&
+    & test_type("strided_writes", strided_writes), &
+    & test_type("write_definition", write_definition), &
+    & test_type("write_selection", write_selection), &
+    & test_type("write_paths", write_paths), &
+    & test_type("write_failures", write_failures), &
     & test_type("c_bindings_storage", c_bindings_storage), &
     & test_type("c_bindings_formats", c_bindings_formats), &
     & test_type("c_bindings_strings", c_bindings_strings), &
@@ -120,6 +125,7 @@ subroutine invalid_error()
   use nc4f_c_interface, only: NC_BYTE, NC_DOUBLE, NC_MAX_NAME
   use, intrinsic :: iso_fortran_env, only: int64
   type(error_type) :: err, returned
+  type(netcdf_type) :: nc
   type(variable_type) :: var
   type(attribute_type) :: att
   character(len=64) :: mode, text
@@ -142,6 +148,12 @@ subroutine invalid_error()
     allocate (var%dims(1))
     var%dims(1)%len = -1
     print *, size(var)
+  case ("define-name")
+    call define_variable(nc, &
+      & variable_type(name="bad/name", dtype=NC_FLOAT, &
+      & dims=["x".dim.1]))
+  case ("put-storage")
+    call put_variable(nc, var)
   case ("write-storage")
     call to_netcdf("build/test-results/fail-fast-storage.nc", var)
   case ("construct-no-fname")

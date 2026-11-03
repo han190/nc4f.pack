@@ -282,7 +282,6 @@ recursive subroutine define_grp_tree_(target, source, err)
   type(dimension_type) :: defined_dim
   type(group_type) :: child
   type(group_type), pointer :: source_child
-  type(variable_type) :: defined_var
   character(len=NC_MAX_NAME) :: child_name
   integer :: i
 
@@ -306,9 +305,7 @@ recursive subroutine define_grp_tree_(target, source, err)
       end if
       call validate(source%vars(i), context="to_netcdf", err=err)
       if (.exists. err) return
-      defined_var = def_var(target, source%vars(i), err)
-      if (has_err(err)) return
-      call put_att_var(target, defined_var, err)
+      call define_variable(target, source%vars(i), err=err)
       if (has_err(err)) return
     end do
   end if
@@ -369,7 +366,7 @@ recursive subroutine write_grp_tree_data_(target, source, err)
       do j = 1, ndims
         count(j) = int(source%vars(i)%dims(j)%len)
       end do
-      call put_vara(target, source%vars(i), start, count, err)
+      call put_variable(target, source%vars(i), start=start, count=count, err=err)
       if (has_err(err)) return
       deallocate (start, count)
     end do

@@ -10,12 +10,18 @@ homepage = "https://github.com/han190/nc4f.pack"
 
 [build]
 link = ["netcdf"]
+auto-executables = false
+auto-examples = false
+auto-tests = false
 
 [install]
 library = true
 
 [library]
 source-dir = "src"
+
+# Build only the C bindings with:
+# (cd src/c_interface && fpm build)
 
 [[example]]
 name = "mandelbrot"

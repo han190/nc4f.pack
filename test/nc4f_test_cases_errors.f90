@@ -72,8 +72,12 @@ module subroutine error_handling(passed)
     & "[buffer_size] Byte-size overflow.")) return
   if (.not. rejected_error("variable-size", &
     & "[size] Negative dimension length.")) return
+  if (.not. rejected_error("define-name", &
+    & "[define_variable] Invalid NetCDF name.")) return
+  if (.not. rejected_error("put-storage", &
+    & "[put_variable] Source variable name is not allocated.")) return
   if (.not. rejected_error("write-storage", &
-    & "[put_var] Variable dimensions are not allocated.")) return
+    & "[to_netcdf] Variable dimensions are not allocated.")) return
   if (.not. rejected_error("construct-no-fname", &
     & "[error_type] Failure requires an allocated fname.")) return
   if (.not. rejected_error("construct-no-msg", &
@@ -196,6 +200,9 @@ module subroutine error_handling(passed)
   if (.exists. err) return
 
   invalid = datarray("", values, ["x".dim.1])
+  ! Invalid array members are now rejected before opening in overwrite mode.
+  call to_netcdf(TEST_RESULTS_DIR//"failed-write-cleanup.nc", present, err=err)
+  if (err%code /= NC_NOERR) return
   vars = [present, invalid]
   call to_netcdf(TEST_RESULTS_DIR//"failed-write-cleanup.nc", vars, err=err)
   if (err%code == NC_NOERR) return

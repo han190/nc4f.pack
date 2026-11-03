@@ -133,13 +133,17 @@ module function get_variable(nc, name, start, count, stride, err) result(var)
 end function get_variable
 
 function get_var_(nc, name, start, count, stride, err) result(var)
-  !! Scalar implementation shared by the fail-fast and error-aware overloads.
+  !! Read data with a required error result for the public wrapper to handle.
   class(group_type), intent(in) :: nc
   !! Open NetCDF dataset handle.
   character(len=*), intent(in) :: name
   !! Name used to identify the NetCDF object.
-  integer, intent(in), optional :: start(:), count(:), stride(:)
-  !! Optional starting indices, extents, and strides for the requested hyperslab.
+  integer, intent(in), optional :: start(:)
+  !! Optional one-based starting indices in Fortran order.
+  integer, intent(in), optional :: count(:)
+  !! Optional element counts in Fortran order; requires start.
+  integer, intent(in), optional :: stride(:)
+  !! Optional index spacing in Fortran order; requires start and count.
   type(error_type), intent(out) :: err
   !! Error object updated if the operation fails.
   type(variable_type), target :: var
@@ -149,8 +153,8 @@ function get_var_(nc, name, start, count, stride, err) result(var)
   integer(c_ptrdiff_t), allocatable, target :: c_stride(:)
   integer(c_int) :: stat
   character(len=MAX_CHAR_LEN) :: msg
-  integer, allocatable :: start_(:), count_(:), stride_(:)
-  integer :: i, j, ndims
+  integer(int64), allocatable :: starts(:), counts(:), strides(:)
+  integer :: i, ndims
   integer(int64) :: f_start, f_count, f_stride, nelems
 
   err = error_type()
@@ -170,47 +174,18 @@ function get_var_(nc, name, start, count, stride, err) result(var)
   end if
 
   ndims = size(var%dims)
-  if (present(start)) then
-    if (size(start) /= ndims) then
-      err = error_type(NC_EINVAL, "get_variable", &
-        & "start must have one entry per dimension.")
-      return
-    end if
-  end if
-  if (present(count)) then
-    if (size(count) /= ndims) then
-      err = error_type(NC_EINVAL, "get_variable", &
-        & "count must have one entry per dimension.")
-      return
-    end if
-  end if
-  if (present(stride)) then
-    if (size(stride) /= ndims) then
-      err = error_type(NC_EINVAL, "get_variable", &
-        & "stride must have one entry per dimension.")
-      return
-    end if
-  end if
+  call prepare_selection_(var%dims%len, "get_variable", &
+    & starts, counts, strides, err, start, count, stride)
+  if (has_err(err)) return
 
-  allocate (start_(ndims), count_(ndims), stride_(ndims))
-  start_ = 1
-  stride_ = 1
-  do i = 1, ndims
-    count_(i) = int(var%dims(i)%len)
-  end do
-  if (present(start)) start_ = start
   if (present(start) .and. .not. present(count)) then
-    do i = 1, ndims
-      count_(i) = int(var%dims(i)%len - int(start_(i), int64) + 1_int64)
-    end do
+    counts = var%dims%len - starts + 1_int64
   end if
-  if (present(count)) count_ = count
-  if (present(stride)) stride_ = stride
 
   do i = 1, ndims
-    f_start = int(start_(i), int64)
-    f_count = int(count_(i), int64)
-    f_stride = int(stride_(i), int64)
+    f_start = starts(i)
+    f_count = counts(i)
+    f_stride = strides(i)
     if (f_start < 1) then
       err = error_type(NC_EINVALCOORDS, "get_variable", &
         & "start indices must be positive.")
@@ -242,13 +217,7 @@ function get_var_(nc, name, start, count, stride, err) result(var)
   if (.exists. err) return
   call validate(var, context="get_variable", err=err)
   if (.exists. err) return
-  allocate (c_start(ndims), c_count(ndims), c_stride(ndims))
-  do i = 1, ndims
-    j = ndims - i + 1
-    c_start(j) = int(start_(i) - 1, c_size_t)
-    c_count(j) = int(count_(i), c_size_t)
-    c_stride(j) = int(stride_(i), c_ptrdiff_t)
-  end do
+  call c_selection_(starts, counts, strides, c_start, c_count, c_stride)
   if (ndims > 0) then
     startp = c_loc(c_start(1))
     countp = c_loc(c_count(1))
@@ -281,7 +250,7 @@ impure elemental module function inquire_variable(nc, name, err) result(var)
 end function inquire_variable
 
 function inq_var_(nc, name, err) result(var)
-  !! Scalar implementation shared by the fail-fast and error-aware overloads.
+  !! Read metadata for public inquiry and the shared read/write implementations.
   class(group_type), intent(in) :: nc
   !! Open NetCDF dataset handle.
   character(len=*), intent(in) :: name
@@ -300,7 +269,10 @@ function inq_var_(nc, name, err) result(var)
   stat = nc_inq_varid(nc%id, f2cstr(var%name), var%id)
   err = netcdf_err(stat, "inquire_variable", msg)
   if (has_err(err)) return
-  var%dtype = inq_vartype_(nc%id, var%id, err)
+  var%dtype = NC_NAT
+  write (msg, "(2(a, 1x, i0, 1x))") "NCID", nc%id, "VARID", var%id
+  stat = nc_inq_vartype(nc%id, var%id, var%dtype)
+  err = netcdf_err(stat, "inquire_variable", msg)
   if (has_err(err)) return
   var%atts = get_atts_var(nc, var, err=err)
   if (has_err(err)) return
@@ -311,195 +283,387 @@ function inq_var_(nc, name, err) result(var)
   var%len = nelems
 end function inq_var_
 
-function inq_vartype_(ncid, varid, err) result(vartype)
-  !! Inquire a variable's NetCDF type while allowing a status to propagate.
-  integer(c_int), intent(in) :: ncid
-  !! Dataset identifier.
-  integer(c_int), intent(in) :: varid
-  !! Variable identifier.
-  type(error_type), intent(out) :: err
-  !! Error object updated if the operation fails.
-  integer(c_int) :: vartype
-  !! Result produced by this operation.
-  integer(c_int) :: stat
-  character(len=MAX_CHAR_LEN) :: msg, fmt
-
-  err = error_type()
-  vartype = NC_NAT
-  fmt = "(2(a, 1x, i0, 1x))"
-  write (msg, fmt) "NCID", ncid, "VARID", varid
-  stat = nc_inq_vartype(ncid, varid, vartype)
-  err = netcdf_err(stat, "inquire_variable", msg)
-end function inq_vartype_
-
-module subroutine put_vara(nc, var, start, count, err)
-  !! Error-returning implementation of a Fortran-order hyperslab write.
+subroutine require_write_access_(nc, err)
+  !! Use NetCDF's permission check, including for empty writes and subgroup handles.
+  !! A temporary define-mode transition is restored when the file was in data mode.
   class(group_type), intent(in) :: nc
-  !! Open NetCDF dataset handle.
-  type(variable_type), target, intent(in) :: var
-  !! Variable to process.
-  integer, intent(in) :: start(:)
-  !! Starting indices for the requested hyperslab.
-  integer, intent(in) :: count(:)
-  !! Element counts for the requested hyperslab.
+  !! Open destination dataset or subgroup; source objects and loaded caches are unchanged.
   type(error_type), intent(out) :: err
-  !! Error object updated if the operation fails.
-  type(variable_type) :: target
-  integer(c_size_t), allocatable, target :: c_start(:), c_count(:)
-  type(c_ptr) :: startp, countp
-  integer(c_int) :: stat
-  character(len=MAX_CHAR_LEN) :: msg
-  integer :: i, j, ndims
-  integer(int64) :: f_start, f_count
+  !! Completed operation result; contains a diagnostic when the operation fails.
+  integer(c_int) :: root, parent, stat
 
+  root = nc%id
+  do
+    stat = nc_inq_grp_parent(root, parent)
+    if (stat == NC_ENOGRP) exit
+    err = netcdf_err(stat, "write_access", "Resolve root group.")
+    if (has_err(err)) return
+    root = parent
+  end do
+  stat = nc_redef(root)
+  if (stat == NC_NOERR) then
+    stat = nc_enddef(root)
+  else if (stat == NC_EINDEFINE) then
+    stat = NC_NOERR
+  end if
+  if (stat /= NC_NOERR) then
+    err = netcdf_err(stat, "write_access", "Dataset must be writable.")
+    return
+  end if
+  ! Enhanced-model NetCDF-4 also ends definition automatically on data writes.
+  ! Leave existing define mode intact; no user-facing mode API is needed.
   err = error_type()
-  target = inq_var_(nc, var%name, err)
+end subroutine require_write_access_
+
+pure module subroutine validate_definition(name, dtype, dims, atts, err)
+  !! Validate schema and attributes without requiring variable data storage.
+  character(len=*), intent(in) :: name
+  !! Local name of the variable to define; trailing Fortran padding is ignored.
+  integer(c_int), intent(in) :: dtype
+  !! Supported NetCDF primitive type code, such as NC_FLOAT or NC_INT.
+  type(dimension_type), intent(in) :: dims(:)
+  !! Destination dimensions in Fortran order; an empty array defines a scalar.
+  type(attribute_type), intent(in), optional :: atts(:)
+  !! Optional attributes to validate, including the scalar matching-type _FillValue.
+  type(error_type), intent(out) :: err
+  !! Completed operation result; contains a diagnostic when the operation fails.
+  integer :: i, j
+
+  call validate(name, context="define_variable", err=err)
   if (has_err(err)) return
-
-  ndims = size(target%dims)
-  if (size(start) /= ndims .or. size(count) /= ndims) then
-    err = error_type(NC_EINVAL, "put_vara", &
-      & "start and count must have one entry per dimension.")
+  select case (dtype)
+  case (NC_BYTE, NC_CHAR, NC_SHORT, NC_INT, NC_INT64, NC_FLOAT, NC_DOUBLE)
+  case default
+    err = error_type(NC_EBADTYPE, "define_variable", &
+      & "Unsupported variable type.")
     return
-  end if
-  call validate(var, context="put_vara", err=err)
-  if (.exists. err) return
-  if (size(var%dims) /= ndims) then
-    err = error_type(NC_EINVAL, "put_vara", &
-      & "Source rank must match the destination variable.")
-    return
-  end if
-  if (var%dtype /= target%dtype) then
-    err = error_type(NC_EINVAL, "put_vara", &
-      & "Source and destination variable types must match.")
-    return
-  end if
-
-  allocate (c_start(ndims), c_count(ndims))
-  do i = 1, ndims
-    f_start = int(start(i), int64)
-    f_count = int(count(i), int64)
-    if (f_start < 1) then
-      err = error_type(NC_EINVALCOORDS, "put_vara", &
-        & "start indices must be positive.")
+  end select
+  do i = 1, size(dims)
+    if (.not. allocated(dims(i)%name)) then
+      err = error_type(NC_EINVAL, "define_variable", &
+        & "Dimension name is not allocated.")
       return
     end if
-    if (f_count <= 0) then
-      err = error_type(NC_EINVAL, "put_vara", "count entries must be positive.")
+    call validate(dims(i)%name, context="define_variable", err=err)
+    if (has_err(err)) return
+    if (dims(i)%len < 0 .or. (dims(i)%len == 0 .and. .not. dims(i)%is_unlim) .or. &
+      & dims(i)%len > int(huge(0_c_size_t), int64)) then
+      err = error_type(NC_EINVAL, "define_variable", &
+        & "Invalid dimension length.")
       return
     end if
-    if (var%dims(i)%len /= f_count) then
-      err = error_type(NC_EINVAL, "put_vara", &
-        & "Source dimensions must equal count.")
+    do j = 1, i - 1
+      if (dims(i)%name /= dims(j)%name) cycle
+      if ((dims(i)%is_unlim .neqv. dims(j)%is_unlim) .or. &
+        & dims(i)%len /= dims(j)%len) then
+        err = error_type(NC_EINVAL, "define_variable", &
+          & "Conflicting repeated dimension.")
+        return
+      end if
+    end do
+  end do
+  if (.not. present(atts)) return
+  do i = 1, size(atts)
+    if (.not. allocated(atts(i)%name)) then
+      err = error_type(NC_EINVAL, "define_variable", &
+        & "Attribute name is not allocated.")
       return
     end if
-    if (.not. target%dims(i)%is_unlim) then
-      if (f_start > target%dims(i)%len .or. &
-        & f_count > target%dims(i)%len - f_start + 1_int64) then
-        err = error_type(NC_EEDGE, "put_vara", &
-          & "Requested hyperslab exceeds a fixed dimension bound.")
+    call validate(atts(i)%name, context="define_variable", err=err)
+    if (has_err(err)) return
+    call validate(atts(i), context="define_variable", err=err)
+    if (has_err(err)) return
+    if (atts(i)%name == "_FillValue") then
+      if (atts(i)%dtype /= dtype .or. atts(i)%len /= 1) then
+        err = error_type(NC_EINVAL, "define_variable", &
+          & "_FillValue must be scalar and match the variable type.")
         return
       end if
     end if
-
-    j = ndims - i + 1
-    c_start(j) = int(f_start - 1_int64, c_size_t)
-    c_count(j) = int(f_count, c_size_t)
+    do j = 1, i - 1
+      if (atts(i)%name /= atts(j)%name) cycle
+      err = error_type(NC_EINVAL, "define_variable", &
+        & "Duplicate attribute name.")
+      return
+    end do
   end do
-  if (var%len == 0) then
-    err = error_type(NC_EINVAL, "put_vara", "Source variable is empty.")
+end subroutine validate_definition
+
+module subroutine def_var(nc, var, err)
+  !! Define a variable from metadata without reading or copying its data storage.
+  class(group_type), intent(in) :: nc
+  !! Open writable dataset or subgroup; loaded caches remain unchanged.
+  type(variable_type), intent(in) :: var
+  !! Schema providing name, type, dimensions, and attributes; the source is unchanged.
+  type(error_type), intent(out), optional :: err
+  !! Optional operation result; failures terminate execution when omitted.
+  type(error_type) :: op_err
+
+  if (.not. allocated(var%name) .or. .not. allocated(var%dims)) then
+    op_err = error_type(NC_EINVAL, "define_variable", &
+      & "Variable name and dimensions must be allocated.")
+    call return_err(op_err, err)
     return
   end if
-  if (ndims > 0) then
-    startp = c_loc(c_start(1))
-    countp = c_loc(c_count(1))
-  else
+  call def_var_raw(nc, var%name, var%dtype, var%dims, var%atts, err)
+end subroutine def_var
+
+module subroutine def_var_raw(nc, name, dtype, dims, atts, err)
+  !! Define a variable from explicit schema arguments without allocating data storage.
+  class(group_type), intent(in) :: nc
+  !! Open writable dataset or subgroup; loaded caches remain unchanged.
+  character(len=*), intent(in) :: name
+  !! Local variable name; trailing Fortran blank padding is ignored.
+  integer(c_int), intent(in) :: dtype
+  !! Supported NetCDF primitive type code, such as NC_FLOAT or NC_INT.
+  type(dimension_type), intent(in) :: dims(:)
+  !! Destination dimensions in Fortran order; an empty array defines a scalar.
+  type(attribute_type), intent(in), optional :: atts(:)
+  !! Optional initial attributes, written before any variable data.
+  type(error_type), intent(out), optional :: err
+  !! Optional operation result; failures terminate execution when omitted.
+  type(variable_type) :: defined
+  type(error_type) :: op_err
+  integer(c_int) :: varid, stat
+  integer(c_int), allocatable :: dimids(:)
+  type(dimension_type) :: actual
+  integer :: i, n
+  logical :: found
+
+  definition: block
+    call validate_definition(name, dtype, dims, atts, op_err)
+    if (has_err(op_err)) exit definition
+    stat = nc_inq_varid(nc%id, f2cstr(name), varid)
+    if (stat == NC_NOERR) then
+      op_err = error_type(NC_ENAMEINUSE, "define_variable", &
+        & "Variable already exists: "//trim(name))
+      exit definition
+    end if
+    if (stat /= NC_ENOTVAR) then
+      op_err = netcdf_err(stat, "define_variable", &
+        & "Inquire variable: "//trim(name))
+      exit definition
+    end if
+    n = size(dims)
+    do i = 1, n
+      call resolve_dim(nc, dims(i), found, actual, op_err)
+      if (has_err(op_err)) exit definition
+    end do
+    call require_write_access_(nc, op_err)
+    if (has_err(op_err)) exit definition
+    allocate (dimids(n))
+    do i = 1, n
+      actual = def_dim(nc, dims(i), op_err)
+      if (has_err(op_err)) exit definition
+      dimids(n-i+1) = actual%id
+    end do
+    stat = nc_def_var(nc%id, f2cstr(name), dtype, n, dimids, defined%id)
+    op_err = netcdf_err(stat, "define_variable", "Define variable: "//trim(name))
+    if (has_err(op_err)) exit definition
+    if (present(atts)) defined%atts = atts
+    call put_att_var(nc, defined, op_err)
+  end block definition
+  call return_err(op_err, err)
+end subroutine def_var_raw
+
+module subroutine put_variable(nc, var, start, count, stride, err)
+  !! Update data only; the file schema and attributes are preserved.
+  class(group_type), intent(in) :: nc
+  !! Open destination dataset or subgroup; source objects and loaded caches are unchanged.
+  type(variable_type), target, intent(in) :: var
+  !! Source variable whose name selects the destination and whose storage supplies the data.
+  integer, intent(in), optional :: start(:)
+  !! Optional one-based Fortran-order starting indices; defaults to ones.
+  integer, intent(in), optional :: count(:)
+  !! Optional element counts in Fortran order; defaults to the source shape.
+  integer, intent(in), optional :: stride(:)
+  !! Optional positive destination strides in Fortran order; defaults to ones.
+  type(error_type), intent(out), optional :: err
+  !! Optional operation result; failures terminate execution when omitted.
+  type(error_type) :: op_err
+  type(variable_type) :: destination
+  integer(int64), allocatable :: starts(:), counts(:), strides(:)
+  integer(c_size_t), allocatable, target :: c_start(:), c_count(:)
+  integer(c_ptrdiff_t), allocatable, target :: c_stride(:)
+  type(c_ptr) :: startp, countp, stridep
+  integer(c_int) :: stat
+  integer :: i, ndims
+  integer(int64) :: limit
+  logical :: selected
+
+  write_data: block
+    op_err = error_type()
+    if (.not. allocated(var%name)) then
+      op_err = error_type(NC_EINVAL, "put_variable", &
+        & "Source variable name is not allocated.")
+      exit write_data
+    end if
+    call validate(var%name, context="put_variable", err=op_err)
+    if (has_err(op_err)) exit write_data
+    call validate(var, context="put_variable", err=op_err)
+    if (has_err(op_err)) exit write_data
+    destination = inq_var_(nc, var%name, op_err)
+    if (has_err(op_err)) exit write_data
+    ndims = size(destination%dims)
+    if (size(var%dims) /= ndims .or. var%dtype /= destination%dtype) then
+      op_err = error_type(NC_EINVAL, "put_variable", &
+        & "Source rank and type must match the destination.")
+      exit write_data
+    end if
+    call prepare_selection_(var%dims%len, "put_variable", &
+      & starts, counts, strides, op_err, start, count, stride)
+    if (has_err(op_err)) exit write_data
+    selected = present(start) .or. present(count) .or. present(stride)
+    limit = min(huge(0_int64), int(huge(0_c_size_t), int64))
+    do i = 1, ndims
+      if (.not. allocated(var%dims(i)%name)) then
+        op_err = error_type(NC_EINVAL, "put_variable", &
+          & "Source dimension name is not allocated.")
+        exit write_data
+      end if
+      if (var%dims(i)%name /= destination%dims(i)%name) then
+        op_err = error_type(NC_EINVAL, "put_variable", &
+          & "Source dimension names/order must match the destination.")
+        exit write_data
+      end if
+      if (starts(i) < 1 .or. starts(i) > limit) then
+        op_err = error_type(NC_EINVALCOORDS, "put_variable", "Invalid start index.")
+        exit write_data
+      end if
+      if (strides(i) < 1 .or. strides(i) > int(huge(0_c_ptrdiff_t), int64) .or. &
+        & counts(i) < 0 .or. counts(i) > limit) then
+        op_err = error_type(NC_EINVAL, "put_variable", "Invalid count or stride.")
+        exit write_data
+      end if
+      if (counts(i) /= var%dims(i)%len .or. (selected .and. counts(i) == 0)) then
+        op_err = error_type(NC_EINVAL, "put_variable", &
+          & "Source shape must equal count; selected counts must be positive.")
+        exit write_data
+      end if
+      if (counts(i) > 0) then
+        if (counts(i) - 1 > (limit - starts(i)) / strides(i)) then
+          op_err = error_type(NC_EINVAL, "put_variable", &
+            & "Selection extent overflows supported indices.")
+          exit write_data
+        end if
+        if (.not. destination%dims(i)%is_unlim) then
+          if (starts(i) > destination%dims(i)%len) then
+            op_err = error_type(NC_EEDGE, "put_variable", &
+              & "Selection starts beyond a fixed dimension.")
+            exit write_data
+          end if
+          if (counts(i) - 1 > (destination%dims(i)%len - starts(i)) / strides(i)) then
+            op_err = error_type(NC_EEDGE, "put_variable", &
+              & "Selection exceeds a fixed dimension.")
+            exit write_data
+          end if
+        end if
+      end if
+    end do
+    call c_selection_(starts, counts, strides, c_start, c_count, c_stride)
     startp = c_null_ptr
     countp = c_null_ptr
-  end if
-  write (msg, "('Invalid variable:', 1x, a)") var%name
-  stat = nc_put_vara(nc%id, target%id, startp, countp, buffer2cptr(var))
-  err = netcdf_err(stat, "put_vara", msg)
-end subroutine put_vara
+    stridep = c_null_ptr
+    if (ndims > 0) then
+      startp = c_loc(c_start(1))
+      countp = c_loc(c_count(1))
+      stridep = c_loc(c_stride(1))
+    end if
+    call require_write_access_(nc, op_err)
+    if (has_err(op_err)) exit write_data
+    if (any(strides /= 1)) then
+      stat = nc_put_vars(nc%id, destination%id, &
+        & startp, countp, stridep, buffer2cptr(var))
+    else
+      stat = nc_put_vara(nc%id, destination%id, &
+        & startp, countp, buffer2cptr(var))
+    end if
+    op_err = netcdf_err(stat, "put_variable", "Write variable: "//var%name)
+  end block write_data
+  call return_err(op_err, err)
+end subroutine put_variable
 
-module subroutine put_var(nc, var, err)
-  !! Scalar implementation shared by the fail-fast and error-aware overloads.
-  class(group_type), intent(in) :: nc
-  !! Open NetCDF dataset handle.
-  type(variable_type), target, intent(in) :: var
-  !! Variable to process.
+pure subroutine prepare_selection_(default_count, context, &
+  & starts, counts, strides, err, start, count, stride)
+  !! Check vector lengths and apply shared defaults; 
+  !! callers enforce operation-specific rules.
+  integer(int64), intent(in) :: default_count(:)
+  !! Default extents in Fortran order: file shape for reads and source shape for writes.
+  character(len=*), intent(in) :: context
+  !! Operation name used in selection diagnostics.
+  integer(int64), allocatable, intent(out) :: starts(:)
+  !! One-based starting indices in Fortran order; defaults to ones.
+  integer(int64), allocatable, intent(out) :: counts(:)
+  !! Element counts in Fortran order; defaults to default_count.
+  integer(int64), allocatable, intent(out) :: strides(:)
+  !! File index spacing in Fortran order; defaults to ones.
   type(error_type), intent(out) :: err
-  !! Error object updated if the operation fails.
-  type(variable_type) :: tmp
-  integer(c_size_t), allocatable, target :: c_start(:), c_count(:)
-  type(c_ptr) :: startp, countp
-  integer(c_int) :: stat
+  !! Completed operation result; failure leaves the output vectors unallocated.
+  integer, intent(in), optional :: start(:)
+  !! Optional one-based starting indices, with one entry per dimension.
+  integer, intent(in), optional :: count(:)
+  !! Optional element counts, with one entry per dimension.
+  integer, intent(in), optional :: stride(:)
+  !! Optional index spacing, with one entry per dimension.
+  integer :: ndims
+
+  err = error_type()
+  ndims = size(default_count)
+  if (present(start)) then
+    if (size(start) /= ndims) then
+      err = error_type(NC_EINVAL, context, &
+        & "start must have one entry per dimension.")
+      return
+    end if
+  end if
+  if (present(count)) then
+    if (size(count) /= ndims) then
+      err = error_type(NC_EINVAL, context, &
+        & "count must have one entry per dimension.")
+      return
+    end if
+  end if
+  if (present(stride)) then
+    if (size(stride) /= ndims) then
+      err = error_type(NC_EINVAL, context, &
+        & "stride must have one entry per dimension.")
+      return
+    end if
+  end if
+  allocate (starts(ndims), counts(ndims), strides(ndims))
+  starts = 1_int64
+  counts = default_count
+  strides = 1_int64
+  if (present(start)) starts = int(start, int64)
+  if (present(count)) counts = int(count, int64)
+  if (present(stride)) strides = int(stride, int64)
+end subroutine prepare_selection_
+
+pure subroutine c_selection_(starts, counts, strides, c_start, c_count, c_stride)
+  !! Convert validated Fortran-order vectors to zero-based C order, 
+  !! including empty scalars.
+  integer(int64), intent(in) :: starts(:)
+  !! Validated one-based starting indices in Fortran order.
+  integer(int64), intent(in) :: counts(:)
+  !! Validated element counts, with the same length as starts.
+  integer(int64), intent(in) :: strides(:)
+  !! Validated index spacing, with the same length as starts.
+  integer(c_size_t), allocatable, intent(out) :: c_start(:)
+  !! Zero-based starting indices in reversed dimension order.
+  integer(c_size_t), allocatable, intent(out) :: c_count(:)
+  !! Element counts in reversed dimension order.
+  integer(c_ptrdiff_t), allocatable, intent(out) :: c_stride(:)
+  !! Index spacing in reversed dimension order.
   integer :: i, j, ndims
 
-  err = error_type()
-  call validate(var, context="put_var", err=err)
-  if (.exists. err) return
-  tmp = def_var(nc, var, err)
-  if (has_err(err)) return
-  if (allocated(var%atts)) then
-    call put_att_var(nc, tmp, err)
-    if (has_err(err)) return
-  end if
-  if (var%len <= 0) return
-
-  ndims = size(var%dims)
-  allocate (c_start(ndims), c_count(ndims))
+  ndims = size(starts)
+  allocate (c_start(ndims), c_count(ndims), c_stride(ndims))
   do i = 1, ndims
     j = ndims - i + 1
-    c_start(j) = 0_c_size_t
-    c_count(j) = int(var%dims(i)%len, c_size_t)
+    c_start(j) = int(starts(i) - 1_int64, c_size_t)
+    c_count(j) = int(counts(i), c_size_t)
+    c_stride(j) = int(strides(i), c_ptrdiff_t)
   end do
-  if (ndims > 0) then
-    startp = c_loc(c_start(1))
-    countp = c_loc(c_count(1))
-  else
-    startp = c_null_ptr
-    countp = c_null_ptr
-  end if
-  stat = nc_put_vara(nc%id, tmp%id, startp, countp, buffer2cptr(var))
-  err = netcdf_err(stat, "put_var", "Write variable data.")
-end subroutine put_var
-
-module function def_var(nc, var, err) result(new_var)
-  !! Define a variable in the netCDF file and return its `variable_type`.
-  class(group_type), intent(in) :: nc
-  !! Open NetCDF dataset handle.
-  type(variable_type), intent(in) :: var
-  !! Variable to process.
-  type(error_type), intent(out) :: err
-  !! Error object updated if the operation fails.
-  type(variable_type) :: new_var
-  !! Result produced by this operation.
-  integer(c_int) :: varid, stat
-  integer(c_int), allocatable :: new_dimids(:)
-  type(dimension_type), allocatable :: new_dims(:)
-  integer :: n, i, j
-
-  new_var = variable_type()
-  err = error_type()
-  n = size(var%dims)
-  allocate (new_dims(n), new_dimids(n))
-  do i = 1, n
-    new_dims(i) = def_dim(nc, var%dims(i), err)
-    if (has_err(err)) return
-  end do
-  do i = 1, n
-    !! Reverse dimensions because this module calls the C API.
-    j = n - i + 1
-    new_dimids(j) = new_dims(i)%id
-  end do
-
-  stat = nc_def_var(nc%id, f2cstr(var%name), var%dtype, size(new_dims), &
-    & new_dimids, varid)
-  err = netcdf_err(stat, "def_var", "Define variable.")
-  if (has_err(err)) return
-  new_var%id = varid
-  if (allocated(var%atts)) new_var%atts = var%atts
-end function def_var
+end subroutine c_selection_
 
 end submodule nc4f_nc_variable

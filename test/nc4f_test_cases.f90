@@ -7,6 +7,7 @@ implicit none (type, external)
 
 public :: simple_wr, simple_rd, character_variables, elemental_reads, hyperslab_reads, buffer_edges
 public :: creation_policy, error_handling
+public :: write_definition, write_selection, write_paths, write_failures, strided_writes
 public :: delete_att_model, delete_att_file, delete_att_errors
 public :: rename_att_model, rename_att_file, rename_att_errors
 public :: rename_var_model, rename_var_file, rename_var_errors
@@ -30,6 +31,36 @@ character(*), parameter :: NETCDF_TYPE_RESULT_FILE = &
   & "build/test-results/nasa_cosp_netcdf_type.txt"
 
 interface
+  module subroutine strided_writes(passed)
+    !! Verify the combined definition, strided-update, and timestep-append workflow.
+    logical, intent(inout) :: passed
+    !! Set true when all reopened values and appended timesteps match.
+  end subroutine strided_writes
+
+  module subroutine write_definition(passed)
+    !! Test metadata-only definition, dimension reuse, supported types, and subgroup access.
+    logical, intent(inout) :: passed
+    !! Set true when all assertions in this test pass.
+  end subroutine write_definition
+
+  module subroutine write_selection(passed)
+    !! Test contiguous and strided writes, unlimited growth, and path/handle equivalence.
+    logical, intent(inout) :: passed
+    !! Set true when all assertions in this test pass.
+  end subroutine write_selection
+
+  module subroutine write_paths(passed)
+    !! Test path-based creation and updates, preserving files on rejected requests.
+    logical, intent(inout) :: passed
+    !! Set true when all assertions in this test pass.
+  end subroutine write_paths
+
+  module subroutine write_failures(passed)
+    !! Test invalid selections, incompatible sources, and read-only or closed handles.
+    logical, intent(inout) :: passed
+    !! Set true when all assertions in this test pass.
+  end subroutine write_failures
+
   module subroutine diskless_read(passed)
     logical, intent(inout) :: passed
   end subroutine diskless_read

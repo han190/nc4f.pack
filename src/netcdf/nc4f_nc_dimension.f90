@@ -224,9 +224,9 @@ function inq_dims_(ncid, varid, err) result(dims)
   type(dimension_type), allocatable :: dims(:)
   !! Allocatable array of `dimension_type` in Fortran ordering
   !! (reversed relative to the C API ordering).
-  integer(c_int), allocatable, target :: dimids(:), unlimdimids(:)
+  integer(c_int), allocatable, target :: dimids(:)
   character(len=NC_MAX_NAME + 1, kind=c_char) :: dim_name
-  integer(c_int) :: i, j, nunlim, ndims, stat
+  integer(c_int) :: i, j, ndims, stat
   integer(c_int), parameter :: include_parents = 0_c_int
 
   ! Callers assign the result before inspecting ERR, even on failure.
@@ -253,16 +253,6 @@ function inq_dims_(ncid, varid, err) result(dims)
       if (has_err(err)) return
     end if
   end if
-  stat = nc_inq_unlimdims(ncid, nunlim, c_null_ptr)
-  err = netcdf_err(stat, "inq_dims", "Unlimited dimension count.")
-  if (has_err(err)) return
-  allocate (unlimdimids(nunlim))
-  if (nunlim > 0) then
-    stat = nc_inq_unlimdims(ncid, nunlim, c_loc(unlimdimids(1)))
-    err = netcdf_err(stat, "inq_dims", "Unlimited dimension identifiers.")
-    if (has_err(err)) return
-  end if
-
   deallocate (dims)
   allocate (dims(ndims))
 
@@ -278,41 +268,123 @@ function inq_dims_(ncid, varid, err) result(dims)
     err = netcdf_err(stat, "inq_dims", "Dimension length.")
     if (has_err(err)) return
     dims(j)%name = clip(c2fstr(dim_name))
-    dims(j)%is_unlim = any(dimids(i) == unlimdimids)
+    call dim_unlimited_(ncid, dimids(i), dims(j)%is_unlim, err)
+    if (has_err(err)) return
   end do
 end function inq_dims_
 
-module function def_dim(nc, dim, err) result(new_dim)
-  !! Define a dimension, preserving `NC_EBADDIM` as the expected create path.
-  class(group_type), intent(in) :: nc
-  !! Open NetCDF dataset handle.
-  type(dimension_type), intent(in) :: dim
-  !! Dimension to process.
+subroutine dim_unlimited_(ncid, dimid, unlimited, err)
+  !! Dimension IDs are file-wide; search the group and its ancestors.
+  integer(c_int), intent(in) :: ncid
+  !! Open group identifier from which to search for the dimension.
+  integer(c_int), intent(in) :: dimid
+  !! Identifier of the visible dimension whose unlimited status is requested.
+  logical, intent(out) :: unlimited
+  !! True when the dimension is unlimited in the supplied group or an ancestor.
   type(error_type), intent(out) :: err
-  !! Error object updated if the operation fails.
-  type(dimension_type) :: new_dim
-  !! Result produced by this operation.
-  integer(c_int) :: stat, dimid
-  integer(c_size_t) :: len
-  character(len=:), allocatable :: context
+  !! Completed operation result; contains a diagnostic when the operation fails.
+  integer(c_int) :: groupid, parent, n, stat
+  integer(c_int), allocatable, target :: ids(:)
 
   err = error_type()
-  context = "Dimension: "//trim(dim%name)//"."
-  stat = nc_inq_dimid(nc%id, f2cstr(dim%name), dimid)
-  dimension_exists: if (stat == NC_NOERR) then
-    new_dim = dimension_type(dimid, dim%name, dim%len, dim%is_unlim)
-    return
-  end if dimension_exists
-  if (stat /= NC_EBADDIM) then
-    err = netcdf_err(stat, "def_dim", context)
+  unlimited = .false.
+  groupid = ncid
+  do
+    stat = nc_inq_unlimdims(groupid, n, c_null_ptr)
+    err = netcdf_err(stat, "resolve_dimension", &
+      & "Inquire unlimited dimensions.")
+    if (has_err(err)) return
+    allocate(ids(n))
+    if (n > 0) then
+      stat = nc_inq_unlimdims(groupid, n, c_loc(ids(1)))
+      err = netcdf_err(stat, "resolve_dimension", &
+        & "Inquire unlimited dimension IDs.")
+      if (has_err(err)) return
+      unlimited = any(ids == dimid)
+    end if
+    deallocate(ids)
+    if (unlimited) return
+    stat = nc_inq_grp_parent(groupid, parent)
+    if (stat == NC_ENOGRP) return
+    err = netcdf_err(stat, "resolve_dimension", "Inquire parent group.")
+    if (has_err(err)) return
+    groupid = parent
+  end do
+end subroutine dim_unlimited_
+
+module subroutine resolve_dim(nc, dim, found, actual, err)
+  !! Resolve a visible dimension and validate its fixed length and unlimited status.
+  class(group_type), intent(in) :: nc
+  !! Open destination dataset or subgroup; source objects and loaded caches are unchanged.
+  type(dimension_type), intent(in) :: dim
+  !! Requested dimension name, length, and unlimited status.
+  logical, intent(out) :: found
+  !! True when a visible dimension with the requested name exists.
+  type(dimension_type), intent(out) :: actual
+  !! Resolved file metadata; valid only when found is true and err indicates success.
+  type(error_type), intent(out) :: err
+  !! Completed operation result; contains a diagnostic when the operation fails.
+  integer(c_int) :: stat, dimid
+  integer(c_size_t) :: length
+
+  found = .false.
+  err = error_type()
+  if (.not. allocated(dim%name)) then
+    err = error_type(NC_EINVAL, "resolve_dimension", &
+      & "Dimension name is not allocated.")
     return
   end if
-
-  len = merge(NC_UNLIMITED, dim%len, dim%is_unlim)
-  stat = nc_def_dim(nc%id, f2cstr(dim%name), len, dimid)
-  err = netcdf_err(stat, "def_dim", context)
+  call validate(dim%name, context="resolve_dimension", err=err)
   if (has_err(err)) return
-  new_dim = dimension_type(dimid, dim%name, dim%len, dim%is_unlim)
+  if (dim%len < 0 .or. (dim%len == 0 .and. .not. dim%is_unlim) .or. &
+    & dim%len > int(huge(0_c_size_t), int64)) then
+    err = error_type(NC_EINVAL, "resolve_dimension", &
+      & "Invalid dimension length.")
+    return
+  end if
+  stat = nc_inq_dimid(nc%id, f2cstr(dim%name), dimid)
+  if (stat == NC_EBADDIM) return
+  err = netcdf_err(stat, "resolve_dimension", dim%name)
+  if (has_err(err)) return
+  found = .true.
+  stat = nc_inq_dimlen(nc%id, dimid, length)
+  err = netcdf_err(stat, "resolve_dimension", dim%name)
+  if (has_err(err)) return
+  actual = dimension_type(dimid, dim%name, int(length, int64), .false.)
+  call dim_unlimited_(nc%id, dimid, actual%is_unlim, err)
+  if (has_err(err)) return
+  if (actual%is_unlim .neqv. dim%is_unlim) then
+    err = error_type(NC_EINVAL, "resolve_dimension", &
+      & "Conflicting unlimited status: "//dim%name)
+  else if (.not. actual%is_unlim .and. actual%len /= dim%len) then
+    err = error_type(NC_EINVAL, "resolve_dimension", &
+      & "Conflicting fixed dimension length: "//dim%name)
+  end if
+end subroutine resolve_dim
+
+module function def_dim(nc, dim, err) result(new_dim)
+  !! Reuse a compatible visible dimension or create a missing local dimension.
+  class(group_type), intent(in) :: nc
+  !! Open destination dataset or subgroup; source objects and loaded caches are unchanged.
+  type(dimension_type), intent(in) :: dim
+  !! Requested dimension name, length, and unlimited status.
+  type(error_type), intent(out) :: err
+  !! Completed operation result; contains a diagnostic when the operation fails.
+  type(dimension_type) :: new_dim
+  !! Created or reused dimension, including its current file length and identifier.
+  integer(c_int) :: stat, dimid
+  integer(c_size_t) :: length
+  logical :: found
+  !! True when a visible dimension with the requested name exists.
+
+  call resolve_dim(nc, dim, found, new_dim, err)
+  if (has_err(err) .or. found) return
+  length = int(dim%len, c_size_t)
+  if (dim%is_unlim) length = NC_UNLIMITED
+  stat = nc_def_dim(nc%id, f2cstr(dim%name), length, dimid)
+  err = netcdf_err(stat, "def_dim", dim%name)
+  if (has_err(err)) return
+  new_dim = dimension_type(dimid, dim%name, int(length, int64), dim%is_unlim)
 end function def_dim
 
 end submodule nc4f_nc_dimension

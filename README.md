@@ -12,14 +12,15 @@ an [xarray](https://xarray.dev/)-like programming style in modern Fortran that w
 
 - Build a [NetCDF data model](https://docs.unidata.ucar.edu/netcdf-c/4.10.0/netcdf_data_model.html) with `DATARRAY` and `DATASET`;
 - Write a data model to a NetCDF file with `TO_NETCDF`;
+- Define variables using `DEFINE_VARIABLE`, then write it with `PUT_VARIABLE`;
 - Open a NetCDF file and retrieve variables with `OPEN_NETCDF` and `GET_VARIABLE`;
 - Extract intrinsic Fortran data from an attribute or variable with `EXTRACT`;
-- Rename attributes, dimensions, variables, and groups in memory or explicitly update an open file with
+- Rename attributes, dimensions, variables, and groups with
   [`RENAME_ATTRIBUTE`](docs/src/reference/functions-and-subroutines.md#rename_attribute--rename-an-attribute),
   [`RENAME_DIMENSION`](docs/src/reference/functions-and-subroutines.md#rename_dimension--rename-a-dimension),
   [`RENAME_VARIABLE`](docs/src/reference/functions-and-subroutines.md#rename_variable--rename-a-variable),
   and [`RENAME_GROUP`](docs/src/reference/functions-and-subroutines.md#rename_group--rename-a-group);
-- Delete variable or group attributes in memory or explicitly update an open file with
+- Delete variable or group attributes with
   [`DELETE_ATTRIBUTE`](docs/src/reference/functions-and-subroutines.md#delete_attribute--delete-an-attribute).
 
 ## A First Program
@@ -64,7 +65,7 @@ model. It does NOT currently support:
 - NetCDF-4 storage controls, such as chunking, compression,
   shuffle/checksum filters, endianness, and custom fill values;
 - parallel I/O or importing/exporting caller-owned in-memory file images;
-- advanced variable access, such as mapped or multi-slab I/O and strided writes;
+- advanced variable access, such as mapped or multi-slab I/O;
 - deleting dimensions, variables, or groups from files.
 
 See [ROADMAP.md](ROADMAP.md) for planned extensions.
