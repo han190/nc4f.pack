@@ -16,7 +16,7 @@ public :: NC_BYTE, NC_CHAR, NC_SHORT, NC_INT, NC_INT64, NC_FLOAT, NC_DOUBLE
 public :: &
   & datarray, dataset, extract, initialize, shape, size, sum, &
   & operator(.att.), operator(.and.), operator(.dim.), operator(.exists.), &
-  & operator(==), operator(/=), write(formatted)
+  & operator(==), operator(/=)
 public :: &
   & open_netcdf, close_netcdf, to_netcdf, define_variable, put_variable, &
   & inquire_dimensions, inquire_variable, inquire_subgroups, inquire_group, &
