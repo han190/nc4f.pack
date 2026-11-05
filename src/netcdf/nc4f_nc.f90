@@ -68,7 +68,7 @@ interface
     !! Optional operation result; failures terminate execution when omitted.
   end subroutine def_var
 
-  module subroutine def_var_raw(nc, name, dtype, dims, atts, err)
+  module subroutine def_var_raw(nc, name, dtype, dims, atts, storage, err)
     !! Define a variable from explicit schema arguments without allocating data storage.
     class(group_type), intent(in) :: nc
     !! Open writable dataset or subgroup; loaded caches remain unchanged.
@@ -80,6 +80,8 @@ interface
     !! Destination dimensions in Fortran order; an empty array defines a scalar.
     type(attribute_type), intent(in), optional :: atts(:)
     !! Optional initial attributes, written before any variable data.
+    type(storage_type), intent(in), optional :: storage
+    !! Optional per-variable storage settings, applied before attributes and data.
     type(error_type), intent(out), optional :: err
     !! Optional operation result; failures terminate execution when omitted.
   end subroutine def_var_raw

@@ -1056,12 +1056,66 @@ if (.exists. err) print '(a)', error_msg(err)
     ```
 :::
 
+## `SET_STORAGE` -- Configure a Variable in Memory
+
+| Synopsis |
+|:--|
+| <span class="ind3">`CALL SET_STORAGE(VAR[, CHUNKS, DEFLATE_LEVEL, SHUFFLE, FLETCHER32, ENDIAN, NO_FILL, FILL_VALUE, ERR])`</span> |
+
+| Class |
+|:--|
+| <span class="ind3">Subroutine.</span> |
+
+| Description |
+|:--|
+| <span class="ind3">Allocate or update a variable's optional in-memory `STORAGE` component. Omitted arguments retain their previous values. Invalid settings leave the component unchanged.</span> |
+
+| Arguments |
+|:--|
+| <span class="grid"><span>`VAR`</span><span>`type(variable_type), INTENT(inout)`</span></span><br><span class="ind6">Variable whose storage settings are updated.</span> |
+| <span class="grid"><span>`CHUNKS`</span><span>`integer(int64), DIMENSION(:), OPTIONAL, INTENT(in)`</span></span><br><span class="ind6">Positive chunk lengths matching the variable rank, in Fortran dimension order.</span> |
+| <span class="grid"><span>`DEFLATE_LEVEL`</span><span>`integer, OPTIONAL, INTENT(in)`</span></span><br><span class="ind6">Compression level from 0 through 9.</span> |
+| <span class="grid"><span>`SHUFFLE`</span><span>`logical, OPTIONAL, INTENT(in)`</span></span><br><span class="ind6">Enable or disable the shuffle filter.</span> |
+| <span class="grid"><span>`FLETCHER32`</span><span>`logical, OPTIONAL, INTENT(in)`</span></span><br><span class="ind6">Enable or disable Fletcher32 checksums.</span> |
+| <span class="grid"><span>`ENDIAN`</span><span>`integer, OPTIONAL, INTENT(in)`</span></span><br><span class="ind6">`NC_ENDIAN_NATIVE`, `NC_ENDIAN_LITTLE`, or `NC_ENDIAN_BIG`.</span> |
+| <span class="grid"><span>`NO_FILL`</span><span>`logical, OPTIONAL, INTENT(in)`</span></span><br><span class="ind6">Disable or enable filling of unwritten values.</span> |
+| <span class="grid"><span>`FILL_VALUE`</span><span>`type(attribute_type), OPTIONAL, INTENT(in)`</span></span><br><span class="ind6">Scalar value matching the variable type; conflicts with `NO_FILL=.true.`.</span> |
+| <span class="grid"><span>`ERR`</span><span>`type(error_type), OPTIONAL, INTENT(out)`</span></span><br><span class="ind6">Receives an operation error. When omitted, failures terminate execution.</span> |
+
+| Notes |
+|:--|
+| <span class="ind3">This call changes only the in-memory variable. `DEFINE_VARIABLE` or `TO_NETCDF` applies the settings when creating a file variable. `PUT_VARIABLE` does not change existing file storage settings.</span> |
+
+:::{list-table}
+:class: example-table
+:header-rows: 1
+
+*
+  - Example
+*
+  -
+    ```fortran
+    use, intrinsic :: iso_fortran_env, only: int64
+    use, non_intrinsic :: nc4f
+    implicit none (type, external)
+
+    type(variable_type) :: var
+    type(error_type) :: err
+
+    var = datarray("temperature", reshape([1.0, 2.0, 3.0, 4.0], [2, 2]), &
+      & ["x".dim.2, "y".dim.2])
+    call set_storage(var, chunks=[2_int64, 2_int64], &
+      & deflate_level=4, shuffle=.true., err=err)
+    call to_netcdf("output.nc", var, err=err)
+    ```
+:::
+
 ## `DEFINE_VARIABLE` -- Define a Variable Without Data
 
 | Synopsis |
 |:--|
 | <span class="ind3">`CALL DEFINE_VARIABLE(NC, VAR[, ERR])`</span> |
-| <span class="ind3">`CALL DEFINE_VARIABLE(NC, NAME, DTYPE, DIMS[, ATTS, ERR])`</span> |
+| <span class="ind3">`CALL DEFINE_VARIABLE(NC, NAME, DTYPE, DIMS[, ATTS, STORAGE, ERR])`</span> |
 
 | Class |
 |:--|
@@ -1079,6 +1133,7 @@ if (.exists. err) print '(a)', error_msg(err)
 | <span class="grid"><span>`DTYPE`</span><span>`integer(c_int), INTENT(in)`</span></span><br><span class="ind6">Supported NetCDF primitive type constant, such as `NC_FLOAT` or `NC_INT`.</span> |
 | <span class="grid"><span>`DIMS`</span><span>`type(dimension_type), DIMENSION(:), INTENT(in)`</span></span><br><span class="ind6">Destination dimensions in Fortran order. An empty array defines a scalar.</span> |
 | <span class="grid"><span>`ATTS`</span><span>`type(attribute_type), DIMENSION(:), OPTIONAL, INTENT(in)`</span></span><br><span class="ind6">Initial variable attributes, written before data.</span> |
+| <span class="grid"><span>`STORAGE`</span><span>`type(storage_type), OPTIONAL, INTENT(in)`</span></span><br><span class="ind6">Per-variable storage settings for the explicit schema form.</span> |
 | <span class="grid"><span>`ERR`</span><span>`type(error_type), OPTIONAL, INTENT(out)`</span></span><br><span class="ind6">Receives an operation error. When omitted, failures terminate execution.</span> |
 
 | Schema Rules |
@@ -1091,7 +1146,7 @@ if (.exists. err) print '(a)', error_msg(err)
 | Notes |
 |:--|
 | <span class="ind3">Source objects and loaded caches remain unchanged. Use `INQUIRE_VARIABLE`, `INQUIRE_DIMENSIONS`, or `GET_VARIABLE` to obtain fresh metadata or data. Closing a dataset invalidates its handle; callers must also treat copied handles and subgroup snapshots as closed.</span> |
-| <span class="ind3">Validation precedes mutation where possible, but later failures can leave created metadata. The operation does not provide rollback. Variable storage controls such as compression are not part of this API.</span> |
+| <span class="ind3">Validation precedes mutation where possible, but later failures can leave created metadata. The operation does not provide rollback. Storage settings are applied after variable creation and before attributes or data; chunking, compression, checksum, and endianness require NetCDF-4 format.</span> |
 
 :::{list-table}
 :class: example-table

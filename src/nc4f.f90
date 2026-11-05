@@ -7,14 +7,15 @@ implicit none (type, external)
 
 public :: &
   & attribute_type, dimension_type, error_type, &
-  & group_type, netcdf_type, variable_type
+  & group_type, netcdf_type, variable_type, storage_type
 public :: &
   & NC_EBADID, NC_EBADDIM, NC_EBADGRPID, NC_EEDGE, NC_EBADTYPE, NC_EPERM, &
   & NC_EINVAL, NC_EINVALCOORDS, NC_ENOGRP, NC_ENOTATT, NC_ENOTFOUND, &
   & NC_ENOTVAR, NC_NOERR, NC_EBADNAME, NC_EMAXNAME, NC_ENAMEINUSE
 public :: NC_BYTE, NC_CHAR, NC_SHORT, NC_INT, NC_INT64, NC_FLOAT, NC_DOUBLE
+public :: NC_ENDIAN_NATIVE, NC_ENDIAN_LITTLE, NC_ENDIAN_BIG
 public :: &
-  & datarray, dataset, extract, initialize, shape, size, sum, &
+  & datarray, dataset, extract, initialize, set_storage, shape, size, sum, &
   & operator(.att.), operator(.and.), operator(.dim.), operator(.exists.), &
   & operator(==), operator(/=)
 public :: &

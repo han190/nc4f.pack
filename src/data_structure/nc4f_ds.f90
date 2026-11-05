@@ -7,11 +7,12 @@ use, intrinsic :: iso_c_binding, only: &
 use, non_intrinsic :: nc4f_c_interface, only: &
   & NC_EBADID, NC_EBADDIM, NC_EBADGRPID, NC_EEDGE, NC_EINVAL, NC_EINVALCOORDS, &
   & NC_ENOMEM, NC_ENOGRP, NC_ENOTATT, NC_ENOTFOUND, NC_ENOTVAR, NC_NOERR, &
-  & NC_NOWRITE, NC_EBADNAME, NC_EMAXNAME, NC_ENAMEINUSE, NC_MAX_NAME
+  & NC_NOWRITE, NC_EBADNAME, NC_EMAXNAME, NC_ENAMEINUSE, NC_MAX_NAME, &
+  & NC_ENDIAN_NATIVE, NC_ENDIAN_LITTLE, NC_ENDIAN_BIG
 implicit none (type, external)
 
 public :: attribute_type, dimension_type, error_type, &
-  & group_type, netcdf_type, variable_type, datarray, dataset, extract, &
+  & group_type, netcdf_type, variable_type, storage_type, set_storage, datarray, dataset, extract, &
   & initialize, delete_attribute, rename_attribute, rename_variable, &
   & rename_group, rename_dimension, &
   & operator(.att.), operator(.and.), operator(.dim.), &
@@ -40,6 +41,7 @@ end type error_type
 interface error_type
   module procedure :: make_err
 end interface error_type
+
 
 interface operator(.exists.)
   !! Return whether an error result represents a failed operation.
@@ -101,6 +103,18 @@ contains
   generic, public :: write(formatted) => write_frmt_att
 end type attribute_type
 
+type :: storage_type
+  !! Requested or inquired per-variable NetCDF storage settings.
+  !! Negative flags mean that the setting was not requested.
+  integer(int64), allocatable :: chunks(:)
+  integer(c_int) :: deflate_level = -1
+  integer(c_int) :: shuffle = -1
+  integer(c_int) :: fletcher32 = -1
+  integer(c_int) :: endian = -1
+  integer(c_int) :: no_fill = -1
+  type(attribute_type), allocatable :: fill_value
+end type storage_type
+
 type :: variable_type
   !! NetCDF variable metadata, dimensions, attributes, and values.
   integer(c_int) :: id = INVALID_INT32
@@ -109,6 +123,7 @@ type :: variable_type
   integer(int64) :: len = INVALID_INT64
   type(dimension_type), allocatable :: dims(:)
   type(attribute_type), allocatable :: atts(:)
+  type(storage_type), allocatable :: storage
   integer(int8), allocatable :: buffer(:)
   integer(int8), contiguous, pointer :: ptr(:) => null()
 contains
@@ -225,6 +240,22 @@ interface dataset
 end interface dataset
 
 interface
+  module subroutine set_storage(var, chunks, deflate_level, shuffle, fletcher32, endian, no_fill, fill_value, err)
+    !! Update selected in-memory variable storage settings after validation.
+    type(variable_type), intent(inout) :: var
+    !! Variable whose optional storage component is updated.
+    integer(int64), intent(in), optional :: chunks(:)
+    !! Positive chunk lengths in Fortran dimension order.
+    integer, intent(in), optional :: deflate_level, endian
+    !! Compression level (0 through 9) and NetCDF endian constant.
+    logical, intent(in), optional :: shuffle, fletcher32, no_fill
+    !! Optional filter and fill switches.
+    type(attribute_type), intent(in), optional :: fill_value
+    !! Scalar value matching the variable type.
+    type(error_type), intent(out), optional :: err
+    !! Receives status; failures terminate execution when omitted.
+  end subroutine set_storage
+
   pure module subroutine rename_dim_dim(dim, new_name, err)
     !! Rename one dimension without changing its identity, length, or unlimited flag.
     type(dimension_type), intent(inout) :: dim

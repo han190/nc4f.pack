@@ -33,8 +33,23 @@ described by the NetCDF data model.
 | <span class="grid"><span>`LEN`</span><span>`integer(int64)`</span></span><br><span class="ind6">Total number of stored values.</span> |
 | <span class="grid"><span>`DIMS`</span><span>`type(dimension_type), allocatable`</span></span><br><span class="ind6">Dimensions in Fortran order.</span> |
 | <span class="grid"><span>`ATTS`</span><span>`type(attribute_type), allocatable`</span></span><br><span class="ind6">Attributes attached to the variable.</span> |
+| <span class="grid"><span>`STORAGE`</span><span>`type(storage_type), allocatable`</span></span><br><span class="ind6">Optional storage settings; unallocated uses NetCDF defaults on creation.</span> |
 | <span class="grid"><span>`BUFFER`</span><span>`integer(int8), allocatable`</span></span><br><span class="ind6">Owned byte storage for copied values.</span> |
 | <span class="grid"><span>`PTR`</span><span>`integer(int8), contiguous, pointer`</span></span><br><span class="ind6">Borrowed byte storage for contiguous caller-owned values.</span> |
+
+## `STORAGE_TYPE` -- Per-Variable Storage Settings
+
+| Component |
+|:--|
+| <span class="grid"><span>`CHUNKS`</span><span>`integer(int64), allocatable`</span></span><br><span class="ind6">Chunk lengths in Fortran dimension order; unallocated leaves layout to NetCDF.</span> |
+| <span class="grid"><span>`DEFLATE_LEVEL`</span><span>`integer(c_int)`</span></span><br><span class="ind6">Compression level from 0 through 9, or -1 when unset.</span> |
+| <span class="grid"><span>`SHUFFLE`</span><span>`integer(c_int)`</span></span><br><span class="ind6">Shuffle filter: 0 disables, 1 enables, -1 leaves unset.</span> |
+| <span class="grid"><span>`FLETCHER32`</span><span>`integer(c_int)`</span></span><br><span class="ind6">Fletcher32 checksum: 0 disables, 1 enables, -1 leaves unset.</span> |
+| <span class="grid"><span>`ENDIAN`</span><span>`integer(c_int)`</span></span><br><span class="ind6">NetCDF endian constant, or -1 when unset.</span> |
+| <span class="grid"><span>`NO_FILL`</span><span>`integer(c_int)`</span></span><br><span class="ind6">Fill mode: 0 enables fill, 1 disables fill, -1 leaves unset.</span> |
+| <span class="grid"><span>`FILL_VALUE`</span><span>`type(attribute_type), allocatable`</span></span><br><span class="ind6">Optional scalar fill value matching the variable type.</span> |
+
+`SET_STORAGE` updates these fields with validation. Storage settings apply when a variable is defined; `PUT_VARIABLE` does not alter the layout of an existing file variable. `INQUIRE_VARIABLE` and `GET_VARIABLE` report settings found in a file. NetCDF may choose chunk sizes automatically, so inquiry can allocate `STORAGE` even when no settings were requested at creation.
 
 ## `GROUP_TYPE` -- NetCDF Group
 

@@ -3,6 +3,74 @@ submodule(nc4f_ds) nc4f_ds_variable
 implicit none (type, external)
 contains
 
+module subroutine set_storage(var, chunks, deflate_level, shuffle, fletcher32, endian, no_fill, fill_value, err)
+  !! Update only supplied in-memory settings, committing after validation.
+  type(variable_type), intent(inout) :: var
+  integer(int64), intent(in), optional :: chunks(:)
+  integer, intent(in), optional :: deflate_level, endian
+  logical, intent(in), optional :: shuffle, fletcher32, no_fill
+  type(attribute_type), intent(in), optional :: fill_value
+  type(error_type), intent(out), optional :: err
+  type(storage_type) :: next
+  type(error_type) :: op_err
+  integer :: i
+
+  op_err = error_type()
+  if (allocated(var%storage)) next = var%storage
+  if (present(chunks)) then
+    if (.not. allocated(var%dims)) then
+      op_err = error_type(NC_EINVAL, "set_storage", "Variable dimensions must be allocated.")
+    else if (size(chunks) /= size(var%dims) .or. size(chunks) == 0 .or. any(chunks <= 0)) then
+      op_err = error_type(NC_EINVAL, "set_storage", "Chunk sizes must be positive and match the variable rank.")
+    else
+      next%chunks = chunks
+    end if
+  end if
+  if (present(deflate_level)) then
+    if (deflate_level < 0 .or. deflate_level > 9) &
+      & op_err = error_type(NC_EINVAL, "set_storage", "Deflate level must be 0 through 9.")
+    next%deflate_level = deflate_level
+  end if
+  if (present(shuffle)) next%shuffle = merge(1, 0, shuffle)
+  if (present(fletcher32)) next%fletcher32 = merge(1, 0, fletcher32)
+  if (present(endian)) then
+    if (endian /= NC_ENDIAN_NATIVE .and. endian /= NC_ENDIAN_LITTLE .and. endian /= NC_ENDIAN_BIG) &
+      & op_err = error_type(NC_EINVAL, "set_storage", "Invalid endianness.")
+    next%endian = endian
+  end if
+  if (present(no_fill)) next%no_fill = merge(1, 0, no_fill)
+  if (present(fill_value)) then
+    if (.not. has_err(op_err)) call validate(fill_value, context="set_storage", err=op_err)
+    if (.not. has_err(op_err)) then
+      if (fill_value%len /= 1 .or. fill_value%dtype /= var%dtype) &
+        & op_err = error_type(NC_EINVAL, "set_storage", "Fill value must be scalar and match variable type.")
+    end if
+    if (.not. has_err(op_err)) then
+      if (.not. allocated(next%fill_value)) allocate(next%fill_value)
+      call clone_att(fill_value, next%fill_value)
+      next%fill_value%name = "_FillValue"
+    end if
+  end if
+  if (.not. has_err(op_err)) then
+    if (next%no_fill == 1 .and. allocated(next%fill_value)) &
+      & op_err = error_type(NC_EINVAL, "set_storage", "No-fill conflicts with a custom fill value.")
+  end if
+  if (.not. has_err(op_err) .and. allocated(var%atts)) then
+    do i = 1, size(var%atts)
+      if (.not. allocated(var%atts(i)%name)) cycle
+      if (var%atts(i)%name /= "_FillValue") cycle
+      if (next%no_fill == 1) &
+        & op_err = error_type(NC_EINVAL, "set_storage", "No-fill conflicts with _FillValue attribute.")
+      if (allocated(next%fill_value)) then
+        if (next%fill_value /= var%atts(i)) &
+          & op_err = error_type(NC_EINVAL, "set_storage", "Conflicting fill values.")
+      end if
+    end do
+  end if
+  if (.not. has_err(op_err)) var%storage = next
+  call return_err(op_err, err)
+end subroutine set_storage
+
 pure module subroutine rename_var_var(var, new_name, err)
   !! Rename an independent variable in memory; preserve its metadata and storage.
   type(variable_type), intent(inout) :: var

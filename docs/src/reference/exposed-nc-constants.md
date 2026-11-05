@@ -38,3 +38,8 @@
 
 The source `variable_type` passed to `PUT_VARIABLE` must have the same type as
 its destination. Other C constants remain available from `nc4f_c_interface`.
+
+## Endianness
+
+`SET_STORAGE` accepts `NC_ENDIAN_NATIVE`, `NC_ENDIAN_LITTLE`, and
+`NC_ENDIAN_BIG`, all exported by `nc4f`.

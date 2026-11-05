@@ -278,6 +278,8 @@ function inq_var_(nc, name, err) result(var)
   if (has_err(err)) return
   var%dims = inq_dims_var(nc, var, err=err)
   if (has_err(err)) return
+  call inquire_storage_(nc, var, err)
+  if (has_err(err)) return
   call compute_size(var, nelems, err)
   if (.exists. err) return
   var%len = nelems
@@ -389,6 +391,160 @@ pure module subroutine validate_definition(name, dtype, dims, atts, err)
   end do
 end subroutine validate_definition
 
+subroutine validate_storage_(storage, dtype, dims, atts, err)
+  type(storage_type), intent(in) :: storage
+  integer(c_int), intent(in) :: dtype
+  type(dimension_type), intent(in) :: dims(:)
+  type(attribute_type), intent(in), optional :: atts(:)
+  type(error_type), intent(out) :: err
+  integer :: i
+
+  err = error_type()
+  if (allocated(storage%chunks)) then
+    if (size(storage%chunks) /= size(dims) .or. size(dims) == 0) then
+      err = error_type(NC_EINVAL, "define_variable", "Chunk rank must match non-scalar variable rank.")
+      return
+    end if
+    if (any(storage%chunks <= 0)) then
+      err = error_type(NC_EINVAL, "define_variable", "Chunk sizes must be positive.")
+      return
+    end if
+  end if
+  if (storage%deflate_level < -1 .or. storage%deflate_level > 9 .or. &
+    & storage%shuffle < -1 .or. storage%shuffle > 1 .or. &
+    & storage%fletcher32 < -1 .or. storage%fletcher32 > 1 .or. &
+    & storage%no_fill < -1 .or. storage%no_fill > 1 .or. &
+    & storage%endian < -1 .or. storage%endian > NC_ENDIAN_BIG) then
+    err = error_type(NC_EINVAL, "define_variable", "Invalid storage setting.")
+    return
+  end if
+  if (allocated(storage%fill_value)) then
+    call validate(storage%fill_value, context="define_variable", err=err)
+    if (has_err(err)) return
+    if (storage%fill_value%len /= 1 .or. storage%fill_value%dtype /= dtype .or. storage%no_fill == 1) then
+      err = error_type(NC_EINVAL, "define_variable", "Invalid custom fill value.")
+      return
+    end if
+  end if
+  if (present(atts)) then
+    do i = 1, size(atts)
+      if (atts(i)%name /= "_FillValue") cycle
+      if (storage%no_fill == 1) &
+        & err = error_type(NC_EINVAL, "define_variable", "No-fill conflicts with _FillValue attribute.")
+      if (allocated(storage%fill_value)) then
+        if (storage%fill_value /= atts(i)) &
+          & err = error_type(NC_EINVAL, "define_variable", "Conflicting fill values.")
+      end if
+    end do
+  end if
+end subroutine validate_storage_
+
+subroutine apply_storage_(nc, varid, name, storage, err)
+  class(group_type), intent(in) :: nc
+  integer(c_int), intent(in) :: varid
+  character(len=*), intent(in) :: name
+  type(storage_type), target, intent(in) :: storage
+  type(error_type), intent(out) :: err
+  integer(c_int) :: stat, fmt, shuffle, deflate
+  integer(c_size_t), allocatable, target :: chunks(:)
+
+  err = error_type()
+  stat = nc_inq_format(nc%id, fmt)
+  err = netcdf_err(stat, "define_variable", "Inquire format: "//trim(name))
+  if (has_err(err)) return
+  if (fmt /= NC_FORMAT_NETCDF4 .and. fmt /= NC_FORMAT_NETCDF4_CLASSIC) then
+    if (allocated(storage%chunks) .or. storage%deflate_level >= 0 .or. &
+      & storage%shuffle >= 0 .or. storage%fletcher32 >= 0 .or. storage%endian >= 0) &
+      & err = error_type(NC_EINVAL, "define_variable", "Storage filters require NetCDF-4 format.")
+    if (has_err(err)) return
+  end if
+  if (allocated(storage%chunks)) then
+    chunks = int(storage%chunks(size(storage%chunks):1:-1), c_size_t)
+    stat = nc_def_var_chunking(nc%id, varid, NC_CHUNKED, c_loc(chunks(1)))
+    err = netcdf_err(stat, "define_variable", "Set chunking: "//trim(name))
+    if (has_err(err)) return
+  end if
+  if (storage%deflate_level >= 0 .or. storage%shuffle >= 0) then
+    shuffle = max(storage%shuffle, 0_c_int)
+    deflate = merge(1_c_int, 0_c_int, storage%deflate_level > 0)
+    stat = nc_def_var_deflate(nc%id, varid, shuffle, deflate, max(storage%deflate_level, 0_c_int))
+    err = netcdf_err(stat, "define_variable", "Set compression: "//trim(name))
+    if (has_err(err)) return
+  end if
+  if (storage%fletcher32 >= 0) then
+    stat = nc_def_var_fletcher32(nc%id, varid, storage%fletcher32)
+    err = netcdf_err(stat, "define_variable", "Set checksum: "//trim(name))
+    if (has_err(err)) return
+  end if
+  if (storage%endian >= 0) then
+    stat = nc_def_var_endian(nc%id, varid, storage%endian)
+    err = netcdf_err(stat, "define_variable", "Set endianness: "//trim(name))
+    if (has_err(err)) return
+  end if
+  if (storage%no_fill >= 0 .or. allocated(storage%fill_value)) then
+    if (allocated(storage%fill_value)) then
+      stat = nc_def_var_fill(nc%id, varid, 0_c_int, buffer2cptr(storage%fill_value))
+    else
+      stat = nc_def_var_fill(nc%id, varid, max(storage%no_fill, 0_c_int), c_null_ptr)
+    end if
+    err = netcdf_err(stat, "define_variable", "Set fill: "//trim(name))
+  end if
+end subroutine apply_storage_
+
+subroutine inquire_storage_(nc, var, err)
+  class(group_type), intent(in) :: nc
+  type(variable_type), intent(inout) :: var
+  type(error_type), intent(out) :: err
+  type(storage_type) :: storage
+  integer(c_int) :: stat, fmt, layout, shuffle, deflate, level, checksum, endian, no_fill
+  integer(c_size_t), allocatable, target :: chunks(:)
+  integer :: rank
+
+  err = error_type()
+  stat = nc_inq_format(nc%id, fmt)
+  err = netcdf_err(stat, "inquire_variable", "Inquire format: "//var%name)
+  if (has_err(err)) return
+  if (fmt /= NC_FORMAT_NETCDF4 .and. fmt /= NC_FORMAT_NETCDF4_CLASSIC) return
+  rank = size(var%dims)
+  allocate(chunks(max(rank, 1)))
+  stat = nc_inq_var_chunking(nc%id, var%id, layout, c_loc(chunks(1)))
+  err = netcdf_err(stat, "inquire_variable", "Inquire chunking: "//var%name)
+  if (has_err(err)) return
+  if (layout == NC_CHUNKED .and. rank > 0) storage%chunks = int(chunks(rank:1:-1), int64)
+  stat = nc_inq_var_deflate(nc%id, var%id, shuffle, deflate, level)
+  err = netcdf_err(stat, "inquire_variable", "Inquire compression: "//var%name)
+  if (has_err(err)) return
+  if (shuffle /= 0) storage%shuffle = shuffle
+  if (deflate /= 0) storage%deflate_level = level
+  stat = nc_inq_var_fletcher32(nc%id, var%id, checksum)
+  err = netcdf_err(stat, "inquire_variable", "Inquire checksum: "//var%name)
+  if (has_err(err)) return
+  if (checksum /= 0) storage%fletcher32 = checksum
+  stat = nc_inq_var_endian(nc%id, var%id, endian)
+  err = netcdf_err(stat, "inquire_variable", "Inquire endianness: "//var%name)
+  if (has_err(err)) return
+  if (endian /= NC_ENDIAN_NATIVE) storage%endian = endian
+  stat = nc_inq_var_fill(nc%id, var%id, no_fill, c_null_ptr)
+  err = netcdf_err(stat, "inquire_variable", "Inquire fill: "//var%name)
+  if (has_err(err)) return
+  if (no_fill /= 0) storage%no_fill = 1
+  if (allocated(var%atts)) then
+    block
+      integer :: i
+      do i = 1, size(var%atts)
+        if (var%atts(i)%name /= "_FillValue") cycle
+        allocate(storage%fill_value)
+        storage%fill_value = var%atts(i)
+        exit
+      end do
+    end block
+  end if
+  if (allocated(storage%chunks) .or. storage%shuffle >= 0 .or. &
+    & storage%deflate_level >= 0 .or. storage%fletcher32 >= 0 .or. &
+    & storage%endian >= 0 .or. storage%no_fill >= 0 .or. &
+    & allocated(storage%fill_value)) var%storage = storage
+end subroutine inquire_storage_
+
 module subroutine def_var(nc, var, err)
   !! Define a variable from metadata without reading or copying its data storage.
   class(group_type), intent(in) :: nc
@@ -405,10 +561,10 @@ module subroutine def_var(nc, var, err)
     call return_err(op_err, err)
     return
   end if
-  call def_var_raw(nc, var%name, var%dtype, var%dims, var%atts, err)
+  call def_var_raw(nc, var%name, var%dtype, var%dims, var%atts, var%storage, err)
 end subroutine def_var
 
-module subroutine def_var_raw(nc, name, dtype, dims, atts, err)
+module subroutine def_var_raw(nc, name, dtype, dims, atts, storage, err)
   !! Define a variable from explicit schema arguments without allocating data storage.
   class(group_type), intent(in) :: nc
   !! Open writable dataset or subgroup; loaded caches remain unchanged.
@@ -420,6 +576,8 @@ module subroutine def_var_raw(nc, name, dtype, dims, atts, err)
   !! Destination dimensions in Fortran order; an empty array defines a scalar.
   type(attribute_type), intent(in), optional :: atts(:)
   !! Optional initial attributes, written before any variable data.
+  type(storage_type), intent(in), optional :: storage
+  !! Optional per-variable storage settings, applied before attributes and data.
   type(error_type), intent(out), optional :: err
   !! Optional operation result; failures terminate execution when omitted.
   type(variable_type) :: defined
@@ -433,6 +591,10 @@ module subroutine def_var_raw(nc, name, dtype, dims, atts, err)
   definition: block
     call validate_definition(name, dtype, dims, atts, op_err)
     if (has_err(op_err)) exit definition
+    if (present(storage)) then
+      call validate_storage_(storage, dtype, dims, atts, op_err)
+      if (has_err(op_err)) exit definition
+    end if
     stat = nc_inq_varid(nc%id, f2cstr(name), varid)
     if (stat == NC_NOERR) then
       op_err = error_type(NC_ENAMEINUSE, "define_variable", &
@@ -460,7 +622,31 @@ module subroutine def_var_raw(nc, name, dtype, dims, atts, err)
     stat = nc_def_var(nc%id, f2cstr(name), dtype, n, dimids, defined%id)
     op_err = netcdf_err(stat, "define_variable", "Define variable: "//trim(name))
     if (has_err(op_err)) exit definition
-    if (present(atts)) defined%atts = atts
+    if (present(storage)) then
+      call apply_storage_(nc, defined%id, name, storage, op_err)
+      if (has_err(op_err)) exit definition
+    end if
+    if (present(atts)) then
+      if (present(storage)) then
+        if (allocated(storage%fill_value)) then
+          n = 0
+          do i = 1, size(atts)
+            if (atts(i)%name /= "_FillValue") n = n + 1
+          end do
+          allocate(defined%atts(n))
+          n = 0
+          do i = 1, size(atts)
+            if (atts(i)%name == "_FillValue") cycle
+            n = n + 1
+            defined%atts(n) = atts(i)
+          end do
+        else
+          defined%atts = atts
+        end if
+      else
+        defined%atts = atts
+      end if
+    end if
     call put_att_var(nc, defined, op_err)
   end block definition
   call return_err(op_err, err)

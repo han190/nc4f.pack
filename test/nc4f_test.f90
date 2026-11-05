@@ -40,6 +40,7 @@ case ("--rename-dim-invalid-file")
   call invalid_file_dim_rename()
 case default
   tests = [&
+    & test_type("storage_controls", storage_controls), &
     & test_type("strided_writes", strided_writes), &
     & test_type("write_definition", write_definition), &
     & test_type("write_selection", write_selection), &

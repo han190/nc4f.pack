@@ -21,7 +21,7 @@ NetCDF format support is excluded from this assessment.
 | Rename groups | Low–medium | Complete | Four `rename_group` overloads support pure model editing and explicit file updates, with root protection and shared-child-cache semantics. |
 | Rename dimensions | Low–medium | Complete | Five `rename_dimension` overloads support pure model editing and explicit file updates, synchronizing direct caches and rejecting inherited file targets. |
 | Strided writes | Low–medium | Complete | Public `define_variable` and `put_variable` support explicit schema definition and contiguous/strided writes; `to_netcdf` supports single-variable selections in append mode. |
-| NetCDF-4 storage controls | Medium | Under consideration | Represent per-variable chunking, compression, shuffle/checksum, endianness, and fill settings; apply them before data writes and support inquiry and validation. |
+| NetCDF-4 storage controls | Medium | Complete | Optional per-variable `storage_type` and `set_storage` configure chunking, compression, shuffle/checksum, endianness, and fill before writes; inquiry reports persisted settings. |
 | Multi-slab I/O | Medium | Under consideration | Compose slab operations and define result ordering, shapes, and partial-failure behavior. |
 | Mapped I/O | Medium–high | Under consideration | Reconcile memory mappings with the contiguous buffer model; validate mappings and memory bounds. |
 | In-memory file images | Medium–high | Under consideration | Define ownership and lifetime rules for importing and exporting file byte buffers. |
@@ -118,10 +118,10 @@ it should not remove limitations for related features that remain unsupported.
 - **Public writes share one selection writer.** `put_variable`, `to_netcdf`,
   and group serialization reuse the validated contiguous/strided write path.
   `define_variable` separates file schema from source-buffer shape.
-- **Custom fill values may already work through attributes.** The serializer
-  writes variable attributes before data, so a scalar, matching-type
-  `_FillValue` appears usable through the existing attribute path. Verify this
-  with a focused test before treating it as missing functionality.
+- **Custom fill values work through storage settings or attributes.**
+  `set_storage(..., fill_value=...)` applies the value with `nc_def_var_fill`
+  before data writes. A scalar, matching-type `_FillValue` attribute remains
+  supported; inquiry reports it in both the attributes and `storage`.
 - **Diskless I/O and file-image I/O are separate milestones.** Diskless mode
   primarily adds open/create flags; file-image support also needs explicit
   buffer ownership and lifetime rules.

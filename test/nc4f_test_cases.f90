@@ -7,7 +7,7 @@ implicit none (type, external)
 
 public :: simple_wr, simple_rd, character_variables, elemental_reads, hyperslab_reads, buffer_edges
 public :: creation_policy, error_handling
-public :: write_definition, write_selection, write_paths, write_failures, strided_writes
+public :: write_definition, write_selection, write_paths, write_failures, strided_writes, storage_controls
 public :: delete_att_model, delete_att_file, delete_att_errors
 public :: rename_att_model, rename_att_file, rename_att_errors
 public :: rename_var_model, rename_var_file, rename_var_errors
@@ -31,6 +31,9 @@ character(*), parameter :: NETCDF_TYPE_RESULT_FILE = &
   & "build/test-results/nasa_cosp_netcdf_type.txt"
 
 interface
+  module subroutine storage_controls(passed)
+    logical, intent(inout) :: passed
+  end subroutine storage_controls
   module subroutine strided_writes(passed)
     !! Verify the combined definition, strided-update, and timestep-append workflow.
     logical, intent(inout) :: passed

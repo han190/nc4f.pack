@@ -20,8 +20,18 @@ library = true
 [library]
 source-dir = "src"
 
-# Build only the C bindings with:
-# (cd src/c_interface && fpm build)
+[features]
+netcdf-paths.macos.flags = "-I/opt/homebrew/opt/netcdf/include"
+netcdf-paths.macos.link-time-flags = "-L/opt/homebrew/opt/netcdf/lib"
+flags-debug.gfortran.flags = "-g -Wall -Wextra -Wimplicit-interface -fPIC -fmax-errors=1 -fcheck=bounds -fcheck=array-temps -fbacktrace -fcoarray=single"
+flags-debug.flang.flags = "-O0 -g -fno-omit-frame-pointer -pedantic -fimplicit-none"
+flags-release.gfortran.flags = "-O3"
+flags-release.flang.flags = "-O3"
+
+[profiles]
+macos-homebrew = ["netcdf-paths", "flags-release"]
+macos-homebrew-release = ["netcdf-paths", "flags-release"]
+macos-homebrew-debug = ["netcdf-paths", "flags-debug"]
 
 [[example]]
 name = "mandelbrot"

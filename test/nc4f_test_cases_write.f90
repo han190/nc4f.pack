@@ -89,7 +89,7 @@ module subroutine write_definition(passed)
   call check_ok(err, "metadata-only definition")
   got = inquire_variable(nc, "large")
   call check_write(got%len == 1000000 .and. .not. allocated(got%buffer), "metadata-only inquiry")
-  call define_variable(nc, "values", NC_INT, ["x".dim.4], ["units".att."original"], err)
+  call define_variable(nc, "values", NC_INT, ["x".dim.4], ["units".att."original"], err=err)
   call check_ok(err, "define fixed variable")
   call define_variable(nc, &
     & variable_type(name="same_dimension", dtype=NC_FLOAT, &
