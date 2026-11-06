@@ -20,7 +20,12 @@ file(MAKE_DIRECTORY "${nc4f_module_dir}" "${nc4f_c_module_dir}")
 
 function(nc4f_compile_options target)
   if(CMAKE_Fortran_COMPILER_ID STREQUAL "GNU")
-    target_compile_options(${target} PRIVATE -fcoarray=single
+    # Match test-drive's default coarray mode when compiling test modules.
+    # Gfortran 15 cannot reread a re-exported test-drive type otherwise.
+    if(NOT target STREQUAL "nc4f_tests")
+      target_compile_options(${target} PRIVATE -fcoarray=single)
+    endif()
+    target_compile_options(${target} PRIVATE
       "$<$<CONFIG:Debug>:-Wall;-Wextra;-fcheck=bounds;-fcheck=array-temps;-fbacktrace>")
   elseif(CMAKE_Fortran_COMPILER_ID STREQUAL "IntelLLVM" AND UNIX)
     target_compile_options(${target} PRIVATE -standard-semantics
@@ -129,6 +134,10 @@ if(NC4F_BUILD_TESTS)
   if(NOT TARGET test-drive::test-drive)
     include(FetchContent)
     set(TESTDRIVE_BUILD_TESTING OFF)
+    # LLVM Flang can detect XDP but lack complex real128 ABS at link time.
+    if(CMAKE_Fortran_COMPILER_ID STREQUAL "LLVMFlang")
+      set(TESTDRIVE_WITH_XDP OFF)
+    endif()
     FetchContent_Declare(test-drive
       GIT_REPOSITORY https://github.com/fortran-lang/test-drive.git
       GIT_TAG v0.6.1)
