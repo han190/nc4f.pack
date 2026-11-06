@@ -34,6 +34,7 @@ jobs:
             gcc-gfortran \
             gcc15-gfortran \
             flang \
+            git \
             make \
             netcdf \
             netcdf-devel \
