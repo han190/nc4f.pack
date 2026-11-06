@@ -1,10 +1,146 @@
-submodule(nc4f_test_cases) nc4f_test_cases_data
-
+module nc4f_test_real_data
+use, intrinsic :: iso_fortran_env, only: int8, int16, int32, int64, &
+  & real32, real64
+use, non_intrinsic :: testdrive, only: check, &
+  & test_error_type => error_type, new_unittest, unittest_type
+use, non_intrinsic :: nc4f
 implicit none (type, external)
+private
+public :: collect_real_data
+
+character(*), parameter :: TEST_RESULTS_DIR = "build/test-results/"
+character(*), parameter :: NETCDF_TYPE_RESULT_FILE = &
+  & "build/test-results/nasa_cosp_netcdf_type.txt"
 
 contains
 
-module subroutine sum_vars_test(passed)
+subroutine collect_real_data(tests)
+  type(unittest_type), allocatable, intent(out) :: tests(:)
+  integer :: status
+
+  call execute_command_line("mkdir -p build/test-results", &
+    & exitstat=status)
+  if (status /= 0) error stop "Cannot create test-results directory."
+  tests = [ &
+    & new_unittest("sum_vars_test", test_sum_vars_test), &
+    & new_unittest("sfc_pres_temp_wr", test_sfc_pres_temp_wr), &
+    & new_unittest("sfc_pres_temp_rd", test_sfc_pres_temp_rd), &
+    & new_unittest("extensive_wr", test_extensive_wr), &
+    & new_unittest("extensive_rd", test_extensive_rd), &
+    & new_unittest("nasa_cosp_read", test_nasa_cosp_read), &
+    & new_unittest("ecmwf_era40_read", test_ecmwf_era40_read), &
+    & new_unittest("sresa1b_ccsm3_read", test_sresa1b_ccsm3_read), &
+    & new_unittest("sample_uddtio", test_sample_uddtio), &
+    & new_unittest("cami_initial_read", test_cami_initial_read), &
+    & new_unittest("tos_o1_read", test_tos_o1_read), &
+    & new_unittest("echam_spectral_read", test_echam_spectral_read) &
+    & ]
+end subroutine collect_real_data
+
+subroutine test_sum_vars_test(error)
+  type(test_error_type), allocatable, intent(out) :: error
+  logical :: passed
+
+  call sum_vars_test(passed)
+  call check(error, passed, "sum_vars_test failed")
+end subroutine test_sum_vars_test
+
+subroutine test_sfc_pres_temp_wr(error)
+  type(test_error_type), allocatable, intent(out) :: error
+  logical :: passed
+
+  call sfc_pres_temp_wr(passed)
+  call check(error, passed, "sfc_pres_temp_wr failed")
+end subroutine test_sfc_pres_temp_wr
+
+subroutine test_sfc_pres_temp_rd(error)
+  type(test_error_type), allocatable, intent(out) :: error
+  logical :: passed
+
+  call sfc_pres_temp_wr(passed)
+  call check(error, passed, "Surface fixture creation failed")
+  if (allocated(error)) return
+  call sfc_pres_temp_rd(passed)
+  call check(error, passed, "sfc_pres_temp_rd failed")
+end subroutine test_sfc_pres_temp_rd
+
+subroutine test_extensive_wr(error)
+  type(test_error_type), allocatable, intent(out) :: error
+  logical :: passed
+
+  call extensive_wr(passed)
+  call check(error, passed, "extensive_wr failed")
+end subroutine test_extensive_wr
+
+subroutine test_extensive_rd(error)
+  type(test_error_type), allocatable, intent(out) :: error
+  logical :: passed
+
+  call extensive_wr(passed)
+  call check(error, passed, "Extensive fixture creation failed")
+  if (allocated(error)) return
+  call extensive_rd(passed)
+  call check(error, passed, "extensive_rd failed")
+end subroutine test_extensive_rd
+
+subroutine test_nasa_cosp_read(error)
+  type(test_error_type), allocatable, intent(out) :: error
+  logical :: passed
+
+  call nasa_cosp_read(passed)
+  call check(error, passed, "nasa_cosp_read failed")
+end subroutine test_nasa_cosp_read
+
+subroutine test_ecmwf_era40_read(error)
+  type(test_error_type), allocatable, intent(out) :: error
+  logical :: passed
+
+  call ecmwf_era40_read(passed)
+  call check(error, passed, "ecmwf_era40_read failed")
+end subroutine test_ecmwf_era40_read
+
+subroutine test_sresa1b_ccsm3_read(error)
+  type(test_error_type), allocatable, intent(out) :: error
+  logical :: passed
+
+  call sresa1b_ccsm3_read(passed)
+  call check(error, passed, "sresa1b_ccsm3_read failed")
+end subroutine test_sresa1b_ccsm3_read
+
+subroutine test_sample_uddtio(error)
+  type(test_error_type), allocatable, intent(out) :: error
+  logical :: passed
+
+  call sample_uddtio(passed)
+  call check(error, passed, "sample_uddtio failed")
+end subroutine test_sample_uddtio
+
+subroutine test_cami_initial_read(error)
+  type(test_error_type), allocatable, intent(out) :: error
+  logical :: passed
+
+  call cami_initial_read(passed)
+  call check(error, passed, "cami_initial_read failed")
+end subroutine test_cami_initial_read
+
+subroutine test_tos_o1_read(error)
+  type(test_error_type), allocatable, intent(out) :: error
+  logical :: passed
+
+  call tos_o1_read(passed)
+  call check(error, passed, "tos_o1_read failed")
+end subroutine test_tos_o1_read
+
+subroutine test_echam_spectral_read(error)
+  type(test_error_type), allocatable, intent(out) :: error
+  logical :: passed
+
+  call echam_spectral_read(passed)
+  call check(error, passed, "echam_spectral_read failed")
+end subroutine test_echam_spectral_read
+
+
+subroutine sum_vars_test(passed)
   !! Verify element-wise summation of compatible variable objects.
   logical, intent(inout) :: passed
   !! Whether the test case has passed.
@@ -28,7 +164,7 @@ module subroutine sum_vars_test(passed)
     & all(result%dims == vars(1)%dims)
 end subroutine sum_vars_test
 
-module subroutine sfc_pres_temp_wr(passed)
+subroutine sfc_pres_temp_wr(passed)
   !! Write the surface pressure and temperature example with dimensions and
   !! units.
   logical, intent(inout) :: passed
@@ -65,7 +201,7 @@ module subroutine sfc_pres_temp_wr(passed)
   passed = .true.
 end subroutine sfc_pres_temp_wr
 
-module subroutine sfc_pres_temp_rd(passed)
+subroutine sfc_pres_temp_rd(passed)
   !! Read and verify the surface pressure and temperature example file.
   logical, intent(inout) :: passed
   !! Whether the test case has passed.
@@ -110,7 +246,7 @@ module subroutine sfc_pres_temp_rd(passed)
   call close_netcdf(nc)
 end subroutine sfc_pres_temp_rd
 
-module subroutine extensive_wr(passed)
+subroutine extensive_wr(passed)
   !! Write the mixed-type, mixed-rank round-trip fixture to NetCDF.
   logical, intent(inout) :: passed
   !! Whether the test case has passed.
@@ -126,7 +262,7 @@ module subroutine extensive_wr(passed)
   if (passed) passed = file_size > 0
 end subroutine extensive_wr
 
-module subroutine extensive_rd(passed)
+subroutine extensive_rd(passed)
   !! Verify types, shapes, attributes, and values in the extensive round-trip
   !! file.
   logical, intent(inout) :: passed
@@ -175,7 +311,7 @@ module subroutine extensive_rd(passed)
   call close_netcdf(nc)
 end subroutine extensive_rd
 
-module subroutine nasa_cosp_read(passed)
+subroutine nasa_cosp_read(passed)
   !! Read root-level data and metadata from NASA's externally produced CLDPROP
   !! COSP NetCDF-4 sample file.  The file also contains nested groups; this test
   !! intentionally exercises the currently supported root group only.
@@ -266,7 +402,7 @@ module subroutine nasa_cosp_read(passed)
   end if
 end subroutine nasa_cosp_read
 
-module subroutine ecmwf_era40_read(passed)
+subroutine ecmwf_era40_read(passed)
   !! Read coordinates, CF metadata, and packed data from Unidata's externally
   !! produced ECMWF ERA-40 sample file.
   logical, intent(inout) :: passed
@@ -344,7 +480,7 @@ module subroutine ecmwf_era40_read(passed)
   end if
 end subroutine ecmwf_era40_read
 
-module subroutine sresa1b_ccsm3_read(passed)
+subroutine sresa1b_ccsm3_read(passed)
   !! Read a CF climate-model file through the root-group API.
   logical, intent(inout) :: passed
   !! Whether the test case has passed.
@@ -405,7 +541,7 @@ module subroutine sresa1b_ccsm3_read(passed)
   end if
 end subroutine sresa1b_ccsm3_read
 
-module subroutine sample_uddtio(passed)
+subroutine sample_uddtio(passed)
   !! Render every externally produced NetCDF fixture through NetCDF UDDTIO.
   logical, intent(inout) :: passed
   !! Whether the test case has passed.
@@ -536,7 +672,7 @@ function render_sample_uddtio_(file, label, expected_dim, expected_var, &
     & attribute_found .and. child_group_found
 end function render_sample_uddtio_
 
-module subroutine cami_initial_read(passed)
+subroutine cami_initial_read(passed)
   !! Read CAM initial-condition data with a four-dimensional hyperslab.
   logical, intent(inout) :: passed
   !! Whether the test case has passed.
@@ -600,7 +736,7 @@ module subroutine cami_initial_read(passed)
   end if
 end subroutine cami_initial_read
 
-module subroutine tos_o1_read(passed)
+subroutine tos_o1_read(passed)
   !! Read an ocean file whose first latitude row contains missing values.
   logical, intent(inout) :: passed
   !! Whether the test case has passed.
@@ -658,7 +794,7 @@ module subroutine tos_o1_read(passed)
   end if
 end subroutine tos_o1_read
 
-module subroutine echam_spectral_read(passed)
+subroutine echam_spectral_read(passed)
   !! Read a spectral-grid file with non-geographical dimensions.
   logical, intent(inout) :: passed
   !! Whether the test case has passed.
@@ -818,4 +954,5 @@ pure function extensive_attributes() result(atts)
     & "scale".att.0.125_real64]
 end function extensive_attributes
 
-end submodule nc4f_test_cases_data
+
+end module nc4f_test_real_data

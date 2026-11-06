@@ -58,6 +58,9 @@ name = "test-suite"
 source-dir = "test"
 main = "nc4f_test.f90"
 
+[test.dependencies]
+test-drive = { git = "https://github.com/fortran-lang/test-drive", tag = "v0.6.1" }
+
 [extra.fortitude.check]
 ignore = ['C002', 'C071', 'C072', 'C121', 'C181']
 line-length = 80
@@ -72,7 +75,7 @@ channel = "beta"
 tag = "0.1.0-beta.1"
 
 [extra.fformat]
-line-length = 80
+line-length = 120
 indent = 2
 base-indent = 0
 indent-units = false

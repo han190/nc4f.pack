@@ -1,293 +1,124 @@
-program main
-
-use, intrinsic :: iso_fortran_env, only: real32
-use, non_intrinsic :: nc4f
-use, non_intrinsic :: nc4f_test_module
-use, non_intrinsic :: nc4f_test_cases
-use, non_intrinsic :: nc4f_test_c_bindings
+program nc4f_test
+use, intrinsic :: iso_fortran_env, only: error_unit
+use, non_intrinsic :: testdrive, only: new_testsuite, run_selected, &
+  & run_testsuite, testsuite_type
+use, non_intrinsic :: nc4f_test_c_interface_dimension, only: &
+  & collect_c_interface_dimension
+use, non_intrinsic :: nc4f_test_c_interface_error, only: &
+  & collect_c_interface_error
+use, non_intrinsic :: nc4f_test_c_interface_group, only: &
+  & collect_c_interface_group
+use, non_intrinsic :: nc4f_test_c_interface_attribute, only: &
+  & collect_c_interface_attribute
+use, non_intrinsic :: nc4f_test_c_interface_utility, only: &
+  & collect_c_interface_utility
+use, non_intrinsic :: nc4f_test_c_interface_dataset, only: &
+  & collect_c_interface_dataset
+use, non_intrinsic :: nc4f_test_c_interface_io, only: &
+  & collect_c_interface_io
+use, non_intrinsic :: nc4f_test_c_interface_variable, only: &
+  & collect_c_interface_variable
+use, non_intrinsic :: nc4f_test_ds_dimension, only: &
+  & collect_ds_dimension
+use, non_intrinsic :: nc4f_test_ds_utility, only: &
+  & collect_ds_utility
+use, non_intrinsic :: nc4f_test_ds_attribute_constructor, &
+  & only: collect_ds_attribute_constructor
+use, non_intrinsic :: nc4f_test_ds_attribute, only: &
+  & collect_ds_attribute
+use, non_intrinsic :: nc4f_test_ds_variable_constructor, &
+  & only: collect_ds_variable_constructor
+use, non_intrinsic :: nc4f_test_ds_extract, only: &
+  & collect_ds_extract
+use, non_intrinsic :: nc4f_test_ds_variable, only: &
+  & collect_ds_variable
+use, non_intrinsic :: nc4f_test_ds_group, only: &
+  & collect_ds_group
+use, non_intrinsic :: nc4f_test_ds_arithmetic, only: &
+  & collect_ds_arithmetic
+use, non_intrinsic :: nc4f_test_ds_clone, only: &
+  & collect_ds_clone
+use, non_intrinsic :: nc4f_test_ds_io, only: &
+  & collect_ds_io
+use, non_intrinsic :: nc4f_test_ds_validate, only: &
+  & collect_ds_validate
+use, non_intrinsic :: nc4f_test_nc_utility, only: collect_nc_utility
+use, non_intrinsic :: nc4f_test_nc_dataset, only: collect_nc_dataset
+use, non_intrinsic :: nc4f_test_nc_variable, only: collect_nc_variable
+use, non_intrinsic :: nc4f_test_nc_dimension, only: collect_nc_dimension
+use, non_intrinsic :: nc4f_test_nc_attribute, only: collect_nc_attribute
+use, non_intrinsic :: nc4f_test_nc_group, only: collect_nc_group
+use, non_intrinsic :: nc4f_test_nc_error, only: collect_nc_error
+use, non_intrinsic :: nc4f_test_real_data, only: collect_real_data
 implicit none (type, external)
 
-character(len=128) :: command
-type(test_type), allocatable :: tests(:)
+type(testsuite_type), allocatable :: suites(:)
+integer :: i, stat
+character(len=64) :: selected
+character(len=64) :: selected_test
+logical :: found
 
-call get_command_argument(1, command)
-select case (trim(command))
-case ("--ownership-invalid-noncontiguous")
-  call invalid_noncontiguous_shallow_constructor()
-case ("--ownership-invalid-character")
-  call invalid_character_shallow_constructor()
-case ("--invalid-error")
-  call invalid_error()
-case ("--delete-invalid-model")
-  call invalid_model_delete()
-case ("--delete-invalid-file")
-  call invalid_file_delete()
-case ("--rename-invalid-model")
-  call invalid_model_rename()
-case ("--rename-invalid-file")
-  call invalid_file_rename()
-case ("--rename-var-invalid-model")
-  call invalid_model_var_rename()
-case ("--rename-var-invalid-file")
-  call invalid_file_var_rename()
-case ("--rename-grp-invalid-model")
-  call invalid_model_grp_rename()
-case ("--rename-grp-invalid-file")
-  call invalid_file_grp_rename()
-case ("--rename-dim-invalid-model")
-  call invalid_model_dim_rename()
-case ("--rename-dim-invalid-file")
-  call invalid_file_dim_rename()
-case default
-  tests = [&
-    & test_type("storage_controls", storage_controls), &
-    & test_type("strided_writes", strided_writes), &
-    & test_type("write_definition", write_definition), &
-    & test_type("write_selection", write_selection), &
-    & test_type("write_paths", write_paths), &
-    & test_type("write_failures", write_failures), &
-    & test_type("c_bindings_storage", c_bindings_storage), &
-    & test_type("c_bindings_formats", c_bindings_formats), &
-    & test_type("c_bindings_strings", c_bindings_strings), &
-    & test_type("c_bindings_user_types", c_bindings_user_types), &
-    & test_type("c_bindings_memory_mapped", c_bindings_memory_mapped), &
-    & test_type("c_bindings_legacy_aux", c_bindings_legacy_aux), &
-    & test_type("simple_wr", simple_wr), &
-    & test_type("simple_rd", simple_rd), &
-    & test_type("character_variables", character_variables), &
-    & test_type("elemental_reads", elemental_reads), &
-    & test_type("hyperslab_reads", hyperslab_reads), &
-    & test_type("creation_policy", creation_policy), &
-    & test_type("error_handling", error_handling), &
-    & test_type("delete_att_model", delete_att_model), &
-    & test_type("delete_att_file", delete_att_file), &
-    & test_type("delete_att_errors", delete_att_errors), &
-    & test_type("rename_att_model", rename_att_model), &
-    & test_type("rename_att_file", rename_att_file), &
-    & test_type("rename_att_errors", rename_att_errors), &
-    & test_type("rename_var_model", rename_var_model), &
-    & test_type("rename_var_file", rename_var_file), &
-    & test_type("rename_var_errors", rename_var_errors), &
-    & test_type("rename_dim_model", rename_dim_model), &
-    & test_type("rename_dim_file", rename_dim_file), &
-    & test_type("rename_dim_errors", rename_dim_errors), &
-    & test_type("rename_grp_model", rename_grp_model), &
-    & test_type("rename_grp_file", rename_grp_file), &
-    & test_type("rename_grp_errors", rename_grp_errors), &
-    & test_type("unlimited_wr", unlimited_wr), &
-    & test_type("unlimited_dims", unlimited_dims), &
-    & test_type("diskless_read", diskless_read), &
-    & test_type("diskless_edit", diskless_edit), &
-    & test_type("diskless_create", diskless_create), &
-    & test_type("diskless_modes", diskless_modes), &
-    & test_type("sum_vars", sum_vars_test), &
-    & test_type("sfc_pres_temp_wr", sfc_pres_temp_wr), &
-    & test_type("sfc_pres_temp_rd", sfc_pres_temp_rd), &
-    & test_type("buffer_edges", buffer_edges), &
-    & test_type("extensive_wr", extensive_wr), &
-    & test_type("extensive_rd", extensive_rd), &
-    & test_type("group_model", group_model), &
-    & test_type("group_write", group_write), &
-    & test_type("copy_semantics", copy_semantics), &
-    & test_type("data_model", data_model), &
-    & test_type("nasa_cosp_read", nasa_cosp_read), &
-    & test_type("ecmwf_era40_read", ecmwf_era40_read), &
-    & test_type("sresa1b_ccsm3_read", sresa1b_ccsm3_read), &
-    & test_type("sample_uddtio", sample_uddtio), &
-    & test_type("cami_initial_read", cami_initial_read), &
-    & test_type("tos_o1_read", tos_o1_read), &
-    & test_type("echam_spectral_read", echam_spectral_read)]
-  call setup_test_results()
-  call run_tests(tests)
-
-end select
-
-contains
-
-subroutine invalid_model_dim_rename()
-  !! Trigger a model dimension rename failure without ERR.
-  type(variable_type) :: var
-
-  call rename_dimension(var, "missing", "new")
-  stop 0
-end subroutine invalid_model_dim_rename
-
-subroutine invalid_file_dim_rename()
-  !! Trigger a file dimension rename failure without ERR.
-  type(group_type) :: grp
-
-  call rename_dimension(grp, "missing", "new", update_file=.true.)
-  stop 0
-end subroutine invalid_file_dim_rename
-
-subroutine invalid_error()
-  !! Exercise diagnostic validation and fail-fast formatting in a child.
-  use nc4f_ds, only: return_err, validate, buffer_size
-  use nc4f_c_interface, only: NC_BYTE, NC_DOUBLE, NC_MAX_NAME
-  use, intrinsic :: iso_fortran_env, only: int64
-  type(error_type) :: err, returned
-  type(netcdf_type) :: nc
-  type(variable_type) :: var
-  type(attribute_type) :: att
-  character(len=64) :: mode, text
-
-  call get_command_argument(2, mode)
-  select case (trim(mode))
-  case ("validate-name")
-    call validate("bad/name", context="[test_validation]")
-  case ("validate-name-long")
-    call validate(repeat("a", NC_MAX_NAME + 1), context="test_validation")
-  case ("validate-var")
-    call validate(var, context="[test_validation]")
-  case ("validate-att")
-    att%dtype = NC_BYTE
-    att%len = 1
-    call validate(att, context="test_validation")
-  case ("buffer-size")
-    print *, buffer_size(NC_DOUBLE, huge(0_int64))
-  case ("variable-size")
-    allocate (var%dims(1))
-    var%dims(1)%len = -1
-    print *, size(var)
-  case ("define-name")
-    call define_variable(nc, &
-      & variable_type(name="bad/name", dtype=NC_FLOAT, &
-      & dims=["x".dim.1]))
-  case ("put-storage")
-    call put_variable(nc, var)
-  case ("write-storage")
-    call to_netcdf("build/test-results/fail-fast-storage.nc", var)
-  case ("construct-no-fname")
-    err = error_type(code=NC_EINVAL, msg="Diagnostic.")
-  case ("construct-no-msg")
-    err = error_type(NC_EINVAL, "test_error")
-  case ("construct-blank-fname")
-    err = error_type(NC_EINVAL, "", "Diagnostic.")
-  case ("construct-blank-msg")
-    err = error_type(NC_EINVAL, "test_error", "   ")
-  case ("return-no-fname")
-    err%code = NC_EINVAL
-    err%msg = "Diagnostic."
-    call return_err(err, returned)
-  case ("return-no-msg")
-    err%code = NC_EINVAL
-    err%fname = "test_error"
-    call return_err(err)
-  case ("format-no-fname")
-    err%code = NC_EINVAL
-    err%msg = "Diagnostic."
-    text = error_msg(err)
-    print "(a)", trim(text)
-  case ("format-blank-fname")
-    err = error_type(NC_EINVAL, "test_error", "Diagnostic.")
-    err%fname = " "
-    text = error_msg(err)
-    print "(a)", trim(text)
-  case ("write-blank-msg")
-    err = error_type(NC_EINVAL, "test_error", "Diagnostic.")
-    err%msg = ""
-    write (text, "(dt)") err
-    print "(a)", trim(text)
-  case ("fail-fast")
-    err = error_type(NC_EINVAL, "test_error", "Diagnostic.")
-    call return_err(err)
-  case default
-    error stop "Unknown invalid-error test mode."
-  end select
-  stop 0
-end subroutine invalid_error
-
-subroutine invalid_model_delete()
-  !! Trigger a model deletion failure without ERR.
-  type(group_type) :: grp
-
-  call delete_attribute(grp, "missing")
-  stop 0
-end subroutine invalid_model_delete
-
-subroutine invalid_file_delete()
-  !! Trigger a file deletion failure without ERR.
-  type(group_type) :: grp
-
-  call delete_attribute(grp, "missing", update_file=.true.)
-  stop 0
-end subroutine invalid_file_delete
-
-subroutine invalid_model_grp_rename()
-  !! Trigger a group-renaming model error without ERR to test error termination.
-  type(group_type) :: grp
-  call rename_group(grp, "bad/name")
-  stop 0
-end subroutine invalid_model_grp_rename
-
-subroutine invalid_file_grp_rename()
-  !! Trigger a group-renaming file error without ERR to test error termination.
-  type(group_type) :: parent
-  call rename_group(parent, "old", "new", update_file=.true.)
-  stop 0
-end subroutine invalid_file_grp_rename
-
-subroutine invalid_model_var_rename()
-  !! Trigger a variable-renaming model error without ERR to test error
-  !! termination.
-  type(variable_type) :: var
-
-  call rename_variable(var, "bad/name")
-  stop 0
-end subroutine invalid_model_var_rename
-
-subroutine invalid_file_var_rename()
-  !! Trigger a variable-renaming file error without ERR to test error
-  !! termination.
-  type(group_type) :: grp
-
-  call rename_variable(grp, "old", "new", update_file=.true.)
-  stop 0
-end subroutine invalid_file_var_rename
-
-subroutine invalid_model_rename()
-  !! Trigger a attribute-renaming model error without ERR to test error
-  !! termination.
-  type(attribute_type) :: att
-
-  att = "old".att.1
-  call rename_attribute(att, "bad/name")
-  stop 0 ! The parent test requires the library to fail before this point.
-end subroutine invalid_model_rename
-
-subroutine invalid_file_rename()
-  !! Trigger a attribute-renaming file error without ERR to test error
-  !! termination.
-  type(group_type) :: grp
-
-  call rename_attribute(grp, "old", "new", update_file=.true.)
-  stop 0
-end subroutine invalid_file_rename
-
-subroutine invalid_noncontiguous_shallow_constructor()
-  !! Attempt shallow construction from a noncontiguous array section.
-  real(real32), target :: values(3, 3)
-  type(variable_type) :: var
-
-  values = reshape([1.0_real32, 2.0_real32, 3.0_real32, 4.0_real32, &
-    & 5.0_real32, &
-    & 6.0_real32, 7.0_real32, 8.0_real32, 9.0_real32], shape(values))
-  var = datarray("invalid", values(1:2, 2:3), ["x".dim.2, "y".dim.2], &
-    & deep=.false.)
-  error stop &
-    & "[ownership test] Noncontiguous shallow construction "// &
-    & "unexpectedly succeeded."
-end subroutine invalid_noncontiguous_shallow_constructor
-
-subroutine invalid_character_shallow_constructor()
-  !! Attempt shallow construction from character storage.
-  character, target :: values(2)
-  type(variable_type) :: var
-
-  values = ["a", "b"]
-  var = datarray("invalid", values, ["x".dim.2], deep=.false.)
-  error stop &
-    & "[ownership test] Character shallow construction unexpectedly succeeded."
-end subroutine invalid_character_shallow_constructor
-
-end program main
+suites = [ &
+  & new_testsuite("c_interface_attribute", collect_c_interface_attribute), &
+  & new_testsuite("c_interface_dataset", collect_c_interface_dataset), &
+  & new_testsuite("c_interface_dimension", collect_c_interface_dimension), &
+  & new_testsuite("c_interface_error", collect_c_interface_error), &
+  & new_testsuite("c_interface_group", collect_c_interface_group), &
+  & new_testsuite("c_interface_io", collect_c_interface_io), &
+  & new_testsuite("c_interface_utility", collect_c_interface_utility), &
+  & new_testsuite("c_interface_variable", collect_c_interface_variable), &
+  & new_testsuite("ds_dimension", &
+  &   collect_ds_dimension), &
+  & new_testsuite("ds_utility", &
+  &   collect_ds_utility), &
+  & new_testsuite("ds_attribute_constructor", &
+  &   collect_ds_attribute_constructor), &
+  & new_testsuite("ds_attribute", &
+  &   collect_ds_attribute), &
+  & new_testsuite("ds_variable_constructor", &
+  &   collect_ds_variable_constructor), &
+  & new_testsuite("ds_extract", &
+  &   collect_ds_extract), &
+  & new_testsuite("ds_variable", &
+  &   collect_ds_variable), &
+  & new_testsuite("ds_group", &
+  &   collect_ds_group), &
+  & new_testsuite("ds_arithmetic", &
+  &   collect_ds_arithmetic), &
+  & new_testsuite("ds_clone", &
+  &   collect_ds_clone), &
+  & new_testsuite("ds_io", &
+  &   collect_ds_io), &
+  & new_testsuite("ds_validate", &
+  &   collect_ds_validate), &
+  & new_testsuite("nc_utility", collect_nc_utility), &
+  & new_testsuite("nc_dataset", collect_nc_dataset), &
+  & new_testsuite("nc_variable", collect_nc_variable), &
+  & new_testsuite("nc_dimension", collect_nc_dimension), &
+  & new_testsuite("nc_attribute", collect_nc_attribute), &
+  & new_testsuite("nc_group", collect_nc_group), &
+  & new_testsuite("nc_error", collect_nc_error), &
+  & new_testsuite("real_data", collect_real_data) &
+  & ]
+stat = 0
+selected = ""
+if (command_argument_count() > 0) call get_command_argument(1, selected)
+selected_test = ""
+if (command_argument_count() > 1) then
+  call get_command_argument(2, selected_test)
+end if
+found = .false.
+do i = 1, size(suites)
+  if (len_trim(selected) > 0 .and. selected /= suites(i)%name) cycle
+  found = .true.
+  write (error_unit, "(a, 1x, a)") "Testing:", suites(i)%name
+  if (len_trim(selected_test) > 0) then
+    call run_selected(suites(i)%collect, trim(selected_test), &
+      & error_unit, stat)
+  else
+    call run_testsuite(suites(i)%collect, error_unit, stat)
+  end if
+end do
+if (.not. found) error stop "Unknown test suite."
+if (stat > 0) error stop "New test suite failed."
+end program nc4f_test

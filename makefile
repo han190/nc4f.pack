@@ -20,6 +20,25 @@ LIB := $(BUILD_DIR)/ncpack.a
 C_INTERFACE_LIB := $(BUILD_DIR)/libnc4f_c_interface.a
 C_INTERFACE_OBJ := $(BUILD_DIR)/nc4f_c_interface.o
 TEST_TARGET := $(BUILD_DIR)/test
+TEST_DRIVE_DIR ?= $(BUILD_DIR)/test-drive
+TEST_DRIVE_SRC ?= $(TEST_DRIVE_DIR)/src/testdrive.F90
+TEST_DRIVE_OBJ := $(BUILD_DIR)/testdrive.o
+DS_TEST_SRC := $(wildcard $(TEST_DIR)/nc4f_test_ds_*.f90)
+NC_TEST_SRC := $(wildcard $(TEST_DIR)/nc4f_test_nc_*.f90)
+DS_TEST_OBJS := $(addprefix $(BUILD_DIR)/,$(notdir $(DS_TEST_SRC:.f90=.o)))
+NC_TEST_OBJS := $(addprefix $(BUILD_DIR)/,$(notdir $(NC_TEST_SRC:.f90=.o)))
+TEST_OBJS := $(BUILD_DIR)/nc4f_test_utility.o \
+	$(BUILD_DIR)/nc4f_test_c_interface_attribute.o \
+	$(BUILD_DIR)/nc4f_test_c_interface_dataset.o \
+	$(BUILD_DIR)/nc4f_test_c_interface_dimension.o \
+	$(BUILD_DIR)/nc4f_test_c_interface_error.o \
+	$(BUILD_DIR)/nc4f_test_c_interface_group.o \
+	$(BUILD_DIR)/nc4f_test_c_interface_io.o \
+	$(BUILD_DIR)/nc4f_test_c_interface_variable.o \
+	$(BUILD_DIR)/nc4f_test_c_interface_utility.o \
+	$(DS_TEST_OBJS) $(NC_TEST_OBJS) \
+	$(BUILD_DIR)/nc4f_test_real_data.o \
+	$(BUILD_DIR)/nc4f_test.o
 EXAMPLE_BUILD_DIR := $(BUILD_DIR)/examples
 # read_netcdf consumes example.nc produced by write_netcdf.
 EXAMPLE_NAMES := write_netcdf read_netcdf $(filter-out write_netcdf read_netcdf,\
@@ -62,9 +81,7 @@ C_INTERFACE_INC := $(wildcard $(C_INTERFACE_DIR)/nc4f_c_interface_*.inc)
 
 # Include generated sources even when they have not been created yet.
 SRC := $(sort $(wildcard $(addsuffix /*.f90,$(SOURCE_DIRS))) $(SRC_F90))
-TEST := $(wildcard $(TEST_DIR)/*.f90)
 OBJ := $(addprefix $(BUILD_DIR)/,$(notdir $(SRC:.f90=.o)))
-TEST_OBJS := $(addprefix $(BUILD_DIR)/,$(notdir $(TEST:.f90=.o)))
 vpath %.f90 $(SOURCE_DIRS) $(TEST_DIR)
 
 .PHONY: all build library c-interface examples preprocess download-test-data test clean
@@ -83,7 +100,6 @@ preprocess: $(SRC_INC) $(SRC_F90)
 download-test-data:
 	@./scripts/download_test_data.sh
 test: $(TEST_TARGET)
-	@printf "[test] run test: $(TEST_TARGET)\n"
 	@$(TEST_TARGET)
 
 $(LIB): $(OBJ)
@@ -100,9 +116,96 @@ $(EXAMPLE_BUILD_DIR)/%: $(EXAMPLE_DIR)/%.f90 $(LIB) makefile | $(EXAMPLE_BUILD_D
 	@printf "[link] create example: $@\n"
 	@$(FC) $(FFLAGS) $(MODULE_FLAGS) $(LDFLAGS) -o $@ $< $(LIB) $(NC_LIBS) $(LDLIBS)
 
-$(TEST_TARGET): $(TEST_OBJS) $(LIB)
-	@printf "[link] create executable: $@\n"
-	@$(FC) $(FFLAGS) $(LDFLAGS) -o $@ $(TEST_OBJS) $(LIB) $(NC_LIBS) $(LDLIBS)
+$(TEST_DRIVE_SRC):
+	@mkdir -p $(BUILD_DIR)
+	git clone --quiet --depth 1 --branch v0.6.1 \
+		https://github.com/fortran-lang/test-drive.git $(TEST_DRIVE_DIR)
+
+$(TEST_DRIVE_OBJ): $(TEST_DRIVE_SRC) | $(BUILD_DIR)
+	@$(FC) $(FFLAGS) $(MODULE_FLAGS) -c $< -o $@
+
+$(BUILD_DIR)/nc4f_test_utility.o: $(TEST_DIR)/nc4f_test_utility.f90 \
+	$(TEST_DRIVE_OBJ) $(C_INTERFACE_OBJ) | $(BUILD_DIR)
+	@$(FC) $(FFLAGS) $(MODULE_FLAGS) -c $< -o $@
+
+$(BUILD_DIR)/nc4f_test_c_interface_dimension.o: \
+	$(TEST_DIR)/nc4f_test_c_interface_dimension.f90 \
+	$(BUILD_DIR)/nc4f_test_utility.o | $(BUILD_DIR)
+	@$(FC) $(FFLAGS) $(MODULE_FLAGS) -c $< -o $@
+
+$(BUILD_DIR)/nc4f_test_c_interface_attribute.o: \
+	$(TEST_DIR)/nc4f_test_c_interface_attribute.f90 \
+	$(BUILD_DIR)/nc4f_test_utility.o | $(BUILD_DIR)
+	@$(FC) $(FFLAGS) $(MODULE_FLAGS) -c $< -o $@
+
+$(BUILD_DIR)/nc4f_test_c_interface_dataset.o: \
+	$(TEST_DIR)/nc4f_test_c_interface_dataset.f90 \
+	$(BUILD_DIR)/nc4f_test_utility.o | $(BUILD_DIR)
+	@$(FC) $(FFLAGS) $(MODULE_FLAGS) -c $< -o $@
+
+$(BUILD_DIR)/nc4f_test_c_interface_io.o: \
+	$(TEST_DIR)/nc4f_test_c_interface_io.f90 \
+	$(BUILD_DIR)/nc4f_test_utility.o | $(BUILD_DIR)
+	@$(FC) $(FFLAGS) $(MODULE_FLAGS) -c $< -o $@
+
+$(BUILD_DIR)/nc4f_test_c_interface_variable.o: \
+	$(TEST_DIR)/nc4f_test_c_interface_variable.f90 \
+	$(BUILD_DIR)/nc4f_test_utility.o | $(BUILD_DIR)
+	@$(FC) $(FFLAGS) $(MODULE_FLAGS) -c $< -o $@
+
+$(BUILD_DIR)/nc4f_test_c_interface_error.o: \
+	$(TEST_DIR)/nc4f_test_c_interface_error.f90 \
+	$(TEST_DRIVE_OBJ) $(C_INTERFACE_OBJ) | $(BUILD_DIR)
+	@$(FC) $(FFLAGS) $(MODULE_FLAGS) -c $< -o $@
+
+$(BUILD_DIR)/nc4f_test_c_interface_group.o: \
+	$(TEST_DIR)/nc4f_test_c_interface_group.f90 \
+	$(BUILD_DIR)/nc4f_test_utility.o | $(BUILD_DIR)
+	@$(FC) $(FFLAGS) $(MODULE_FLAGS) -c $< -o $@
+
+$(BUILD_DIR)/nc4f_test_c_interface_utility.o: \
+	$(TEST_DIR)/nc4f_test_c_interface_utility.f90 \
+	$(TEST_DRIVE_OBJ) $(C_INTERFACE_OBJ) | $(BUILD_DIR)
+	@$(FC) $(FFLAGS) $(MODULE_FLAGS) -c $< -o $@
+
+$(BUILD_DIR)/nc4f_test_ds_%.o: \
+	$(TEST_DIR)/nc4f_test_ds_%.f90 $(LIB) $(TEST_DRIVE_OBJ) | $(BUILD_DIR)
+	@$(FC) $(FFLAGS) $(MODULE_FLAGS) -c $< -o $@
+
+$(BUILD_DIR)/nc4f_test_nc_utility.o: \
+	$(TEST_DIR)/nc4f_test_nc_utility.f90 $(LIB) \
+	$(TEST_DRIVE_OBJ) | $(BUILD_DIR)
+	@$(FC) $(FFLAGS) $(MODULE_FLAGS) -c $< -o $@
+
+$(filter-out $(BUILD_DIR)/nc4f_test_nc_utility.o,$(NC_TEST_OBJS)): \
+	$(BUILD_DIR)/nc4f_test_nc_utility.o
+
+$(BUILD_DIR)/nc4f_test_nc_%.o: \
+	$(TEST_DIR)/nc4f_test_nc_%.f90 $(LIB) \
+	$(TEST_DRIVE_OBJ) | $(BUILD_DIR)
+	@$(FC) $(FFLAGS) $(MODULE_FLAGS) -c $< -o $@
+
+$(BUILD_DIR)/nc4f_test_real_data.o: \
+	$(TEST_DIR)/nc4f_test_real_data.f90 $(LIB) \
+	$(TEST_DRIVE_OBJ) | $(BUILD_DIR)
+	@$(FC) $(FFLAGS) $(MODULE_FLAGS) -c $< -o $@
+
+$(BUILD_DIR)/nc4f_test.o: $(TEST_DIR)/nc4f_test.f90 \
+	$(BUILD_DIR)/nc4f_test_c_interface_attribute.o \
+	$(BUILD_DIR)/nc4f_test_c_interface_dataset.o \
+	$(BUILD_DIR)/nc4f_test_c_interface_dimension.o \
+	$(BUILD_DIR)/nc4f_test_c_interface_error.o \
+	$(BUILD_DIR)/nc4f_test_c_interface_group.o \
+	$(BUILD_DIR)/nc4f_test_c_interface_io.o \
+	$(BUILD_DIR)/nc4f_test_c_interface_variable.o \
+	$(BUILD_DIR)/nc4f_test_c_interface_utility.o \
+	$(DS_TEST_OBJS) $(NC_TEST_OBJS) \
+	$(BUILD_DIR)/nc4f_test_real_data.o | $(BUILD_DIR)
+	@$(FC) $(FFLAGS) $(MODULE_FLAGS) -c $< -o $@
+
+$(TEST_TARGET): $(TEST_OBJS) $(TEST_DRIVE_OBJ) $(LIB)
+	@$(FC) $(FFLAGS) $(LDFLAGS) -o $@ $(TEST_OBJS) \
+		$(TEST_DRIVE_OBJ) $(LIB) $(NC_LIBS) $(LDLIBS)
 
 $(OBJ) $(TEST_OBJS): makefile | $(BUILD_DIR)
 $(BUILD_DIR)/%.o: %.f90
@@ -116,11 +219,6 @@ $(filter $(BUILD_DIR)/nc4f_ds_%.o,$(OBJ)): $(BUILD_DIR)/nc4f_ds.o
 $(BUILD_DIR)/nc4f_nc.o: $(BUILD_DIR)/nc4f_ds.o $(BUILD_DIR)/nc4f_c_interface.o
 $(filter $(BUILD_DIR)/nc4f_nc_%.o,$(OBJ)): $(BUILD_DIR)/nc4f_nc.o
 $(BUILD_DIR)/nc4f.o: $(BUILD_DIR)/nc4f_ds.o $(BUILD_DIR)/nc4f_nc.o
-$(BUILD_DIR)/nc4f_test_cases.o: $(BUILD_DIR)/nc4f.o
-$(filter $(BUILD_DIR)/nc4f_test_cases_%.o,$(TEST_OBJS)): $(BUILD_DIR)/nc4f_test_cases.o
-$(BUILD_DIR)/nc4f_test_c_bindings.o: $(BUILD_DIR)/nc4f_c_interface.o
-$(BUILD_DIR)/nc4f_test.o: $(BUILD_DIR)/nc4f.o $(BUILD_DIR)/nc4f_test_module.o \
-	$(BUILD_DIR)/nc4f_test_cases.o $(BUILD_DIR)/nc4f_test_c_bindings.o
 
 # Explicit targets let vpath locate generated sources before they exist.
 $(SRC_INC): $(DATA_STRUCTURE_DIR)/%.inc: $(FYPP_DIR)/%_inc.fypp $(FYPP_DIR)/common.fypp

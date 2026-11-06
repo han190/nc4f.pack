@@ -54,7 +54,7 @@ jobs:
         run: FC=${{ matrix.compiler.command }} make test
 
       - name: Inspect generated NetCDF file
-        run: ncdump -h build/test-results/characters.nc
+        run: ncdump -h build/test-results/sfc_pres_temp_wr.nc
 
       - name: Configure CMake with regenerated sources
         run: >-

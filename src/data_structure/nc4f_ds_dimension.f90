@@ -288,7 +288,7 @@ logical elemental module function eq_dim(x, y)
   type(dimension_type), intent(in) :: x, y
   !! x: Left-hand value to compare. y: Right-hand value to compare.
 
-  eq_dim = x%len == y%len .and. x%is_unlim .eqv. y%is_unlim
+  eq_dim = x%len == y%len .and. (x%is_unlim .eqv. y%is_unlim)
   if (eq_dim) then
     eq_dim = allocated(x%name) .eqv. allocated(y%name)
     if (eq_dim .and. allocated(x%name)) eq_dim = x%name == y%name

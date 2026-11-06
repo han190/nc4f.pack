@@ -125,34 +125,69 @@ endif()
 
 if(NC4F_BUILD_TESTS)
   enable_testing()
+  find_package(test-drive 0.6.1 CONFIG QUIET)
+  if(NOT TARGET test-drive::test-drive)
+    include(FetchContent)
+    set(TESTDRIVE_BUILD_TESTING OFF)
+    FetchContent_Declare(test-drive
+      GIT_REPOSITORY https://github.com/fortran-lang/test-drive.git
+      GIT_TAG v0.6.1)
+    FetchContent_MakeAvailable(test-drive)
+    if(TARGET test-drive AND NOT TARGET test-drive::test-drive)
+      add_library(test-drive::test-drive ALIAS test-drive)
+    endif()
+  endif()
   add_executable(nc4f_tests
     test/nc4f_test.f90
-    test/nc4f_test_module.f90
-    test/nc4f_test_c_bindings.f90
-    test/nc4f_test_cases.f90
-    test/nc4f_test_cases_basic.f90
-    test/nc4f_test_cases_copy.f90
-    test/nc4f_test_cases_data.f90
-    test/nc4f_test_cases_delete.f90
-    test/nc4f_test_cases_errors.f90
-    test/nc4f_test_cases_group.f90
-    test/nc4f_test_cases_io.f90
-    test/nc4f_test_cases_model.f90
-    test/nc4f_test_cases_rename.f90
-    test/nc4f_test_cases_rename_dimension.f90
-    test/nc4f_test_cases_rename_group.f90
-    test/nc4f_test_cases_strided_writes.f90
-    test/nc4f_test_cases_write.f90)
-  set(nc4f_test_module_dir "${CMAKE_CURRENT_BINARY_DIR}/modules/tests")
+    test/nc4f_test_c_interface_dimension.f90
+    test/nc4f_test_c_interface_error.f90
+    test/nc4f_test_c_interface_group.f90
+    test/nc4f_test_c_interface_attribute.f90
+    test/nc4f_test_c_interface_dataset.f90
+    test/nc4f_test_c_interface_io.f90
+    test/nc4f_test_c_interface_variable.f90
+    test/nc4f_test_c_interface_utility.f90
+    test/nc4f_test_utility.f90
+    test/nc4f_test_ds_arithmetic.f90
+    test/nc4f_test_ds_attribute.f90
+    test/nc4f_test_ds_attribute_constructor.f90
+    test/nc4f_test_ds_clone.f90
+    test/nc4f_test_ds_dimension.f90
+    test/nc4f_test_ds_extract.f90
+    test/nc4f_test_ds_group.f90
+    test/nc4f_test_ds_io.f90
+    test/nc4f_test_ds_utility.f90
+    test/nc4f_test_ds_validate.f90
+    test/nc4f_test_ds_variable.f90
+    test/nc4f_test_ds_variable_constructor.f90
+    test/nc4f_test_nc_attribute.f90
+    test/nc4f_test_nc_dataset.f90
+    test/nc4f_test_nc_dimension.f90
+    test/nc4f_test_nc_error.f90
+    test/nc4f_test_nc_group.f90
+    test/nc4f_test_nc_utility.f90
+    test/nc4f_test_nc_variable.f90
+    test/nc4f_test_real_data.f90)
+  set(nc4f_test_module_dir
+    "${CMAKE_CURRENT_BINARY_DIR}/modules/tests")
   file(MAKE_DIRECTORY "${nc4f_test_module_dir}")
   set_target_properties(nc4f_tests PROPERTIES
     Fortran_MODULE_DIRECTORY "${nc4f_test_module_dir}")
-  target_include_directories(nc4f_tests PRIVATE "${nc4f_test_module_dir}")
-  target_link_libraries(nc4f_tests PRIVATE nc4f::nc4f)
+  target_include_directories(nc4f_tests PRIVATE
+    "${nc4f_test_module_dir}")
+  target_link_libraries(nc4f_tests PRIVATE
+    nc4f::nc4f test-drive::test-drive)
   nc4f_compile_options(nc4f_tests)
-  add_test(NAME nc4f.regression COMMAND nc4f_tests)
-  # Existing tests resolve fixtures under data/ and outputs under build/.
-  set_tests_properties(nc4f.regression PROPERTIES
+  foreach(suite IN ITEMS c_interface_attribute c_interface_dataset
+      c_interface_dimension c_interface_error c_interface_group
+      c_interface_io c_interface_utility c_interface_variable
+      ds_arithmetic ds_attribute ds_attribute_constructor ds_clone
+      ds_dimension ds_extract ds_group ds_io ds_utility ds_validate
+      ds_variable ds_variable_constructor nc_attribute nc_dataset
+      nc_dimension nc_error nc_group nc_utility nc_variable real_data)
+    add_test(NAME "nc4f.${suite}" COMMAND nc4f_tests "${suite}")
+  endforeach()
+  set_tests_properties(nc4f.real_data PROPERTIES
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
 endif()
 
