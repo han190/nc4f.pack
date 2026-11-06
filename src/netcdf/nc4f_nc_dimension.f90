@@ -190,9 +190,10 @@ pure subroutine commit_dim_grp_(grp, staged, old_name)
     k = lbound(staged%vars(i)%dims, 1)
     do j = lbound(grp%vars(i)%dims, 1), ubound(grp%vars(i)%dims, 1)
       if (allocated(grp%vars(i)%dims(j)%name)) then
-        if (grp%vars(i)%dims(j)%name == trim(old_name)) &
-          & call move_alloc(staged%vars(i)%dims(k)%name, &
-          & grp%vars(i)%dims(j)%name)
+        if (grp%vars(i)%dims(j)%name == trim(old_name)) then
+          call move_alloc(staged%vars(i)%dims(k)%name, &
+            & grp%vars(i)%dims(j)%name)
+        end if
       end if
       k = k + 1
     end do

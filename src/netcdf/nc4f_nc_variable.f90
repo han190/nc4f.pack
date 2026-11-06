@@ -443,13 +443,15 @@ subroutine validate_storage_(storage, dtype, dims, atts, err)
   if (present(atts)) then
     do i = 1, size(atts)
       if (atts(i)%name /= "_FillValue") cycle
-      if (storage%no_fill == 1) &
-        & err = error_type(NC_EINVAL, "define_variable", &
-        & "No-fill conflicts with _FillValue attribute.")
+      if (storage%no_fill == 1) then
+        err = error_type(NC_EINVAL, "define_variable", &
+          & "No-fill conflicts with _FillValue attribute.")
+      end if
       if (allocated(storage%fill_value)) then
-        if (storage%fill_value /= atts(i)) &
-          & err = error_type(NC_EINVAL, "define_variable", &
-          & "Conflicting fill values.")
+        if (storage%fill_value /= atts(i)) then
+          err = error_type(NC_EINVAL, "define_variable", &
+            & "Conflicting fill values.")
+        end if
       end if
     end do
   end if
@@ -471,9 +473,10 @@ subroutine apply_storage_(nc, varid, name, storage, err)
   if (fmt /= NC_FORMAT_NETCDF4 .and. fmt /= NC_FORMAT_NETCDF4_CLASSIC) then
     if (allocated(storage%chunks) .or. storage%deflate_level >= 0 .or. &
       & storage%shuffle >= 0 .or. storage%fletcher32 >= 0 .or. &
-      & storage%endian >= 0) &
-      & err = error_type(NC_EINVAL, "define_variable", &
-      & "Storage filters require NetCDF-4 format.")
+      & storage%endian >= 0) then
+      err = error_type(NC_EINVAL, "define_variable", &
+        & "Storage filters require NetCDF-4 format.")
+    end if
     if (has_err(err)) return
   end if
   if (allocated(storage%chunks)) then

@@ -146,9 +146,10 @@ module subroutine to_netcdf_var(file, vars, atts, err, mode, start, count, &
   call write_mode_(mode, append, op_err)
   selected = present(start) .or. present(count) .or. present(stride)
   if (.not. has_err(op_err)) then
-    if (selected .and. .not. append) &
-      & op_err = error_type(NC_EINVAL, "to_netcdf", &
-      & "Selections require mode='a' and an existing variable.")
+    if (selected .and. .not. append) then
+      op_err = error_type(NC_EINVAL, "to_netcdf", &
+        & "Selections require mode='a' and an existing variable.")
+    end if
   end if
   if (.not. has_err(op_err)) then
     select rank (items => vars)
@@ -339,9 +340,11 @@ module subroutine to_netcdf_grp(file, grp, atts, err, mode, start, count, &
 
   call write_mode_(mode, append, op_err)
   if (.not. has_err(op_err)) then
-    if (append .or. present(start) .or. present(count) .or. present(stride)) &
-      & op_err = error_type(NC_EINVAL, "to_netcdf", &
-      & "Groups require overwrite mode without selections.")
+    if (append .or. present(start) .or. present(count) &
+      & .or. present(stride)) then
+      op_err = error_type(NC_EINVAL, "to_netcdf", &
+        & "Groups require overwrite mode without selections.")
+    end if
   end if
   if (.not. has_err(op_err)) then
     if (rank(grp) > 1) op_err = error_type(NC_EINVAL, "to_netcdf", &

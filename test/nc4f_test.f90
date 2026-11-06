@@ -276,7 +276,7 @@ subroutine invalid_noncontiguous_shallow_constructor()
     & deep=.false.)
   error stop &
     & "[ownership test] Noncontiguous shallow construction "// &
-      & "unexpectedly succeeded."
+    & "unexpectedly succeeded."
 end subroutine invalid_noncontiguous_shallow_constructor
 
 subroutine invalid_character_shallow_constructor()

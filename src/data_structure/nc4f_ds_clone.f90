@@ -55,8 +55,9 @@ impure elemental module subroutine clone_var(src, dest)
   if (allocated(src%dims)) dest%dims = src%dims
   if (allocated(src%storage)) then
     dest%storage = src%storage
-    if (allocated(src%storage%fill_value)) &
-      & call clone_att(src%storage%fill_value, dest%storage%fill_value)
+    if (allocated(src%storage%fill_value)) then
+      call clone_att(src%storage%fill_value, dest%storage%fill_value)
+    end if
   end if
   nullify (dest%ptr)
   call clone_(dest%buffer, src%buffer, src%ptr)

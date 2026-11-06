@@ -49,14 +49,18 @@ pure subroutine validate_err(err)
   !! Result to validate; success needs no diagnostic fields.
 
   if (.not. (.exists. err)) return
-  if (.not. allocated(err%fname)) &
-    & error stop "[error_type] Failure requires an allocated fname."
-  if (len_trim(err%fname) == 0) &
-    & error stop "[error_type] Failure requires a nonblank fname."
-  if (.not. allocated(err%msg)) &
-    & error stop "[error_type] Failure requires an allocated msg."
-  if (len_trim(err%msg) == 0) &
-    & error stop "[error_type] Failure requires a nonblank msg."
+  if (.not. allocated(err%fname)) then
+    error stop "[error_type] Failure requires an allocated fname."
+  end if
+  if (len_trim(err%fname) == 0) then
+    error stop "[error_type] Failure requires a nonblank fname."
+  end if
+  if (.not. allocated(err%msg)) then
+    error stop "[error_type] Failure requires an allocated msg."
+  end if
+  if (len_trim(err%msg) == 0) then
+    error stop "[error_type] Failure requires a nonblank msg."
+  end if
 end subroutine validate_err
 
 pure module subroutine return_err(op_err, err)

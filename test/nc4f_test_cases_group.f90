@@ -56,28 +56,39 @@ module subroutine group_model(passed)
       read (file_unit, "(a)", iostat=iostat) line
       if (iostat /= 0) exit
       line_number = line_number + 1
-      if (index(line, "group: / {") > 0 .and. root_at == 0) &
-        & root_at = line_number
-      if (index(line, "dimensions:") > 0 .and. dims_at == 0) &
-        & dims_at = line_number
-      if (index(line, "variables:") > 0 .and. vars_at == 0) &
-        & vars_at = line_number
-      if (index(line, "// global attributes:") > 0 .and. atts_at == 0) &
-        & atts_at = line_number
-      if (index(line, "groups:") > 0 .and. groups_at == 0) &
-        & groups_at = line_number
-      if (index(line, "    group: child {") > 0) &
-        & child_at = line_number
-      if (index(line, 'char:title = "root group" ;') > 0) &
-        & root_title_found = .true.
-      if (index(line, 'char:title = "child group" ;') > 0) &
-        & child_title_found = .true.
-      if (index(line, "float:scale = 1.5 ;") > 0) &
-        & scale_found = .true.
-      if (index(line, "double:offset = -999.0 ;") > 0) &
-        & offset_found = .true.
-      if (index(line, "double:compact = 2.176 ;") > 0) &
-        & compact_found = .true.
+      if (index(line, "group: / {") > 0 .and. root_at == 0) then
+        root_at = line_number
+      end if
+      if (index(line, "dimensions:") > 0 .and. dims_at == 0) then
+        dims_at = line_number
+      end if
+      if (index(line, "variables:") > 0 .and. vars_at == 0) then
+        vars_at = line_number
+      end if
+      if (index(line, "// global attributes:") > 0 .and. atts_at == 0) then
+        atts_at = line_number
+      end if
+      if (index(line, "groups:") > 0 .and. groups_at == 0) then
+        groups_at = line_number
+      end if
+      if (index(line, "    group: child {") > 0) then
+        child_at = line_number
+      end if
+      if (index(line, 'char:title = "root group" ;') > 0) then
+        root_title_found = .true.
+      end if
+      if (index(line, 'char:title = "child group" ;') > 0) then
+        child_title_found = .true.
+      end if
+      if (index(line, "float:scale = 1.5 ;") > 0) then
+        scale_found = .true.
+      end if
+      if (index(line, "double:offset = -999.0 ;") > 0) then
+        offset_found = .true.
+      end if
+      if (index(line, "double:compact = 2.176 ;") > 0) then
+        compact_found = .true.
+      end if
     end do
     close (file_unit)
   end if

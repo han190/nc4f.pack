@@ -59,7 +59,7 @@ source-dir = "test"
 main = "nc4f_test.f90"
 
 [extra.fortitude.check]
-ignore = ['C002', 'C071', 'C072', 'C121', 'C152', 'C181']
+ignore = ['C002', 'C071', 'C072', 'C121', 'C181']
 line-length = 80
 extend-exclude = [
   "src/data_structure/nc4f_ds_attribute_constructor.f90",

@@ -311,11 +311,13 @@ module subroutine rename_dim_errors(passed)
       if (index(line, "ERROR STOP") == 0) cycle
       if (i == 1) then
         if (index(line, &
-          & "[rename_dimension] Dimension not found: missing") > 0) &
-          & found_diagnostic = .true.
+          & "[rename_dimension] Dimension not found: missing") > 0) then
+          found_diagnostic = .true.
+        end if
       else
-        if (index(line, "[inq_dims] Dimension count.") > 0) &
-          & found_diagnostic = .true.
+        if (index(line, "[inq_dims] Dimension count.") > 0) then
+          found_diagnostic = .true.
+        end if
       end if
     end do
     close (unit)
