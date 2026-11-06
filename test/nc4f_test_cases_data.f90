@@ -29,7 +29,8 @@ module subroutine sum_vars_test(passed)
 end subroutine sum_vars_test
 
 module subroutine sfc_pres_temp_wr(passed)
-  !! Write the surface pressure and temperature example with dimensions and units.
+  !! Write the surface pressure and temperature example with dimensions and
+  !! units.
   logical, intent(inout) :: passed
   !! Whether the test case has passed.
   integer, parameter :: nlat = 181, nlon = 361
@@ -126,7 +127,8 @@ module subroutine extensive_wr(passed)
 end subroutine extensive_wr
 
 module subroutine extensive_rd(passed)
-  !! Verify types, shapes, attributes, and values in the extensive round-trip file.
+  !! Verify types, shapes, attributes, and values in the extensive round-trip
+  !! file.
   logical, intent(inout) :: passed
   !! Whether the test case has passed.
   character(len=16), parameter :: names(7) = [character(len=16) :: &
@@ -174,9 +176,9 @@ module subroutine extensive_rd(passed)
 end subroutine extensive_rd
 
 module subroutine nasa_cosp_read(passed)
-  !! Read root-level data and metadata from NASA's externally produced
-  !! CLDPROP COSP NetCDF-4 sample file.  The file also contains nested groups;
-  !! this test intentionally exercises the currently supported root group only.
+  !! Read root-level data and metadata from NASA's externally produced CLDPROP
+  !! COSP NetCDF-4 sample file.  The file also contains nested groups; this test
+  !! intentionally exercises the currently supported root group only.
   logical, intent(inout) :: passed
   !! Whether the test case has passed.
   character(*), parameter :: SAMPLE_FILE = &
@@ -744,17 +746,19 @@ end function has_dim
 
 pure logical function starts_with(text, prefix)
   !! Return whether `text` begins with `prefix`; trailing NULs are retained when
-  !! an externally written `NC_CHAR` attribute includes them in its stored value.
+  !! an externally written `NC_CHAR` attribute includes them in its stored
+  !! value.
   character(len=*), intent(in) :: text, prefix
-  !! text: Text to test for the requested prefix.
-  !! prefix: Leading substring that the text must contain.
+  !! text: Text to test for the requested prefix. prefix: Leading substring that
+  !! the text must contain.
 
   starts_with = len(text) >= len(prefix)
   if (starts_with) starts_with = text(:len(prefix)) == prefix
 end function starts_with
 
 function extensive_variables() result(vars)
-  !! Construct numeric variables of ranks one through seven for round-trip tests.
+  !! Construct numeric variables of ranks one through seven for round-trip
+  !! tests.
   type(variable_type), allocatable :: vars(:)
   !! Retrieved variables.
   type(dimension_type) :: dims(7)

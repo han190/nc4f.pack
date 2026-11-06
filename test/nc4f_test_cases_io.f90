@@ -1,7 +1,8 @@
 submodule(nc4f_test_cases) nc4f_test_cases_io
 
 use, intrinsic :: iso_c_binding, only: c_char, c_loc, c_null_char, c_size_t
-use, non_intrinsic :: nc4f_c_interface, only: NC_DISKLESS, NC_PERSIST, NC_GLOBAL, nc_put_att_text
+use, non_intrinsic :: nc4f_c_interface, only: NC_DISKLESS, NC_PERSIST, &
+  & NC_GLOBAL, nc_put_att_text
 implicit none (type, external)
 
 contains
@@ -31,7 +32,8 @@ module subroutine diskless_read(passed)
   values = 9.0_real32
   reread = get_variable(child, "data")
   call extract(reread, values)
-  call chk_diskless(all(values == [1.0_real32, 2.0_real32]), "extracted data does not write through")
+  call chk_diskless(all(values == [1.0_real32, 2.0_real32]), &
+    & "extracted data does not write through")
   call rename_attribute(child, "title", "heading", update_file=.true., err=err)
   call chk_diskless(err%code /= NC_NOERR, "read-only rename rejected")
   call delete_attribute(child, "title", update_file=.true., err=err)
@@ -63,12 +65,14 @@ module subroutine diskless_edit(passed)
 
   do mode_index = 1, size(modes)
     var = datarray("data", [1.0_real32, 2.0_real32], ["x".dim.2])
-    child = dataset("child", vars=[var], atts=["title".att."child", "remove".att.1])
+    child = dataset("child", vars=[var], atts=["title".att."child", &
+      & "remove".att.1])
     call to_netcdf(file, [child])
     nc = open_netcdf(file, modes(mode_index), .true., err)
     call chk_diskless(err%code == NC_NOERR, "open "//modes(mode_index))
     call chk_diskless(iand(nc%mode, NC_DISKLESS) /= 0, "edit diskless flag")
-    call chk_diskless((iand(nc%mode, NC_PERSIST) /= 0) .eqv. saves(mode_index), "edit persist flag")
+    call chk_diskless((iand(nc%mode, &
+      & NC_PERSIST) /= 0) .eqv. saves(mode_index), "edit persist flag")
     child = get_group(nc, "child")
     call rename_variable(child, "data", "renamed", update_file=.true.)
     call rename_dimension(child, "x", "axis", update_file=.true.)
@@ -113,7 +117,7 @@ module subroutine diskless_create(passed)
   character(10), parameter :: modes(*) = [character(10) :: &
     & "wn", "w", "write_temp", "write"]
   logical, parameter :: saves(*) = [.false., .true., .false., .true.]
-  character(kind=c_char, len=3), target :: marker = "ram"
+  character(kind=c_char, len=3), target :: marker
   type(netcdf_type) :: nc
   type(variable_type) :: var
   type(attribute_type) :: att
@@ -121,6 +125,7 @@ module subroutine diskless_create(passed)
   logical :: exists
   integer :: mode_index, file_unit, existing_index
 
+  marker = "ram"
   do mode_index = 1, size(modes)
     do existing_index = 0, 1
       inquire(file=file, exist=exists)
@@ -135,26 +140,31 @@ module subroutine diskless_create(passed)
       nc = open_netcdf(file, modes(mode_index), diskless=.true., err=err)
       call chk_diskless(err%code == NC_NOERR, "create "//modes(mode_index))
       call chk_diskless(iand(nc%mode, NC_DISKLESS) /= 0, "create diskless flag")
-      call chk_diskless((iand(nc%mode, NC_PERSIST) /= 0) .eqv. saves(mode_index), "create persist flag")
-      call chk_diskless(nc_put_att_text(nc%id, NC_GLOBAL, "marker"//c_null_char, &
+      call chk_diskless((iand(nc%mode, &
+        & NC_PERSIST) /= 0) .eqv. saves(mode_index), "create persist flag")
+      call chk_diskless(nc_put_att_text(nc%id, NC_GLOBAL, &
+        & "marker"//c_null_char, &
         & 3_c_size_t, c_loc(marker)) == NC_NOERR, "populate RAM dataset")
       att = get_attribute(nc, "marker")
       call chk_diskless(att == ("marker".att."ram"), "read created RAM data")
       call close_netcdf(nc, err)
       call chk_diskless(err%code == NC_NOERR, "close "//modes(mode_index))
       inquire(file=file, exist=exists)
-      call chk_diskless(exists .eqv. (saves(mode_index) .or. existing_index == 1), "creation persistence")
+      call chk_diskless(exists .eqv. (saves(mode_index) .or. existing_index == &
+        & 1), "creation persistence")
       if (.not. exists) cycle
       nc = open_netcdf(file)
       if (saves(mode_index)) then
         att = get_attribute(nc, "marker")
         call chk_diskless(att == ("marker".att."ram"), "created data persisted")
         var = get_variable(nc, "original", err=err)
-        call chk_diskless(err%code == NC_ENOTVAR, "persistent create replaces contents")
+        call chk_diskless(err%code == NC_ENOTVAR, &
+          & "persistent create replaces contents")
       else
         var = get_variable(nc, "original")
         att = get_attribute(nc, "marker", err=err)
-        call chk_diskless(err%code == NC_ENOTATT, "nonpersistent create preserves original file")
+        call chk_diskless(err%code == NC_ENOTATT, &
+          & "nonpersistent create preserves original file")
       end if
       call close_netcdf(nc)
     end do
@@ -168,10 +178,14 @@ module subroutine diskless_modes(passed)
   character(*), parameter :: missing = TEST_RESULTS_DIR//"diskless-missing.nc"
   character(6), parameter :: disk_modes(*) = [character(6) :: &
     & "r", "read", "a", "append", "w", "write"]
-  character(11), parameter :: existing_modes(*) = [character(11) :: "r", "a", "an", "read", "append", "append_temp"]
-  character(11), parameter :: temp_modes(*) = [character(11) :: "an", "wn", "append_temp", "write_temp"]
-  character(20), parameter :: invalid_modes(*) = [character(20) :: "rp", "rn", "", "xx", "ap", "wp", &
-    & "read_diskless", "append_diskless", "append_diskless_temp", "write_diskless", "write_diskless_temp", &
+  character(11), parameter :: existing_modes(*) = [character(11) :: "r", "a", &
+    & "an", "read", "append", "append_temp"]
+  character(11), parameter :: temp_modes(*) = [character(11) :: "an", "wn", &
+    & "append_temp", "write_temp"]
+  character(20), parameter :: invalid_modes(*) = [character(20) :: "rp", "rn", &
+    & "", "xx", "ap", "wp", &
+    & "read_diskless", "append_diskless", "append_diskless_temp", &
+    & "write_diskless", "write_diskless_temp", &
     & "rw", "readwrite", "replace", "overwrite"]
   type(netcdf_type) :: nc
   type(variable_type) :: var
@@ -183,28 +197,34 @@ module subroutine diskless_modes(passed)
   do mode_index = 1, size(disk_modes)
     call to_netcdf(file, var)
     nc = open_netcdf(file, trim(disk_modes(mode_index)), .false., err)
-    call chk_diskless(err%code == NC_NOERR, "disk-backed alias "//trim(disk_modes(mode_index)))
+    call chk_diskless(err%code == NC_NOERR, &
+      & "disk-backed alias "//trim(disk_modes(mode_index)))
     call chk_diskless(iand(nc%mode, NC_DISKLESS) == 0, "disk-backed mode flags")
     call close_netcdf(nc)
   end do
   call to_netcdf(file, var)
   do mode_index = 1, size(temp_modes)
     nc = open_netcdf(file, temp_modes(mode_index), err=err)
-    call chk_diskless(err%code == NC_EINVAL, "reject diskless mode without diskless")
+    call chk_diskless(err%code == NC_EINVAL, &
+      & "reject diskless mode without diskless")
     nc = open_netcdf(file, temp_modes(mode_index), .false., err)
-    call chk_diskless(err%code == NC_EINVAL, "reject diskless mode with explicit false")
+    call chk_diskless(err%code == NC_EINVAL, &
+      & "reject diskless mode with explicit false")
   end do
   do mode_index = 1, size(invalid_modes)
     nc = open_netcdf(file, invalid_modes(mode_index), .true., err)
     call chk_diskless(err%code == NC_EINVAL, "invalid diskless mode")
     call chk_diskless(index(err%msg, "r/read") > 0 .and. &
-      & index(err%msg, "a/append") > 0 .and. index(err%msg, "an/append_temp") > 0 .and. &
-      & index(err%msg, "w/write") > 0 .and. index(err%msg, "wn/write_temp") > 0, &
+      & index(err%msg, "a/append") > 0 .and. index(err%msg, &
+      & "an/append_temp") > 0 .and. &
+      & index(err%msg, "w/write") > 0 .and. index(err%msg, &
+      & "wn/write_temp") > 0, &
       & "diskless diagnostic lists aliases")
     nc = open_netcdf(file, invalid_modes(mode_index), .false., err)
     call chk_diskless(err%code == NC_EINVAL, "invalid disk-backed mode")
     nc = open_netcdf(file, invalid_modes(mode_index), err=err)
-    call chk_diskless(err%code == NC_EINVAL, "invalid mode with default storage")
+    call chk_diskless(err%code == NC_EINVAL, &
+      & "invalid mode with default storage")
   end do
   nc = open_netcdf(file, "r", .true., err)
   call chk_diskless(err%code == NC_NOERR, "explicit diskless read")
@@ -230,8 +250,10 @@ module subroutine diskless_modes(passed)
   call chk_diskless(err%code == NC_EINVAL, "validate before creation")
   do mode_index = 1, size(existing_modes)
     nc = open_netcdf(missing, trim(existing_modes(mode_index)), .true., err)
-    call chk_diskless(err%code /= NC_NOERR, "diskless open requires existing file")
-    call chk_diskless(err%fname == "open_netcdf" .and. len_trim(err%msg) > 0, "open error context")
+    call chk_diskless(err%code /= NC_NOERR, &
+      & "diskless open requires existing file")
+    call chk_diskless(err%fname == "open_netcdf" .and. len_trim(err%msg) > 0, &
+      & "open error context")
   end do
   inquire(file=missing, exist=exists)
   call chk_diskless(.not. exists, "failed opens do not create files")

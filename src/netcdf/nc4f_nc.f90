@@ -59,17 +59,20 @@ end interface initialize
 
 interface
   module subroutine def_var(nc, var, err)
-    !! Define a variable from metadata without reading or copying its data storage.
+    !! Define a variable from metadata without reading or copying its data
+    !! storage.
     class(group_type), intent(in) :: nc
     !! Open writable dataset or subgroup; loaded caches remain unchanged.
     type(variable_type), intent(in) :: var
-    !! Schema providing name, type, dimensions, and attributes; the source is unchanged.
+    !! Schema providing name, type, dimensions, and attributes; the source is
+    !! unchanged.
     type(error_type), intent(out), optional :: err
     !! Optional operation result; failures terminate execution when omitted.
   end subroutine def_var
 
   module subroutine def_var_raw(nc, name, dtype, dims, atts, storage, err)
-    !! Define a variable from explicit schema arguments without allocating data storage.
+    !! Define a variable from explicit schema arguments without allocating data
+    !! storage.
     class(group_type), intent(in) :: nc
     !! Open writable dataset or subgroup; loaded caches remain unchanged.
     character(len=*), intent(in) :: name
@@ -81,17 +84,21 @@ interface
     type(attribute_type), intent(in), optional :: atts(:)
     !! Optional initial attributes, written before any variable data.
     type(storage_type), intent(in), optional :: storage
-    !! Optional per-variable storage settings, applied before attributes and data.
+    !! Optional per-variable storage settings, applied before attributes and
+    !! data.
     type(error_type), intent(out), optional :: err
     !! Optional operation result; failures terminate execution when omitted.
   end subroutine def_var_raw
 
   module subroutine put_variable(nc, var, start, count, stride, err)
-    !! Write an existing variable; selections use one-based Fortran dimension order.
+    !! Write an existing variable; selections use one-based Fortran dimension
+    !! order.
     class(group_type), intent(in) :: nc
-    !! Open destination dataset or subgroup; source objects and loaded caches are unchanged.
+    !! Open destination dataset or subgroup; source objects and loaded caches
+    !! are unchanged.
     type(variable_type), target, intent(in) :: var
-    !! Source variable whose name selects the destination and whose storage supplies the data.
+    !! Source variable whose name selects the destination and whose storage
+    !! supplies the data.
     integer, intent(in), optional :: start(:)
     !! Optional one-based Fortran-order starting indices; defaults to ones.
     integer, intent(in), optional :: count(:)
@@ -105,37 +112,47 @@ interface
   pure module subroutine validate_definition(name, dtype, dims, atts, err)
     !! Validate a definition independently of data storage and file mutation.
     character(len=*), intent(in) :: name
-    !! Local name of the variable to define; trailing Fortran padding is ignored.
+    !! Local name of the variable to define; trailing Fortran padding is
+    !! ignored.
     integer(c_int), intent(in) :: dtype
     !! Supported NetCDF primitive type code, such as NC_FLOAT or NC_INT.
     type(dimension_type), intent(in) :: dims(:)
     !! Destination dimensions in Fortran order; an empty array defines a scalar.
     type(attribute_type), intent(in), optional :: atts(:)
-    !! Optional attributes to validate, including the scalar matching-type _FillValue.
+    !! Optional attributes to validate, including the scalar matching-type
+    !! _FillValue.
     type(error_type), intent(out) :: err
-    !! Completed operation result; contains a diagnostic when the operation fails.
+    !! Completed operation result; contains a diagnostic when the operation
+    !! fails.
   end subroutine validate_definition
 
   module subroutine resolve_dim(nc, dim, found, actual, err)
-    !! Resolve a visible dimension and check schema compatibility without creating it.
+    !! Resolve a visible dimension and check schema compatibility without
+    !! creating it.
     class(group_type), intent(in) :: nc
-    !! Open destination dataset or subgroup; source objects and loaded caches are unchanged.
+    !! Open destination dataset or subgroup; source objects and loaded caches
+    !! are unchanged.
     type(dimension_type), intent(in) :: dim
     !! Requested dimension name, length, and unlimited status.
     logical, intent(out) :: found
     !! True when a visible dimension with the requested name exists.
     type(dimension_type), intent(out) :: actual
-    !! Resolved file metadata; valid only when found is true and err indicates success.
+    !! Resolved file metadata; valid only when found is true and err indicates
+    !! success.
     type(error_type), intent(out) :: err
-    !! Completed operation result; contains a diagnostic when the operation fails.
+    !! Completed operation result; contains a diagnostic when the operation
+    !! fails.
   end subroutine resolve_dim
 
   module subroutine rename_dim_nc_dim(grp, dim, new_name, update_file, err)
-    !! Rename a locally defined file dimension and only the supplied dimension object.
+    !! Rename a locally defined file dimension and only the supplied dimension
+    !! object.
     class(group_type), intent(in) :: grp
-    !! Defining open group when update_file is true; its caches are not synchronized.
+    !! Defining open group when update_file is true; its caches are not
+    !! synchronized.
     type(dimension_type), intent(inout) :: dim
-    !! Dimension whose old name selects the file target; its cached ID is not trusted.
+    !! Dimension whose old name selects the file target; its cached ID is not
+    !! trusted.
     character(len=*), intent(in) :: new_name
     !! Replacement local name; trailing padding is ignored.
     logical, intent(in), optional :: update_file
@@ -145,13 +162,16 @@ interface
   end subroutine rename_dim_nc_dim
 
   module subroutine rename_dim_nc_grp(grp, old_name, new_name, update_file, err)
-    !! Rename a local file dimension and synchronize only direct loaded dimension references.
+    !! Rename a local file dimension and synchronize only direct loaded
+    !! dimension references.
     class(group_type), intent(inout) :: grp
-    !! Defining group; descendant caches and independent snapshots are unchanged.
+    !! Defining group; descendant caches and independent snapshots are
+    !! unchanged.
     character(len=*), intent(in) :: old_name, new_name
     !! old_name: Local dimension to find. new_name: Replacement local name.
     logical, intent(in) :: update_file
-    !! Whether to update the file; required to distinguish the model-only overload.
+    !! Whether to update the file; required to distinguish the model-only
+    !! overload.
     type(error_type), intent(out), optional :: err
     !! Receives status; failures terminate execution when omitted.
   end subroutine rename_dim_nc_grp
@@ -165,18 +185,21 @@ interface
     character(len=*), intent(in) :: new_name
     !! Replacement local name; trailing Fortran blank padding is removed.
     logical, intent(in), optional :: update_file
-    !! Whether to update the open NetCDF file as well as the model (default false).
+    !! Whether to update the open NetCDF file as well as the model (default
+    !! false).
     type(error_type), intent(out), optional :: err
     !! Receives the status and diagnostic; failures stop execution when omitted.
   end subroutine rename_grp_nc_grp
 
-  module subroutine rename_grp_nc_par(parent, old_name, new_name, update_file, err)
+  module subroutine rename_grp_nc_par(parent, old_name, &
+    & new_name, update_file, err)
     !! Rename a direct child by name; update a matching cached child if present.
     class(group_type), intent(inout) :: parent
-    !! Parent providing the file context and any cached direct children to update.
+    !! Parent providing the file context and any cached direct children to
+    !! update.
     character(len=*), intent(in) :: old_name, new_name
-    !! old_name: Existing local name to locate.
-    !! new_name: Replacement local name; trailing Fortran blank padding is removed.
+    !! old_name: Existing local name to locate. new_name: Replacement local
+    !! name; trailing Fortran blank padding is removed.
     logical, intent(in) :: update_file
     !! Whether to update the open NetCDF file as well as the model.
     type(error_type), intent(out), optional :: err
@@ -185,15 +208,19 @@ interface
 
   module subroutine rename_var_nc_var(grp, var, new_name, update_file, err)
     !! Rename the supplied variable, optionally updating its name in the file.
-    !! grp%vars and other copies are not synchronized; the old name selects the target.
+    !! grp%vars and other copies are not synchronized; the old name selects the
+    !! target.
     class(group_type), intent(in) :: grp
-    !! Open group containing the supplied variable when a file update is requested.
+    !! Open group containing the supplied variable when a file update is
+    !! requested.
     type(variable_type), intent(inout) :: var
-    !! Variable whose local name is changed; its metadata and storage are preserved.
+    !! Variable whose local name is changed; its metadata and storage are
+    !! preserved.
     character(len=*), intent(in) :: new_name
     !! Replacement local name; trailing Fortran blank padding is removed.
     logical, intent(in), optional :: update_file
-    !! Whether to update the open NetCDF file as well as the model (default false).
+    !! Whether to update the open NetCDF file as well as the model (default
+    !! false).
     type(error_type), intent(out), optional :: err
     !! Receives the status and diagnostic; failures stop execution when omitted.
   end subroutine rename_var_nc_var
@@ -204,8 +231,8 @@ interface
     class(group_type), intent(inout) :: grp
     !! Group whose direct variable collection contains the name to change.
     character(len=*), intent(in) :: old_name, new_name
-    !! old_name: Existing local name to locate.
-    !! new_name: Replacement local name; trailing Fortran blank padding is removed.
+    !! old_name: Existing local name to locate. new_name: Replacement local
+    !! name; trailing Fortran blank padding is removed.
     logical, intent(in) :: update_file
     !! Whether to update the open NetCDF file as well as the model.
     type(error_type), intent(out), optional :: err
@@ -213,12 +240,14 @@ interface
   end subroutine rename_var_nc_grp
 
   module subroutine del_att_nc_var(grp, var, name, update_file, err)
-    !! Delete a variable attribute in the model and optionally in its open NetCDF group.
-    !! Independent copies, including grp%vars, are not synchronized.
+    !! Delete a variable attribute in the model and optionally in its open
+    !! NetCDF group. Independent copies, including grp%vars, are not
+    !! synchronized.
     class(group_type), intent(in) :: grp
     !! Open containing group, used only when updating the file.
     type(variable_type), intent(inout) :: var
-    !! Variable whose supplied attribute cache is updated after successful deletion.
+    !! Variable whose supplied attribute cache is updated after successful
+    !! deletion.
     character(len=*), intent(in) :: name
     !! Local attribute name; trailing Fortran padding is ignored.
     logical, intent(in), optional :: update_file
@@ -228,41 +257,49 @@ interface
   end subroutine del_att_nc_var
 
   module subroutine del_att_nc_grp(grp, name, update_file, err)
-    !! Delete a group/global attribute in the model and optionally in the open file.
+    !! Delete a group/global attribute in the model and optionally in the open
+    !! file.
     class(group_type), intent(inout) :: grp
-    !! Group whose supplied attribute cache is updated after successful deletion.
+    !! Group whose supplied attribute cache is updated after successful
+    !! deletion.
     character(len=*), intent(in) :: name
     !! Local attribute name; trailing Fortran padding is ignored.
     logical, intent(in) :: update_file
-    !! Whether to delete from the file too; required to distinguish model-only calls.
+    !! Whether to delete from the file too; required to distinguish model-only
+    !! calls.
     type(error_type), intent(out), optional :: err
     !! Receives status and diagnostic; failures stop execution when omitted.
   end subroutine del_att_nc_grp
 
-  module subroutine rename_att_nc_var(grp, var, old_name, new_name, update_file, err)
+  module subroutine rename_att_nc_var(grp, var, &
+    & old_name, new_name, update_file, err)
     !! Rename a variable attribute; optionally update the file and supplied
     !! cache. Other variable copies, including grp%vars, are not synchronized.
     class(group_type), intent(in) :: grp
-    !! Open group containing the supplied variable when a file update is requested.
+    !! Open group containing the supplied variable when a file update is
+    !! requested.
     type(variable_type), intent(inout) :: var
-    !! Variable whose matching attribute is renamed; its data and own name are preserved.
+    !! Variable whose matching attribute is renamed; its data and own name are
+    !! preserved.
     character(len=*), intent(in) :: old_name, new_name
-    !! old_name: Existing local name to locate.
-    !! new_name: Replacement local name; trailing Fortran blank padding is removed.
+    !! old_name: Existing local name to locate. new_name: Replacement local
+    !! name; trailing Fortran blank padding is removed.
     logical, intent(in), optional :: update_file
-    !! Whether to update the open NetCDF file as well as the model (default false).
+    !! Whether to update the open NetCDF file as well as the model (default
+    !! false).
     type(error_type), intent(out), optional :: err
     !! Receives the status and diagnostic; failures stop execution when omitted.
   end subroutine rename_att_nc_var
 
   module subroutine rename_att_nc_grp(grp, old_name, new_name, update_file, err)
-    !! Rename a group/global attribute in the file and any matching cached entry.
-    !! update_file is required to distinguish this from the model-only overload.
+    !! Rename a group/global attribute in the file and any matching cached
+    !! entry. update_file is required to distinguish this from the model-only
+    !! overload.
     class(group_type), intent(inout) :: grp
     !! Group whose matching global attribute is renamed.
     character(len=*), intent(in) :: old_name, new_name
-    !! old_name: Existing local name to locate.
-    !! new_name: Replacement local name; trailing Fortran blank padding is removed.
+    !! old_name: Existing local name to locate. new_name: Replacement local
+    !! name; trailing Fortran blank padding is removed.
     logical, intent(in) :: update_file
     !! Whether to update the open NetCDF file as well as the model.
     type(error_type), intent(out), optional :: err
@@ -297,10 +334,10 @@ interface
     class(group_type), intent(inout) :: group
     !! Dataset group to process.
     logical, intent(in), optional :: inq_dims, inq_atts, inq_vars, inq_grps
-    !! inq_dims: Whether to populate the cached dimensions.
-    !! inq_atts: Whether to populate the cached group attributes.
-    !! inq_vars: Whether to populate the cached variable metadata.
-    !! inq_grps: Whether to populate the cached child groups.
+    !! inq_dims: Whether to populate the cached dimensions. inq_atts: Whether to
+    !! populate the cached group attributes. inq_vars: Whether to populate the
+    !! cached variable metadata. inq_grps: Whether to populate the cached child
+    !! groups.
     logical, intent(in), optional :: recur
     !! Whether to apply the requested inquiries recursively to descendants.
     type(error_type), intent(out), optional :: err
@@ -376,12 +413,12 @@ interface
     character(len=*), intent(in) :: file
     !! Path to the dataset file.
     character(len=*), intent(in), optional :: mode
-    !! Disk-backed aliases: r/read, a/append, w/write.
-    !! Diskless aliases: r/read, a/append, an/append_temp, w/write, wn/write_temp.
+    !! Disk-backed aliases: r/read, a/append, w/write. Diskless aliases: r/read,
+    !! a/append, an/append_temp, w/write, wn/write_temp.
     logical, intent(in), optional :: diskless
     !! Keep the NetCDF dataset in RAM; defaults to false (disk-backed access).
-    !! When true, use a diskless mode or alias listed above.
-    !! a/w and their aliases save on close; an/wn and their _temp aliases discard changes.
+    !! When true, use a diskless mode or alias listed above. a/w and their
+    !! aliases save on close; an/wn and their _temp aliases discard changes.
     !! This does not write back values modified in separate Fortran objects.
     type(error_type), intent(out), optional :: err
     !! Optional error result. When absent, failures stop the program.
@@ -397,8 +434,10 @@ interface
     !! Optional error result. When absent, failures stop the program.
   end subroutine close_netcdf
 
-  module subroutine to_netcdf_var(file, vars, atts, err, mode, start, count, stride)
-    !! Create a file or update variables; selections require a single variable in append mode.
+  module subroutine to_netcdf_var(file, vars, atts, err, &
+    & mode, start, count, stride)
+    !! Create a file or update variables; selections require a single variable
+    !! in append mode.
     character(len=*), intent(in) :: file
     !! Output file to create.
     type(variable_type), intent(in) :: vars(..)
@@ -408,7 +447,8 @@ interface
     type(error_type), intent(out), optional :: err
     !! Optional error result. When absent, failures stop the program.
     character(len=*), intent(in), optional :: mode
-    !! w/write (default) replaces the file; a/append updates variables in an existing file.
+    !! w/write (default) replaces the file; a/append updates variables in an
+    !! existing file.
     integer, intent(in), optional :: start(:)
     !! Optional one-based Fortran-order starting indices; defaults to ones.
     integer, intent(in), optional :: count(:)
@@ -417,7 +457,8 @@ interface
     !! Optional positive destination strides in Fortran order; defaults to ones.
   end subroutine to_netcdf_var
 
-  module subroutine to_netcdf_grp(file, grp, atts, err, mode, start, count, stride)
+  module subroutine to_netcdf_grp(file, grp, atts, err, &
+    & mode, start, count, stride)
     !! Create a netCDF file from one group or a rank-one group array.
     character(len=*), intent(in) :: file
     !! Output file to create.
@@ -514,8 +555,8 @@ interface
   end subroutine initialize_var
 
   module function get_variable(nc, name, start, count, stride, err) result(var)
-    !! submodule_variable.f90
-    !! Read a variable's data from a netCDF dataset into a `variable_type`.
+    !! submodule_variable.f90 Read a variable's data from a netCDF dataset into
+    !! a `variable_type`.
     class(group_type), intent(in) :: nc
     !! High-level `netcdf_type` representing the open file.
     character(len=*), intent(in) :: name

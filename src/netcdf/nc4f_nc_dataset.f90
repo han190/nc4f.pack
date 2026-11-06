@@ -7,13 +7,13 @@ module function open_netcdf(file, mode, diskless, err) result(nc)
   character(len=*), intent(in) :: file
   !! Path to the dataset file.
   character(len=*), intent(in), optional :: mode
-  !! Disk-backed aliases: r/read, a/append, w/write.
-  !! Diskless aliases: r/read, a/append, an/append_temp, w/write, wn/write_temp.
+  !! Disk-backed aliases: r/read, a/append, w/write. Diskless aliases: r/read,
+  !! a/append, an/append_temp, w/write, wn/write_temp.
   logical, intent(in), optional :: diskless
   !! Keep the NetCDF dataset in RAM; defaults to false (disk-backed access).
-  !! When true, use a diskless mode or alias listed above.
-  !! a/w and their aliases save on close; an/wn and their _temp aliases discard changes.
-  !! This does not write back values modified in separate Fortran objects.
+  !! When true, use a diskless mode or alias listed above. a/w and their aliases
+  !! save on close; an/wn and their _temp aliases discard changes. This does not
+  !! write back values modified in separate Fortran objects.
   type(error_type), intent(out), optional :: err
   !! Optional error result. When absent, failures stop the program.
   type(netcdf_type) :: nc
@@ -50,7 +50,8 @@ module function open_netcdf(file, mode, diskless, err) result(nc)
     case default
       op_err = error_type(NC_EINVAL, "open_netcdf", &
         & "Invalid diskless mode: "//trim(open_mode)// &
-        & "; expected r/read, a/append, an/append_temp, w/write, or wn/write_temp.")
+        & "; expected r/read, a/append, an/append_temp, "// &
+        & "w/write, or wn/write_temp.")
       call return_err(op_err, err)
       return
     end select
@@ -114,7 +115,8 @@ subroutine close_netcdf_(nc, err)
   if (associated(nc%grps)) nullify (nc%grps)
 end subroutine close_netcdf_
 
-module subroutine to_netcdf_var(file, vars, atts, err, mode, start, count, stride)
+module subroutine to_netcdf_var(file, vars, atts, err, mode, start, count, &
+  & stride)
   !! Serialize complete variables or update one selection in an existing file.
   character(len=*), intent(in) :: file
   !! Path of the output file to create or update.
@@ -203,7 +205,8 @@ end subroutine to_netcdf_var
 pure subroutine write_mode_(mode, append, err)
   !! Resolve the requested file-writing mode without accessing the filesystem.
   character(len=*), intent(in), optional :: mode
-  !! Optional w/write (default) or a/append mode; append requires an existing file.
+  !! Optional w/write (default) or a/append mode; append requires an existing
+  !! file.
   logical, intent(out) :: append
   !! Whether the operation updates an existing file instead of replacing it.
   type(error_type), intent(out) :: err
@@ -268,7 +271,8 @@ pure subroutine check_global_atts_(atts, err)
 end subroutine check_global_atts_
 
 subroutine write_item_(nc, var, append, err, start, count, stride)
-  !! Create a complete missing variable or update data in an existing destination.
+  !! Create a complete missing variable or update data in an existing
+  !! destination.
   class(group_type), intent(in) :: nc
   !! Open destination dataset or subgroup; source objects and loaded caches are
   !! unchanged.
@@ -306,7 +310,8 @@ subroutine write_item_(nc, var, append, err, start, count, stride)
   call put_variable(nc, var, start, count, stride, err)
 end subroutine write_item_
 
-module subroutine to_netcdf_grp(file, grp, atts, err, mode, start, count, stride)
+module subroutine to_netcdf_grp(file, grp, atts, err, mode, start, count, &
+  & stride)
   !! Create a NetCDF file from a root group or direct child groups.
   character(len=*), intent(in) :: file
   !! Output file to create.

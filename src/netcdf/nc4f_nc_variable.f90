@@ -4,15 +4,19 @@ contains
 
 module subroutine rename_var_nc_var(grp, var, new_name, update_file, err)
   !! Rename the supplied variable, optionally updating its name in the file.
-  !! grp%vars and other copies are not synchronized; the old name selects the target.
+  !! grp%vars and other copies are not synchronized; the old name selects the
+  !! target.
   class(group_type), intent(in) :: grp
-  !! Open group containing the supplied variable when a file update is requested.
+  !! Open group containing the supplied variable when a file update is
+  !! requested.
   type(variable_type), intent(inout) :: var
-  !! Variable whose local name is changed; its metadata and storage are preserved.
+  !! Variable whose local name is changed; its metadata and storage are
+  !! preserved.
   character(len=*), intent(in) :: new_name
   !! Replacement local name; trailing Fortran blank padding is removed.
   logical, intent(in), optional :: update_file
-  !! Whether to update the open NetCDF file as well as the model (default false).
+  !! Whether to update the open NetCDF file as well as the model (default
+  !! false).
   type(error_type), intent(out), optional :: err
   !! Receives the status and diagnostic; failures stop execution when omitted.
   type(error_type) :: op_err
@@ -43,8 +47,8 @@ module subroutine rename_var_nc_grp(grp, old_name, new_name, update_file, err)
   class(group_type), intent(inout) :: grp
   !! Group whose direct variable collection contains the name to change.
   character(len=*), intent(in) :: old_name, new_name
-  !! old_name: Existing local name to locate.
-  !! new_name: Replacement local name; trailing Fortran blank padding is removed.
+  !! old_name: Existing local name to locate. new_name: Replacement local name;
+  !! trailing Fortran blank padding is removed.
   logical, intent(in) :: update_file
   !! Whether to update the open NetCDF file as well as the model.
   type(error_type), intent(out), optional :: err
@@ -88,8 +92,8 @@ subroutine rename_var_nc_(ncid, old_name, new_name, err)
   integer(c_int), intent(in) :: ncid
   !! Open file or group identifier used by the NetCDF C API.
   character(len=*), intent(in) :: old_name, new_name
-  !! old_name: Existing local name to locate.
-  !! new_name: Replacement local name; trailing Fortran blank padding is removed.
+  !! old_name: Existing local name to locate. new_name: Replacement local name;
+  !! trailing Fortran blank padding is removed.
   type(error_type), intent(out) :: err
   !! Receives the operation status and diagnostic message.
   type(variable_type) :: name
@@ -105,7 +109,8 @@ subroutine rename_var_nc_(ncid, old_name, new_name, err)
   if (has_err(err)) return
   stat = nc_rename_var(ncid, varid, f2cstr(new_name))
   ! Preserve access errors, but accept an existing variable renamed to itself.
-  if (trim(old_name) == trim(new_name) .and. stat == NC_ENAMEINUSE) stat = NC_NOERR
+  if (trim(old_name) == trim(new_name) .and. stat == NC_ENAMEINUSE) stat = &
+    & NC_NOERR
   err = netcdf_err(stat, "rename_variable", "Rename variable: "// &
     & trim(old_name)//" -> "//trim(new_name))
 end subroutine rename_var_nc_
@@ -162,7 +167,8 @@ function get_var_(nc, name, start, count, stride, err) result(var)
   if (has_err(err)) return
 
   if (present(count) .and. .not. present(start) .or. &
-    & present(stride) .and. (.not. present(start) .or. .not. present(count))) then
+    & present(stride) .and. (.not. present(start) .or. &
+    & .not. present(count))) then
     err = error_type(NC_EINVAL, "get_variable", &
       & "count requires start; stride requires start and count.")
     return
@@ -286,10 +292,12 @@ function inq_var_(nc, name, err) result(var)
 end function inq_var_
 
 subroutine require_write_access_(nc, err)
-  !! Use NetCDF's permission check, including for empty writes and subgroup handles.
-  !! A temporary define-mode transition is restored when the file was in data mode.
+  !! Use NetCDF's permission check, including for empty writes and subgroup
+  !! handles. A temporary define-mode transition is restored when the file was
+  !! in data mode.
   class(group_type), intent(in) :: nc
-  !! Open destination dataset or subgroup; source objects and loaded caches are unchanged.
+  !! Open destination dataset or subgroup; source objects and loaded caches are
+  !! unchanged.
   type(error_type), intent(out) :: err
   !! Completed operation result; contains a diagnostic when the operation fails.
   integer(c_int) :: root, parent, stat
@@ -326,7 +334,8 @@ pure module subroutine validate_definition(name, dtype, dims, atts, err)
   type(dimension_type), intent(in) :: dims(:)
   !! Destination dimensions in Fortran order; an empty array defines a scalar.
   type(attribute_type), intent(in), optional :: atts(:)
-  !! Optional attributes to validate, including the scalar matching-type _FillValue.
+  !! Optional attributes to validate, including the scalar matching-type
+  !! _FillValue.
   type(error_type), intent(out) :: err
   !! Completed operation result; contains a diagnostic when the operation fails.
   integer :: i, j
@@ -348,7 +357,8 @@ pure module subroutine validate_definition(name, dtype, dims, atts, err)
     end if
     call validate(dims(i)%name, context="define_variable", err=err)
     if (has_err(err)) return
-    if (dims(i)%len < 0 .or. (dims(i)%len == 0 .and. .not. dims(i)%is_unlim) .or. &
+    if (dims(i)%len < 0 .or. (dims(i)%len == 0 .and. &
+      & .not. dims(i)%is_unlim) .or. &
       & dims(i)%len > int(huge(0_c_size_t), int64)) then
       err = error_type(NC_EINVAL, "define_variable", &
         & "Invalid dimension length.")
@@ -402,11 +412,13 @@ subroutine validate_storage_(storage, dtype, dims, atts, err)
   err = error_type()
   if (allocated(storage%chunks)) then
     if (size(storage%chunks) /= size(dims) .or. size(dims) == 0) then
-      err = error_type(NC_EINVAL, "define_variable", "Chunk rank must match non-scalar variable rank.")
+      err = error_type(NC_EINVAL, "define_variable", &
+        & "Chunk rank must match non-scalar variable rank.")
       return
     end if
     if (any(storage%chunks <= 0)) then
-      err = error_type(NC_EINVAL, "define_variable", "Chunk sizes must be positive.")
+      err = error_type(NC_EINVAL, "define_variable", &
+        & "Chunk sizes must be positive.")
       return
     end if
   end if
@@ -421,8 +433,10 @@ subroutine validate_storage_(storage, dtype, dims, atts, err)
   if (allocated(storage%fill_value)) then
     call validate(storage%fill_value, context="define_variable", err=err)
     if (has_err(err)) return
-    if (storage%fill_value%len /= 1 .or. storage%fill_value%dtype /= dtype .or. storage%no_fill == 1) then
-      err = error_type(NC_EINVAL, "define_variable", "Invalid custom fill value.")
+    if (storage%fill_value%len /= 1 .or. storage%fill_value%dtype /= &
+      & dtype .or. storage%no_fill == 1) then
+      err = error_type(NC_EINVAL, "define_variable", &
+        & "Invalid custom fill value.")
       return
     end if
   end if
@@ -430,10 +444,12 @@ subroutine validate_storage_(storage, dtype, dims, atts, err)
     do i = 1, size(atts)
       if (atts(i)%name /= "_FillValue") cycle
       if (storage%no_fill == 1) &
-        & err = error_type(NC_EINVAL, "define_variable", "No-fill conflicts with _FillValue attribute.")
+        & err = error_type(NC_EINVAL, "define_variable", &
+        & "No-fill conflicts with _FillValue attribute.")
       if (allocated(storage%fill_value)) then
         if (storage%fill_value /= atts(i)) &
-          & err = error_type(NC_EINVAL, "define_variable", "Conflicting fill values.")
+          & err = error_type(NC_EINVAL, "define_variable", &
+          & "Conflicting fill values.")
       end if
     end do
   end if
@@ -454,8 +470,10 @@ subroutine apply_storage_(nc, varid, name, storage, err)
   if (has_err(err)) return
   if (fmt /= NC_FORMAT_NETCDF4 .and. fmt /= NC_FORMAT_NETCDF4_CLASSIC) then
     if (allocated(storage%chunks) .or. storage%deflate_level >= 0 .or. &
-      & storage%shuffle >= 0 .or. storage%fletcher32 >= 0 .or. storage%endian >= 0) &
-      & err = error_type(NC_EINVAL, "define_variable", "Storage filters require NetCDF-4 format.")
+      & storage%shuffle >= 0 .or. storage%fletcher32 >= 0 .or. &
+      & storage%endian >= 0) &
+      & err = error_type(NC_EINVAL, "define_variable", &
+      & "Storage filters require NetCDF-4 format.")
     if (has_err(err)) return
   end if
   if (allocated(storage%chunks)) then
@@ -467,7 +485,8 @@ subroutine apply_storage_(nc, varid, name, storage, err)
   if (storage%deflate_level >= 0 .or. storage%shuffle >= 0) then
     shuffle = max(storage%shuffle, 0_c_int)
     deflate = merge(1_c_int, 0_c_int, storage%deflate_level > 0)
-    stat = nc_def_var_deflate(nc%id, varid, shuffle, deflate, max(storage%deflate_level, 0_c_int))
+    stat = nc_def_var_deflate(nc%id, varid, shuffle, deflate, &
+      & max(storage%deflate_level, 0_c_int))
     err = netcdf_err(stat, "define_variable", "Set compression: "//trim(name))
     if (has_err(err)) return
   end if
@@ -483,9 +502,11 @@ subroutine apply_storage_(nc, varid, name, storage, err)
   end if
   if (storage%no_fill >= 0 .or. allocated(storage%fill_value)) then
     if (allocated(storage%fill_value)) then
-      stat = nc_def_var_fill(nc%id, varid, 0_c_int, buffer2cptr(storage%fill_value))
+      stat = nc_def_var_fill(nc%id, varid, 0_c_int, &
+        & buffer2cptr(storage%fill_value))
     else
-      stat = nc_def_var_fill(nc%id, varid, max(storage%no_fill, 0_c_int), c_null_ptr)
+      stat = nc_def_var_fill(nc%id, varid, max(storage%no_fill, 0_c_int), &
+        & c_null_ptr)
     end if
     err = netcdf_err(stat, "define_variable", "Set fill: "//trim(name))
   end if
@@ -496,7 +517,8 @@ subroutine inquire_storage_(nc, var, err)
   type(variable_type), intent(inout) :: var
   type(error_type), intent(out) :: err
   type(storage_type) :: storage
-  integer(c_int) :: stat, fmt, layout, shuffle, deflate, level, checksum, endian, no_fill
+  integer(c_int) :: stat, fmt, layout, shuffle, deflate, level, checksum, &
+    & endian, no_fill
   integer(c_size_t), allocatable, target :: chunks(:)
   integer :: rank
 
@@ -510,7 +532,8 @@ subroutine inquire_storage_(nc, var, err)
   stat = nc_inq_var_chunking(nc%id, var%id, layout, c_loc(chunks(1)))
   err = netcdf_err(stat, "inquire_variable", "Inquire chunking: "//var%name)
   if (has_err(err)) return
-  if (layout == NC_CHUNKED .and. rank > 0) storage%chunks = int(chunks(rank:1:-1), int64)
+  if (layout == NC_CHUNKED .and. rank > 0) storage%chunks = &
+    & int(chunks(rank:1:-1), int64)
   stat = nc_inq_var_deflate(nc%id, var%id, shuffle, deflate, level)
   err = netcdf_err(stat, "inquire_variable", "Inquire compression: "//var%name)
   if (has_err(err)) return
@@ -546,11 +569,13 @@ subroutine inquire_storage_(nc, var, err)
 end subroutine inquire_storage_
 
 module subroutine def_var(nc, var, err)
-  !! Define a variable from metadata without reading or copying its data storage.
+  !! Define a variable from metadata without reading or copying its data
+  !! storage.
   class(group_type), intent(in) :: nc
   !! Open writable dataset or subgroup; loaded caches remain unchanged.
   type(variable_type), intent(in) :: var
-  !! Schema providing name, type, dimensions, and attributes; the source is unchanged.
+  !! Schema providing name, type, dimensions, and attributes; the source is
+  !! unchanged.
   type(error_type), intent(out), optional :: err
   !! Optional operation result; failures terminate execution when omitted.
   type(error_type) :: op_err
@@ -561,11 +586,13 @@ module subroutine def_var(nc, var, err)
     call return_err(op_err, err)
     return
   end if
-  call def_var_raw(nc, var%name, var%dtype, var%dims, var%atts, var%storage, err)
+  call def_var_raw(nc, var%name, var%dtype, var%dims, var%atts, var%storage, &
+    & err)
 end subroutine def_var
 
 module subroutine def_var_raw(nc, name, dtype, dims, atts, storage, err)
-  !! Define a variable from explicit schema arguments without allocating data storage.
+  !! Define a variable from explicit schema arguments without allocating data
+  !! storage.
   class(group_type), intent(in) :: nc
   !! Open writable dataset or subgroup; loaded caches remain unchanged.
   character(len=*), intent(in) :: name
@@ -620,7 +647,8 @@ module subroutine def_var_raw(nc, name, dtype, dims, atts, storage, err)
       dimids(n-i+1) = actual%id
     end do
     stat = nc_def_var(nc%id, f2cstr(name), dtype, n, dimids, defined%id)
-    op_err = netcdf_err(stat, "define_variable", "Define variable: "//trim(name))
+    op_err = netcdf_err(stat, "define_variable", &
+      & "Define variable: "//trim(name))
     if (has_err(op_err)) exit definition
     if (present(storage)) then
       call apply_storage_(nc, defined%id, name, storage, op_err)
@@ -655,9 +683,11 @@ end subroutine def_var_raw
 module subroutine put_variable(nc, var, start, count, stride, err)
   !! Update data only; the file schema and attributes are preserved.
   class(group_type), intent(in) :: nc
-  !! Open destination dataset or subgroup; source objects and loaded caches are unchanged.
+  !! Open destination dataset or subgroup; source objects and loaded caches are
+  !! unchanged.
   type(variable_type), target, intent(in) :: var
-  !! Source variable whose name selects the destination and whose storage supplies the data.
+  !! Source variable whose name selects the destination and whose storage
+  !! supplies the data.
   integer, intent(in), optional :: start(:)
   !! Optional one-based Fortran-order starting indices; defaults to ones.
   integer, intent(in), optional :: count(:)
@@ -713,15 +743,19 @@ module subroutine put_variable(nc, var, start, count, stride, err)
         exit write_data
       end if
       if (starts(i) < 1 .or. starts(i) > limit) then
-        op_err = error_type(NC_EINVALCOORDS, "put_variable", "Invalid start index.")
+        op_err = error_type(NC_EINVALCOORDS, "put_variable", &
+          & "Invalid start index.")
         exit write_data
       end if
-      if (strides(i) < 1 .or. strides(i) > int(huge(0_c_ptrdiff_t), int64) .or. &
+      if (strides(i) < 1 .or. strides(i) > int(huge(0_c_ptrdiff_t), &
+        & int64) .or. &
         & counts(i) < 0 .or. counts(i) > limit) then
-        op_err = error_type(NC_EINVAL, "put_variable", "Invalid count or stride.")
+        op_err = error_type(NC_EINVAL, "put_variable", &
+          & "Invalid count or stride.")
         exit write_data
       end if
-      if (counts(i) /= var%dims(i)%len .or. (selected .and. counts(i) == 0)) then
+      if (counts(i) /= var%dims(i)%len .or. (selected .and. counts(i) == &
+        & 0)) then
         op_err = error_type(NC_EINVAL, "put_variable", &
           & "Source shape must equal count; selected counts must be positive.")
         exit write_data
@@ -738,7 +772,8 @@ module subroutine put_variable(nc, var, start, count, stride, err)
               & "Selection starts beyond a fixed dimension.")
             exit write_data
           end if
-          if (counts(i) - 1 > (destination%dims(i)%len - starts(i)) / strides(i)) then
+          if (counts(i) - 1 > (destination%dims(i)%len - starts(i)) / &
+            & strides(i)) then
             op_err = error_type(NC_EEDGE, "put_variable", &
               & "Selection exceeds a fixed dimension.")
             exit write_data
@@ -771,10 +806,11 @@ end subroutine put_variable
 
 pure subroutine prepare_selection_(default_count, context, &
   & starts, counts, strides, err, start, count, stride)
-  !! Check vector lengths and apply shared defaults;
-  !! callers enforce operation-specific rules.
+  !! Check vector lengths and apply shared defaults; callers enforce
+  !! operation-specific rules.
   integer(int64), intent(in) :: default_count(:)
-  !! Default extents in Fortran order: file shape for reads and source shape for writes.
+  !! Default extents in Fortran order: file shape for reads and source shape for
+  !! writes.
   character(len=*), intent(in) :: context
   !! Operation name used in selection diagnostics.
   integer(int64), allocatable, intent(out) :: starts(:)
@@ -825,9 +861,10 @@ pure subroutine prepare_selection_(default_count, context, &
   if (present(stride)) strides = int(stride, int64)
 end subroutine prepare_selection_
 
-pure subroutine c_selection_(starts, counts, strides, c_start, c_count, c_stride)
-  !! Convert validated Fortran-order vectors to zero-based C order,
-  !! including empty scalars.
+pure subroutine c_selection_(starts, counts, strides, c_start, c_count, &
+  & c_stride)
+  !! Convert validated Fortran-order vectors to zero-based C order, including
+  !! empty scalars.
   integer(int64), intent(in) :: starts(:)
   !! Validated one-based starting indices in Fortran order.
   integer(int64), intent(in) :: counts(:)

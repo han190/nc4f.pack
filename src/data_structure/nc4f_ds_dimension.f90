@@ -11,7 +11,8 @@ pure module function nameof_dim(dim) result(name)
 end function nameof_dim
 
 pure module subroutine rename_dim_dim(dim, new_name, err)
-  !! Rename one dimension without changing its identity, length, or unlimited flag.
+  !! Rename one dimension without changing its identity, length, or unlimited
+  !! flag.
   type(dimension_type), intent(inout) :: dim
   !! Standalone dimension to rename; other copies are unchanged.
   character(len=*), intent(in) :: new_name
@@ -32,9 +33,11 @@ pure module subroutine rename_dim_dim(dim, new_name, err)
 end subroutine rename_dim_dim
 
 pure module subroutine rename_dim_var(var, old_name, new_name, err)
-  !! Rename all matching axes in one variable, including repeated dimension references.
+  !! Rename all matching axes in one variable, including repeated dimension
+  !! references.
   type(variable_type), intent(inout) :: var
-  !! Variable whose dimension names change; data and other metadata are preserved.
+  !! Variable whose dimension names change; data and other metadata are
+  !! preserved.
   character(len=*), intent(in) :: old_name, new_name
   !! old_name: Dimension to find. new_name: Replacement local name.
   type(error_type), intent(out), optional :: err
@@ -64,9 +67,11 @@ pure module subroutine rename_dim_var(var, old_name, new_name, err)
 end subroutine rename_dim_var
 
 pure module subroutine rename_dim_grp(grp, old_name, new_name, err)
-  !! Rename a local dimension and its direct variable references; do not traverse children.
+  !! Rename a local dimension and its direct variable references; do not
+  !! traverse children.
   class(group_type), intent(inout) :: grp
-  !! Group with local definitions or, if dims is unallocated, implicit variable dimensions.
+  !! Group with local definitions or, if dims is unallocated, implicit variable
+  !! dimensions.
   character(len=*), intent(in) :: old_name, new_name
   !! old_name: Dimension to find. new_name: Replacement local name.
   type(error_type), intent(out), optional :: err
@@ -155,9 +160,11 @@ pure module subroutine rename_dim_grp(grp, old_name, new_name, err)
 end subroutine rename_dim_grp
 
 pure subroutine rename_dims_(dims, old_name, new_name, err)
-  !! Validate a flattened set of definitions/references, then rename all matching entries.
+  !! Validate a flattened set of definitions/references, then rename all
+  !! matching entries.
   type(dimension_type), intent(inout) :: dims(:)
-  !! Staged dimension metadata; duplicate references must agree in length and unlimited status.
+  !! Staged dimension metadata; duplicate references must agree in length and
+  !! unlimited status.
   character(len=*), intent(in) :: old_name, new_name
   !! old_name: Dimension to find. new_name: Replacement local name.
   type(error_type), intent(out) :: err
@@ -279,8 +286,7 @@ end function new_dim_args
 logical elemental module function eq_dim(x, y)
   !! Return true when two dimensions have identical metadata.
   type(dimension_type), intent(in) :: x, y
-  !! x: Left-hand value to compare.
-  !! y: Right-hand value to compare.
+  !! x: Left-hand value to compare. y: Right-hand value to compare.
 
   eq_dim = x%len == y%len .and. x%is_unlim .eqv. y%is_unlim
   if (eq_dim) then
@@ -292,8 +298,7 @@ end function eq_dim
 logical elemental module function neq_dim(x, y)
   !! Return true when two dimensions have different metadata.
   type(dimension_type), intent(in) :: x, y
-  !! x: Left-hand value to compare.
-  !! y: Right-hand value to compare.
+  !! x: Left-hand value to compare. y: Right-hand value to compare.
 
   neq_dim = .not. eq_dim(x, y)
 end function neq_dim

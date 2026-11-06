@@ -53,8 +53,8 @@ pure module subroutine rename_grp_par(parent, old_name, new_name, err)
   class(group_type), intent(inout) :: parent
   !! Parent whose matching direct child is renamed in memory.
   character(len=*), intent(in) :: old_name, new_name
-  !! old_name: Existing local name to locate.
-  !! new_name: Replacement local name; trailing Fortran blank padding is removed.
+  !! old_name: Existing local name to locate. new_name: Replacement local name;
+  !! trailing Fortran blank padding is removed.
   type(error_type), intent(out), optional :: err
   !! Receives the status and diagnostic; failures stop execution when omitted.
   type(error_type) :: op_err
@@ -79,12 +79,13 @@ pure module subroutine rename_grp_par(parent, old_name, new_name, err)
 end subroutine rename_grp_par
 
 pure subroutine rename_grps_(grps, old_name, new_name, err)
-  !! Assumed-shape indexing also supports pointer arrays with nonunit lower bounds.
+  !! Assumed-shape indexing also supports pointer arrays with nonunit lower
+  !! bounds.
   type(group_type), intent(inout) :: grps(:)
   !! Direct child collection whose matching entry is renamed.
   character(len=*), intent(in) :: old_name, new_name
-  !! old_name: Existing local name to locate.
-  !! new_name: Replacement local name; trailing Fortran blank padding is removed.
+  !! old_name: Existing local name to locate. new_name: Replacement local name;
+  !! trailing Fortran blank padding is removed.
   type(error_type), intent(out) :: err
   !! Receives the operation status and diagnostic message.
   integer :: i, pos
@@ -252,7 +253,8 @@ module function new_dataset_grps(name, grps, atts, deep) result(grp)
 end function new_dataset_grps
 
 module function new_dataset_all(name, vars, grps, atts, deep) result(grp)
-  !! Construct a named group from variables, child groups, and optional attributes.
+  !! Construct a named group from variables, child groups, and optional
+  !! attributes.
   character(len=*), intent(in) :: name
   !! Name used to identify the NetCDF object.
   type(variable_type), intent(in) :: vars(:)

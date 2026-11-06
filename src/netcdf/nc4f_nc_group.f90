@@ -11,7 +11,8 @@ module subroutine rename_grp_nc_grp(parent, grp, new_name, update_file, err)
   character(len=*), intent(in) :: new_name
   !! Replacement local name; trailing Fortran blank padding is removed.
   logical, intent(in), optional :: update_file
-  !! Whether to update the open NetCDF file as well as the model (default false).
+  !! Whether to update the open NetCDF file as well as the model (default
+  !! false).
   type(error_type), intent(out), optional :: err
   !! Receives the status and diagnostic; failures stop execution when omitted.
   type(error_type) :: op_err
@@ -23,7 +24,8 @@ module subroutine rename_grp_nc_grp(parent, grp, new_name, update_file, err)
   if (.not. write_file) then
     call rename_group(grp, new_name, op_err)
   else
-    ! MOLD preserves the dynamic type for root validation without copying children.
+    ! MOLD preserves the dynamic type for root validation without copying
+    ! children.
     allocate (staged, mold=grp)
     if (allocated(grp%name)) staged%name = grp%name
     call rename_group(staged, new_name, op_err)
@@ -40,13 +42,14 @@ module subroutine rename_grp_nc_grp(parent, grp, new_name, update_file, err)
   call return_err(op_err, err)
 end subroutine rename_grp_nc_grp
 
-module subroutine rename_grp_nc_par(parent, old_name, new_name, update_file, err)
+module subroutine rename_grp_nc_par(parent, old_name, new_name, update_file, &
+  & err)
   !! Rename a direct child by name; update a matching cached child if present.
   class(group_type), intent(inout) :: parent
   !! Parent providing the file context and any cached direct children to update.
   character(len=*), intent(in) :: old_name, new_name
-  !! old_name: Existing local name to locate.
-  !! new_name: Replacement local name; trailing Fortran blank padding is removed.
+  !! old_name: Existing local name to locate. new_name: Replacement local name;
+  !! trailing Fortran blank padding is removed.
   logical, intent(in) :: update_file
   !! Whether to update the open NetCDF file as well as the model.
   type(error_type), intent(out), optional :: err
@@ -92,8 +95,8 @@ subroutine rename_grp_nc_(ncid, old_name, new_name, err)
   integer(c_int), intent(in) :: ncid
   !! Open file or group identifier used by the NetCDF C API.
   character(len=*), intent(in) :: old_name, new_name
-  !! old_name: Existing local name to locate.
-  !! new_name: Replacement local name; trailing Fortran blank padding is removed.
+  !! old_name: Existing local name to locate. new_name: Replacement local name;
+  !! trailing Fortran blank padding is removed.
   type(error_type), intent(out) :: err
   !! Receives the operation status and diagnostic message.
   type(group_type) :: name
@@ -108,7 +111,8 @@ subroutine rename_grp_nc_(ncid, old_name, new_name, err)
   if (has_err(err)) return
   stat = nc_rename_grp(grpid, f2cstr(new_name))
   ! A self-rename still checks existence and write access through the C API.
-  if (trim(old_name) == trim(new_name) .and. stat == NC_ENAMEINUSE) stat = NC_NOERR
+  if (trim(old_name) == trim(new_name) .and. stat == NC_ENAMEINUSE) stat = &
+    & NC_NOERR
   err = netcdf_err(stat, "rename_group", &
     & "Rename group: "//trim(old_name)//" -> "//trim(new_name))
 end subroutine rename_grp_nc_
@@ -149,10 +153,10 @@ recursive module subroutine inquire_group(group, &
   class(group_type), intent(inout) :: group
   !! Dataset group to process.
   logical, intent(in), optional :: inq_dims, inq_atts, inq_vars, inq_grps
-  !! inq_dims: Whether to populate the cached dimensions.
-  !! inq_atts: Whether to populate the cached group attributes.
-  !! inq_vars: Whether to populate the cached variable metadata.
-  !! inq_grps: Whether to populate the cached child groups.
+  !! inq_dims: Whether to populate the cached dimensions. inq_atts: Whether to
+  !! populate the cached group attributes. inq_vars: Whether to populate the
+  !! cached variable metadata. inq_grps: Whether to populate the cached child
+  !! groups.
   logical, intent(in), optional :: recur
   !! Whether to apply the requested inquiries recursively to descendants.
   type(error_type), intent(out), optional :: err
@@ -366,7 +370,8 @@ recursive subroutine write_grp_tree_data_(target, source, err)
       do j = 1, ndims
         count(j) = int(source%vars(i)%dims(j)%len)
       end do
-      call put_variable(target, source%vars(i), start=start, count=count, err=err)
+      call put_variable(target, source%vars(i), start=start, count=count, &
+        & err=err)
       if (has_err(err)) return
       deallocate (start, count)
     end do

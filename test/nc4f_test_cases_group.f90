@@ -213,7 +213,8 @@ module subroutine group_write(passed)
   if (.not. passed) return
 
   invalid_rank(1, 1) = child
-  call to_netcdf(TEST_RESULTS_DIR//"invalid-group-rank.nc", invalid_rank, err=err)
+  call to_netcdf(TEST_RESULTS_DIR//"invalid-group-rank.nc", invalid_rank, &
+    & err=err)
   passed = err%code == NC_EINVAL
 end subroutine group_write
 

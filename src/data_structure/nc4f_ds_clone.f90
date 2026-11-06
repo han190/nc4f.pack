@@ -67,7 +67,8 @@ impure elemental module subroutine clone_var(src, dest)
 end subroutine clone_var
 
 impure elemental module subroutine clone_att(src, dest)
-  !! Deep-copy attribute metadata and active bytes into owned destination storage.
+  !! Deep-copy attribute metadata and active bytes into owned destination
+  !! storage.
   type(attribute_type), intent(in) :: src
   !! Source object or group to read from.
   type(attribute_type), intent(out) :: dest

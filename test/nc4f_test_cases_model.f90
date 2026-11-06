@@ -50,7 +50,8 @@ module subroutine data_model(passed)
   borrowed_var = datarray("borrowed", values, &
     & ["x".dim.2, "y".dim.2], deep=.false.)
   if (.not. allocated(owned_var%buffer) .or. associated(owned_var%ptr)) return
-  if (allocated(borrowed_var%buffer) .or. .not. associated(borrowed_var%ptr)) return
+  if (allocated(borrowed_var%buffer) .or. &
+    & .not. associated(borrowed_var%ptr)) return
   if (.not. c_associated(c_loc(borrowed_var%ptr(1)), &
     & c_loc(values(1, 1)))) return
   if (.not. is_contiguous(owned_var%buffer) .or. &
@@ -81,7 +82,8 @@ module subroutine data_model(passed)
   if (.not. dim%is_unlim .or. dim%len /= 0) return
   call initialize(cloned_att, "copied_units", mold=atts(1))
   if (cloned_att%name /= "copied_units" .or. &
-    & cloned_att%dtype /= atts(1)%dtype .or. cloned_att%len /= atts(1)%len) return
+    & cloned_att%dtype /= atts(1)%dtype .or. cloned_att%len /= &
+    & atts(1)%len) return
   if (.not. allocated(cloned_att%buffer) .or. associated(cloned_att%ptr)) return
   call initialize(cloned_att, "borrowed_units", mold=atts(1), deep=.false.)
   if (allocated(cloned_att%buffer) .or. .not. associated(cloned_att%ptr)) return
@@ -91,7 +93,8 @@ module subroutine data_model(passed)
   atts(1)%buffer(1) = original_byte
   call initialize(cloned_var, "copied_temperature", vars(1), deep=.false.)
   if (cloned_var%name /= "copied_temperature" .or. &
-    & cloned_var%dtype /= vars(1)%dtype .or. cloned_var%len /= vars(1)%len .or. &
+    & cloned_var%dtype /= vars(1)%dtype .or. cloned_var%len /= &
+    & vars(1)%len .or. &
     & .not. all(cloned_var%dims == vars(1)%dims) .or. &
     & allocated(cloned_var%atts) .or. allocated(cloned_var%buffer) .or. &
     & .not. associated(cloned_var%ptr)) return
@@ -101,7 +104,8 @@ module subroutine data_model(passed)
   vars(1)%buffer(1) = original_byte
   call initialize(cloned_var, "copied_temperature", vars(1), atts=atts)
   if (.not. allocated(cloned_var%atts) .or. &
-    & .not. all(cloned_var%atts == atts) .or. .not. allocated(cloned_var%buffer)) return
+    & .not. all(cloned_var%atts == atts) .or. &
+    & .not. allocated(cloned_var%buffer)) return
   if (.not. (owned_var == owned_var) .or. owned_var == borrowed_var) return
   if (size(owned_var) /= 4 .or. size(owned_var, 1) /= 2) return
   extents = shape(owned_var)

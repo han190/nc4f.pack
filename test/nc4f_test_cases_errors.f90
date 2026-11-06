@@ -128,7 +128,7 @@ module subroutine error_handling(passed)
   if (.not. allocated(err%fname) .or. .not. allocated(err%msg)) return
   if (err%fname /= "test_error" .or. err%msg /= "constructed error") return
   if (error_msg(err) /= "[test_error] constructed error") return
-  write (stdout, '(dt)', iostat=iostat) err
+  write (stdout, "(dt)", iostat=iostat) err
   if (iostat /= 0 .or. trim(stdout) /= error_msg(err)) return
   write (stdout, *, iostat=iostat) err
   if (iostat /= 0 .or. trim(adjustl(stdout)) /= error_msg(err)) return
@@ -137,7 +137,7 @@ module subroutine error_handling(passed)
   err = error_type()
   if (.exists.err) return
   if (allocated(err%fname) .or. allocated(err%msg)) return
-  write (stdout, '(dt)', iostat=iostat) err
+  write (stdout, "(dt)", iostat=iostat) err
   if (iostat /= 0 .or. trim(stdout) /= "No error") return
 
   nc = open_netcdf(TEST_RESULTS_DIR//"unused.nc", "invalid", err=err)
@@ -464,10 +464,6 @@ end function storage_io_errors
 pure logical function pure_error_predicates() result(passed)
   use, non_intrinsic :: nc4f_ds, only: &
     & error_type, has_err, operator(.exists.)
-  use, non_intrinsic :: nc4f_nc, only: &
-    & operator(.ncexists.) => operator(.exists.)
-  use, non_intrinsic :: nc4f, only: &
-    & operator(.publicexists.) => operator(.exists.)
   type(error_type) :: errors(2)
   logical, parameter :: expected(2) = [.false., .true.]
 
@@ -480,10 +476,26 @@ pure logical function pure_error_predicates() result(passed)
   if (.not. (.exists. errors(2))) return
   if (.not. all(has_err(errors) .eqv. expected)) return
   if (.not. all((.exists. errors) .eqv. expected)) return
-  if (.not. all((.ncexists. errors) .eqv. expected)) return
-  if (.not. all((.publicexists. errors) .eqv. expected)) return
+  if (.not. pure_ncexists(errors, expected)) return
+  if (.not. pure_publicexists(errors, expected)) return
   passed = .true.
 end function pure_error_predicates
+
+pure logical function pure_ncexists(errors, expected) result(passed)
+  use, non_intrinsic :: nc4f_nc, only: operator(.exists.)
+  type(error_type), intent(in) :: errors(:)
+  logical, intent(in) :: expected(:)
+
+  passed = all((.exists. errors) .eqv. expected)
+end function pure_ncexists
+
+pure logical function pure_publicexists(errors, expected) result(passed)
+  use, non_intrinsic :: nc4f, only: operator(.exists.)
+  type(error_type), intent(in) :: errors(:)
+  logical, intent(in) :: expected(:)
+
+  passed = all((.exists. errors) .eqv. expected)
+end function pure_publicexists
 
 pure function pure_error_text(msg) result(text)
   !! Check that construction and formatting are usable in pure callers.
@@ -515,7 +527,7 @@ logical function rejected_error(mode, expected) result(rejected)
   open (newunit=unit, file=logfile, status="old", iostat=iostat)
   if (iostat /= 0) return
   do
-    read (unit, '(a)', iostat=iostat) line
+    read (unit, "(a)", iostat=iostat) line
     if (iostat /= 0) exit
     if (index(line, expected) > 0) rejected = .true.
   end do

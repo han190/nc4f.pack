@@ -177,20 +177,22 @@ subroutine invalid_error()
     err%code = NC_EINVAL
     err%msg = "Diagnostic."
     text = error_msg(err)
-    print '(a)', trim(text)
+    print "(a)", trim(text)
   case ("format-blank-fname")
     err = error_type(NC_EINVAL, "test_error", "Diagnostic.")
     err%fname = " "
     text = error_msg(err)
-    print '(a)', trim(text)
+    print "(a)", trim(text)
   case ("write-blank-msg")
     err = error_type(NC_EINVAL, "test_error", "Diagnostic.")
     err%msg = ""
-    write (text, '(dt)') err
-    print '(a)', trim(text)
+    write (text, "(dt)") err
+    print "(a)", trim(text)
   case ("fail-fast")
     err = error_type(NC_EINVAL, "test_error", "Diagnostic.")
     call return_err(err)
+  case default
+    error stop "Unknown invalid-error test mode."
   end select
   stop 0
 end subroutine invalid_error
@@ -226,7 +228,8 @@ subroutine invalid_file_grp_rename()
 end subroutine invalid_file_grp_rename
 
 subroutine invalid_model_var_rename()
-  !! Trigger a variable-renaming model error without ERR to test error termination.
+  !! Trigger a variable-renaming model error without ERR to test error
+  !! termination.
   type(variable_type) :: var
 
   call rename_variable(var, "bad/name")
@@ -234,7 +237,8 @@ subroutine invalid_model_var_rename()
 end subroutine invalid_model_var_rename
 
 subroutine invalid_file_var_rename()
-  !! Trigger a variable-renaming file error without ERR to test error termination.
+  !! Trigger a variable-renaming file error without ERR to test error
+  !! termination.
   type(group_type) :: grp
 
   call rename_variable(grp, "old", "new", update_file=.true.)
@@ -242,7 +246,8 @@ subroutine invalid_file_var_rename()
 end subroutine invalid_file_var_rename
 
 subroutine invalid_model_rename()
-  !! Trigger a attribute-renaming model error without ERR to test error termination.
+  !! Trigger a attribute-renaming model error without ERR to test error
+  !! termination.
   type(attribute_type) :: att
 
   att = "old".att.1
@@ -251,7 +256,8 @@ subroutine invalid_model_rename()
 end subroutine invalid_model_rename
 
 subroutine invalid_file_rename()
-  !! Trigger a attribute-renaming file error without ERR to test error termination.
+  !! Trigger a attribute-renaming file error without ERR to test error
+  !! termination.
   type(group_type) :: grp
 
   call rename_attribute(grp, "old", "new", update_file=.true.)
@@ -263,19 +269,25 @@ subroutine invalid_noncontiguous_shallow_constructor()
   real(real32), target :: values(3, 3)
   type(variable_type) :: var
 
-  values = reshape([1.0_real32, 2.0_real32, 3.0_real32, 4.0_real32, 5.0_real32, &
+  values = reshape([1.0_real32, 2.0_real32, 3.0_real32, 4.0_real32, &
+    & 5.0_real32, &
     & 6.0_real32, 7.0_real32, 8.0_real32, 9.0_real32], shape(values))
-  var = datarray("invalid", values(1:2, 2:3), ["x".dim.2, "y".dim.2], deep=.false.)
-  error stop "[ownership test] Noncontiguous shallow construction unexpectedly succeeded."
+  var = datarray("invalid", values(1:2, 2:3), ["x".dim.2, "y".dim.2], &
+    & deep=.false.)
+  error stop &
+    & "[ownership test] Noncontiguous shallow construction "// &
+      & "unexpectedly succeeded."
 end subroutine invalid_noncontiguous_shallow_constructor
 
 subroutine invalid_character_shallow_constructor()
   !! Attempt shallow construction from character storage.
-  character, target :: values(2) = ["a", "b"]
+  character, target :: values(2)
   type(variable_type) :: var
 
+  values = ["a", "b"]
   var = datarray("invalid", values, ["x".dim.2], deep=.false.)
-  error stop "[ownership test] Character shallow construction unexpectedly succeeded."
+  error stop &
+    & "[ownership test] Character shallow construction unexpectedly succeeded."
 end subroutine invalid_character_shallow_constructor
 
 end program main

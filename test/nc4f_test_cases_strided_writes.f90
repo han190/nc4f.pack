@@ -6,7 +6,8 @@ module subroutine storage_controls(passed)
   logical, intent(inout) :: passed
   character(*), parameter :: file = TEST_RESULTS_DIR//"storage-controls.nc"
   character(*), parameter :: fill_file = TEST_RESULTS_DIR//"storage-fill.nc"
-  character(*), parameter :: fill_copy = TEST_RESULTS_DIR//"storage-fill-copy.nc"
+  character(*), &
+    & parameter :: fill_copy = TEST_RESULTS_DIR//"storage-fill-copy.nc"
   character(*), parameter :: raw_file = TEST_RESULTS_DIR//"storage-raw.nc"
   type(variable_type) :: var, found, invalid
   type(storage_type) :: explicit_storage
@@ -35,7 +36,8 @@ module subroutine storage_controls(passed)
   if (.not. allocated(found%storage%chunks)) return
   if (any(found%storage%chunks /= [3_int64, 2_int64])) return
   if (found%storage%deflate_level /= 3 .or. found%storage%shuffle /= 1 .or. &
-    & found%storage%fletcher32 /= 1 .or. found%storage%endian /= NC_ENDIAN_LITTLE .or. &
+    & found%storage%fletcher32 /= 1 .or. found%storage%endian /= &
+    & NC_ENDIAN_LITTLE .or. &
     & found%storage%no_fill /= 1) return
   call extract(found, values)
   if (any(values /= reshape([(real(i), i=1,12)], [3,4]))) return
@@ -78,7 +80,8 @@ module subroutine storage_controls(passed)
 end subroutine storage_controls
 
 module subroutine strided_writes(passed)
-  !! Verify explicit definition, strided updates, and incremental timestep writes together.
+  !! Verify explicit definition, strided updates, and incremental timestep
+  !! writes together.
   logical, intent(inout) :: passed
   !! Set true when reopened temperature values and all appended timesteps match.
   character(*), parameter :: file = TEST_RESULTS_DIR//"strided-writes.nc"
@@ -116,14 +119,16 @@ module subroutine strided_writes(passed)
   nc = open_netcdf(file)
   result = get_variable(nc, "temperature")
   call extract(result, values)
-  passed = all(abs(values - [11.0, 10.0, 21.0, 20.0, 31.0, 30.0]) < epsilon(1.0))
+  passed = all(abs(values - [11.0, 10.0, 21.0, 20.0, 31.0, &
+    & 30.0]) < epsilon(1.0))
   result = get_variable(nc, "history")
   call extract(result, history)
   passed = passed .and. all(shape(history) == [6, 3])
   passed = passed .and. result%dims(2)%is_unlim
   if (passed) then
     do step = 1, 3
-      passed = passed .and. all(abs(history(:, step) - real(step)) < epsilon(1.0))
+      passed = passed .and. all(abs(history(:, &
+        & step) - real(step)) < epsilon(1.0))
     end do
   end if
   call close_netcdf(nc)

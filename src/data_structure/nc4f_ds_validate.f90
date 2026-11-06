@@ -4,8 +4,8 @@ implicit none (type, external)
 contains
 
 pure module subroutine validate_nc_name(name, context, err)
-  !! Validate NetCDF name syntax independently of data-model storage.
-  !! UTF-8 is validated here; callers supply NFC-normalized Unicode names.
+  !! Validate NetCDF name syntax independently of data-model storage. UTF-8 is
+  !! validated here; callers supply NFC-normalized Unicode names.
   character(len=*), intent(in) :: name
   !! NetCDF local name to validate; trailing Fortran blank padding is ignored.
   character(len=*), intent(in) :: context

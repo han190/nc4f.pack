@@ -151,7 +151,7 @@ module subroutine write_frmt_err(err, unit, iotype, v_list, iostat, iomsg)
   end associate
   iostat = 1
   if (iotype /= "LISTDIRECTED" .and. iotype /= "DT") return
-  write (unit, '(a)', iostat=iostat, iomsg=iomsg) error_msg(err)
+  write (unit, "(a)", iostat=iostat, iomsg=iomsg) error_msg(err)
 end subroutine write_frmt_err
 
 recursive function render_grp(grp, depth) result(text)

@@ -5,9 +5,11 @@ use, intrinsic :: iso_fortran_env, only: int8, int16, int32, int64, real32, &
 use, non_intrinsic :: nc4f
 implicit none (type, external)
 
-public :: simple_wr, simple_rd, character_variables, elemental_reads, hyperslab_reads, buffer_edges
+public :: simple_wr, simple_rd, character_variables, elemental_reads, &
+  & hyperslab_reads, buffer_edges
 public :: creation_policy, error_handling
-public :: write_definition, write_selection, write_paths, write_failures, strided_writes, storage_controls
+public :: write_definition, write_selection, write_paths, write_failures, &
+  & strided_writes, storage_controls
 public :: delete_att_model, delete_att_file, delete_att_errors
 public :: rename_att_model, rename_att_file, rename_att_errors
 public :: rename_var_model, rename_var_file, rename_var_errors
@@ -35,31 +37,36 @@ interface
     logical, intent(inout) :: passed
   end subroutine storage_controls
   module subroutine strided_writes(passed)
-    !! Verify the combined definition, strided-update, and timestep-append workflow.
+    !! Verify the combined definition, strided-update, and timestep-append
+    !! workflow.
     logical, intent(inout) :: passed
     !! Set true when all reopened values and appended timesteps match.
   end subroutine strided_writes
 
   module subroutine write_definition(passed)
-    !! Test metadata-only definition, dimension reuse, supported types, and subgroup access.
+    !! Test metadata-only definition, dimension reuse, supported types, and
+    !! subgroup access.
     logical, intent(inout) :: passed
     !! Set true when all assertions in this test pass.
   end subroutine write_definition
 
   module subroutine write_selection(passed)
-    !! Test contiguous and strided writes, unlimited growth, and path/handle equivalence.
+    !! Test contiguous and strided writes, unlimited growth, and path/handle
+    !! equivalence.
     logical, intent(inout) :: passed
     !! Set true when all assertions in this test pass.
   end subroutine write_selection
 
   module subroutine write_paths(passed)
-    !! Test path-based creation and updates, preserving files on rejected requests.
+    !! Test path-based creation and updates, preserving files on rejected
+    !! requests.
     logical, intent(inout) :: passed
     !! Set true when all assertions in this test pass.
   end subroutine write_paths
 
   module subroutine write_failures(passed)
-    !! Test invalid selections, incompatible sources, and read-only or closed handles.
+    !! Test invalid selections, incompatible sources, and read-only or closed
+    !! handles.
     logical, intent(inout) :: passed
     !! Set true when all assertions in this test pass.
   end subroutine write_failures
@@ -159,13 +166,15 @@ interface
   end subroutine rename_att_model
 
   module subroutine rename_att_file(passed)
-    !! Test persistent attribute renaming and synchronization of supplied caches.
+    !! Test persistent attribute renaming and synchronization of supplied
+    !! caches.
     logical, intent(inout) :: passed
     !! Set true when all checks in this test succeed.
   end subroutine rename_att_file
 
   module subroutine rename_att_errors(passed)
-    !! Test attribute-renaming failures, unchanged state, and fail-fast behavior.
+    !! Test attribute-renaming failures, unchanged state, and fail-fast
+    !! behavior.
     logical, intent(inout) :: passed
     !! Set true when all checks in this test succeed.
   end subroutine rename_att_errors
@@ -237,7 +246,8 @@ interface
   end subroutine sum_vars_test
 
   module subroutine sfc_pres_temp_wr(passed)
-    !! Write the surface pressure and temperature example with dimensions and units.
+    !! Write the surface pressure and temperature example with dimensions and
+    !! units.
     logical, intent(inout) :: passed
     !! Whether the test case has passed.
   end subroutine sfc_pres_temp_wr
@@ -255,7 +265,8 @@ interface
   end subroutine extensive_wr
 
   module subroutine extensive_rd(passed)
-    !! Verify types, shapes, attributes, and values in the extensive round-trip file.
+    !! Verify types, shapes, attributes, and values in the extensive round-trip
+    !! file.
     logical, intent(inout) :: passed
     !! Whether the test case has passed.
   end subroutine extensive_rd
@@ -273,9 +284,9 @@ interface
   end subroutine group_write
 
   module subroutine nasa_cosp_read(passed)
-    !! Read root-level data and metadata from NASA's externally produced
-    !! CLDPROP COSP NetCDF-4 sample file.  The file also contains nested groups;
-    !! this test intentionally exercises the currently supported root group only.
+    !! Read root-level data and metadata from NASA's externally produced CLDPROP
+    !! COSP NetCDF-4 sample file.  The file also contains nested groups; this
+    !! test intentionally exercises the currently supported root group only.
     logical, intent(inout) :: passed
     !! Whether the test case has passed.
   end subroutine nasa_cosp_read

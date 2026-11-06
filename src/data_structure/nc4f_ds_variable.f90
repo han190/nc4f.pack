@@ -1,5 +1,6 @@
 submodule(nc4f_ds) nc4f_ds_variable
-!! Variable construction, renaming, inquiry, and equality for the direct v2 data model.
+!! Variable construction, renaming, inquiry, and equality for the direct v2 data
+!! model.
 implicit none (type, external)
 contains
 
@@ -18,7 +19,8 @@ elemental module function typeof_var(var) result(dtype)
   dtype = var%dtype
 end function typeof_var
 
-module subroutine set_storage(var, chunks, deflate_level, shuffle, fletcher32, endian, no_fill, fill_value, err)
+module subroutine set_storage(var, chunks, deflate_level, shuffle, &
+  & fletcher32, endian, no_fill, fill_value, err)
   !! Update only supplied in-memory settings, committing after validation.
   type(variable_type), intent(inout) :: var
   integer(int64), intent(in), optional :: chunks(:)
@@ -34,31 +36,42 @@ module subroutine set_storage(var, chunks, deflate_level, shuffle, fletcher32, e
   if (allocated(var%storage)) next = var%storage
   if (present(chunks)) then
     if (.not. allocated(var%dims)) then
-      op_err = error_type(NC_EINVAL, "set_storage", "Variable dimensions must be allocated.")
-    else if (size(chunks) /= size(var%dims) .or. size(chunks) == 0 .or. any(chunks <= 0)) then
-      op_err = error_type(NC_EINVAL, "set_storage", "Chunk sizes must be positive and match the variable rank.")
+      op_err = error_type(NC_EINVAL, "set_storage", &
+        & "Variable dimensions must be allocated.")
+    else if (size(chunks) /= size(var%dims) .or. size(chunks) == 0 .or. &
+      & any(chunks <= 0)) then
+      op_err = error_type(NC_EINVAL, "set_storage", &
+        & "Chunk sizes must be positive and match the variable rank.")
     else
       next%chunks = chunks
     end if
   end if
   if (present(deflate_level)) then
-    if (deflate_level < 0 .or. deflate_level > 9) &
-      & op_err = error_type(NC_EINVAL, "set_storage", "Deflate level must be 0 through 9.")
+    if (deflate_level < 0 .or. deflate_level > 9) then
+      op_err = error_type(NC_EINVAL, "set_storage", &
+        & "Deflate level must be 0 through 9.")
+    end if
     next%deflate_level = deflate_level
   end if
   if (present(shuffle)) next%shuffle = merge(1, 0, shuffle)
   if (present(fletcher32)) next%fletcher32 = merge(1, 0, fletcher32)
   if (present(endian)) then
-    if (endian /= NC_ENDIAN_NATIVE .and. endian /= NC_ENDIAN_LITTLE .and. endian /= NC_ENDIAN_BIG) &
-      & op_err = error_type(NC_EINVAL, "set_storage", "Invalid endianness.")
+    if (endian /= NC_ENDIAN_NATIVE .and. endian /= NC_ENDIAN_LITTLE .and. &
+      & endian /= NC_ENDIAN_BIG) then
+      op_err = error_type(NC_EINVAL, "set_storage", "Invalid endianness.")
+    end if
     next%endian = endian
   end if
   if (present(no_fill)) next%no_fill = merge(1, 0, no_fill)
   if (present(fill_value)) then
-    if (.not. has_err(op_err)) call validate(fill_value, context="set_storage", err=op_err)
     if (.not. has_err(op_err)) then
-      if (fill_value%len /= 1 .or. fill_value%dtype /= var%dtype) &
-        & op_err = error_type(NC_EINVAL, "set_storage", "Fill value must be scalar and match variable type.")
+      call validate(fill_value, context="set_storage", err=op_err)
+    end if
+    if (.not. has_err(op_err)) then
+      if (fill_value%len /= 1 .or. fill_value%dtype /= var%dtype) then
+        op_err = error_type(NC_EINVAL, "set_storage", &
+          & "Fill value must be scalar and match variable type.")
+      end if
     end if
     if (.not. has_err(op_err)) then
       if (.not. allocated(next%fill_value)) allocate(next%fill_value)
@@ -67,18 +80,24 @@ module subroutine set_storage(var, chunks, deflate_level, shuffle, fletcher32, e
     end if
   end if
   if (.not. has_err(op_err)) then
-    if (next%no_fill == 1 .and. allocated(next%fill_value)) &
-      & op_err = error_type(NC_EINVAL, "set_storage", "No-fill conflicts with a custom fill value.")
+    if (next%no_fill == 1 .and. allocated(next%fill_value)) then
+      op_err = error_type(NC_EINVAL, "set_storage", &
+        & "No-fill conflicts with a custom fill value.")
+    end if
   end if
   if (.not. has_err(op_err) .and. allocated(var%atts)) then
     do i = 1, size(var%atts)
       if (.not. allocated(var%atts(i)%name)) cycle
       if (var%atts(i)%name /= "_FillValue") cycle
-      if (next%no_fill == 1) &
-        & op_err = error_type(NC_EINVAL, "set_storage", "No-fill conflicts with _FillValue attribute.")
+      if (next%no_fill == 1) then
+        op_err = error_type(NC_EINVAL, "set_storage", &
+          & "No-fill conflicts with _FillValue attribute.")
+      end if
       if (allocated(next%fill_value)) then
-        if (next%fill_value /= var%atts(i)) &
-          & op_err = error_type(NC_EINVAL, "set_storage", "Conflicting fill values.")
+        if (next%fill_value /= var%atts(i)) then
+          op_err = error_type(NC_EINVAL, "set_storage", &
+            & "Conflicting fill values.")
+        end if
       end if
     end do
   end if
@@ -87,9 +106,11 @@ module subroutine set_storage(var, chunks, deflate_level, shuffle, fletcher32, e
 end subroutine set_storage
 
 pure module subroutine rename_var_var(var, new_name, err)
-  !! Rename an independent variable in memory; preserve its metadata and storage.
+  !! Rename an independent variable in memory; preserve its metadata and
+  !! storage.
   type(variable_type), intent(inout) :: var
-  !! Variable whose local name is changed; its metadata and storage are preserved.
+  !! Variable whose local name is changed; its metadata and storage are
+  !! preserved.
   character(len=*), intent(in) :: new_name
   !! Replacement local name; trailing Fortran blank padding is removed.
   type(error_type), intent(out), optional :: err
@@ -112,8 +133,8 @@ pure module subroutine rename_var_grp(grp, old_name, new_name, err)
   class(group_type), intent(inout) :: grp
   !! Group whose direct variable collection contains the name to change.
   character(len=*), intent(in) :: old_name, new_name
-  !! old_name: Existing local name to locate.
-  !! new_name: Replacement local name; trailing Fortran blank padding is removed.
+  !! old_name: Existing local name to locate. new_name: Replacement local name;
+  !! trailing Fortran blank padding is removed.
   type(error_type), intent(out), optional :: err
   !! Receives the status and diagnostic; failures stop execution when omitted.
   type(error_type) :: op_err
@@ -127,8 +148,8 @@ pure subroutine rename_vars_(vars, old_name, new_name, err)
   type(variable_type), allocatable, intent(inout) :: vars(:)
   !! Direct variable collection whose matching entry is renamed.
   character(len=*), intent(in) :: old_name, new_name
-  !! old_name: Existing local name to locate.
-  !! new_name: Replacement local name; trailing Fortran blank padding is removed.
+  !! old_name: Existing local name to locate. new_name: Replacement local name;
+  !! trailing Fortran blank padding is removed.
   type(error_type), intent(out) :: err
   !! Receives the operation status and diagnostic message.
   integer :: i, pos, lo
@@ -295,8 +316,7 @@ end function get_shape
 logical elemental module function eq_var(x, y) result(is_equal)
   !! Return true when two variables have identical metadata and byte values.
   type(variable_type), intent(in) :: x, y
-  !! x: Left-hand value to compare.
-  !! y: Right-hand value to compare.
+  !! x: Left-hand value to compare. y: Right-hand value to compare.
 
   call validate(x, context="[eq_var]")
   call validate(y, context="[eq_var]")
@@ -358,8 +378,7 @@ end function eq_var
 logical elemental module function neq_var(x, y) result(is_equal)
   !! Return true when two variables differ.
   type(variable_type), intent(in) :: x, y
-  !! x: Left-hand value to compare.
-  !! y: Right-hand value to compare.
+  !! x: Left-hand value to compare. y: Right-hand value to compare.
 
   is_equal = .not. eq_var(x, y)
 end function neq_var

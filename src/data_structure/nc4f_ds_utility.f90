@@ -60,8 +60,8 @@ pure subroutine validate_err(err)
 end subroutine validate_err
 
 pure module subroutine return_err(op_err, err)
-  !! Return an optional error or terminate, shared by model
-  !! and NetCDF operations.
+  !! Return an optional error or terminate, shared by model and NetCDF
+  !! operations.
   type(error_type), intent(in) :: op_err
   !! Completed operation result to return or use for error termination.
   type(error_type), intent(out), optional :: err
@@ -76,8 +76,8 @@ pure module subroutine return_err(op_err, err)
 end subroutine return_err
 
 pure module function buffer_size(dtype, len) result(nbytes)
-  !! Compute the byte count for a NetCDF type and element count,
-  !! checking overflow.
+  !! Compute the byte count for a NetCDF type and element count, checking
+  !! overflow.
   integer(data_type), intent(in) :: dtype
   !! Dataset data type code to validate or translate.
   integer(int64), intent(in) :: len

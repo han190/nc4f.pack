@@ -32,7 +32,8 @@ subroutine setup_test_results()
 end subroutine setup_test_results
 
 subroutine run_tests(tests)
-  !! Run registered test callbacks, print their results, and fail if any test fails.
+  !! Run registered test callbacks, print their results, and fail if any test
+  !! fails.
   type(test_type), intent(inout) :: tests(:)
   !! Registered test names, callback procedures, and pass flags.
   integer :: i

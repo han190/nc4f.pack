@@ -60,13 +60,19 @@ main = "nc4f_test.f90"
 
 [extra.fortitude.check]
 ignore = ['C002', 'C071', 'C072', 'C121', 'C152', 'C181']
-line-length = 120
+line-length = 80
+extend-exclude = [
+  "src/data_structure/nc4f_ds_attribute_constructor.f90",
+  "src/data_structure/nc4f_ds_variable_constructor.f90",
+  "src/data_structure/nc4f_ds_extract.f90",
+]
 
 [extra.release]
 channel = "beta"
 tag = "0.1.0-beta.1"
 
 [extra.fformat]
+line-length = 80
 indent = 2
 base-indent = 0
 indent-units = false

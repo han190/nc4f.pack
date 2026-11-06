@@ -155,7 +155,8 @@ module subroutine hyperslab_reads(passed)
   if (err%code /= NC_NOERR) return
 
   actual = get_variable(nc, "data", start=[2, 2], err=err)
-  if (err%code /= NC_NOERR .or. .not. all(actual%dims == ["x".dim.3, "y".dim.4])) then
+  if (err%code /= NC_NOERR .or. .not. all(actual%dims == ["x".dim.3, &
+    & "y".dim.4])) then
     call close_netcdf(nc)
     return
   end if
@@ -167,7 +168,8 @@ module subroutine hyperslab_reads(passed)
 
   actual = get_variable(nc, "data", start=[2, 1], count=[2, 3], &
     & stride=[2, 2], err=err)
-  if (err%code /= NC_NOERR .or. .not. all(actual%dims == ["x".dim.2, "y".dim.3])) then
+  if (err%code /= NC_NOERR .or. .not. all(actual%dims == ["x".dim.2, &
+    & "y".dim.3])) then
     call close_netcdf(nc)
     return
   end if

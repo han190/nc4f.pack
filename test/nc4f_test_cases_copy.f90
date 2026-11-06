@@ -12,14 +12,17 @@ module subroutine copy_semantics(passed)
   logical, intent(inout) :: passed
   !! Whether the test case has passed.
   type(attribute_type) :: copied_att, empty_att, owned_att, source_att
-  type(group_type) :: borrowed_group, child, deep_group, empty_group, grandchild, &
+  type(group_type) :: borrowed_group, child, deep_group, empty_group, &
+    & grandchild, &
     & shallow_group, unlimited_group
   type(group_type) :: child_grps(1), grandchild_grps(1)
   type(variable_type) :: borrowed_copy, deep_copy, deep_var, empty_shallow, &
     & noncontiguous_var, shallow_var, source_var, unlimited_var
   real(real32), target :: empty_values(0), raw_values(2), source_matrix(3, 3)
-  real(real32), pointer :: att_values(:), borrowed_values(:), copied_att_values(:), &
-    & deep_copy_values(:), deep_values(:), packed_values(:, :), shallow_values(:), &
+  real(real32), pointer :: att_values(:), borrowed_values(:), &
+    & copied_att_values(:), &
+    & deep_copy_values(:), deep_values(:), packed_values(:, :), &
+    & shallow_values(:), &
     & source_values(:), unlimited_values(:)
   logical :: invalid_shallow_valid, scoped_owned_valid
 
@@ -47,12 +50,16 @@ module subroutine copy_semantics(passed)
   end block
   if (.not. allocated(deep_var%buffer) .or. associated(deep_var%ptr)) return
   if (.not. allocated(deep_copy%buffer) .or. associated(deep_copy%ptr)) return
-  if (allocated(shallow_var%buffer) .or. .not. associated(shallow_var%ptr)) return
-  if (allocated(borrowed_copy%buffer) .or. .not. associated(borrowed_copy%ptr)) return
+  if (allocated(shallow_var%buffer) .or. &
+    & .not. associated(shallow_var%ptr)) return
+  if (allocated(borrowed_copy%buffer) .or. &
+    & .not. associated(borrowed_copy%ptr)) return
   if (.not. is_contiguous(deep_var%buffer) .or. &
     & .not. is_contiguous(shallow_var%ptr)) return
-  if (.not. c_associated(c_loc(shallow_var%ptr(1)), c_loc(raw_values(1)))) return
-  if (.not. c_associated(c_loc(borrowed_copy%ptr(1)), c_loc(raw_values(1)))) return
+  if (.not. c_associated(c_loc(shallow_var%ptr(1)), &
+    & c_loc(raw_values(1)))) return
+  if (.not. c_associated(c_loc(borrowed_copy%ptr(1)), &
+    & c_loc(raw_values(1)))) return
   call extract(deep_var, deep_values)
   call extract(deep_copy, deep_copy_values)
   call extract(shallow_var, shallow_values)
@@ -108,7 +115,8 @@ module subroutine copy_semantics(passed)
   child = dataset("child", grps=grandchild_grps)
   child_grps(1) = child
   shallow_group = dataset("root", [source_var], child_grps, atts=[source_att])
-  deep_group = dataset("root", [source_var], child_grps, atts=[source_att], deep=.true.)
+  deep_group = dataset("root", [source_var], child_grps, atts=[source_att], &
+    & deep=.true.)
   borrowed_group = dataset("borrowed", [shallow_var])
   if (.not. allocated(shallow_group%vars(1)%buffer) .or. &
     & associated(shallow_group%vars(1)%ptr)) return
@@ -161,7 +169,8 @@ contains
   end subroutine check_scoped_owned_value
 
   function new_scoped_owned_var() result(var)
-    !! Build an owned variable from local storage which ceases to exist on return.
+    !! Build an owned variable from local storage which ceases to exist on
+    !! return.
     type(variable_type) :: var
     !! Retrieved or constructed variable.
     real(real32), target :: local_values(2)

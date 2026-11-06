@@ -22,7 +22,8 @@ end function typeof_att
 pure module subroutine del_att_var(var, name, err)
   !! Remove a named attribute from the supplied model without accessing a file.
   type(variable_type), intent(inout) :: var
-  !! Owner whose attribute collection is reduced, preserving survivor order and storage.
+  !! Owner whose attribute collection is reduced, preserving survivor order and
+  !! storage.
   character(len=*), intent(in) :: name
   !! Local attribute name; trailing Fortran padding is ignored.
   type(error_type), intent(out), optional :: err
@@ -36,7 +37,8 @@ end subroutine del_att_var
 pure module subroutine del_att_grp(grp, name, err)
   !! Remove a named attribute from the supplied model without accessing a file.
   class(group_type), intent(inout) :: grp
-  !! Owner whose attribute collection is reduced, preserving survivor order and storage.
+  !! Owner whose attribute collection is reduced, preserving survivor order and
+  !! storage.
   character(len=*), intent(in) :: name
   !! Local attribute name; trailing Fortran padding is ignored.
   type(error_type), intent(out), optional :: err
@@ -48,13 +50,16 @@ pure module subroutine del_att_grp(grp, name, err)
 end subroutine del_att_grp
 
 pure subroutine del_atts_(atts, name, err)
-  !! Remove one matching entry, moving owned storage and retaining borrowed pointers.
+  !! Remove one matching entry, moving owned storage and retaining borrowed
+  !! pointers.
   type(attribute_type), allocatable, intent(inout) :: atts(:)
-  !! Collection to reduce; deleting its last entry leaves an allocated empty array.
+  !! Collection to reduce; deleting its last entry leaves an allocated empty
+  !! array.
   character(len=*), intent(in) :: name
   !! Local name of the attribute to remove.
   type(error_type), intent(out) :: err
-  !! Receives validation or allocation failure; the collection is unchanged on failure.
+  !! Receives validation or allocation failure; the collection is unchanged on
+  !! failure.
   type(attribute_type), allocatable :: kept(:)
   integer :: i, j, pos, matches, stat
 
@@ -123,10 +128,11 @@ end subroutine rename_att_att
 pure module subroutine rename_att_var(var, old_name, new_name, err)
   !! Rename a variable attribute in memory, preserving its value and storage.
   type(variable_type), intent(inout) :: var
-  !! Variable whose matching attribute is renamed; its data and own name are preserved.
+  !! Variable whose matching attribute is renamed; its data and own name are
+  !! preserved.
   character(len=*), intent(in) :: old_name, new_name
-  !! old_name: Existing local name to locate.
-  !! new_name: Replacement local name; trailing Fortran blank padding is removed.
+  !! old_name: Existing local name to locate. new_name: Replacement local name;
+  !! trailing Fortran blank padding is removed.
   type(error_type), intent(out), optional :: err
   !! Receives the status and diagnostic; failures stop execution when omitted.
   type(error_type) :: op_err
@@ -140,8 +146,8 @@ pure module subroutine rename_att_grp(grp, old_name, new_name, err)
   class(group_type), intent(inout) :: grp
   !! Group whose matching global attribute is renamed.
   character(len=*), intent(in) :: old_name, new_name
-  !! old_name: Existing local name to locate.
-  !! new_name: Replacement local name; trailing Fortran blank padding is removed.
+  !! old_name: Existing local name to locate. new_name: Replacement local name;
+  !! trailing Fortran blank padding is removed.
   type(error_type), intent(out), optional :: err
   !! Receives the status and diagnostic; failures stop execution when omitted.
   type(error_type) :: op_err
@@ -155,8 +161,8 @@ pure subroutine rename_atts_(atts, old_name, new_name, err)
   type(attribute_type), allocatable, intent(inout) :: atts(:)
   !! Attribute collection whose matching entry is renamed.
   character(len=*), intent(in) :: old_name, new_name
-  !! old_name: Existing local name to locate.
-  !! new_name: Replacement local name; trailing Fortran blank padding is removed.
+  !! old_name: Existing local name to locate. new_name: Replacement local name;
+  !! trailing Fortran blank padding is removed.
   type(error_type), intent(out) :: err
   !! Receives the operation status and diagnostic message.
   integer :: i, pos
@@ -196,8 +202,8 @@ pure subroutine rename_atts_(atts, old_name, new_name, err)
 end subroutine rename_atts_
 
 module subroutine init_att_mold(att, name, mold, deep)
-  !! Initialize an attribute from a name and existing value metadata.
-  !! Must remain impure: shallow construction exposes the intent(in) mold's storage.
+  !! Initialize an attribute from a name and existing value metadata. Must
+  !! remain impure: shallow construction exposes the intent(in) mold's storage.
   type(attribute_type), intent(inout) :: att
   !! Attribute to process.
   character(len=*), intent(in) :: name
@@ -225,8 +231,7 @@ end subroutine init_att_mold
 logical elemental module function eq_att(x, y) result(is_equal)
   !! Return true when two attributes have identical metadata and byte values.
   type(attribute_type), intent(in) :: x, y
-  !! x: Left-hand value to compare.
-  !! y: Right-hand value to compare.
+  !! x: Left-hand value to compare. y: Right-hand value to compare.
 
   call validate(x, context="[eq_att]")
   call validate(y, context="[eq_att]")
@@ -270,8 +275,7 @@ end function eq_att
 logical elemental module function neq_att(x, y) result(is_equal)
   !! Return true when two attributes differ.
   type(attribute_type), intent(in) :: x, y
-  !! x: Left-hand value to compare.
-  !! y: Right-hand value to compare.
+  !! x: Left-hand value to compare. y: Right-hand value to compare.
 
   is_equal = .not. eq_att(x, y)
 end function neq_att

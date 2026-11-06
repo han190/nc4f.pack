@@ -3,11 +3,14 @@ implicit none (type, external)
 contains
 
 module subroutine rename_dim_nc_dim(grp, dim, new_name, update_file, err)
-  !! Rename a locally defined file dimension and only the supplied dimension object.
+  !! Rename a locally defined file dimension and only the supplied dimension
+  !! object.
   class(group_type), intent(in) :: grp
-  !! Defining open group when update_file is true; its caches are not synchronized.
+  !! Defining open group when update_file is true; its caches are not
+  !! synchronized.
   type(dimension_type), intent(inout) :: dim
-  !! Dimension whose old name selects the file target; its cached ID is not trusted.
+  !! Dimension whose old name selects the file target; its cached ID is not
+  !! trusted.
   character(len=*), intent(in) :: new_name
   !! Replacement local name; trailing padding is ignored.
   logical, intent(in), optional :: update_file
@@ -29,7 +32,8 @@ module subroutine rename_dim_nc_dim(grp, dim, new_name, update_file, err)
     call find_dim_nc_(grp%id, dim%name, new_name, actual, op_err)
     if (.not. has_err(op_err)) then
       call rename_dimension(staged, new_name, op_err)
-      if (.not. has_err(op_err)) call put_dim_name_(grp%id, actual%id, dim%name, new_name, op_err)
+      if (.not. has_err(op_err)) call put_dim_name_(grp%id, actual%id, &
+        & dim%name, new_name, op_err)
       if (.not. has_err(op_err)) call move_alloc(staged%name, dim%name)
     end if
   end if
@@ -37,13 +41,15 @@ module subroutine rename_dim_nc_dim(grp, dim, new_name, update_file, err)
 end subroutine rename_dim_nc_dim
 
 module subroutine rename_dim_nc_grp(grp, old_name, new_name, update_file, err)
-  !! Rename a local file dimension and synchronize only direct loaded dimension references.
+  !! Rename a local file dimension and synchronize only direct loaded dimension
+  !! references.
   class(group_type), intent(inout) :: grp
   !! Defining group; descendant caches and independent snapshots are unchanged.
   character(len=*), intent(in) :: old_name, new_name
   !! old_name: Local dimension to find. new_name: Replacement local name.
   logical, intent(in) :: update_file
-  !! Whether to update the file; required to distinguish the model-only overload.
+  !! Whether to update the file; required to distinguish the model-only
+  !! overload.
   type(error_type), intent(out), optional :: err
   !! Receives status; failures terminate execution when omitted.
   type(error_type) :: op_err
@@ -57,7 +63,8 @@ module subroutine rename_dim_nc_grp(grp, old_name, new_name, update_file, err)
     if (.not. has_err(op_err)) then
       call stage_dim_grp_(grp, actual, staged)
       call rename_dimension(staged, old_name, new_name, op_err)
-      if (.not. has_err(op_err)) call put_dim_name_(grp%id, actual%id, old_name, new_name, op_err)
+      if (.not. has_err(op_err)) call put_dim_name_(grp%id, actual%id, &
+        & old_name, new_name, op_err)
       if (.not. has_err(op_err)) call commit_dim_grp_(grp, staged, old_name)
     end if
   end if
@@ -65,7 +72,8 @@ module subroutine rename_dim_nc_grp(grp, old_name, new_name, update_file, err)
 end subroutine rename_dim_nc_grp
 
 subroutine find_dim_nc_(ncid, old_name, new_name, dim, err)
-  !! Validate names and resolve only dimensions defined directly in the supplied group.
+  !! Validate names and resolve only dimensions defined directly in the supplied
+  !! group.
   integer(c_int), intent(in) :: ncid
   !! Open defining group identifier.
   character(len=*), intent(in) :: old_name, new_name
@@ -94,7 +102,8 @@ subroutine find_dim_nc_(ncid, old_name, new_name, dim, err)
 end subroutine find_dim_nc_
 
 subroutine put_dim_name_(ncid, dimid, old_name, new_name, err)
-  !! Apply the file rename while retaining existence and write-access checks for self-renames.
+  !! Apply the file rename while retaining existence and write-access checks for
+  !! self-renames.
   integer(c_int), intent(in) :: ncid, dimid
   !! ncid: Defining group. dimid: Freshly resolved local dimension identifier.
   character(len=*), intent(in) :: old_name, new_name
@@ -104,19 +113,23 @@ subroutine put_dim_name_(ncid, dimid, old_name, new_name, err)
   integer(c_int) :: stat
 
   stat = nc_rename_dim(ncid, dimid, f2cstr(new_name))
-  if (trim(old_name) == trim(new_name) .and. stat == NC_ENAMEINUSE) stat = NC_NOERR
+  if (trim(old_name) == trim(new_name) .and. stat == NC_ENAMEINUSE) stat = &
+    & NC_NOERR
   err = netcdf_err(stat, "rename_dimension", &
     & "Rename dimension: "//trim(old_name)//" -> "//trim(new_name))
 end subroutine put_dim_name_
 
 pure subroutine stage_dim_grp_(grp, actual, staged)
-  !! Copy dimension metadata only, adding a temporary definition for an incomplete cache.
+  !! Copy dimension metadata only, adding a temporary definition for an
+  !! incomplete cache.
   class(group_type), intent(in) :: grp
-  !! Supplied cache; variable payloads, attributes, and child pointers are never copied.
+  !! Supplied cache; variable payloads, attributes, and child pointers are never
+  !! copied.
   type(dimension_type), intent(in) :: actual
   !! File dimension used as a placeholder when no cached definition exists.
   type(group_type), intent(out) :: staged
-  !! Temporary model containing only dimension definitions and direct variable dimensions.
+  !! Temporary model containing only dimension definitions and direct variable
+  !! dimensions.
   type(dimension_type) :: placeholder
   integer :: i, j, n
   logical :: found
@@ -138,8 +151,10 @@ pure subroutine stage_dim_grp_(grp, actual, staged)
       staged%vars(i)%dims = grp%vars(i)%dims
       do j = lbound(grp%vars(i)%dims, 1), ubound(grp%vars(i)%dims, 1)
         if (.not. allocated(grp%vars(i)%dims(j)%name)) cycle
-        ! A cache may describe an earlier unlimited extent; compare cached copies to each other.
-        if (grp%vars(i)%dims(j)%name == actual%name) placeholder = grp%vars(i)%dims(j)
+        ! A cache may describe an earlier unlimited extent; compare cached
+        ! copies to each other.
+        if (grp%vars(i)%dims(j)%name == actual%name) placeholder = &
+          & grp%vars(i)%dims(j)
       end do
     end do
   end if
@@ -149,13 +164,15 @@ pure subroutine stage_dim_grp_(grp, actual, staged)
 end subroutine stage_dim_grp_
 
 pure subroutine commit_dim_grp_(grp, staged, old_name)
-  !! Move prepared names into existing cache entries without allocating or replacing arrays.
+  !! Move prepared names into existing cache entries without allocating or
+  !! replacing arrays.
   class(group_type), intent(inout) :: grp
   !! Original cache whose direct matching dimension names are updated.
   type(group_type), intent(inout) :: staged
   !! Staged metadata supplying the new names after a successful file operation.
   character(len=*), intent(in) :: old_name
-  !! Original name used to select cache entries; unrelated entries remain untouched.
+  !! Original name used to select cache entries; unrelated entries remain
+  !! untouched.
   integer :: i, j, k
 
   k = 0
@@ -163,7 +180,8 @@ pure subroutine commit_dim_grp_(grp, staged, old_name)
     do i = lbound(grp%dims, 1), ubound(grp%dims, 1)
       k = k + 1
       if (.not. allocated(grp%dims(i)%name)) cycle
-      if (grp%dims(i)%name == trim(old_name)) call move_alloc(staged%dims(k)%name, grp%dims(i)%name)
+      if (grp%dims(i)%name == &
+        & trim(old_name)) call move_alloc(staged%dims(k)%name, grp%dims(i)%name)
     end do
   end if
   if (.not. allocated(grp%vars)) return
@@ -173,7 +191,8 @@ pure subroutine commit_dim_grp_(grp, staged, old_name)
     do j = lbound(grp%vars(i)%dims, 1), ubound(grp%vars(i)%dims, 1)
       if (allocated(grp%vars(i)%dims(j)%name)) then
         if (grp%vars(i)%dims(j)%name == trim(old_name)) &
-          & call move_alloc(staged%vars(i)%dims(k)%name, grp%vars(i)%dims(j)%name)
+          & call move_alloc(staged%vars(i)%dims(k)%name, &
+          & grp%vars(i)%dims(j)%name)
       end if
       k = k + 1
     end do
@@ -212,18 +231,18 @@ module function inq_dims_var(nc, var, err) result(dims)
 end function inq_dims_var
 
 function inq_dims_(ncid, varid, err) result(dims)
-  !! Low-level helper to inquire dimensions from a netCDF `ncid` or an
-  !! optional `varid`.
+  !! Low-level helper to inquire dimensions from a netCDF `ncid` or an optional
+  !! `varid`.
   integer(c_int), intent(in) :: ncid
   !! C `ncid` for the dataset or group.
   integer(c_int), optional, intent(in) :: varid
-  !! Optional C `varid` for a variable. If present, return that
-  !! variable's dimensions.
+  !! Optional C `varid` for a variable. If present, return that variable's
+  !! dimensions.
   type(error_type), intent(out) :: err
   !! Completed result of this operation.
   type(dimension_type), allocatable :: dims(:)
-  !! Allocatable array of `dimension_type` in Fortran ordering
-  !! (reversed relative to the C API ordering).
+  !! Allocatable array of `dimension_type` in Fortran ordering (reversed
+  !! relative to the C API ordering).
   integer(c_int), allocatable, target :: dimids(:)
   character(len=NC_MAX_NAME + 1, kind=c_char) :: dim_name
   integer(c_int) :: i, j, ndims, stat
@@ -257,8 +276,8 @@ function inq_dims_(ncid, varid, err) result(dims)
   allocate (dims(ndims))
 
   do i = 1, ndims
-    !! Since this module uses the C API, the dimension order is reversed
-    !! when read into a Fortran program.
+    !! Since this module uses the C API, the dimension order is reversed when
+    !! read into a Fortran program.
     j = ndims - i + 1
     dims(j)%id = dimids(i)
     stat = nc_inq_dimname(ncid, dimids(i), dim_name)
@@ -313,15 +332,18 @@ subroutine dim_unlimited_(ncid, dimid, unlimited, err)
 end subroutine dim_unlimited_
 
 module subroutine resolve_dim(nc, dim, found, actual, err)
-  !! Resolve a visible dimension and validate its fixed length and unlimited status.
+  !! Resolve a visible dimension and validate its fixed length and unlimited
+  !! status.
   class(group_type), intent(in) :: nc
-  !! Open destination dataset or subgroup; source objects and loaded caches are unchanged.
+  !! Open destination dataset or subgroup; source objects and loaded caches are
+  !! unchanged.
   type(dimension_type), intent(in) :: dim
   !! Requested dimension name, length, and unlimited status.
   logical, intent(out) :: found
   !! True when a visible dimension with the requested name exists.
   type(dimension_type), intent(out) :: actual
-  !! Resolved file metadata; valid only when found is true and err indicates success.
+  !! Resolved file metadata; valid only when found is true and err indicates
+  !! success.
   type(error_type), intent(out) :: err
   !! Completed operation result; contains a diagnostic when the operation fails.
   integer(c_int) :: stat, dimid
@@ -365,13 +387,15 @@ end subroutine resolve_dim
 module function def_dim(nc, dim, err) result(new_dim)
   !! Reuse a compatible visible dimension or create a missing local dimension.
   class(group_type), intent(in) :: nc
-  !! Open destination dataset or subgroup; source objects and loaded caches are unchanged.
+  !! Open destination dataset or subgroup; source objects and loaded caches are
+  !! unchanged.
   type(dimension_type), intent(in) :: dim
   !! Requested dimension name, length, and unlimited status.
   type(error_type), intent(out) :: err
   !! Completed operation result; contains a diagnostic when the operation fails.
   type(dimension_type) :: new_dim
-  !! Created or reused dimension, including its current file length and identifier.
+  !! Created or reused dimension, including its current file length and
+  !! identifier.
   integer(c_int) :: stat, dimid
   integer(c_size_t) :: length
   logical :: found

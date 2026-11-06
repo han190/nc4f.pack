@@ -11,42 +11,17 @@ use, non_intrinsic :: nc4f_c_interface, only: &
   & NC_ENDIAN_NATIVE, NC_ENDIAN_LITTLE, NC_ENDIAN_BIG
 implicit none (type, external)
 
-public :: attribute_type, dimension_type, error_type, &
-  & group_type, netcdf_type, variable_type, storage_type, set_storage, nameof, typeof, datarray, dataset, extract, &
-  & initialize, delete_attribute, rename_attribute, rename_variable, &
-  & rename_group, rename_dimension, &
-  & operator(.att.), operator(.and.), operator(.dim.), &
-  & operator(==), operator(/=), operator(.exists.), shape, size, sum, &
-  & buffer_size, buffer2cptr, validate, error_msg, return_err, has_err, &
-  & compute_buffer_size, compute_size
+public :: attribute_type, dimension_type, error_type, delete_attribute, &
+  & group_type, netcdf_type, variable_type, initialize, nameof, typeof, &
+  & storage_type, set_storage, datarray, dataset, extract, &
+  & rename_attribute, rename_variable, rename_group, rename_dimension, &
+  & operator(.att.), operator(.and.), operator(.dim.), operator(.exists.), &
+  & operator(==), operator(/=), shape, size, sum, buffer_size, buffer2cptr, &
+  & validate, error_msg, return_err, has_err, compute_buffer_size, compute_size
 private
 
 integer(int32), parameter :: INVALID_INT32 = -2147483647_int32
 integer(int64), parameter :: INVALID_INT64 = -9223372036854775807_int64
-
-type :: error_type
-  !! Result of an nc4f operation that was allowed to return normally on error.
-  !!
-  !! A zero `code` denotes success, with optional diagnostic fields.
-  !! Failures require nonblank `fname` and `msg` and preserve the status code.
-  integer(c_int) :: code = NC_NOERR
-  !! NetCDF status code; zero denotes success.
-  character(len=:), allocatable :: fname, msg
-  !! Operation name and diagnostic text, required for failures.
-contains
-  procedure, private :: write_frmt_err
-  generic, public :: write(formatted) => write_frmt_err
-end type error_type
-
-interface error_type
-  module procedure :: make_err
-end interface error_type
-
-
-interface operator(.exists.)
-  !! Return whether an error result represents a failed operation.
-  module procedure :: has_err
-end interface operator(.exists.)
 
 enum, bind(c)
   !! Type constant used for NetCDF external data types.
@@ -66,12 +41,34 @@ enum, bind(c)
 end enum
 integer, parameter :: data_type = kind(NAT_TYPE)
 
+type :: error_type
+  !! Result of an nc4f operation that was allowed to return normally on error.
+  integer(c_int) :: code = NC_NOERR
+  !! NetCDF status code; zero denotes success.
+  character(len=:), allocatable :: fname
+  !! Operation name; required and nonblank on failure.
+  character(len=:), allocatable :: msg
+  !! Diagnostic text; required and nonblank on failure.
+contains
+  procedure, private :: write_frmt_err
+  generic, public :: write(formatted) => write_frmt_err
+end type error_type
+
+interface error_type
+  module procedure :: make_err
+end interface error_type
+
 type :: dimension_type
   !! NetCDF dimension metadata remains a small value object.
   integer(c_int) :: id = INVALID_INT32
+  !! NetCDF dimension identifier; the initial value marks an unassigned
+  !! dimension.
   character(len=:), allocatable :: name
+  !! Local dimension name.
   integer(int64) :: len = INVALID_INT64
+  !! Dimension length in elements; the initial value marks an unknown length.
   logical :: is_unlim = .false.
+  !! Whether the dimension may grow when records are written.
 contains
   procedure, private :: write_frmt_dim
   generic, public :: write(formatted) => write_frmt_dim
@@ -80,52 +77,71 @@ end type dimension_type
 type :: dimension_argument_type
   !! Arguments used to construct an unlimited dimension with `.and.`.
   integer(int64) :: len = INVALID_INT64
+  !! Dimension length supplied to the `.dim.` constructor.
   logical :: is_unlim = .false.
+  !! Whether the constructed dimension is unlimited.
 end type dimension_argument_type
 
 type :: attribute_type
   !! NetCDF attribute metadata and values.
-  !!
-  !! `buffer` owns copied data, while `ptr` borrows contiguous caller storage.
-  !!
-  !! Exactly one backing store is present for a nonempty value: either
-  !! `buffer` is allocated or `ptr` is associated.  The allocatable component
-  !! gives copied values normal Fortran lifetime management; the pointer is
-  !! reserved exclusively for caller-owned storage.
   integer(c_int) :: id = INVALID_INT32
+  !! NetCDF attribute identifier; the initial value marks an unassigned
+  !! attribute.
   character(len=:), allocatable :: name
+  !! Local attribute name.
   integer(data_type) :: dtype = NAT_TYPE
+  !! NetCDF external data-type code; NAT_TYPE marks an unspecified type.
   integer(int64) :: len = INVALID_INT64
+  !! Number of attribute elements; the initial value marks an unknown length.
   integer(int8), allocatable :: buffer(:)
+  !! Owned bytes of a copied value.
   integer(int8), contiguous, pointer :: ptr(:) => null()
+  !! Borrowed contiguous value bytes; the caller retains ownership and lifetime.
 contains
   procedure, private :: write_frmt_att
   generic, public :: write(formatted) => write_frmt_att
 end type attribute_type
 
 type :: storage_type
-  !! Requested or inquired per-variable NetCDF storage settings.
-  !! Negative flags mean that the setting was not requested.
+  !! Requested or inquired per-variable NetCDF storage settings. Negative flags
+  !! mean that the setting was not requested.
   integer(int64), allocatable :: chunks(:)
+  !! Chunk lengths in Fortran dimension order, when chunking is requested.
   integer(c_int) :: deflate_level = -1
+  !! Compression level from 0 through 9; negative means unspecified.
   integer(c_int) :: shuffle = -1
+  !! Shuffle filter flag; negative means unspecified.
   integer(c_int) :: fletcher32 = -1
+  !! Fletcher32 checksum flag; negative means unspecified.
   integer(c_int) :: endian = -1
+  !! NetCDF byte-order setting; negative means unspecified.
   integer(c_int) :: no_fill = -1
+  !! No-fill flag; negative means unspecified.
   type(attribute_type), allocatable :: fill_value
+  !! Scalar `_FillValue` attribute used for uninitialized elements, when
+  !! supplied.
 end type storage_type
 
 type :: variable_type
   !! NetCDF variable metadata, dimensions, attributes, and values.
   integer(c_int) :: id = INVALID_INT32
+  !! NetCDF variable identifier; the initial value marks an unassigned variable.
   character(len=:), allocatable :: name
+  !! Local variable name.
   integer(data_type) :: dtype = NAT_TYPE
+  !! NetCDF external data-type code; NAT_TYPE marks an unspecified type.
   integer(int64) :: len = INVALID_INT64
+  !! Number of variable elements; the initial value marks an unknown length.
   type(dimension_type), allocatable :: dims(:)
+  !! Dimensions describing the variable shape, in Fortran order.
   type(attribute_type), allocatable :: atts(:)
+  !! Attributes attached to this variable.
   type(storage_type), allocatable :: storage
+  !! Optional per-variable chunking, filters, byte order, and fill settings.
   integer(int8), allocatable :: buffer(:)
+  !! Owned bytes of copied variable data.
   integer(int8), contiguous, pointer :: ptr(:) => null()
+  !! Borrowed contiguous data bytes; the caller retains ownership and lifetime.
 contains
   procedure, private :: write_frmt_var
   generic, public :: write(formatted) => write_frmt_var
@@ -133,15 +149,18 @@ end type variable_type
 
 type :: group_type
   !! NetCDF group metadata.
-  !!
-  !! Child groups are pointer-backed so intrinsic assignment shares the child
-  !! tree instead of recursively copying it.
   integer(c_int) :: id = INVALID_INT32
+  !! NetCDF group identifier; the initial value marks an unassigned group.
   character(len=:), allocatable :: name
+  !! Local group name.
   type(dimension_type), allocatable :: dims(:)
+  !! Dimensions defined in this group.
   type(attribute_type), allocatable :: atts(:)
+  !! Group-level attributes.
   type(variable_type), allocatable :: vars(:)
+  !! Variables directly contained in this group.
   type(group_type), pointer :: grps(:) => null()
+  !! Child groups; pointer assignment may share the child tree.
 contains
   procedure, private :: write_frmt_grp
   generic, public :: write(formatted) => write_frmt_grp
@@ -150,7 +169,9 @@ end type group_type
 type, extends(group_type) :: netcdf_type
   !! An open NetCDF file: a root-group value plus file-specific state.
   character(len=:), allocatable :: file
+  !! Path of the open NetCDF file.
   integer(c_int) :: mode = NC_NOWRITE
+  !! File access mode; defaults to read-only.
 contains
   procedure, private :: write_frmt_grp => write_frmt_netcdf
 end type netcdf_type
@@ -178,6 +199,10 @@ end interface rename_group
 interface rename_variable
   module procedure :: rename_var_var, rename_var_grp
 end interface rename_variable
+
+interface operator(.exists.)
+  module procedure :: has_err
+end interface operator(.exists.)
 
 interface operator(.dim.)
   module procedure :: new_dim_len_int32
@@ -278,7 +303,8 @@ interface
     integer(data_type) :: dtype
   end function typeof_var
 
-  module subroutine set_storage(var, chunks, deflate_level, shuffle, fletcher32, endian, no_fill, fill_value, err)
+  module subroutine set_storage(var, chunks, deflate_level, shuffle, &
+    & fletcher32, endian, no_fill, fill_value, err)
     !! Update selected in-memory variable storage settings after validation.
     type(variable_type), intent(inout) :: var
     !! Variable whose optional storage component is updated.
@@ -295,7 +321,8 @@ interface
   end subroutine set_storage
 
   pure module subroutine rename_dim_dim(dim, new_name, err)
-    !! Rename one dimension without changing its identity, length, or unlimited flag.
+    !! Rename one dimension without changing its identity, length, or unlimited
+    !! flag.
     type(dimension_type), intent(inout) :: dim
     !! Standalone dimension to rename; other copies are unchanged.
     character(len=*), intent(in) :: new_name
@@ -305,9 +332,11 @@ interface
   end subroutine rename_dim_dim
 
   pure module subroutine rename_dim_var(var, old_name, new_name, err)
-    !! Rename all matching axes in one variable, including repeated dimension references.
+    !! Rename all matching axes in one variable, including repeated dimension
+    !! references.
     type(variable_type), intent(inout) :: var
-    !! Variable whose dimension names change; data and other metadata are preserved.
+    !! Variable whose dimension names change; data and other metadata are
+    !! preserved.
     character(len=*), intent(in) :: old_name, new_name
     !! old_name: Dimension to find. new_name: Replacement local name.
     type(error_type), intent(out), optional :: err
@@ -315,9 +344,11 @@ interface
   end subroutine rename_dim_var
 
   pure module subroutine rename_dim_grp(grp, old_name, new_name, err)
-    !! Rename a local dimension and its direct variable references; do not traverse children.
+    !! Rename a local dimension and its direct variable references; do not
+    !! traverse children.
     class(group_type), intent(inout) :: grp
-    !! Group with local definitions or, if dims is unallocated, implicit variable dimensions.
+    !! Group with local definitions or, if dims is unallocated, implicit
+    !! variable dimensions.
     character(len=*), intent(in) :: old_name, new_name
     !! old_name: Dimension to find. new_name: Replacement local name.
     type(error_type), intent(out), optional :: err
@@ -325,7 +356,8 @@ interface
   end subroutine rename_dim_grp
 
   pure module subroutine rename_grp_grp(grp, new_name, err)
-    !! Rename a non-root group in memory, preserving its contents and child aliases.
+    !! Rename a non-root group in memory, preserving its contents and child
+    !! aliases.
     class(group_type), intent(inout) :: grp
     !! Non-root group whose local name is changed.
     character(len=*), intent(in) :: new_name
@@ -339,8 +371,8 @@ interface
     class(group_type), intent(inout) :: parent
     !! Parent whose matching direct child is renamed in memory.
     character(len=*), intent(in) :: old_name, new_name
-    !! old_name: Existing local name to locate.
-    !! new_name: Replacement local name; trailing Fortran blank padding is removed.
+    !! old_name: Existing local name to locate. new_name: Replacement local
+    !! name; trailing Fortran blank padding is removed.
     type(error_type), intent(out), optional :: err
     !! Receives the status and diagnostic; failures stop execution when omitted.
   end subroutine rename_grp_par
@@ -391,9 +423,11 @@ interface
   end subroutine return_err
 
   pure module subroutine rename_var_var(var, new_name, err)
-    !! Rename an independent variable in memory; preserve its metadata and storage.
+    !! Rename an independent variable in memory; preserve its metadata and
+    !! storage.
     type(variable_type), intent(inout) :: var
-    !! Variable whose local name is changed; its metadata and storage are preserved.
+    !! Variable whose local name is changed; its metadata and storage are
+    !! preserved.
     character(len=*), intent(in) :: new_name
     !! Replacement local name; trailing Fortran blank padding is removed.
     type(error_type), intent(out), optional :: err
@@ -405,16 +439,18 @@ interface
     class(group_type), intent(inout) :: grp
     !! Group whose direct variable collection contains the name to change.
     character(len=*), intent(in) :: old_name, new_name
-    !! old_name: Existing local name to locate.
-    !! new_name: Replacement local name; trailing Fortran blank padding is removed.
+    !! old_name: Existing local name to locate. new_name: Replacement local
+    !! name; trailing Fortran blank padding is removed.
     type(error_type), intent(out), optional :: err
     !! Receives the status and diagnostic; failures stop execution when omitted.
   end subroutine rename_var_grp
 
   pure module subroutine del_att_var(var, name, err)
-    !! Remove a named attribute from the supplied model without accessing a file.
+    !! Remove a named attribute from the supplied model without accessing a
+    !! file.
     type(variable_type), intent(inout) :: var
-    !! Owner whose attribute collection is reduced, preserving survivor order and storage.
+    !! Owner whose attribute collection is reduced, preserving survivor order
+    !! and storage.
     character(len=*), intent(in) :: name
     !! Local attribute name; trailing Fortran padding is ignored.
     type(error_type), intent(out), optional :: err
@@ -422,9 +458,11 @@ interface
   end subroutine del_att_var
 
   pure module subroutine del_att_grp(grp, name, err)
-    !! Remove a named attribute from the supplied model without accessing a file.
+    !! Remove a named attribute from the supplied model without accessing a
+    !! file.
     class(group_type), intent(inout) :: grp
-    !! Owner whose attribute collection is reduced, preserving survivor order and storage.
+    !! Owner whose attribute collection is reduced, preserving survivor order
+    !! and storage.
     character(len=*), intent(in) :: name
     !! Local attribute name; trailing Fortran padding is ignored.
     type(error_type), intent(out), optional :: err
@@ -444,10 +482,11 @@ interface
   pure module subroutine rename_att_var(var, old_name, new_name, err)
     !! Rename a variable attribute in memory, preserving its value and storage.
     type(variable_type), intent(inout) :: var
-    !! Variable whose matching attribute is renamed; its data and own name are preserved.
+    !! Variable whose matching attribute is renamed; its data and own name are
+    !! preserved.
     character(len=*), intent(in) :: old_name, new_name
-    !! old_name: Existing local name to locate.
-    !! new_name: Replacement local name; trailing Fortran blank padding is removed.
+    !! old_name: Existing local name to locate. new_name: Replacement local
+    !! name; trailing Fortran blank padding is removed.
     type(error_type), intent(out), optional :: err
     !! Receives the status and diagnostic; failures stop execution when omitted.
   end subroutine rename_att_var
@@ -457,8 +496,8 @@ interface
     class(group_type), intent(inout) :: grp
     !! Group whose matching global attribute is renamed.
     character(len=*), intent(in) :: old_name, new_name
-    !! old_name: Existing local name to locate.
-    !! new_name: Replacement local name; trailing Fortran blank padding is removed.
+    !! old_name: Existing local name to locate. new_name: Replacement local
+    !! name; trailing Fortran blank padding is removed.
     type(error_type), intent(out), optional :: err
     !! Receives the status and diagnostic; failures stop execution when omitted.
   end subroutine rename_att_grp
@@ -470,7 +509,8 @@ interface
     character(len=*), intent(in) :: name
     !! Name used to identify the NetCDF object.
     integer(data_type), intent(in) :: dtype
-    !! NetCDF data-type code used to determine the stored element representation.
+    !! NetCDF data-type code used to determine the stored element
+    !! representation.
     integer(int64), intent(in) :: len
     !! Number of stored data elements.
   end subroutine init_att
@@ -482,7 +522,8 @@ interface
     character(len=*), intent(in) :: name
     !! Name used to identify the NetCDF object.
     integer(data_type), intent(in) :: dtype
-    !! NetCDF data-type code used to determine the stored element representation.
+    !! NetCDF data-type code used to determine the stored element
+    !! representation.
     integer(int64), intent(in) :: len
     !! Number of stored data elements.
     type(dimension_type), intent(in) :: dims(:)
@@ -498,7 +539,8 @@ interface
     character(len=*), intent(in) :: name
     !! Name used to identify the NetCDF object.
     integer(data_type), intent(in) :: dtype
-    !! NetCDF data-type code used to determine the stored element representation.
+    !! NetCDF data-type code used to determine the stored element
+    !! representation.
     integer(int64), intent(in) :: len
     !! Number of stored data elements.
     logical, intent(in), optional :: deep
@@ -512,7 +554,8 @@ interface
     character(len=*), intent(in) :: name
     !! Name used to identify the NetCDF object.
     integer(data_type), intent(in) :: dtype
-    !! NetCDF data-type code used to determine the stored element representation.
+    !! NetCDF data-type code used to determine the stored element
+    !! representation.
     integer(int64), intent(in) :: len
     !! Number of stored data elements.
     type(dimension_type), intent(in) :: dims(:)
@@ -550,7 +593,8 @@ interface
   end subroutine init_var_mold
 
   module function new_dataset_empty(name, atts, deep) result(grp)
-    !! Construct a named group with optional attributes and no child collections.
+    !! Construct a named group with optional attributes and no child
+    !! collections.
     character(len=*), intent(in) :: name
     !! Name used to identify the NetCDF object.
     type(attribute_type), intent(in), optional :: atts(:)
@@ -590,7 +634,8 @@ interface
   end function new_dataset_grps
 
   module function new_dataset_all(name, vars, grps, atts, deep) result(grp)
-    !! Construct a named group from variables, child groups, and optional attributes.
+    !! Construct a named group from variables, child groups, and optional
+    !! attributes.
     character(len=*), intent(in) :: name
     !! Name used to identify the NetCDF object.
     type(variable_type), intent(in) :: vars(:)
@@ -622,7 +667,8 @@ interface
   end subroutine new_dataset_
 
   impure elemental module subroutine clone_att(src, dest)
-    !! Deep-copy attribute metadata and active bytes into owned destination storage.
+    !! Deep-copy attribute metadata and active bytes into owned destination
+    !! storage.
     type(attribute_type), intent(in) :: src
     !! Source object or group to read from.
     type(attribute_type), intent(out) :: dest
@@ -630,7 +676,8 @@ interface
   end subroutine clone_att
 
   impure elemental module subroutine clone_var(src, dest)
-    !! Deep-copy a variable, its attributes, and active bytes into owned storage.
+    !! Deep-copy a variable, its attributes, and active bytes into owned
+    !! storage.
     type(variable_type), intent(in) :: src
     !! Source object or group to read from.
     type(variable_type), intent(out) :: dest
@@ -836,43 +883,37 @@ interface
   logical elemental module function eq_dim(x, y)
     !! Return true when two dimensions have identical metadata.
     type(dimension_type), intent(in) :: x, y
-    !! x: Left-hand value to compare.
-    !! y: Right-hand value to compare.
+    !! x: Left-hand value to compare. y: Right-hand value to compare.
   end function eq_dim
 
   logical elemental module function neq_dim(x, y)
     !! Return true when two dimensions have different metadata.
     type(dimension_type), intent(in) :: x, y
-    !! x: Left-hand value to compare.
-    !! y: Right-hand value to compare.
+    !! x: Left-hand value to compare. y: Right-hand value to compare.
   end function neq_dim
 
   logical elemental module function eq_att(x, y) result(is_equal)
     !! Return true when two attributes have identical metadata and byte values.
     type(attribute_type), intent(in) :: x, y
-    !! x: Left-hand value to compare.
-    !! y: Right-hand value to compare.
+    !! x: Left-hand value to compare. y: Right-hand value to compare.
   end function eq_att
 
   logical elemental module function neq_att(x, y) result(is_equal)
     !! Return true when two attributes differ.
     type(attribute_type), intent(in) :: x, y
-    !! x: Left-hand value to compare.
-    !! y: Right-hand value to compare.
+    !! x: Left-hand value to compare. y: Right-hand value to compare.
   end function neq_att
 
   logical elemental module function eq_var(x, y) result(is_equal)
     !! Return true when two variables have identical metadata and byte values.
     type(variable_type), intent(in) :: x, y
-    !! x: Left-hand value to compare.
-    !! y: Right-hand value to compare.
+    !! x: Left-hand value to compare. y: Right-hand value to compare.
   end function eq_var
 
   logical elemental module function neq_var(x, y) result(is_equal)
     !! Return true when two variables differ.
     type(variable_type), intent(in) :: x, y
-    !! x: Left-hand value to compare.
-    !! y: Right-hand value to compare.
+    !! x: Left-hand value to compare. y: Right-hand value to compare.
   end function neq_var
 
   pure module function get_size(var, dim) result(n)
@@ -918,9 +959,11 @@ interface
   end subroutine compute_buffer_size
 
   pure module function buffer_size(dtype, len) result(nbytes)
-    !! Compute the byte count for a NetCDF type and element count, checking overflow.
+    !! Compute the byte count for a NetCDF type and element count, checking
+    !! overflow.
     integer(data_type), intent(in) :: dtype
-    !! NetCDF data-type code used to determine the stored element representation.
+    !! NetCDF data-type code used to determine the stored element
+    !! representation.
     integer(int64), intent(in) :: len
     !! Number of stored data elements.
     integer :: nbytes

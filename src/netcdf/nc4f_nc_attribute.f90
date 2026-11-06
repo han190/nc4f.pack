@@ -3,12 +3,13 @@ implicit none (type, external)
 contains
 
 module subroutine del_att_nc_var(grp, var, name, update_file, err)
-  !! Delete a variable attribute in the model and optionally in its open NetCDF group.
-  !! Independent copies, including grp%vars, are not synchronized.
+  !! Delete a variable attribute in the model and optionally in its open NetCDF
+  !! group. Independent copies, including grp%vars, are not synchronized.
   class(group_type), intent(in) :: grp
   !! Open containing group, used only when updating the file.
   type(variable_type), intent(inout) :: var
-  !! Variable whose supplied attribute cache is updated after successful deletion.
+  !! Variable whose supplied attribute cache is updated after successful
+  !! deletion.
   character(len=*), intent(in) :: name
   !! Local attribute name; trailing Fortran padding is ignored.
   logical, intent(in), optional :: update_file
@@ -34,20 +35,23 @@ module subroutine del_att_nc_var(grp, var, name, update_file, err)
       stat = nc_inq_varid(grp%id, f2cstr(checked%name), varid)
       op_err = netcdf_err(stat, "delete_attribute", &
         & "Resolve variable: "//checked%name)
-      if (.not. has_err(op_err)) call del_att_nc_(grp%id, varid, var%atts, name, op_err)
+      if (.not. has_err(op_err)) call del_att_nc_(grp%id, varid, var%atts, &
+        & name, op_err)
     end if
   end if
   call return_err(op_err, err)
 end subroutine del_att_nc_var
 
 module subroutine del_att_nc_grp(grp, name, update_file, err)
-  !! Delete a group/global attribute in the model and optionally in the open file.
+  !! Delete a group/global attribute in the model and optionally in the open
+  !! file.
   class(group_type), intent(inout) :: grp
   !! Group whose supplied attribute cache is updated after successful deletion.
   character(len=*), intent(in) :: name
   !! Local attribute name; trailing Fortran padding is ignored.
   logical, intent(in) :: update_file
-  !! Whether to delete from the file too; required to distinguish model-only calls.
+  !! Whether to delete from the file too; required to distinguish model-only
+  !! calls.
   type(error_type), intent(out), optional :: err
   !! Receives status and diagnostic; failures stop execution when omitted.
   type(error_type) :: op_err
@@ -61,11 +65,13 @@ module subroutine del_att_nc_grp(grp, name, update_file, err)
 end subroutine del_att_nc_grp
 
 subroutine del_att_nc_(ncid, varid, atts, name, err)
-  !! Stage cache removal, delete from the file, then commit without copying values.
+  !! Stage cache removal, delete from the file, then commit without copying
+  !! values.
   integer(c_int), intent(in) :: ncid, varid
   !! ncid: Open file/group identifier. varid: Variable identifier or NC_GLOBAL.
   type(attribute_type), allocatable, intent(inout) :: atts(:)
-  !! Optional cache; successful deletion invalidates all surviving attribute IDs.
+  !! Optional cache; successful deletion invalidates all surviving attribute
+  !! IDs.
   character(len=*), intent(in) :: name
   !! Local name to delete; existence is determined by the file.
   type(error_type), intent(out) :: err
@@ -101,7 +107,8 @@ subroutine del_att_nc_(ncid, varid, atts, name, err)
       if (allocated(atts(i)%name)) staged%atts(j)%name = atts(i)%name
     end do
   end if
-  ! A placeholder permits an unloaded/partial cache while checking names and duplicates.
+  ! A placeholder permits an unloaded/partial cache while checking names and
+  ! duplicates.
   if (.not. cached) staged%atts(n + 1)%name = trim(name)
   call delete_attribute(staged, name, err)
   if (has_err(err)) return
@@ -123,23 +130,27 @@ subroutine del_att_nc_(ncid, varid, atts, name, err)
     end do
     call move_alloc(staged%atts, atts)
   end if
-  ! Attribute numbers shift on disk, including when the deleted entry was not cached.
+  ! Attribute numbers shift on disk, including when the deleted entry was not
+  ! cached.
   atts%id = empty%id
 end subroutine del_att_nc_
 
 module subroutine rename_att_nc_var(grp, var, old_name, new_name, update_file, &
-    err)
+  & err)
   !! Rename a variable attribute; optionally update the file and supplied cache.
   !! Other variable copies, including grp%vars, are not synchronized.
   class(group_type), intent(in) :: grp
-  !! Open group containing the supplied variable when a file update is requested.
+  !! Open group containing the supplied variable when a file update is
+  !! requested.
   type(variable_type), intent(inout) :: var
-  !! Variable whose matching attribute is renamed; its data and own name are preserved.
+  !! Variable whose matching attribute is renamed; its data and own name are
+  !! preserved.
   character(len=*), intent(in) :: old_name, new_name
-  !! old_name: Existing local name to locate.
-  !! new_name: Replacement local name; trailing Fortran blank padding is removed.
+  !! old_name: Existing local name to locate. new_name: Replacement local name;
+  !! trailing Fortran blank padding is removed.
   logical, intent(in), optional :: update_file
-  !! Whether to update the open NetCDF file as well as the model (default false).
+  !! Whether to update the open NetCDF file as well as the model (default
+  !! false).
   type(error_type), intent(out), optional :: err
   !! Receives the status and diagnostic; failures stop execution when omitted.
   type(error_type) :: op_err
@@ -175,8 +186,8 @@ module subroutine rename_att_nc_grp(grp, old_name, new_name, update_file, err)
   class(group_type), intent(inout) :: grp
   !! Group whose matching global attribute is renamed.
   character(len=*), intent(in) :: old_name, new_name
-  !! old_name: Existing local name to locate.
-  !! new_name: Replacement local name; trailing Fortran blank padding is removed.
+  !! old_name: Existing local name to locate. new_name: Replacement local name;
+  !! trailing Fortran blank padding is removed.
   logical, intent(in) :: update_file
   !! Whether to update the open NetCDF file as well as the model.
   type(error_type), intent(out), optional :: err
@@ -193,15 +204,16 @@ end subroutine rename_att_nc_grp
 
 subroutine rename_att_nc_(ncid, varid, atts, old_name, new_name, err)
   !! Stage only names: attribute values and borrowed buffers are never copied.
-  !! An unloaded cache remains unloaded. The file is authoritative for existence.
+  !! An unloaded cache remains unloaded. The file is authoritative for
+  !! existence.
   integer(c_int), intent(in) :: ncid, varid
-  !! ncid: Open file or group identifier used by the NetCDF C API.
-  !! varid: Variable identifier, or NC_GLOBAL for group attributes.
+  !! ncid: Open file or group identifier used by the NetCDF C API. varid:
+  !! Variable identifier, or NC_GLOBAL for group attributes.
   type(attribute_type), allocatable, intent(inout) :: atts(:)
   !! Attribute collection whose matching entry is renamed.
   character(len=*), intent(in) :: old_name, new_name
-  !! old_name: Existing local name to locate.
-  !! new_name: Replacement local name; trailing Fortran blank padding is removed.
+  !! old_name: Existing local name to locate. new_name: Replacement local name;
+  !! trailing Fortran blank padding is removed.
   type(error_type), intent(out) :: err
   !! Receives the operation status and diagnostic message.
   type(group_type) :: staged
@@ -230,8 +242,10 @@ subroutine rename_att_nc_(ncid, varid, atts, old_name, new_name, err)
   if (has_err(err)) return
   stat = nc_rename_att(ncid, varid, f2cstr(old_name), f2cstr(new_name))
   ! NetCDF-4 reports a collision for an existing attribute renamed to itself.
-  ! Preserve other errors (notably read-only access), and verify existence above.
-  if (trim(old_name) == trim(new_name) .and. stat == NC_ENAMEINUSE) stat = NC_NOERR
+  ! Preserve other errors (notably read-only access), and verify existence
+  ! above.
+  if (trim(old_name) == trim(new_name) .and. stat == NC_ENAMEINUSE) stat = &
+    & NC_NOERR
   err = netcdf_err(stat, "rename_attribute", "Rename attribute: "// &
     & trim(old_name)//" -> "//trim(new_name))
   if (has_err(err)) return
