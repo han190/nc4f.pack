@@ -12,7 +12,7 @@ use, non_intrinsic :: nc4f_c_interface, only: &
 implicit none (type, external)
 
 public :: attribute_type, dimension_type, error_type, &
-  & group_type, netcdf_type, variable_type, storage_type, set_storage, datarray, dataset, extract, &
+  & group_type, netcdf_type, variable_type, storage_type, set_storage, nameof, typeof, datarray, dataset, extract, &
   & initialize, delete_attribute, rename_attribute, rename_variable, &
   & rename_group, rename_dimension, &
   & operator(.att.), operator(.and.), operator(.dim.), &
@@ -210,6 +210,14 @@ interface shape
   module procedure :: get_shape
 end interface shape
 
+interface nameof
+  module procedure :: nameof_att, nameof_dim, nameof_var, nameof_grp
+end interface nameof
+
+interface typeof
+  module procedure :: typeof_att, typeof_var
+end interface typeof
+
 interface sum
   module procedure :: sum_vars
 end interface sum
@@ -240,6 +248,36 @@ interface dataset
 end interface dataset
 
 interface
+  pure module function nameof_att(att) result(name)
+    type(attribute_type), intent(in) :: att
+    character(len=:), allocatable :: name
+  end function nameof_att
+
+  pure module function nameof_dim(dim) result(name)
+    type(dimension_type), intent(in) :: dim
+    character(len=:), allocatable :: name
+  end function nameof_dim
+
+  pure module function nameof_var(var) result(name)
+    type(variable_type), intent(in) :: var
+    character(len=:), allocatable :: name
+  end function nameof_var
+
+  pure module function nameof_grp(grp) result(name)
+    class(group_type), intent(in) :: grp
+    character(len=:), allocatable :: name
+  end function nameof_grp
+
+  elemental module function typeof_att(att) result(dtype)
+    type(attribute_type), intent(in) :: att
+    integer(data_type) :: dtype
+  end function typeof_att
+
+  elemental module function typeof_var(var) result(dtype)
+    type(variable_type), intent(in) :: var
+    integer(data_type) :: dtype
+  end function typeof_var
+
   module subroutine set_storage(var, chunks, deflate_level, shuffle, fletcher32, endian, no_fill, fill_value, err)
     !! Update selected in-memory variable storage settings after validation.
     type(variable_type), intent(inout) :: var

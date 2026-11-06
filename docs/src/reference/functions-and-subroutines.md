@@ -598,6 +598,58 @@ if (.exists. err) print '(a)', error_msg(err)
     ```
 :::
 
+## `NAMEOF` -- Get an Object Name
+
+| Synopsis |
+|:--|
+| <span class="ind3">`NAME = NAMEOF(OBJECT)`</span> |
+
+| Class |
+|:--|
+| <span class="ind3">Pure generic function.</span> |
+
+| Description |
+|:--|
+| <span class="ind3">Return the in-memory name of an attribute, dimension, variable, group, or open NetCDF root. An object without an allocated name returns an empty string. No file inquiry is performed.</span> |
+
+| Arguments |
+|:--|
+| <span class="grid"><span>`OBJECT`</span><span>`type(attribute_type)`, `type(dimension_type)`, `type(variable_type)`, or `class(group_type)`, `INTENT(in)`</span></span><br><span class="ind6">Named model object; `netcdf_type` is accepted through `group_type` inheritance.</span> |
+
+| Result |
+|:--|
+| <span class="grid"><span>`NAME`</span><span>`character(len=:), allocatable`</span></span><br><span class="ind6">Name value, or an allocated empty string when no name is assigned.</span> |
+
+```fortran
+print '(a)', nameof(var)
+```
+
+## `TYPEOF` -- Get an Object's Data Type
+
+| Synopsis |
+|:--|
+| <span class="ind3">`DTYPE = TYPEOF(OBJECT)`</span> |
+
+| Class |
+|:--|
+| <span class="ind3">Elemental generic function.</span> |
+
+| Description |
+|:--|
+| <span class="ind3">Return the in-memory NetCDF external data type code of a variable or attribute. No file inquiry or type conversion is performed.</span> |
+
+| Arguments |
+|:--|
+| <span class="grid"><span>`OBJECT`</span><span>`type(variable_type)` or `type(attribute_type), INTENT(in)`</span></span><br><span class="ind6">Variable or attribute whose data type is requested; arrays are accepted element-wise.</span> |
+
+| Result |
+|:--|
+| <span class="grid"><span>`DTYPE`</span><span>`integer(data_type)`</span></span><br><span class="ind6">The object's `DTYPE` component, such as `NC_FLOAT` or `NC_CHAR`.</span> |
+
+```fortran
+if (typeof(var) == NC_FLOAT) print '(a)', "floating-point variable"
+```
+
 (open_netcdf--open-a-netcdf-file)=
 ## `OPEN_NETCDF` -- Open a NetCDF File
 

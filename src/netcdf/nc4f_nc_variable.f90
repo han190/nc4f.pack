@@ -771,7 +771,7 @@ end subroutine put_variable
 
 pure subroutine prepare_selection_(default_count, context, &
   & starts, counts, strides, err, start, count, stride)
-  !! Check vector lengths and apply shared defaults; 
+  !! Check vector lengths and apply shared defaults;
   !! callers enforce operation-specific rules.
   integer(int64), intent(in) :: default_count(:)
   !! Default extents in Fortran order: file shape for reads and source shape for writes.
@@ -826,7 +826,7 @@ pure subroutine prepare_selection_(default_count, context, &
 end subroutine prepare_selection_
 
 pure subroutine c_selection_(starts, counts, strides, c_start, c_count, c_stride)
-  !! Convert validated Fortran-order vectors to zero-based C order, 
+  !! Convert validated Fortran-order vectors to zero-based C order,
   !! including empty scalars.
   integer(int64), intent(in) :: starts(:)
   !! Validated one-based starting indices in Fortran order.

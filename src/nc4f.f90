@@ -15,7 +15,7 @@ public :: &
 public :: NC_BYTE, NC_CHAR, NC_SHORT, NC_INT, NC_INT64, NC_FLOAT, NC_DOUBLE
 public :: NC_ENDIAN_NATIVE, NC_ENDIAN_LITTLE, NC_ENDIAN_BIG
 public :: &
-  & datarray, dataset, extract, initialize, set_storage, shape, size, sum, &
+  & datarray, dataset, extract, initialize, set_storage, nameof, typeof, shape, size, sum, &
   & operator(.att.), operator(.and.), operator(.dim.), operator(.exists.), &
   & operator(==), operator(/=)
 public :: &

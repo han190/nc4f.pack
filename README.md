@@ -15,13 +15,9 @@ an [xarray](https://xarray.dev/)-like programming style in modern Fortran that w
 - Define variables using `DEFINE_VARIABLE`, then write it with `PUT_VARIABLE`;
 - Open a NetCDF file and retrieve variables with `OPEN_NETCDF` and `GET_VARIABLE`;
 - Extract intrinsic Fortran data from an attribute or variable with `EXTRACT`;
-- Rename attributes, dimensions, variables, and groups with
-  [`RENAME_ATTRIBUTE`](docs/src/reference/functions-and-subroutines.md#rename_attribute--rename-an-attribute),
-  [`RENAME_DIMENSION`](docs/src/reference/functions-and-subroutines.md#rename_dimension--rename-a-dimension),
-  [`RENAME_VARIABLE`](docs/src/reference/functions-and-subroutines.md#rename_variable--rename-a-variable),
-  and [`RENAME_GROUP`](docs/src/reference/functions-and-subroutines.md#rename_group--rename-a-group);
-- Delete variable or group attributes with
-  [`DELETE_ATTRIBUTE`](docs/src/reference/functions-and-subroutines.md#delete_attribute--delete-an-attribute).
+- Rename attributes, dimensions, variables, and groups with `RENAME_ATTRIBUTE`, `RENAME_DIMENSION`, `RENAME_VARIABLE`, and `RENAME_GROUP`;
+- Delete variable or group attributes with `DELETE_ATTRIBUTE`;
+- Configure storage controls of a variable such as chunking or endianness through `SET_STORAGE`.
 
 ## A First Program
 

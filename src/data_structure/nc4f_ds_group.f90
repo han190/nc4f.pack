@@ -3,6 +3,14 @@ submodule(nc4f_ds) nc4f_ds_group
 implicit none (type, external)
 contains
 
+pure module function nameof_grp(grp) result(name)
+  class(group_type), intent(in) :: grp
+  character(len=:), allocatable :: name
+
+  name = ""
+  if (allocated(grp%name)) name = grp%name
+end function nameof_grp
+
 pure module subroutine rename_grp_grp(grp, new_name, err)
   !! Rename an independent non-root group without changing its child tree.
   class(group_type), intent(inout) :: grp

@@ -2,6 +2,14 @@ submodule(nc4f_ds) nc4f_ds_dimension
 implicit none (type, external)
 contains
 
+pure module function nameof_dim(dim) result(name)
+  type(dimension_type), intent(in) :: dim
+  character(len=:), allocatable :: name
+
+  name = ""
+  if (allocated(dim%name)) name = dim%name
+end function nameof_dim
+
 pure module subroutine rename_dim_dim(dim, new_name, err)
   !! Rename one dimension without changing its identity, length, or unlimited flag.
   type(dimension_type), intent(inout) :: dim

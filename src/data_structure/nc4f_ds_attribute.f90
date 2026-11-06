@@ -4,6 +4,21 @@ submodule(nc4f_ds) nc4f_ds_attribute
 implicit none (type, external)
 contains
 
+pure module function nameof_att(att) result(name)
+  type(attribute_type), intent(in) :: att
+  character(len=:), allocatable :: name
+
+  name = ""
+  if (allocated(att%name)) name = att%name
+end function nameof_att
+
+elemental module function typeof_att(att) result(dtype)
+  type(attribute_type), intent(in) :: att
+  integer(data_type) :: dtype
+
+  dtype = att%dtype
+end function typeof_att
+
 pure module subroutine del_att_var(var, name, err)
   !! Remove a named attribute from the supplied model without accessing a file.
   type(variable_type), intent(inout) :: var

@@ -39,6 +39,11 @@ module subroutine data_model(passed)
 
   atts(1) = "units".att."K"
   vars(1) = datarray("temperature", [273.0, 274.0], ["x".dim.2], atts=atts)
+  if (nameof(dim) /= "sample" .or. nameof(atts(1)) /= "units" .or. &
+    & nameof(vars(1)) /= "temperature") return
+  if (typeof(atts(1)) /= NC_CHAR .or. typeof(vars(1)) /= NC_FLOAT) return
+  if (any(typeof(vars) /= [NC_FLOAT])) return
+  if (nameof(variable_type()) /= "") return
   allocate (values(2, 2), source=reshape([ &
     & 1.0_real32, 2.0_real32, 3.0_real32, 4.0_real32], [2, 2]))
   owned_var = datarray("owned", values, ["x".dim.2, "y".dim.2], deep=.true.)
@@ -61,6 +66,9 @@ module subroutine data_model(passed)
   child_grps(1) = child
   group_only = dataset("groups", child_grps, [atts(1)])
   grp = dataset("root", [vars(1)], child_grps, [atts(1)])
+  if (nameof(grp) /= "root") return
+  nc%name = "/"
+  if (nameof(nc) /= "/") return
   deep_grp = dataset("deep", [borrowed_var], child_grps, [atts(1)], deep=.true.)
   if (.not. allocated(deep_grp%vars(1)%buffer) .or. &
     & associated(deep_grp%vars(1)%ptr)) return

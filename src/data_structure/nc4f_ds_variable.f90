@@ -3,6 +3,21 @@ submodule(nc4f_ds) nc4f_ds_variable
 implicit none (type, external)
 contains
 
+pure module function nameof_var(var) result(name)
+  type(variable_type), intent(in) :: var
+  character(len=:), allocatable :: name
+
+  name = ""
+  if (allocated(var%name)) name = var%name
+end function nameof_var
+
+elemental module function typeof_var(var) result(dtype)
+  type(variable_type), intent(in) :: var
+  integer(data_type) :: dtype
+
+  dtype = var%dtype
+end function typeof_var
+
 module subroutine set_storage(var, chunks, deflate_level, shuffle, fletcher32, endian, no_fill, fill_value, err)
   !! Update only supplied in-memory settings, committing after validation.
   type(variable_type), intent(inout) :: var
