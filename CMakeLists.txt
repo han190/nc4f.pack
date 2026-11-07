@@ -148,6 +148,7 @@ if(NC4F_BUILD_TESTS)
   endif()
   add_executable(nc4f_tests
     test/nc4f_test.f90
+    test/nc4f_test_c_interface.f90
     test/nc4f_test_c_interface_dimension.f90
     test/nc4f_test_c_interface_error.f90
     test/nc4f_test_c_interface_group.f90
@@ -157,6 +158,7 @@ if(NC4F_BUILD_TESTS)
     test/nc4f_test_c_interface_variable.f90
     test/nc4f_test_c_interface_utility.f90
     test/nc4f_test_utility.f90
+    test/nc4f_test_ds.f90
     test/nc4f_test_ds_arithmetic.f90
     test/nc4f_test_ds_attribute.f90
     test/nc4f_test_ds_attribute_constructor.f90
@@ -169,6 +171,7 @@ if(NC4F_BUILD_TESTS)
     test/nc4f_test_ds_validate.f90
     test/nc4f_test_ds_variable.f90
     test/nc4f_test_ds_variable_constructor.f90
+    test/nc4f_test_nc.f90
     test/nc4f_test_nc_attribute.f90
     test/nc4f_test_nc_dataset.f90
     test/nc4f_test_nc_dimension.f90

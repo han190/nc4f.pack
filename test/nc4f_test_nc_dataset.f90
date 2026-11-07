@@ -1,4 +1,4 @@
-module nc4f_test_nc_dataset
+submodule(nc4f_test_nc) nc4f_test_nc_dataset
 use, intrinsic :: iso_c_binding, only: c_null_char
 use, intrinsic :: iso_fortran_env, only: real32
 use, non_intrinsic :: testdrive, only: check, &
@@ -9,12 +9,10 @@ use, non_intrinsic :: nc4f, only: netcdf_type, group_type, &
   & operator(.att.), operator(.dim.), NC_NOERR
 use, non_intrinsic :: nc4f_c_interface, only: nc_delete
 implicit none (type, external)
-private
-public :: collect_nc_dataset
 
 contains
 
-subroutine collect_nc_dataset(tests)
+module subroutine collect_nc_dataset(tests)
   type(unittest_type), allocatable, intent(out) :: tests(:)
 
   tests = [ &
@@ -84,4 +82,4 @@ subroutine test_group(error)
     & "Serialized group file cleanup failed")
 end subroutine test_group
 
-end module nc4f_test_nc_dataset
+end submodule nc4f_test_nc_dataset

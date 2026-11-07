@@ -1,18 +1,16 @@
-module nc4f_test_nc_dimension
+submodule(nc4f_test_nc) nc4f_test_nc_dimension
 use, non_intrinsic :: testdrive, only: check, &
   & test_error_type => error_type, new_unittest, unittest_type
 use, non_intrinsic :: nc4f, only: netcdf_type, variable_type, &
   & dimension_type, model_error_type => error_type, &
   & define_variable, inquire_dimensions, inquire_variable, &
   & rename_dimension, nameof, operator(.dim.), NC_FLOAT, NC_NOERR
-use, non_intrinsic :: nc4f_test_nc_utility, only: open_temp, close_temp
+use, non_intrinsic :: nc4f_test_utility, only: open_temp, close_temp
 implicit none (type, external)
-private
-public :: collect_nc_dimension
 
 contains
 
-subroutine collect_nc_dimension(tests)
+module subroutine collect_nc_dimension(tests)
   type(unittest_type), allocatable, intent(out) :: tests(:)
 
   tests = [ &
@@ -94,4 +92,4 @@ subroutine test_rename_object(error)
   call close_temp(error, nc)
 end subroutine test_rename_object
 
-end module nc4f_test_nc_dimension
+end submodule nc4f_test_nc_dimension

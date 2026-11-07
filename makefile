@@ -28,6 +28,7 @@ NC_TEST_SRC := $(wildcard $(TEST_DIR)/nc4f_test_nc_*.f90)
 DS_TEST_OBJS := $(addprefix $(BUILD_DIR)/,$(notdir $(DS_TEST_SRC:.f90=.o)))
 NC_TEST_OBJS := $(addprefix $(BUILD_DIR)/,$(notdir $(NC_TEST_SRC:.f90=.o)))
 TEST_OBJS := $(BUILD_DIR)/nc4f_test_utility.o \
+	$(BUILD_DIR)/nc4f_test_c_interface.o \
 	$(BUILD_DIR)/nc4f_test_c_interface_attribute.o \
 	$(BUILD_DIR)/nc4f_test_c_interface_dataset.o \
 	$(BUILD_DIR)/nc4f_test_c_interface_dimension.o \
@@ -36,6 +37,8 @@ TEST_OBJS := $(BUILD_DIR)/nc4f_test_utility.o \
 	$(BUILD_DIR)/nc4f_test_c_interface_io.o \
 	$(BUILD_DIR)/nc4f_test_c_interface_variable.o \
 	$(BUILD_DIR)/nc4f_test_c_interface_utility.o \
+	$(BUILD_DIR)/nc4f_test_ds.o \
+	$(BUILD_DIR)/nc4f_test_nc.o \
 	$(DS_TEST_OBJS) $(NC_TEST_OBJS) \
 	$(BUILD_DIR)/nc4f_test_real_data.o \
 	$(BUILD_DIR)/nc4f_test.o
@@ -125,8 +128,26 @@ $(TEST_DRIVE_OBJ): $(TEST_DRIVE_SRC) | $(BUILD_DIR)
 	@$(FC) $(FFLAGS) $(MODULE_FLAGS) -c $< -o $@
 
 $(BUILD_DIR)/nc4f_test_utility.o: $(TEST_DIR)/nc4f_test_utility.f90 \
-	$(TEST_DRIVE_OBJ) $(C_INTERFACE_OBJ) | $(BUILD_DIR)
+	$(TEST_DRIVE_OBJ) $(LIB) | $(BUILD_DIR)
 	@$(FC) $(FFLAGS) $(MODULE_FLAGS) -c $< -o $@
+
+$(BUILD_DIR)/nc4f_test_c_interface.o: \
+	$(TEST_DIR)/nc4f_test_c_interface.f90 $(TEST_DRIVE_OBJ) | $(BUILD_DIR)
+	@$(FC) $(FFLAGS) $(MODULE_FLAGS) -c $< -o $@
+
+$(BUILD_DIR)/nc4f_test_ds.o: \
+	$(TEST_DIR)/nc4f_test_ds.f90 $(TEST_DRIVE_OBJ) | $(BUILD_DIR)
+	@$(FC) $(FFLAGS) $(MODULE_FLAGS) -c $< -o $@
+
+$(BUILD_DIR)/nc4f_test_nc.o: \
+	$(TEST_DIR)/nc4f_test_nc.f90 $(TEST_DRIVE_OBJ) | $(BUILD_DIR)
+	@$(FC) $(FFLAGS) $(MODULE_FLAGS) -c $< -o $@
+
+$(filter $(BUILD_DIR)/nc4f_test_c_interface_%.o,$(TEST_OBJS)): \
+	$(BUILD_DIR)/nc4f_test_c_interface.o
+$(DS_TEST_OBJS): $(BUILD_DIR)/nc4f_test_ds.o
+$(NC_TEST_OBJS) $(BUILD_DIR)/nc4f_test_real_data.o: \
+	$(BUILD_DIR)/nc4f_test_nc.o $(BUILD_DIR)/nc4f_test_utility.o
 
 $(BUILD_DIR)/nc4f_test_c_interface_dimension.o: \
 	$(TEST_DIR)/nc4f_test_c_interface_dimension.f90 \
@@ -172,14 +193,6 @@ $(BUILD_DIR)/nc4f_test_ds_%.o: \
 	$(TEST_DIR)/nc4f_test_ds_%.f90 $(LIB) $(TEST_DRIVE_OBJ) | $(BUILD_DIR)
 	@$(FC) $(FFLAGS) $(MODULE_FLAGS) -c $< -o $@
 
-$(BUILD_DIR)/nc4f_test_nc_utility.o: \
-	$(TEST_DIR)/nc4f_test_nc_utility.f90 $(LIB) \
-	$(TEST_DRIVE_OBJ) | $(BUILD_DIR)
-	@$(FC) $(FFLAGS) $(MODULE_FLAGS) -c $< -o $@
-
-$(filter-out $(BUILD_DIR)/nc4f_test_nc_utility.o,$(NC_TEST_OBJS)): \
-	$(BUILD_DIR)/nc4f_test_nc_utility.o
-
 $(BUILD_DIR)/nc4f_test_nc_%.o: \
 	$(TEST_DIR)/nc4f_test_nc_%.f90 $(LIB) \
 	$(TEST_DRIVE_OBJ) | $(BUILD_DIR)
@@ -191,16 +204,9 @@ $(BUILD_DIR)/nc4f_test_real_data.o: \
 	@$(FC) $(FFLAGS) $(MODULE_FLAGS) -c $< -o $@
 
 $(BUILD_DIR)/nc4f_test.o: $(TEST_DIR)/nc4f_test.f90 \
-	$(BUILD_DIR)/nc4f_test_c_interface_attribute.o \
-	$(BUILD_DIR)/nc4f_test_c_interface_dataset.o \
-	$(BUILD_DIR)/nc4f_test_c_interface_dimension.o \
-	$(BUILD_DIR)/nc4f_test_c_interface_error.o \
-	$(BUILD_DIR)/nc4f_test_c_interface_group.o \
-	$(BUILD_DIR)/nc4f_test_c_interface_io.o \
-	$(BUILD_DIR)/nc4f_test_c_interface_variable.o \
-	$(BUILD_DIR)/nc4f_test_c_interface_utility.o \
-	$(DS_TEST_OBJS) $(NC_TEST_OBJS) \
-	$(BUILD_DIR)/nc4f_test_real_data.o | $(BUILD_DIR)
+	$(BUILD_DIR)/nc4f_test_c_interface.o \
+	$(BUILD_DIR)/nc4f_test_ds.o \
+	$(BUILD_DIR)/nc4f_test_nc.o | $(BUILD_DIR)
 	@$(FC) $(FFLAGS) $(MODULE_FLAGS) -c $< -o $@
 
 $(TEST_TARGET): $(TEST_OBJS) $(TEST_DRIVE_OBJ) $(LIB)

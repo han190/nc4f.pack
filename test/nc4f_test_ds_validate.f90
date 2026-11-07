@@ -1,16 +1,14 @@
-module nc4f_test_ds_validate
+submodule(nc4f_test_ds) nc4f_test_ds_validate
 use, non_intrinsic :: testdrive, only: check, error_type, new_unittest, &
   & unittest_type
 use, non_intrinsic :: nc4f, only: dimension_type, &
   & model_error_type => error_type, rename_dimension, &
   & operator(.dim.), NC_EBADNAME
 implicit none (type, external)
-private
-public :: collect_ds_validate
 
 contains
 
-subroutine collect_ds_validate(tests)
+module subroutine collect_ds_validate(tests)
   type(unittest_type), allocatable, intent(out) :: tests(:)
 
   tests = [new_unittest("name validation on rename", test_name)]
@@ -27,4 +25,4 @@ subroutine test_name(error)
     & dim%name == "valid", "Invalid name changed the dimension")
 end subroutine test_name
 
-end module nc4f_test_ds_validate
+end submodule nc4f_test_ds_validate

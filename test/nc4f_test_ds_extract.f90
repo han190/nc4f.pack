@@ -1,16 +1,14 @@
-module nc4f_test_ds_extract
+submodule(nc4f_test_ds) nc4f_test_ds_extract
 use, intrinsic :: iso_fortran_env, only: int32, real32
 use, non_intrinsic :: testdrive, only: check, error_type, new_unittest, &
   & unittest_type
 use, non_intrinsic :: nc4f, only: attribute_type, variable_type, &
   & datarray, extract, operator(.att.), operator(.dim.)
 implicit none (type, external)
-private
-public :: collect_ds_extract
 
 contains
 
-subroutine collect_ds_extract(tests)
+module subroutine collect_ds_extract(tests)
   type(unittest_type), allocatable, intent(out) :: tests(:)
 
   tests = [ &
@@ -49,4 +47,4 @@ subroutine test_variable(error)
     & "Extracted variable values differ")
 end subroutine test_variable
 
-end module nc4f_test_ds_extract
+end submodule nc4f_test_ds_extract

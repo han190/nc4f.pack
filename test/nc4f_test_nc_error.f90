@@ -1,16 +1,14 @@
-module nc4f_test_nc_error
+submodule(nc4f_test_nc) nc4f_test_nc_error
 use, non_intrinsic :: testdrive, only: check, &
   & test_error_type => error_type, new_unittest, unittest_type
 use, non_intrinsic :: nc4f, only: netcdf_type, &
   & model_error_type => error_type, open_netcdf, error_msg, &
   & operator(.exists.), NC_EINVAL
 implicit none (type, external)
-private
-public :: collect_nc_error
 
 contains
 
-subroutine collect_nc_error(tests)
+module subroutine collect_nc_error(tests)
   type(unittest_type), allocatable, intent(out) :: tests(:)
 
   tests = [new_unittest("NetCDF error propagation", test_error)]
@@ -29,4 +27,4 @@ subroutine test_error(error)
     & "NetCDF error lacks operation context")
 end subroutine test_error
 
-end module nc4f_test_nc_error
+end submodule nc4f_test_nc_error

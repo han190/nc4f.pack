@@ -1,16 +1,14 @@
-module nc4f_test_c_interface_utility
+submodule(nc4f_test_c_interface) nc4f_test_c_interface_utility
 use, intrinsic :: iso_c_binding, only: c_associated, c_char, c_f_pointer, &
   & c_loc, c_null_char, c_null_ptr, c_ptr, c_size_t
 use, non_intrinsic :: testdrive, only: check, error_type, new_unittest, &
   & unittest_type
 use, non_intrinsic :: nc4f_c_interface, only: c_free, c_malloc, c_strlen
 implicit none (type, external)
-private
-public :: collect_c_interface_utility
 
 contains
 
-subroutine collect_c_interface_utility(tests)
+module subroutine collect_c_interface_utility(tests)
   type(unittest_type), allocatable, intent(out) :: tests(:)
 
   tests = [ &
@@ -56,4 +54,4 @@ subroutine test_c_free(error)
   call c_free(c_null_ptr)
 end subroutine test_c_free
 
-end module nc4f_test_c_interface_utility
+end submodule nc4f_test_c_interface_utility

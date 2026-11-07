@@ -1,4 +1,4 @@
-module nc4f_test_ds_utility
+submodule(nc4f_test_ds) nc4f_test_ds_utility
 use, non_intrinsic :: testdrive, only: check, error_type, new_unittest, &
   & unittest_type
 use, non_intrinsic :: nc4f, only: model_error_type => error_type, &
@@ -10,12 +10,10 @@ use, non_intrinsic :: nc4f, only: model_error_type => error_type, &
   & NC_ENDIAN_BIG, NC_BYTE, NC_CHAR, NC_SHORT, NC_INT, &
   & NC_INT64, NC_FLOAT, NC_DOUBLE
 implicit none (type, external)
-private
-public :: collect_ds_utility
 
 contains
 
-subroutine collect_ds_utility(tests)
+module subroutine collect_ds_utility(tests)
   type(unittest_type), allocatable, intent(out) :: tests(:)
 
   tests = [ &
@@ -64,4 +62,4 @@ subroutine test_error(error)
     & "Failure result differs")
 end subroutine test_error
 
-end module nc4f_test_ds_utility
+end submodule nc4f_test_ds_utility

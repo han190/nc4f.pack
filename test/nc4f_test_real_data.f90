@@ -1,12 +1,10 @@
-module nc4f_test_real_data
+submodule(nc4f_test_nc) nc4f_test_real_data
 use, intrinsic :: iso_fortran_env, only: int8, int16, int32, int64, &
   & real32, real64
 use, non_intrinsic :: testdrive, only: check, &
   & test_error_type => error_type, new_unittest, unittest_type
 use, non_intrinsic :: nc4f
 implicit none (type, external)
-private
-public :: collect_real_data
 
 character(*), parameter :: TEST_RESULTS_DIR = "build/test-results/"
 character(*), parameter :: NETCDF_TYPE_RESULT_FILE = &
@@ -14,7 +12,7 @@ character(*), parameter :: NETCDF_TYPE_RESULT_FILE = &
 
 contains
 
-subroutine collect_real_data(tests)
+module subroutine collect_real_data(tests)
   type(unittest_type), allocatable, intent(out) :: tests(:)
   integer :: status
 
@@ -955,4 +953,4 @@ pure function extensive_attributes() result(atts)
 end function extensive_attributes
 
 
-end module nc4f_test_real_data
+end submodule nc4f_test_real_data

@@ -1,4 +1,4 @@
-module nc4f_test_ds_variable
+submodule(nc4f_test_ds) nc4f_test_ds_variable
 use, intrinsic :: iso_fortran_env, only: int64, real32
 use, non_intrinsic :: testdrive, only: check, error_type, new_unittest, &
   & unittest_type
@@ -8,12 +8,10 @@ use, non_intrinsic :: nc4f, only: variable_type, group_type, &
   & operator(.dim.), operator(==), &
   & operator(/=), NC_EINVAL, NC_ENDIAN_LITTLE, NC_FLOAT, NC_NOERR
 implicit none (type, external)
-private
-public :: collect_ds_variable
 
 contains
 
-subroutine collect_ds_variable(tests)
+module subroutine collect_ds_variable(tests)
   type(unittest_type), allocatable, intent(out) :: tests(:)
 
   tests = [ &
@@ -95,4 +93,4 @@ subroutine test_storage(error)
     & "Invalid storage settings changed the variable")
 end subroutine test_storage
 
-end module nc4f_test_ds_variable
+end submodule nc4f_test_ds_variable

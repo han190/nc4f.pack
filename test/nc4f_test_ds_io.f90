@@ -1,4 +1,4 @@
-module nc4f_test_ds_io
+submodule(nc4f_test_ds) nc4f_test_ds_io
 use, intrinsic :: iso_fortran_env, only: real32
 use, non_intrinsic :: testdrive, only: check, error_type, new_unittest, &
   & unittest_type
@@ -7,12 +7,10 @@ use, non_intrinsic :: nc4f, only: attribute_type, dimension_type, &
   & error_type, datarray, dataset, operator(.att.), &
   & operator(.dim.)
 implicit none (type, external)
-private
-public :: collect_ds_io
 
 contains
 
-subroutine collect_ds_io(tests)
+module subroutine collect_ds_io(tests)
   type(unittest_type), allocatable, intent(out) :: tests(:)
 
   tests = [new_unittest("formatted derived types", test_formatted)]
@@ -54,4 +52,4 @@ subroutine test_formatted(error)
     & "Formatted attribute output differs")
 end subroutine test_formatted
 
-end module nc4f_test_ds_io
+end submodule nc4f_test_ds_io

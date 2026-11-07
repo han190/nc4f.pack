@@ -1,4 +1,4 @@
-module nc4f_test_ds_dimension
+submodule(nc4f_test_ds) nc4f_test_ds_dimension
 use, intrinsic :: iso_fortran_env, only: int64
 use, non_intrinsic :: testdrive, only: check, error_type, new_unittest, &
   & unittest_type
@@ -7,12 +7,10 @@ use, non_intrinsic :: nc4f, only: dimension_type, error_type_model => &
   & rename_dimension, nameof, operator(.dim.), operator(.and.), &
   & operator(==), operator(/=)
 implicit none (type, external)
-private
-public :: collect_ds_dimension
 
 contains
 
-subroutine collect_ds_dimension(tests)
+module subroutine collect_ds_dimension(tests)
   type(unittest_type), allocatable, intent(out) :: tests(:)
 
   tests = [ &
@@ -73,4 +71,4 @@ subroutine test_rename(error)
     & nameof(grp%dims(1)) == "other", "Group dimension rename failed")
 end subroutine test_rename
 
-end module nc4f_test_ds_dimension
+end submodule nc4f_test_ds_dimension

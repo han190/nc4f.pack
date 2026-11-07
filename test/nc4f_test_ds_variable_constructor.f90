@@ -1,4 +1,4 @@
-module nc4f_test_ds_variable_constructor
+submodule(nc4f_test_ds) nc4f_test_ds_variable_constructor
 use, intrinsic :: iso_fortran_env, only: int8, int16, int32, int64, &
   & real32, real64
 use, non_intrinsic :: testdrive, only: check, error_type, new_unittest, &
@@ -7,12 +7,10 @@ use, non_intrinsic :: nc4f, only: datarray, dimension_type, &
   & variable_type, nameof, typeof, operator(.dim.), NC_BYTE, &
   & NC_SHORT, NC_INT, NC_INT64, NC_FLOAT, NC_DOUBLE
 implicit none (type, external)
-private
-public :: collect_ds_variable_constructor
 
 contains
 
-subroutine collect_ds_variable_constructor(tests)
+module subroutine collect_ds_variable_constructor(tests)
   type(unittest_type), allocatable, intent(out) :: tests(:)
 
   tests = [ &
@@ -60,4 +58,4 @@ subroutine test_ownership(error)
     & "Shallow datarray did not borrow storage")
 end subroutine test_ownership
 
-end module nc4f_test_ds_variable_constructor
+end submodule nc4f_test_ds_variable_constructor

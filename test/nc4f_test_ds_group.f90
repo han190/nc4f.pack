@@ -1,4 +1,4 @@
-module nc4f_test_ds_group
+submodule(nc4f_test_ds) nc4f_test_ds_group
 use, intrinsic :: iso_fortran_env, only: int64, real32
 use, non_intrinsic :: testdrive, only: check, error_type, new_unittest, &
   & unittest_type
@@ -8,12 +8,10 @@ use, non_intrinsic :: nc4f, only: attribute_type, group_type, &
   & rename_group, initialize, operator(.att.), operator(.dim.), &
   & NC_CHAR, NC_FLOAT, NC_NOERR
 implicit none (type, external)
-private
-public :: collect_ds_group
 
 contains
 
-subroutine collect_ds_group(tests)
+module subroutine collect_ds_group(tests)
   type(unittest_type), allocatable, intent(out) :: tests(:)
 
   tests = [ &
@@ -74,4 +72,4 @@ subroutine test_rename(error)
     & "Child group rename failed")
 end subroutine test_rename
 
-end module nc4f_test_ds_group
+end submodule nc4f_test_ds_group

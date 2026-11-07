@@ -1,4 +1,4 @@
-module nc4f_test_ds_attribute
+submodule(nc4f_test_ds) nc4f_test_ds_attribute
 use, non_intrinsic :: testdrive, only: check, error_type, new_unittest, &
   & unittest_type
 use, non_intrinsic :: nc4f, only: attribute_type, variable_type, &
@@ -6,12 +6,10 @@ use, non_intrinsic :: nc4f, only: attribute_type, variable_type, &
   & rename_attribute, nameof, operator(.att.), operator(==), &
   & operator(/=), NC_NOERR, NC_ENOTATT
 implicit none (type, external)
-private
-public :: collect_ds_attribute
 
 contains
 
-subroutine collect_ds_attribute(tests)
+module subroutine collect_ds_attribute(tests)
   type(unittest_type), allocatable, intent(out) :: tests(:)
 
   tests = [ &
@@ -77,4 +75,4 @@ subroutine test_delete(error)
     & size(grp%atts) == 0, "Group attribute deletion failed")
 end subroutine test_delete
 
-end module nc4f_test_ds_attribute
+end submodule nc4f_test_ds_attribute

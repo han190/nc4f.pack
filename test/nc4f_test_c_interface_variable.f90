@@ -1,4 +1,4 @@
-module nc4f_test_c_interface_variable
+submodule(nc4f_test_c_interface) nc4f_test_c_interface_variable
 use, intrinsic :: iso_c_binding, only: c_char, c_int, c_loc, &
   & c_null_char, c_size_t
 use, non_intrinsic :: testdrive, only: check, error_type, new_unittest, &
@@ -17,12 +17,10 @@ use, non_intrinsic :: nc4f_c_interface, only: nc_def_dim, nc_def_var, &
   & nc_rename_var, &
   & nc_inq_type
 implicit none (type, external)
-private
-public :: collect_c_interface_variable
 
 contains
 
-subroutine collect_c_interface_variable(tests)
+module subroutine collect_c_interface_variable(tests)
   type(unittest_type), allocatable, intent(out) :: tests(:)
   tests = [ &
     & new_unittest("nc_def_var", test_nc_def_var), &
@@ -108,7 +106,7 @@ subroutine test_nc_inq_var(error)
   call finish(error, ncid, status, "nc_inq_var failed")
   if (allocated(error)) return
   call check(error, name(1) == "v" .and. xtype == NC_INT .and. ndims == 1 &
-  & .and. natts == 0, &
+    & .and. natts == 0, &
     & "Variable metadata differs")
 end subroutine test_nc_inq_var
 
@@ -211,4 +209,4 @@ subroutine test_nc_inq_type(error)
     & "Variable metadata differs")
 end subroutine test_nc_inq_type
 
-end module nc4f_test_c_interface_variable
+end submodule nc4f_test_c_interface_variable

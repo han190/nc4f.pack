@@ -1,4 +1,4 @@
-module nc4f_test_c_interface_io
+submodule(nc4f_test_c_interface) nc4f_test_c_interface_io
 use, intrinsic :: iso_c_binding, only: c_associated, c_char, c_int, &
   & c_loc, c_long, &
   & c_long_long, c_ptrdiff_t, c_short, c_signed_char, c_size_t, &
@@ -44,12 +44,10 @@ use, non_intrinsic :: nc4f_c_interface, only: nc_def_dim, nc_def_var, &
   & nc_get_vars_string, nc_put_var1_string, nc_get_var1_string, &
   & nc_put_varm_string, nc_get_varm_string
 implicit none (type, external)
-private
-public :: collect_c_interface_io
 
 contains
 
-subroutine collect_c_interface_io(tests)
+module subroutine collect_c_interface_io(tests)
   type(unittest_type), allocatable, intent(out) :: tests(:)
   tests = [ &
     & new_unittest("nc_put_var_schar", test_nc_put_var_schar), &
@@ -2991,4 +2989,4 @@ subroutine test_nc_get_varm_string(error)
   call finish(error, ncid, status, "nc_get_varm_string failed")
 end subroutine test_nc_get_varm_string
 
-end module nc4f_test_c_interface_io
+end submodule nc4f_test_c_interface_io

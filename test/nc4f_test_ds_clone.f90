@@ -1,16 +1,14 @@
-module nc4f_test_ds_clone
+submodule(nc4f_test_ds) nc4f_test_ds_clone
 use, intrinsic :: iso_fortran_env, only: real32
 use, non_intrinsic :: testdrive, only: check, error_type, new_unittest, &
   & unittest_type
 use, non_intrinsic :: nc4f, only: group_type, variable_type, &
   & datarray, dataset, extract, operator(.dim.)
 implicit none (type, external)
-private
-public :: collect_ds_clone
 
 contains
 
-subroutine collect_ds_clone(tests)
+module subroutine collect_ds_clone(tests)
   type(unittest_type), allocatable, intent(out) :: tests(:)
 
   tests = [new_unittest("deep dataset clone", test_deep_clone)]
@@ -36,4 +34,4 @@ subroutine test_deep_clone(error)
     & "Deep clone still aliases source data")
 end subroutine test_deep_clone
 
-end module nc4f_test_ds_clone
+end submodule nc4f_test_ds_clone

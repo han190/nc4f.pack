@@ -1,4 +1,4 @@
-module nc4f_test_ds_attribute_constructor
+submodule(nc4f_test_ds) nc4f_test_ds_attribute_constructor
 use, intrinsic :: iso_fortran_env, only: int8, int16, int32, int64, &
   & real32, real64
 use, non_intrinsic :: testdrive, only: check, error_type, new_unittest, &
@@ -7,12 +7,10 @@ use, non_intrinsic :: nc4f, only: attribute_type, nameof, typeof, &
   & operator(.att.), NC_BYTE, NC_CHAR, NC_SHORT, NC_INT, NC_INT64, &
   & NC_FLOAT, NC_DOUBLE
 implicit none (type, external)
-private
-public :: collect_ds_attribute_constructor
 
 contains
 
-subroutine collect_ds_attribute_constructor(tests)
+module subroutine collect_ds_attribute_constructor(tests)
   type(unittest_type), allocatable, intent(out) :: tests(:)
 
   tests = [ &
@@ -58,4 +56,4 @@ subroutine test_vectors(error)
     & "Attribute vector types differ")
 end subroutine test_vectors
 
-end module nc4f_test_ds_attribute_constructor
+end submodule nc4f_test_ds_attribute_constructor

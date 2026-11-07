@@ -1,4 +1,4 @@
-module nc4f_test_nc_attribute
+submodule(nc4f_test_nc) nc4f_test_nc_attribute
 use, intrinsic :: iso_c_binding, only: c_char, c_loc, c_null_char, &
   & c_size_t
 use, non_intrinsic :: testdrive, only: check, &
@@ -9,14 +9,12 @@ use, non_intrinsic :: nc4f, only: attribute_type, netcdf_type, &
   & rename_attribute, delete_attribute, nameof, &
   & operator(.att.), operator(.dim.), NC_FLOAT, NC_NOERR
 use, non_intrinsic :: nc4f_c_interface, only: nc_put_att_text, NC_GLOBAL
-use, non_intrinsic :: nc4f_test_nc_utility, only: open_temp, close_temp
+use, non_intrinsic :: nc4f_test_utility, only: open_temp, close_temp
 implicit none (type, external)
-private
-public :: collect_nc_attribute
 
 contains
 
-subroutine collect_nc_attribute(tests)
+module subroutine collect_nc_attribute(tests)
   type(unittest_type), allocatable, intent(out) :: tests(:)
 
   tests = [ &
@@ -100,4 +98,4 @@ subroutine test_variable(error)
   call close_temp(error, nc)
 end subroutine test_variable
 
-end module nc4f_test_nc_attribute
+end submodule nc4f_test_nc_attribute

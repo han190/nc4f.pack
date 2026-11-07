@@ -1,16 +1,14 @@
-module nc4f_test_c_interface_error
+submodule(nc4f_test_c_interface) nc4f_test_c_interface_error
 use, intrinsic :: iso_c_binding, only: c_associated, c_char, &
   & c_f_pointer, c_ptr, c_null_char
 use, non_intrinsic :: testdrive, only: check, error_type, new_unittest, &
   & unittest_type
 use, non_intrinsic :: nc4f_c_interface, only: nc_strerror, NC_EBADID
 implicit none (type, external)
-private
-public :: collect_c_interface_error
 
 contains
 
-subroutine collect_c_interface_error(tests)
+module subroutine collect_c_interface_error(tests)
   type(unittest_type), allocatable, intent(out) :: tests(:)
 
   tests = [new_unittest("nc_strerror", test_nc_strerror)]
@@ -29,4 +27,4 @@ subroutine test_nc_strerror(error)
     & "nc_strerror returned an empty message")
 end subroutine test_nc_strerror
 
-end module nc4f_test_c_interface_error
+end submodule nc4f_test_c_interface_error

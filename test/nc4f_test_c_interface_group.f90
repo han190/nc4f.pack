@@ -1,4 +1,4 @@
-module nc4f_test_c_interface_group
+submodule(nc4f_test_c_interface) nc4f_test_c_interface_group
 use, intrinsic :: iso_c_binding, only: c_char, c_int, c_loc, &
   & c_null_char, c_null_ptr, c_size_t
 use, non_intrinsic :: testdrive, only: check, error_type, new_unittest, &
@@ -9,12 +9,10 @@ use, non_intrinsic :: nc4f_c_interface, only: nc_def_grp, nc_inq_grps, &
   & nc_inq_grp_ncid, nc_inq_ncid, nc_rename_grp, NC_MAX_NAME, NC_NOERR
 use, non_intrinsic :: nc4f_test_utility, only: open_dataset, finish
 implicit none (type, external)
-private
-public :: collect_c_interface_group
 
 contains
 
-subroutine collect_c_interface_group(tests)
+module subroutine collect_c_interface_group(tests)
   type(unittest_type), allocatable, intent(out) :: tests(:)
 
   tests = [ &
@@ -211,4 +209,4 @@ subroutine test_nc_inq_grp_ncid(error)
   call check(error, found_id == childid, "Incorrect group ID")
 end subroutine test_nc_inq_grp_ncid
 
-end module nc4f_test_c_interface_group
+end submodule nc4f_test_c_interface_group

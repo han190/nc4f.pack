@@ -1,4 +1,4 @@
-module nc4f_test_c_interface_dataset
+submodule(nc4f_test_c_interface) nc4f_test_c_interface_dataset
 use, intrinsic :: iso_c_binding, only: c_associated, c_int, c_null_char, &
   & c_null_ptr, c_size_t
 use, non_intrinsic :: testdrive, only: check, error_type, new_unittest, &
@@ -13,12 +13,10 @@ use, non_intrinsic :: nc4f_c_interface, only: c_strlen, nc_abort, &
   & NC_FORMAT_NETCDF4, NC_FORMATX_NC_HDF5, NC_NOERR, NC_NOWRITE, &
   & NC_PERSIST
 implicit none (type, external)
-private
-public :: collect_c_interface_dataset
 
 contains
 
-subroutine collect_c_interface_dataset(tests)
+module subroutine collect_c_interface_dataset(tests)
   type(unittest_type), allocatable, intent(out) :: tests(:)
   tests = [ &
     & new_unittest("nc_create", test_nc_create), &
@@ -43,7 +41,7 @@ subroutine collect_c_interface_dataset(tests)
     & new_unittest("nc_inq_nvars", test_nc_inq_nvars), &
     & new_unittest("nc_inq_format", test_nc_inq_format), &
     & new_unittest("nc_inq_format_extended", &
-    &   test_nc_inq_format_extended), &
+    & test_nc_inq_format_extended), &
     & new_unittest("nc_inq_path", test_nc_inq_path), &
     & new_unittest("nc_set_fill", test_nc_set_fill) &
     & ]
@@ -336,4 +334,4 @@ subroutine test_nc_set_fill(error)
   call check(error, old_mode == NC_FILL, "Incorrect previous fill mode")
 end subroutine test_nc_set_fill
 
-end module nc4f_test_c_interface_dataset
+end submodule nc4f_test_c_interface_dataset

@@ -1,4 +1,4 @@
-module nc4f_test_c_interface_attribute
+submodule(nc4f_test_c_interface) nc4f_test_c_interface_attribute
 use, intrinsic :: iso_c_binding, only: c_associated, c_char, c_double, &
   & c_float, c_int, c_loc, c_long, c_long_long, c_null_char, &
   & c_null_ptr, c_ptr, c_short, c_signed_char, c_size_t
@@ -21,12 +21,10 @@ use, non_intrinsic :: nc4f_c_interface, only: &
   & nc_def_grp, nc_def_var, nc_free_string, c_strlen, NC_ENOTATT, NC_GLOBAL, &
   & NC_INT, NC_MAX_NAME, NC_NOERR
 implicit none (type, external)
-private
-public :: collect_c_interface_attribute
 
 contains
 
-subroutine collect_c_interface_attribute(tests)
+module subroutine collect_c_interface_attribute(tests)
   type(unittest_type), allocatable, intent(out) :: tests(:)
   tests = [ &
     & new_unittest("nc_inq_att", test_nc_inq_att), &
@@ -655,7 +653,7 @@ subroutine test_ncattput(error)
       & xtype, length)
   end if
   if (status == 1) status = NC_NOERR
-call finish(error, ncid, status, "ncattput failed")
+  call finish(error, ncid, status, "ncattput failed")
   if (allocated(error)) return
   call check(error, xtype == NC_INT .and. length == 1_c_int, &
     & "Legacy attribute metadata differs")
@@ -670,7 +668,7 @@ subroutine test_ncattinq(error)
   status = ncattinq(ncid, NC_GLOBAL, "a"//c_null_char, &
     & xtype, length)
   if (status == 1) status = NC_NOERR
-call finish(error, ncid, status, "ncattinq failed")
+  call finish(error, ncid, status, "ncattinq failed")
   if (allocated(error)) return
   call check(error, xtype == NC_INT .and. length == 1_c_int, &
     & "Legacy attribute metadata differs")
@@ -686,7 +684,7 @@ subroutine test_ncattget(error)
   value = 0_c_int
   status = ncattget(ncid, NC_GLOBAL, "a"//c_null_char, c_loc(value))
   if (status == 1) status = NC_NOERR
-call finish(error, ncid, status, "ncattget failed")
+  call finish(error, ncid, status, "ncattget failed")
   if (allocated(error)) return
   call check(error, value == 7_c_int, "Legacy attribute value differs")
 end subroutine test_ncattget
@@ -709,7 +707,7 @@ subroutine test_ncattcopy(error)
       & xtype, length)
   end if
   if (status == 1) status = NC_NOERR
-call finish(error, ncid, status, "ncattcopy failed")
+  call finish(error, ncid, status, "ncattcopy failed")
   if (allocated(error)) return
   call check(error, xtype == NC_INT .and. length == 1_c_int, &
     & "Legacy copied attribute differs")
@@ -759,4 +757,4 @@ subroutine test_ncattdel(error)
   call finish(error, ncid, status, "ncattdel failed")
 end subroutine test_ncattdel
 
-end module nc4f_test_c_interface_attribute
+end submodule nc4f_test_c_interface_attribute

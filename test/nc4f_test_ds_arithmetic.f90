@@ -1,16 +1,14 @@
-module nc4f_test_ds_arithmetic
+submodule(nc4f_test_ds) nc4f_test_ds_arithmetic
 use, intrinsic :: iso_fortran_env, only: real32
 use, non_intrinsic :: testdrive, only: check, error_type, new_unittest, &
   & unittest_type
 use, non_intrinsic :: nc4f, only: variable_type, datarray, extract, &
   & operator(.dim.), sum
 implicit none (type, external)
-private
-public :: collect_ds_arithmetic
 
 contains
 
-subroutine collect_ds_arithmetic(tests)
+module subroutine collect_ds_arithmetic(tests)
   type(unittest_type), allocatable, intent(out) :: tests(:)
 
   tests = [new_unittest("sum variables", test_sum)]
@@ -33,4 +31,4 @@ subroutine test_sum(error)
     & "Variable sum differs")
 end subroutine test_sum
 
-end module nc4f_test_ds_arithmetic
+end submodule nc4f_test_ds_arithmetic

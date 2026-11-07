@@ -1,4 +1,4 @@
-module nc4f_test_c_interface_dimension
+submodule(nc4f_test_c_interface) nc4f_test_c_interface_dimension
 use, intrinsic :: iso_c_binding, only: c_char, c_int, c_loc, c_long, &
   & c_null_char, c_null_ptr, c_size_t
 use, non_intrinsic :: testdrive, only: check, error_type, new_unittest, &
@@ -10,12 +10,10 @@ use, non_intrinsic :: nc4f_c_interface, only: nc_def_dim, nc_def_grp, &
   & NC_MAX_NAME, NC_NOERR, NC_UNLIMITED
 use, non_intrinsic :: nc4f_test_utility, only: open_dataset, finish
 implicit none (type, external)
-private
-public :: collect_c_interface_dimension
 
 contains
 
-subroutine collect_c_interface_dimension(tests)
+module subroutine collect_c_interface_dimension(tests)
   type(unittest_type), allocatable, intent(out) :: tests(:)
 
   tests = [ &
@@ -270,4 +268,4 @@ subroutine test_ncdimrename(error)
   call check(error, found_id == dimid, "Rename changed dimension ID")
 end subroutine test_ncdimrename
 
-end module nc4f_test_c_interface_dimension
+end submodule nc4f_test_c_interface_dimension

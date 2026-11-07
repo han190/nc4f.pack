@@ -1,4 +1,4 @@
-module nc4f_test_nc_variable
+submodule(nc4f_test_nc) nc4f_test_nc_variable
 use, intrinsic :: iso_fortran_env, only: real32
 use, non_intrinsic :: testdrive, only: check, &
   & test_error_type => error_type, new_unittest, unittest_type
@@ -7,14 +7,12 @@ use, non_intrinsic :: nc4f, only: netcdf_type, variable_type, &
   & put_variable, get_variable, inquire_variable, rename_variable, &
   & extract, nameof, &
   & operator(.dim.), NC_FLOAT, NC_NOERR
-use, non_intrinsic :: nc4f_test_nc_utility, only: open_temp, close_temp
+use, non_intrinsic :: nc4f_test_utility, only: open_temp, close_temp
 implicit none (type, external)
-private
-public :: collect_nc_variable
 
 contains
 
-subroutine collect_nc_variable(tests)
+module subroutine collect_nc_variable(tests)
   type(unittest_type), allocatable, intent(out) :: tests(:)
 
   tests = [ &
@@ -118,4 +116,4 @@ subroutine test_rename(error)
   call close_temp(error, nc)
 end subroutine test_rename
 
-end module nc4f_test_nc_variable
+end submodule nc4f_test_nc_variable
