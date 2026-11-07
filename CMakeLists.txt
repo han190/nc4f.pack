@@ -38,14 +38,14 @@ function(nc4f_compile_options target)
 endfunction()
 
 # This target can be built independently of the high-level data model.
-add_library(nc4f_c_interface STATIC src/c_interface/nc4f_c_interface.f90)
+add_library(nc4f_c_interface STATIC src/nc4f_c_interface.f90)
 add_library(nc4f::c_interface ALIAS nc4f_c_interface)
 set_target_properties(nc4f_c_interface PROPERTIES
   EXPORT_NAME c_interface
   Fortran_MODULE_DIRECTORY "${nc4f_c_module_dir}"
   POSITION_INDEPENDENT_CODE ON)
 target_include_directories(nc4f_c_interface
-  PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/c_interface"
+  PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src"
   PUBLIC "$<BUILD_INTERFACE:${nc4f_c_module_dir}>"
          "$<INSTALL_INTERFACE:${nc4f_install_module_dir}>")
 target_link_libraries(nc4f_c_interface PUBLIC PkgConfig::NC4F_NETCDF)
@@ -55,7 +55,7 @@ set(nc4f_generated_names
   nc4f_ds_attribute_constructor
   nc4f_ds_variable_constructor
   nc4f_ds_extract)
-set(nc4f_data_dir "${CMAKE_CURRENT_SOURCE_DIR}/src/data_structure")
+set(nc4f_data_dir "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(nc4f_data_module "${nc4f_data_dir}/nc4f_ds.f90")
 set(nc4f_generated_sources)
 
@@ -97,23 +97,23 @@ add_library(nc4f STATIC
   src/nc4f.f90
   "${nc4f_data_module}"
   ${nc4f_generated_sources}
-  src/data_structure/nc4f_ds_arithmetic.f90
-  src/data_structure/nc4f_ds_attribute.f90
-  src/data_structure/nc4f_ds_clone.f90
-  src/data_structure/nc4f_ds_dimension.f90
-  src/data_structure/nc4f_ds_group.f90
-  src/data_structure/nc4f_ds_io.f90
-  src/data_structure/nc4f_ds_utility.f90
-  src/data_structure/nc4f_ds_validate.f90
-  src/data_structure/nc4f_ds_variable.f90
-  src/netcdf/nc4f_nc.f90
-  src/netcdf/nc4f_nc_attribute.f90
-  src/netcdf/nc4f_nc_dataset.f90
-  src/netcdf/nc4f_nc_dimension.f90
-  src/netcdf/nc4f_nc_error.f90
-  src/netcdf/nc4f_nc_group.f90
-  src/netcdf/nc4f_nc_utility.f90
-  src/netcdf/nc4f_nc_variable.f90)
+  src/nc4f_ds_arithmetic.f90
+  src/nc4f_ds_attribute.f90
+  src/nc4f_ds_clone.f90
+  src/nc4f_ds_dimension.f90
+  src/nc4f_ds_group.f90
+  src/nc4f_ds_io.f90
+  src/nc4f_ds_utility.f90
+  src/nc4f_ds_validate.f90
+  src/nc4f_ds_variable.f90
+  src/nc4f_nc.f90
+  src/nc4f_nc_attribute.f90
+  src/nc4f_nc_dataset.f90
+  src/nc4f_nc_dimension.f90
+  src/nc4f_nc_error.f90
+  src/nc4f_nc_group.f90
+  src/nc4f_nc_utility.f90
+  src/nc4f_nc_variable.f90)
 add_library(nc4f::nc4f ALIAS nc4f)
 set_target_properties(nc4f PROPERTIES
   Fortran_MODULE_DIRECTORY "${nc4f_module_dir}"

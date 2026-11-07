@@ -52,7 +52,8 @@ suites = [ &
   & new_testsuite("c_interface_variable", collect_c_interface_variable), &
   & new_testsuite("ds_dimension", collect_ds_dimension), &
   & new_testsuite("ds_utility", collect_ds_utility), &
-  & new_testsuite("ds_attribute_constructor", collect_ds_attribute_constructor), &
+  & new_testsuite("ds_attribute_constructor", &
+  &   collect_ds_attribute_constructor), &
   & new_testsuite("ds_attribute", collect_ds_attribute), &
   & new_testsuite("ds_variable_constructor", collect_ds_variable_constructor), &
   & new_testsuite("ds_extract", collect_ds_extract), &
@@ -70,7 +71,7 @@ suites = [ &
   & new_testsuite("nc_group", collect_nc_group), &
   & new_testsuite("nc_error", collect_nc_error), &
   & new_testsuite("real_data", collect_real_data)]
-  
+
 stat = 0
 selected = ""
 if (command_argument_count() > 0) call get_command_argument(1, selected)

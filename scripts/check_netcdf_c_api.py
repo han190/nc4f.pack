@@ -14,7 +14,7 @@ import subprocess
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = ROOT / "src" / "c_interface"
+SOURCE = ROOT / "src"
 
 
 def pkg_config(*args):
@@ -54,6 +54,7 @@ def main():
         prototype = api[name]
         assert binding[1] == manifest["aliases"].get(name, name), name
         result, cargs = prototype
+        args = re.sub(r"&\s*&", "", args)
         fargs = [a.strip() for a in args.split(",") if a.strip()]
         cargs = [a.strip() for a in cargs.split(",") if a.strip() not in ("void", "")]
         assert len(fargs) == len(cargs), (name, fargs, cargs)

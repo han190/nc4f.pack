@@ -2,10 +2,6 @@
 .DELETE_ON_ERROR:
 
 SRC_DIR := src
-C_INTERFACE_DIR := $(SRC_DIR)/c_interface
-DATA_STRUCTURE_DIR := $(SRC_DIR)/data_structure
-NETCDF_DIR := $(SRC_DIR)/netcdf
-SOURCE_DIRS := $(SRC_DIR) $(C_INTERFACE_DIR) $(DATA_STRUCTURE_DIR) $(NETCDF_DIR)
 FYPP_DIR := fypp
 TEST_DIR := test
 EXAMPLE_DIR := example
@@ -73,19 +69,19 @@ else
   $(error Unsupported PROFILE '$(PROFILE)'; choose debug or release)
 endif
 FFLAGS ?= -fPIC $(COMPILER_FFLAGS) $(PROFILE_FFLAGS)
-MODULE_FLAGS := $(MODULE_OUTPUT_FLAG) -I$(BUILD_DIR) $(addprefix -I,$(SOURCE_DIRS)) $(NC_CFLAGS)
+MODULE_FLAGS := $(MODULE_OUTPUT_FLAG) -I$(BUILD_DIR) -I$(SRC_DIR) $(NC_CFLAGS)
 
 # All current templates generate data_structure sources; common.fypp is a helper.
 FYPP_INC := $(wildcard $(FYPP_DIR)/*_inc.fypp)
 FYPP_F90 := $(filter-out $(FYPP_INC) $(FYPP_DIR)/common.fypp,$(wildcard $(FYPP_DIR)/*.fypp))
-SRC_INC := $(patsubst $(FYPP_DIR)/%_inc.fypp,$(DATA_STRUCTURE_DIR)/%.inc,$(FYPP_INC))
-SRC_F90 := $(patsubst $(FYPP_DIR)/%.fypp,$(DATA_STRUCTURE_DIR)/%.f90,$(FYPP_F90))
-C_INTERFACE_INC := $(wildcard $(C_INTERFACE_DIR)/nc4f_c_interface_*.inc)
+SRC_INC := $(patsubst $(FYPP_DIR)/%_inc.fypp,$(SRC_DIR)/%.inc,$(FYPP_INC))
+SRC_F90 := $(patsubst $(FYPP_DIR)/%.fypp,$(SRC_DIR)/%.f90,$(FYPP_F90))
+C_INTERFACE_INC := $(wildcard $(SRC_DIR)/nc4f_c_interface_*.inc)
 
 # Include generated sources even when they have not been created yet.
-SRC := $(sort $(wildcard $(addsuffix /*.f90,$(SOURCE_DIRS))) $(SRC_F90))
+SRC := $(sort $(wildcard $(SRC_DIR)/*.f90) $(SRC_F90))
 OBJ := $(addprefix $(BUILD_DIR)/,$(notdir $(SRC:.f90=.o)))
-vpath %.f90 $(SOURCE_DIRS) $(TEST_DIR)
+vpath %.f90 $(SRC_DIR) $(TEST_DIR)
 
 .PHONY: all build library c-interface examples preprocess download-test-data test clean
 all library: $(LIB)
@@ -227,12 +223,12 @@ $(filter $(BUILD_DIR)/nc4f_nc_%.o,$(OBJ)): $(BUILD_DIR)/nc4f_nc.o
 $(BUILD_DIR)/nc4f.o: $(BUILD_DIR)/nc4f_ds.o $(BUILD_DIR)/nc4f_nc.o
 
 # Explicit targets let vpath locate generated sources before they exist.
-$(SRC_INC): $(DATA_STRUCTURE_DIR)/%.inc: $(FYPP_DIR)/%_inc.fypp $(FYPP_DIR)/common.fypp
+$(SRC_INC): $(SRC_DIR)/%.inc: $(FYPP_DIR)/%_inc.fypp $(FYPP_DIR)/common.fypp
 	@printf "[preproc] $<\n"
 	@mkdir -p $(@D)
 	@$(FYPP) $< > $@
 
-$(SRC_F90): $(DATA_STRUCTURE_DIR)/%.f90: $(FYPP_DIR)/%.fypp $(FYPP_DIR)/common.fypp
+$(SRC_F90): $(SRC_DIR)/%.f90: $(FYPP_DIR)/%.fypp $(FYPP_DIR)/common.fypp
 	@printf "[preproc] $<\n"
 	@mkdir -p $(@D)
 	@$(FYPP) $< > $@

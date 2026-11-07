@@ -65,9 +65,9 @@ test-drive = { git = "https://github.com/fortran-lang/test-drive", tag = "v0.6.1
 ignore = ['C002', 'C071', 'C072', 'C121', 'C181']
 line-length = 80
 extend-exclude = [
-  "src/data_structure/nc4f_ds_attribute_constructor.f90",
-  "src/data_structure/nc4f_ds_variable_constructor.f90",
-  "src/data_structure/nc4f_ds_extract.f90",
+  "src/nc4f_ds_attribute_constructor.f90",
+  "src/nc4f_ds_variable_constructor.f90",
+  "src/nc4f_ds_extract.f90",
 ]
 
 [extra.release]
