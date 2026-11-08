@@ -99,6 +99,38 @@ def main():
         value = re.sub(r"int\(z'([\da-fA-F]+)', kind=c_int\)", lambda m: "0x" + m[1], value)
         value = value.replace("_c_int", "")
         csource.append(f'_Static_assert({name} == ({value}), "{name}");')
+    data_text = (SOURCE / "nc4f_data.f90").read_text()
+    data_constants = {
+        "NO_ERROR": "NC_NOERR",
+        "BADID": "NC_EBADID",
+        "INVALID": "NC_EINVAL",
+        "INVALID_COORDS": "NC_EINVALCOORDS",
+        "NAME_IN_USE": "NC_ENAMEINUSE",
+        "NO_ATTRIBUTE": "NC_ENOTATT",
+        "BAD_DIMENSION": "NC_EBADDIM",
+        "NO_VARIABLE": "NC_ENOTVAR",
+        "MAX_NAME": "NC_EMAXNAME",
+        "EDGE": "NC_EEDGE",
+        "BAD_NAME": "NC_EBADNAME",
+        "NO_MEMORY": "NC_ENOMEM",
+        "NOT_FOUND": "NC_ENOTFOUND",
+        "BAD_GROUP_ID": "NC_EBADGRPID",
+        "NO_GROUP": "NC_ENOGRP",
+        "MODE_READ_ONLY": "NC_NOWRITE",
+        "ENDIAN_NATIVE": "NC_ENDIAN_NATIVE",
+        "ENDIAN_LITTLE": "NC_ENDIAN_LITTLE",
+        "ENDIAN_BIG": "NC_ENDIAN_BIG",
+        "MAX_NAME_LENGTH": "NC_MAX_NAME",
+    }
+    for local, upstream in data_constants.items():
+        declaration = re.search(
+            rf"(?:enumerator|integer\(c_int\), parameter) :: {local} = (-?\d+)",
+            data_text,
+        )
+        assert declaration, f"Missing data constant: {local}"
+        csource.append(
+            f'_Static_assert({upstream} == {declaration[1]}, "{local}");'
+        )
     # Volatile storage retains relocations for every function, including ones
     # not exercised by the representative runtime tests.
     csource += ["static void (*volatile symbols[])(void) = {"]
@@ -118,7 +150,8 @@ def main():
     serial = set(api) - set(manifest["exclusion_groups"]["parallel"])
     print(f"NetCDF {pkg_config('--modversion')}: {len(expected)}/{len(serial)} serial API declarations covered "
           f"({len(expected) / len(serial):.1%}); all retained declarations passed.")
-    print(f"ABI checks, {len(constants)} integer constants, and all linked entry points passed.")
+    print(f"ABI checks, {len(constants)} binding constants, "
+          f"{len(data_constants)} data constants, and all linked entry points passed.")
     print("No C adapters; unsigned, parallel, and adapter-dependent APIs are explicitly excluded.")
 
 

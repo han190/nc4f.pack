@@ -1,7 +1,7 @@
 module nc4f
 
-use, non_intrinsic :: nc4f_ds
-use, non_intrinsic :: nc4f_nc
+use, non_intrinsic :: nc4f_data
+use, non_intrinsic :: nc4f_netcdf
 use, non_intrinsic :: nc4f_c_interface
 implicit none (type, external)
 

@@ -133,8 +133,9 @@
 
 ## `OPERATOR(.EXISTS.)` -- Test an Error Result
 
-Defined in `nc4f_ds` alongside `error_type`, and re-exported by `nc4f_nc`
-and `nc4f`. The public elemental function `has_err(err)` in `nc4f_ds`
+Defined in `nc4f_data` alongside `error_type`, and re-exported by
+`nc4f_netcdf` and `nc4f`. The public elemental function `has_err(err)` in
+`nc4f_data`
 provides the same test. Both forms accept scalars and arrays and may be
 used in pure procedures. Use explicit code comparisons when distinguishing
 specific errors or checking raw C status integers.

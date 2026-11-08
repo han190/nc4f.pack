@@ -1,0 +1,724 @@
+submodule(nc4f_data) nc4f_data_io
+!! ncdump-like formatted output for the direct v2 data model.
+implicit none (type, external)
+contains
+
+module subroutine write_frmt_dim(dim, unit, iotype, v_list, iostat, iomsg)
+  !! Write a formatted dimension representation to a Fortran I/O unit.
+  class(dimension_type), intent(in) :: dim
+  !! Dimension to process.
+  integer, intent(in) :: unit
+  !! Fortran output unit supplied by the invoking formatted WRITE.
+  character(len=*), intent(in) :: iotype
+  !! Requested defined-I/O mode; LISTDIRECTED and DT are supported.
+  integer, intent(in) :: v_list(:)
+  !! Integer DT edit-descriptor parameters; currently ignored.
+  integer, intent(out) :: iostat
+  !! Receives zero on success or a nonzero I/O status on failure.
+  character(len=*), intent(inout) :: iomsg
+  !! Receives the diagnostic message if the underlying WRITE fails.
+
+  associate (ignored_v_list => v_list)
+  end associate
+  iostat = 1
+  if (iotype /= "LISTDIRECTED" .and. iotype /= "DT") return
+  if (dim%is_unlim) then
+    associate (fmt => "(a, ' = UNLIMITED ; // (', i0, ' currently)')")
+      write (unit, fmt, iostat=iostat, iomsg=iomsg) dim%name, dim%len
+    end associate
+  else
+    associate (fmt => "(a, ' = ', i0, ' ;')")
+      write (unit, fmt, iostat=iostat, iomsg=iomsg) dim%name, dim%len
+    end associate
+  end if
+end subroutine write_frmt_dim
+
+module subroutine write_frmt_att(att, unit, iotype, v_list, iostat, iomsg)
+  !! Write a formatted attribute representation to a Fortran I/O unit.
+  class(attribute_type), intent(in) :: att
+  !! Attribute to process.
+  integer, intent(in) :: unit
+  !! Fortran output unit supplied by the invoking formatted WRITE.
+  character(len=*), intent(in) :: iotype
+  !! Requested defined-I/O mode; LISTDIRECTED and DT are supported.
+  integer, intent(in) :: v_list(:)
+  !! Integer DT edit-descriptor parameters; currently ignored.
+  integer, intent(out) :: iostat
+  !! Receives zero on success or a nonzero I/O status on failure.
+  character(len=*), intent(inout) :: iomsg
+  !! Receives the diagnostic message if the underlying WRITE fails.
+  character(len=16) :: dtype
+  character(len=:), allocatable :: value
+
+  associate (ignored_v_list => v_list)
+  end associate
+  iostat = 1
+  if (iotype /= "LISTDIRECTED" .and. iotype /= "DT") return
+  call type_name(att%dtype, dtype)
+  value = render_att_value(att)
+  write (unit, "(a, ' = ', a, ' ;')", iostat=iostat, iomsg=iomsg) &
+    & trim(dtype)//":"//att%name, value
+end subroutine write_frmt_att
+
+module subroutine write_frmt_var(var, unit, iotype, v_list, iostat, iomsg)
+  !! Write a formatted variable representation to a Fortran I/O unit.
+  class(variable_type), intent(in) :: var
+  !! Variable to process.
+  integer, intent(in) :: unit
+  !! Fortran output unit supplied by the invoking formatted WRITE.
+  character(len=*), intent(in) :: iotype
+  !! Requested defined-I/O mode; LISTDIRECTED and DT are supported.
+  integer, intent(in) :: v_list(:)
+  !! Integer DT edit-descriptor parameters; currently ignored.
+  integer, intent(out) :: iostat
+  !! Receives zero on success or a nonzero I/O status on failure.
+  character(len=*), intent(inout) :: iomsg
+  !! Receives the diagnostic message if the underlying WRITE fails.
+  character(len=:), allocatable :: text
+
+  associate (ignored_v_list => v_list)
+  end associate
+  iostat = 1
+  if (iotype /= "LISTDIRECTED" .and. iotype /= "DT") return
+  text = render_var(var, "")
+  write (unit, "(a)", iostat=iostat, iomsg=iomsg) text
+end subroutine write_frmt_var
+
+module subroutine write_frmt_grp(grp, unit, iotype, v_list, iostat, iomsg)
+  !! Write a formatted group representation to a Fortran I/O unit.
+  class(group_type), intent(in) :: grp
+  !! Group or root dataset whose metadata is formatted.
+  integer, intent(in) :: unit
+  !! Fortran output unit supplied by the invoking formatted WRITE.
+  character(len=*), intent(in) :: iotype
+  !! Requested defined-I/O mode; LISTDIRECTED and DT are supported.
+  integer, intent(in) :: v_list(:)
+  !! Integer DT edit-descriptor parameters; currently ignored.
+  integer, intent(out) :: iostat
+  !! Receives zero on success or a nonzero I/O status on failure.
+  character(len=*), intent(inout) :: iomsg
+  !! Receives the diagnostic message if the underlying WRITE fails.
+  character(len=:), allocatable :: text
+
+  associate (ignored_v_list => v_list)
+  end associate
+  iostat = 1
+  if (iotype /= "LISTDIRECTED" .and. iotype /= "DT") return
+  text = render_grp(grp, 0)
+  write (unit, "(a)", iostat=iostat, iomsg=iomsg) text
+end subroutine write_frmt_grp
+
+module subroutine write_frmt_netcdf(grp, unit, iotype, v_list, iostat, iomsg)
+  !! Write a formatted dataset representation to a Fortran I/O unit.
+  class(netcdf_type), intent(in) :: grp
+  !! Group or root dataset whose metadata is formatted.
+  integer, intent(in) :: unit
+  !! Fortran output unit supplied by the invoking formatted WRITE.
+  character(len=*), intent(in) :: iotype
+  !! Requested defined-I/O mode; LISTDIRECTED and DT are supported.
+  integer, intent(in) :: v_list(:)
+  !! Integer DT edit-descriptor parameters; currently ignored.
+  integer, intent(out) :: iostat
+  !! Receives zero on success or a nonzero I/O status on failure.
+  character(len=*), intent(inout) :: iomsg
+  !! Receives the diagnostic message if the underlying WRITE fails.
+  character(len=:), allocatable :: text
+
+  associate (ignored_v_list => v_list)
+  end associate
+  iostat = 1
+  if (iotype /= "LISTDIRECTED" .and. iotype /= "DT") return
+  text = render_netcdf(grp)
+  write (unit, "(a)", iostat=iostat, iomsg=iomsg) text
+end subroutine write_frmt_netcdf
+
+module subroutine write_frmt_err(err, unit, iotype, v_list, iostat, iomsg)
+  !! Write a formatted error result representation to a Fortran I/O unit.
+  class(error_type), intent(in) :: err
+  !! Result to validate and format through error_msg.
+  integer, intent(in) :: unit
+  !! Fortran output unit supplied by the invoking formatted WRITE.
+  character(len=*), intent(in) :: iotype
+  !! Requested defined-I/O mode; LISTDIRECTED and DT are supported.
+  integer, intent(in) :: v_list(:)
+  !! Integer DT edit-descriptor parameters; currently ignored.
+  integer, intent(out) :: iostat
+  !! Receives zero on success or a nonzero I/O status on failure.
+  character(len=*), intent(inout) :: iomsg
+  !! Receives the diagnostic message if the underlying WRITE fails.
+
+  associate (ignored_v_list => v_list)
+  end associate
+  iostat = 1
+  if (iotype /= "LISTDIRECTED" .and. iotype /= "DT") return
+  write (unit, "(a)", iostat=iostat, iomsg=iomsg) error_msg(err)
+end subroutine write_frmt_err
+
+recursive function render_grp(grp, depth) result(text)
+  !! Render a group and its descendants as indented ncdump-like text.
+  class(group_type), intent(in) :: grp
+  !! Group or root dataset whose metadata is formatted.
+  integer, intent(in) :: depth
+  !! Nesting depth used to indent the rendered group.
+  character(len=:), allocatable :: text
+  !! Result produced by this operation.
+  character(len=:), allocatable :: indent, name
+
+  indent = repeat(" ", 4*depth)
+  name = "/"
+  if (allocated(grp%name)) name = grp%name
+  text = indent//"group: "//trim(name)//" {"//new_line("a")
+
+  text = text//render_grp_(grp, indent, depth)
+  text = text//indent//"}"
+end function render_grp
+
+function render_netcdf(nc) result(text)
+  !! Compute the ncdump-like representation of an open NetCDF dataset.
+  type(netcdf_type), intent(in) :: nc
+  !! Open NetCDF dataset handle.
+  character(len=:), allocatable :: text
+  !! Result produced by this operation.
+  character(len=:), allocatable :: name
+
+  name = "unnamed"
+  if (allocated(nc%file)) name = filename_stem(nc%file)
+  text = "netcdf "//name//" {"//new_line("a")
+  text = text//render_grp_(nc, "", 0)
+  text = text//"}"
+end function render_netcdf
+
+recursive function render_grp_(grp, indent, depth) result(text)
+  !! Compute the contents of a group in ncdump-like formatted output.
+  class(group_type), intent(in) :: grp
+  !! Group or root dataset whose metadata is formatted.
+  character(len=*), intent(in) :: indent
+  !! Indentation prefix for the rendered declarations.
+  integer, intent(in) :: depth
+  !! Nesting depth used to indent the rendered group.
+  character(len=:), allocatable :: text
+  !! Result produced by this operation.
+  character, allocatable :: buffer(:)
+  integer :: i, used
+  character, parameter :: nl = new_line("a")
+
+  used = 0
+
+  call append(buffer, used, render_dims(grp, indent))
+  call append(buffer, used, render_vars(grp, indent))
+  call append(buffer, used, render_atts(grp, indent))
+
+  if (associated(grp%grps)) then
+    if (size(grp%grps) > 0) then
+      call append(buffer, used, indent//"groups:"//nl)
+      do i = 1, size(grp%grps)
+        call append(buffer, used, render_grp(grp%grps(i), depth + 1)//nl)
+      end do
+    end if
+  end if
+
+  if (used == 0) then
+    text = ""
+  else
+    text = transfer(buffer(:used), repeat(" ", used))
+  end if
+end function render_grp_
+
+pure function render_dims(grp, indent) result(text)
+  !! Compute the dimensions section of a group in ncdump-like formatted output.
+  class(group_type), intent(in) :: grp
+  !! Group or root dataset whose metadata is formatted.
+  character(len=*), intent(in) :: indent
+  !! Indentation prefix for the rendered declarations.
+  character(len=:), allocatable :: text
+  !! Result produced by this operation.
+  character, allocatable :: buffer(:)
+  integer :: i, used
+  character(len=:), allocatable :: ind
+  character, parameter :: nl = new_line("a")
+
+  used = 0
+  ind = indent//repeat(" ", 4)
+  if (allocated(grp%dims)) then
+    if (size(grp%dims) > 0) then
+      call append(buffer, used, indent//"dimensions:"//nl)
+      do i = 1, size(grp%dims)
+        call append(buffer, used, render_dim(grp%dims(i), ind)//nl)
+      end do
+    end if
+  end if
+
+  if (used == 0) then
+    text = ""
+  else
+    text = transfer(buffer(:used), repeat(" ", used))
+  end if
+end function render_dims
+
+function render_vars(grp, indent) result(text)
+  !! Compute the variables section of a group in ncdump-like formatted output.
+  class(group_type), intent(in) :: grp
+  !! Group or root dataset whose metadata is formatted.
+  character(len=*), intent(in) :: indent
+  !! Indentation prefix for the rendered declarations.
+  character(len=:), allocatable :: text
+  !! Result produced by this operation.
+  character, allocatable :: buffer(:)
+  integer :: i, used
+  character(len=:), allocatable :: ind
+  character, parameter :: nl = new_line("a")
+
+  used = 0
+  ind = indent//repeat(" ", 4)
+  if (allocated(grp%vars)) then
+    if (size(grp%vars) > 0) then
+      call append(buffer, used, indent//"variables:"//nl)
+      do i = 1, size(grp%vars)
+        call append(buffer, used, render_var(grp%vars(i), ind)//nl)
+      end do
+    end if
+  end if
+
+  if (used == 0) then
+    text = ""
+  else
+    text = transfer(buffer(:used), repeat(" ", used))
+  end if
+end function render_vars
+
+function render_atts(grp, indent) result(text)
+  !! Compute the attributes section of a group in ncdump-like formatted output.
+  class(group_type), intent(in) :: grp
+  !! Group or root dataset whose metadata is formatted.
+  character(len=*), intent(in) :: indent
+  !! Indentation prefix for the rendered declarations.
+  character(len=:), allocatable :: text
+  !! Result produced by this operation.
+  character, allocatable :: buffer(:)
+  integer :: i, used
+  character(len=:), allocatable :: ind
+  character, parameter :: nl = new_line("a")
+
+  used = 0
+  ind = indent//repeat(" ", 4)
+  if (allocated(grp%atts)) then
+    if (size(grp%atts) > 0) then
+      call append(buffer, used, indent//"// global attributes:"//nl)
+      do i = 1, size(grp%atts)
+        call append(buffer, used, render_att(grp%atts(i), ind)//nl)
+      end do
+    end if
+  end if
+
+  if (used == 0) then
+    text = ""
+  else
+    text = transfer(buffer(:used), repeat(" ", used))
+  end if
+end function render_atts
+
+pure subroutine append(buffer, used, fragment)
+  !! Append a text fragment to a dynamically grown character buffer.
+  character, allocatable, intent(inout) :: buffer(:)
+  !! Storage for the text accumulated so far.
+  integer, intent(inout) :: used
+  !! Number of occupied characters in `buffer`.
+  character(len=*), intent(in) :: fragment
+  !! Text to append.
+  character, allocatable :: expanded(:)
+  integer :: capacity, i, needed
+
+  if (len(fragment) == 0) return
+  needed = used + len(fragment)
+  if (.not. allocated(buffer)) then
+    allocate (buffer(max(256, needed)))
+  else if (size(buffer) < needed) then
+    capacity = max(2*size(buffer), needed)
+    allocate (expanded(capacity))
+    if (used > 0) expanded(:used) = buffer(:used)
+    call move_alloc(expanded, buffer)
+  end if
+
+  do i = 1, len(fragment)
+    buffer(used + i) = fragment(i:i)
+  end do
+  used = needed
+end subroutine append
+
+pure function filename_stem(file) result(stem)
+  !! Return the final path component of a file without its final extension.
+  character(len=*), intent(in) :: file
+  !! Path of the NetCDF file to read or write.
+  character(len=:), allocatable :: stem
+  !! Result produced by this operation.
+  integer :: base, extension, filename_len
+
+  filename_len = len_trim(file)
+  if (filename_len == 0) then
+    stem = "unnamed"
+    return
+  end if
+  base = scan(file(:filename_len), "/", back=.true.) + 1
+  if (base > filename_len) then
+    stem = "unnamed"
+    return
+  end if
+
+  stem = file(base:filename_len)
+  extension = index(stem, ".", back=.true.)
+  if (extension > 1) stem = stem(:extension - 1)
+  if (len(stem) == 0) stem = "unnamed"
+end function filename_stem
+
+pure function render_dim(dim, indent) result(line)
+  !! Render a dimension length or unlimited marker as an indented declaration.
+  type(dimension_type), intent(in) :: dim
+  !! Dimension to process.
+  character(len=*), intent(in) :: indent
+  !! Indentation prefix for the rendered declarations.
+  character(len=:), allocatable :: line
+  !! Result produced by this operation.
+  character(len=64) :: len_text
+
+  write (len_text, "(i0)") dim%len
+  if (dim%is_unlim) then
+    associate (unlim => " = UNLIMITED ; // (")
+      line = indent//dim%name//unlim//trim(len_text)//" currently)"
+    end associate
+  else
+    line = indent//dim%name//" = "//trim(len_text)//" ;"
+  end if
+end function render_dim
+
+function render_att(att, indent) result(line)
+  !! Render an attribute name, type, and value as an indented declaration.
+  type(attribute_type), intent(in) :: att
+  !! Attribute to process.
+  character(len=*), intent(in) :: indent
+  !! Indentation prefix for the rendered declarations.
+  character(len=:), allocatable :: line
+  !! Result produced by this operation.
+  character(len=16) :: dtype
+
+  call type_name(att%dtype, dtype)
+  line = indent//trim(dtype)//":"//att%name//" = "//render_att_value(att)//" ;"
+end function render_att
+
+function render_att_value(att) result(rendered)
+  !! Render an attribute buffer as an ncdump-like literal.
+  type(attribute_type), target, intent(in) :: att
+  !! Attribute to process.
+  character(len=:), allocatable :: rendered
+  !! Rendered NetCDF text.
+  character, allocatable :: chars(:)
+  integer(int8), allocatable :: int8_values(:)
+  integer(int16), allocatable :: int16_values(:)
+  integer(int32), allocatable :: int32_values(:)
+  integer(int64), allocatable :: int64_values(:)
+  real(real32), allocatable :: real32_values(:)
+  real(real64), allocatable :: real64_values(:)
+  integer(int8), pointer, contiguous :: bytes(:)
+  call validate(att, context="[render_att_value]")
+  if (att%len == 0) then
+    if (att%dtype == CHAR_TYPE) then
+      rendered = '""'
+    else
+      rendered = "[]"
+    end if
+    return
+  end if
+  if (allocated(att%buffer)) then
+    bytes => att%buffer
+  else
+    bytes => att%ptr
+  end if
+
+  select case (att%dtype)
+  case (BYTE_TYPE, CHAR_TYPE, SHORT_TYPE, &
+    & INT_TYPE, INT64_TYPE, FLOAT_TYPE, DOUBLE_TYPE)
+  case default
+    rendered = "unsupported"
+    return
+  end select
+
+  select case (att%dtype)
+  case (BYTE_TYPE)
+    int8_values = transfer(bytes, 0_int8, int(att%len))
+    rendered = render_int8_values(int8_values)
+  case (CHAR_TYPE)
+    chars = transfer(bytes, " ", int(att%len))
+    rendered = render_char_values(chars)
+  case (SHORT_TYPE)
+    int16_values = transfer(bytes, 0_int16, int(att%len))
+    rendered = render_int16_values(int16_values)
+  case (INT_TYPE)
+    int32_values = transfer(bytes, 0_int32, int(att%len))
+    rendered = render_int32_values(int32_values)
+  case (INT64_TYPE)
+    int64_values = transfer(bytes, 0_int64, int(att%len))
+    rendered = render_int64_values(int64_values)
+  case (FLOAT_TYPE)
+    real32_values = transfer(bytes, 0.0_real32, int(att%len))
+    rendered = render_real32_values(real32_values)
+  case (DOUBLE_TYPE)
+    real64_values = transfer(bytes, 0.0_real64, int(att%len))
+    rendered = render_real64_values(real64_values)
+  case default
+    rendered = "unsupported"
+  end select
+end function render_att_value
+
+pure function render_char_values(values) result(text)
+  !! Render a character attribute as a quoted string.
+  character, intent(in) :: values(:)
+  !! Values used to populate the dataset object.
+  character(len=:), allocatable :: text
+  !! Result produced by this operation.
+  integer :: i, last, position, text_len
+
+  last = size(values)
+  do while (last > 0)
+    if (values(last) /= achar(0)) exit
+    last = last - 1
+  end do
+  text_len = 2
+  do i = 1, last
+    select case (values(i))
+    case ('"', "\", achar(0), new_line("a"))
+      text_len = text_len + 2
+    case default
+      text_len = text_len + 1
+    end select
+  end do
+
+  allocate (character(len=text_len) :: text)
+  !! Rendered NetCDF text.
+  text(1:1) = '"'
+  position = 2
+  do i = 1, last
+    select case (values(i))
+    case ('"')
+      text(position:position + 1) = '\"'
+      position = position + 2
+    case ("\")
+      text(position:position + 1) = "\\"
+      position = position + 2
+    case (achar(0))
+      text(position:position + 1) = "\0"
+      position = position + 2
+    case (new_line("a"))
+      text(position:position + 1) = "\n"
+      position = position + 2
+    case default
+      text(position:position) = values(i)
+      position = position + 1
+    end select
+  end do
+  text(position:position) = '"'
+end function render_char_values
+
+pure function render_int8_values(values) result(text)
+  !! Render integer(kind=int8) attribute values.
+  integer(int8), intent(in) :: values(:)
+  !! Values used to populate the dataset object.
+  character(len=:), allocatable :: text
+  !! Rendered NetCDF text.
+  character(len=64) :: item
+  integer :: i
+
+  text = ""
+  do i = 1, size(values)
+    if (i > 1) text = text//", "
+    write (item, "(i0)") values(i)
+    text = text//trim(item)
+  end do
+end function render_int8_values
+
+pure function render_int16_values(values) result(text)
+  !! Render integer(kind=int16) attribute values.
+  integer(int16), intent(in) :: values(:)
+  !! Values used to populate the dataset object.
+  character(len=:), allocatable :: text
+  !! Rendered NetCDF text.
+  character(len=64) :: item
+  integer :: i
+
+  text = ""
+  do i = 1, size(values)
+    if (i > 1) text = text//", "
+    write (item, "(i0)") values(i)
+    text = text//trim(item)
+  end do
+end function render_int16_values
+
+pure function render_int32_values(values) result(text)
+  !! Render integer(kind=int32) attribute values.
+  integer(int32), intent(in) :: values(:)
+  !! Values used to populate the dataset object.
+  character(len=:), allocatable :: text
+  !! Rendered NetCDF text.
+  character(len=64) :: item
+  integer :: i
+
+  text = ""
+  do i = 1, size(values)
+    if (i > 1) text = text//", "
+    write (item, "(i0)") values(i)
+    text = text//trim(item)
+  end do
+end function render_int32_values
+
+pure function render_int64_values(values) result(text)
+  !! Render integer(kind=int64) attribute values.
+  integer(int64), intent(in) :: values(:)
+  !! Values used to populate the dataset object.
+  character(len=:), allocatable :: text
+  !! Rendered NetCDF text.
+  character(len=64) :: item
+  integer :: i
+
+  text = ""
+  do i = 1, size(values)
+    if (i > 1) text = text//", "
+    write (item, "(i0)") values(i)
+    text = text//trim(item)
+  end do
+end function render_int64_values
+
+pure function render_real32_values(values) result(text)
+  !! Render real(kind=real32) attribute values.
+  real(real32), intent(in) :: values(:)
+  !! Values used to populate the dataset object.
+  character(len=:), allocatable :: text
+  !! Rendered NetCDF text.
+  character(len=64) :: item
+  integer :: i
+
+  text = ""
+  do i = 1, size(values)
+    if (i > 1) text = text//", "
+    write (item, "(g0.15)") values(i)
+    text = text//trim_trailing_zeros(item)
+  end do
+end function render_real32_values
+
+pure function render_real64_values(values) result(text)
+  !! Render real(kind=real64) attribute values.
+  real(real64), intent(in) :: values(:)
+  !! Values used to populate the dataset object.
+  character(len=:), allocatable :: text
+  !! Rendered NetCDF text.
+  character(len=64) :: item
+  integer :: i
+
+  text = ""
+  do i = 1, size(values)
+    if (i > 1) text = text//", "
+    write (item, "(g0.15)") values(i)
+    text = text//trim_trailing_zeros(item)
+  end do
+end function render_real64_values
+
+pure function trim_trailing_zeros(text) result(trimmed)
+  !! Remove redundant fractional zeroes from a formatted real literal.
+  !!
+  !! An integral finite value retains one digit after its decimal point. Any
+  !! exponent suffix is retained without modification.
+  character(len=*), intent(in) :: text
+  !! Text to render or normalize.
+  character(len=:), allocatable :: trimmed
+  !! Result produced by this operation.
+  character(len=:), allocatable :: exponent, mantissa
+  integer :: decimal_at, exponent_at, last
+
+  trimmed = trim(text)
+  exponent_at = scan(trimmed, "EeDd")
+  if (exponent_at > 0) then
+    mantissa = trimmed(:exponent_at - 1)
+    exponent = trimmed(exponent_at:)
+  else
+    mantissa = trimmed
+    exponent = ""
+  end if
+
+  decimal_at = index(mantissa, ".")
+  if (decimal_at == 0) then
+    if (len(mantissa) > 0 .and. verify(mantissa, "+-0123456789") == 0) then
+      mantissa = mantissa//".0"
+    end if
+    trimmed = mantissa//exponent
+    return
+  end if
+
+  last = len(mantissa)
+  do while (last > decimal_at .and. mantissa(last:last) == "0")
+    last = last - 1
+  end do
+  if (last == decimal_at) then
+    mantissa = mantissa(:decimal_at)//"0"
+  else
+    mantissa = mantissa(:last)
+  end if
+  trimmed = mantissa//exponent
+end function trim_trailing_zeros
+
+function render_var(var, indent) result(line)
+  !! Render a variable declaration and its attributes as indented text.
+  type(variable_type), intent(in) :: var
+  !! Variable to process.
+  character(len=*), intent(in) :: indent
+  !! Indentation prefix for the rendered declarations.
+  character(len=:), allocatable :: line
+  !! Result produced by this operation.
+  character(len=16) :: dtype
+  character(len=:), allocatable :: dims
+  integer :: i
+
+  call type_name(var%dtype, dtype)
+  dims = ""
+  if (allocated(var%dims)) then
+    if (size(var%dims) > 0) then
+      dims = "("
+      do i = 1, size(var%dims)
+        if (i > 1) dims = dims//", "
+        dims = dims//trim(var%dims(i)%name)
+      end do
+      dims = dims//")"
+    end if
+  end if
+  line = indent//trim(dtype)//" "//var%name//dims//" ;"
+  if (allocated(var%atts)) then
+    do i = 1, size(var%atts)
+      line = line//new_line("a")//render_att(var%atts(i), indent//"    ")
+    end do
+  end if
+end function render_var
+
+pure subroutine type_name(dtype, name)
+  !! Map a supported NetCDF type code to its printable CDL type name.
+  integer(data_type), intent(in) :: dtype
+  !! Dataset data type code to validate or translate.
+  character(len=*), intent(out) :: name
+  !! Name used to identify the NetCDF object.
+
+  select case (dtype)
+  case (BYTE_TYPE)
+    name = "byte"
+  case (CHAR_TYPE)
+    name = "char"
+  case (SHORT_TYPE)
+    name = "short"
+  case (INT_TYPE)
+    name = "int"
+  case (INT64_TYPE)
+    name = "int64"
+  case (FLOAT_TYPE)
+    name = "float"
+  case (DOUBLE_TYPE)
+    name = "double"
+  case default
+    name = "unknown"
+  end select
+end subroutine type_name
+
+end submodule nc4f_data_io

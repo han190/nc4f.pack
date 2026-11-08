@@ -11,27 +11,27 @@ use, non_intrinsic :: nc4f_test_c_interface, only: &
   & collect_c_interface_dataset, &
   & collect_c_interface_io, &
   & collect_c_interface_variable
-use, non_intrinsic :: nc4f_test_ds, only: &
-  & collect_ds_dimension, &
-  & collect_ds_utility, &
-  & collect_ds_attribute_constructor, &
-  & collect_ds_attribute, &
-  & collect_ds_variable_constructor, &
-  & collect_ds_extract, &
-  & collect_ds_variable, &
-  & collect_ds_group, &
-  & collect_ds_arithmetic, &
-  & collect_ds_clone, &
-  & collect_ds_io, &
-  & collect_ds_validate
-use, non_intrinsic :: nc4f_test_nc, only: &
-  & collect_nc_utility, &
-  & collect_nc_dataset, &
-  & collect_nc_variable, &
-  & collect_nc_dimension, &
-  & collect_nc_attribute, &
-  & collect_nc_group, &
-  & collect_nc_error, &
+use, non_intrinsic :: nc4f_test_data, only: &
+  & collect_data_dimension, &
+  & collect_data_utility, &
+  & collect_data_attribute_constructor, &
+  & collect_data_attribute, &
+  & collect_data_variable_constructor, &
+  & collect_data_extract, &
+  & collect_data_variable, &
+  & collect_data_group, &
+  & collect_data_arithmetic, &
+  & collect_data_clone, &
+  & collect_data_io, &
+  & collect_data_validate
+use, non_intrinsic :: nc4f_test_netcdf, only: &
+  & collect_netcdf_utility, &
+  & collect_netcdf_dataset, &
+  & collect_netcdf_variable, &
+  & collect_netcdf_dimension, &
+  & collect_netcdf_attribute, &
+  & collect_netcdf_group, &
+  & collect_netcdf_error, &
   & collect_real_data
 implicit none (type, external)
 
@@ -50,26 +50,30 @@ suites = [ &
   & new_testsuite("c_interface_io", collect_c_interface_io), &
   & new_testsuite("c_interface_utility", collect_c_interface_utility), &
   & new_testsuite("c_interface_variable", collect_c_interface_variable), &
-  & new_testsuite("ds_dimension", collect_ds_dimension), &
-  & new_testsuite("ds_utility", collect_ds_utility), &
-  & new_testsuite("ds_attribute_constructor", &
-  &   collect_ds_attribute_constructor), &
-  & new_testsuite("ds_attribute", collect_ds_attribute), &
-  & new_testsuite("ds_variable_constructor", collect_ds_variable_constructor), &
-  & new_testsuite("ds_extract", collect_ds_extract), &
-  & new_testsuite("ds_variable", collect_ds_variable), &
-  & new_testsuite("ds_group", collect_ds_group), &
-  & new_testsuite("ds_arithmetic", collect_ds_arithmetic), &
-  & new_testsuite("ds_clone", collect_ds_clone), &
-  & new_testsuite("ds_io", collect_ds_io), &
-  & new_testsuite("ds_validate", collect_ds_validate), &
-  & new_testsuite("nc_utility", collect_nc_utility), &
-  & new_testsuite("nc_dataset", collect_nc_dataset), &
-  & new_testsuite("nc_variable", collect_nc_variable), &
-  & new_testsuite("nc_dimension", collect_nc_dimension), &
-  & new_testsuite("nc_attribute", collect_nc_attribute), &
-  & new_testsuite("nc_group", collect_nc_group), &
-  & new_testsuite("nc_error", collect_nc_error), &
+  & new_testsuite("data_dimension", &
+  &   collect_data_dimension), &
+  & new_testsuite("data_utility", collect_data_utility), &
+  & new_testsuite("data_attribute_constructor", &
+  &   collect_data_attribute_constructor), &
+  & new_testsuite("data_attribute", &
+  &   collect_data_attribute), &
+  & new_testsuite("data_variable_constructor", &
+  &   collect_data_variable_constructor), &
+  & new_testsuite("data_extract", collect_data_extract), &
+  & new_testsuite("data_variable", collect_data_variable), &
+  & new_testsuite("data_group", collect_data_group), &
+  & new_testsuite("data_arithmetic", &
+  &   collect_data_arithmetic), &
+  & new_testsuite("data_clone", collect_data_clone), &
+  & new_testsuite("data_io", collect_data_io), &
+  & new_testsuite("data_validate", collect_data_validate), &
+  & new_testsuite("netcdf_utility", collect_netcdf_utility), &
+  & new_testsuite("netcdf_dataset", collect_netcdf_dataset), &
+  & new_testsuite("netcdf_variable", collect_netcdf_variable), &
+  & new_testsuite("netcdf_dimension", collect_netcdf_dimension), &
+  & new_testsuite("netcdf_attribute", collect_netcdf_attribute), &
+  & new_testsuite("netcdf_group", collect_netcdf_group), &
+  & new_testsuite("netcdf_error", collect_netcdf_error), &
   & new_testsuite("real_data", collect_real_data)]
 
 stat = 0

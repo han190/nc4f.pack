@@ -52,11 +52,11 @@ target_link_libraries(nc4f_c_interface PUBLIC PkgConfig::NC4F_NETCDF)
 nc4f_compile_options(nc4f_c_interface)
 
 set(nc4f_generated_names
-  nc4f_ds_attribute_constructor
-  nc4f_ds_variable_constructor
-  nc4f_ds_extract)
+  nc4f_data_attribute_constructor
+  nc4f_data_variable_constructor
+  nc4f_data_extract)
 set(nc4f_data_dir "${CMAKE_CURRENT_SOURCE_DIR}/src")
-set(nc4f_data_module "${nc4f_data_dir}/nc4f_ds.f90")
+set(nc4f_data_module "${nc4f_data_dir}/nc4f_data.f90")
 set(nc4f_generated_sources)
 
 if(NC4F_REGENERATE_SOURCES)
@@ -65,8 +65,8 @@ if(NC4F_REGENERATE_SOURCES)
   file(MAKE_DIRECTORY "${nc4f_generated_dir}")
   # Fortran INCLUDE searches beside the source first. Copy the parent module
   # so it includes the generated interfaces instead of the tracked copies.
-  set(nc4f_data_module "${nc4f_generated_dir}/nc4f_ds.f90")
-  configure_file("${nc4f_data_dir}/nc4f_ds.f90" "${nc4f_data_module}" COPYONLY)
+  set(nc4f_data_module "${nc4f_generated_dir}/nc4f_data.f90")
+  configure_file("${nc4f_data_dir}/nc4f_data.f90" "${nc4f_data_module}" COPYONLY)
   foreach(name IN LISTS nc4f_generated_names)
     foreach(extension IN ITEMS f90 inc)
       if(extension STREQUAL "inc")
@@ -97,23 +97,23 @@ add_library(nc4f STATIC
   src/nc4f.f90
   "${nc4f_data_module}"
   ${nc4f_generated_sources}
-  src/nc4f_ds_arithmetic.f90
-  src/nc4f_ds_attribute.f90
-  src/nc4f_ds_clone.f90
-  src/nc4f_ds_dimension.f90
-  src/nc4f_ds_group.f90
-  src/nc4f_ds_io.f90
-  src/nc4f_ds_utility.f90
-  src/nc4f_ds_validate.f90
-  src/nc4f_ds_variable.f90
-  src/nc4f_nc.f90
-  src/nc4f_nc_attribute.f90
-  src/nc4f_nc_dataset.f90
-  src/nc4f_nc_dimension.f90
-  src/nc4f_nc_error.f90
-  src/nc4f_nc_group.f90
-  src/nc4f_nc_utility.f90
-  src/nc4f_nc_variable.f90)
+  src/nc4f_data_arithmetic.f90
+  src/nc4f_data_attribute.f90
+  src/nc4f_data_clone.f90
+  src/nc4f_data_dimension.f90
+  src/nc4f_data_group.f90
+  src/nc4f_data_io.f90
+  src/nc4f_data_utility.f90
+  src/nc4f_data_validate.f90
+  src/nc4f_data_variable.f90
+  src/nc4f_netcdf.f90
+  src/nc4f_netcdf_attribute.f90
+  src/nc4f_netcdf_dataset.f90
+  src/nc4f_netcdf_dimension.f90
+  src/nc4f_netcdf_error.f90
+  src/nc4f_netcdf_group.f90
+  src/nc4f_netcdf_utility.f90
+  src/nc4f_netcdf_variable.f90)
 add_library(nc4f::nc4f ALIAS nc4f)
 set_target_properties(nc4f PROPERTIES
   Fortran_MODULE_DIRECTORY "${nc4f_module_dir}"
@@ -158,27 +158,27 @@ if(NC4F_BUILD_TESTS)
     test/nc4f_test_c_interface_variable.f90
     test/nc4f_test_c_interface_utility.f90
     test/nc4f_test_utility.f90
-    test/nc4f_test_ds.f90
-    test/nc4f_test_ds_arithmetic.f90
-    test/nc4f_test_ds_attribute.f90
-    test/nc4f_test_ds_attribute_constructor.f90
-    test/nc4f_test_ds_clone.f90
-    test/nc4f_test_ds_dimension.f90
-    test/nc4f_test_ds_extract.f90
-    test/nc4f_test_ds_group.f90
-    test/nc4f_test_ds_io.f90
-    test/nc4f_test_ds_utility.f90
-    test/nc4f_test_ds_validate.f90
-    test/nc4f_test_ds_variable.f90
-    test/nc4f_test_ds_variable_constructor.f90
-    test/nc4f_test_nc.f90
-    test/nc4f_test_nc_attribute.f90
-    test/nc4f_test_nc_dataset.f90
-    test/nc4f_test_nc_dimension.f90
-    test/nc4f_test_nc_error.f90
-    test/nc4f_test_nc_group.f90
-    test/nc4f_test_nc_utility.f90
-    test/nc4f_test_nc_variable.f90
+    test/nc4f_test_data.f90
+    test/nc4f_test_data_arithmetic.f90
+    test/nc4f_test_data_attribute.f90
+    test/nc4f_test_data_attribute_constructor.f90
+    test/nc4f_test_data_clone.f90
+    test/nc4f_test_data_dimension.f90
+    test/nc4f_test_data_extract.f90
+    test/nc4f_test_data_group.f90
+    test/nc4f_test_data_io.f90
+    test/nc4f_test_data_utility.f90
+    test/nc4f_test_data_validate.f90
+    test/nc4f_test_data_variable.f90
+    test/nc4f_test_data_variable_constructor.f90
+    test/nc4f_test_netcdf.f90
+    test/nc4f_test_netcdf_attribute.f90
+    test/nc4f_test_netcdf_dataset.f90
+    test/nc4f_test_netcdf_dimension.f90
+    test/nc4f_test_netcdf_error.f90
+    test/nc4f_test_netcdf_group.f90
+    test/nc4f_test_netcdf_utility.f90
+    test/nc4f_test_netcdf_variable.f90
     test/nc4f_test_real_data.f90)
   set(nc4f_test_module_dir
     "${CMAKE_CURRENT_BINARY_DIR}/modules/tests")
@@ -193,10 +193,10 @@ if(NC4F_BUILD_TESTS)
   foreach(suite IN ITEMS c_interface_attribute c_interface_dataset
       c_interface_dimension c_interface_error c_interface_group
       c_interface_io c_interface_utility c_interface_variable
-      ds_arithmetic ds_attribute ds_attribute_constructor ds_clone
-      ds_dimension ds_extract ds_group ds_io ds_utility ds_validate
-      ds_variable ds_variable_constructor nc_attribute nc_dataset
-      nc_dimension nc_error nc_group nc_utility nc_variable real_data)
+      data_arithmetic data_attribute data_attribute_constructor data_clone
+      data_dimension data_extract data_group data_io data_utility data_validate
+      data_variable data_variable_constructor netcdf_attribute netcdf_dataset
+      netcdf_dimension netcdf_error netcdf_group netcdf_utility netcdf_variable real_data)
     add_test(NAME "nc4f.${suite}" COMMAND nc4f_tests "${suite}")
   endforeach()
   set_tests_properties(nc4f.real_data PROPERTIES

@@ -23,7 +23,10 @@ source-dir = "src"
 [features]
 netcdf-paths.macos.flags = "-I/opt/homebrew/opt/netcdf/include"
 netcdf-paths.macos.link-time-flags = "-L/opt/homebrew/opt/netcdf/lib"
-flags-debug.gfortran.flags = "-g -Wall -Wextra -Wimplicit-interface -fPIC -fmax-errors=1 -fcheck=bounds -fcheck=array-temps -fbacktrace -fcoarray=single"
+flags-debug.gfortran.flags = """
+  -g -Wall -Wextra -Wimplicit-interface -fPIC -fmax-errors=1 -fcheck=bounds \
+  -fcheck=array-temps -fbacktrace -fcoarray=single
+"""
 flags-debug.flang.flags = "-O0 -g -fno-omit-frame-pointer -pedantic -fimplicit-none"
 flags-release.gfortran.flags = "-O3"
 flags-release.flang.flags = "-O3"
@@ -65,9 +68,9 @@ test-drive = { git = "https://github.com/fortran-lang/test-drive", tag = "v0.6.1
 ignore = ['C002', 'C071', 'C072', 'C121', 'C181']
 line-length = 80
 extend-exclude = [
-  "src/nc4f_ds_attribute_constructor.f90",
-  "src/nc4f_ds_variable_constructor.f90",
-  "src/nc4f_ds_extract.f90",
+  "src/nc4f_data_attribute_constructor.f90",
+  "src/nc4f_data_variable_constructor.f90",
+  "src/nc4f_data_extract.f90",
 ]
 
 [extra.release]
@@ -84,8 +87,7 @@ indent-fypp = false
 continuation = "indent"
 
 [extra.fformat.spaces]
-assignment = "add"    # x = 1
+assignment = "add"
 
 [extra.fformat.files]
 extensions = ["f90", "inc", "fypp"]
-# keyword-args = "add"  # call foo(x = 1)
