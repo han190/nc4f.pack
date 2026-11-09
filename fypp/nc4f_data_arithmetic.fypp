@@ -1,0 +1,150 @@
+#: include 'common.fypp'
+submodule(nc4f_data) nc4f_data_arithmetic
+!! Build deferred arithmetic expressions from variables and expressions.
+implicit none (type, external)
+contains
+
+#: for NAME in op_names
+  #: for LEFT in ['var', 'expr']
+    #: for RIGHT in ['var', 'expr']
+module function ${NAME}$_${LEFT}$_${RIGHT}$(a, b) result(expr)
+    #: if LEFT == 'var'
+  type(variable_type), target, intent(in) :: a
+    #: else
+  type(expression_type), intent(in) :: a
+    #: endif
+    #: if RIGHT == 'var'
+  type(variable_type), target, intent(in) :: b
+    #: else
+  type(expression_type), intent(in) :: b
+    #: endif
+  type(expression_type) :: expr
+
+  expr%operation = OP_${NAME.upper()}$
+  allocate (expr%left, expr%right)
+    #: if LEFT == 'var'
+  expr%left%operation = OP_LEAF
+  expr%left%leaf => a
+    #: else
+  call copy_expr(a, expr%left)
+    #: endif
+    #: if RIGHT == 'var'
+  expr%right%operation = OP_LEAF
+  expr%right%leaf => b
+    #: else
+  call copy_expr(b, expr%right)
+    #: endif
+end function ${NAME}$_${LEFT}$_${RIGHT}$${NEWLINE()}$
+    #: endfor
+  #: endfor
+#: endfor
+#: for KIND, TYPE in zip(kinds, types)
+  #: for LEFT in ['var', 'expr']
+module function pow_${LEFT}$_${KIND}$(a, exponent) result(expr)
+    #: if LEFT == 'var'
+  type(variable_type), target, intent(in) :: a
+    #: else
+  type(expression_type), intent(in) :: a
+    #: endif
+  ${TYPE}$(${KIND}$), intent(in) :: exponent
+  type(expression_type) :: expr
+
+  expr%operation = OP_${KIND.upper()}$_POW
+    #: if TYPE == 'integer'
+  expr%exp_int = int(exponent, int64)
+    #: else
+  expr%exp_real = real(exponent, real64)
+    #: endif
+  allocate (expr%left)
+    #: if LEFT == 'var'
+  expr%left%operation = OP_LEAF
+  expr%left%leaf => a
+    #: else
+  call copy_expr(a, expr%left)
+    #: endif
+end function pow_${LEFT}$_${KIND}$${NEWLINE()}$
+  #: endfor
+#: endfor
+#: for NAME in op_names
+  #: if NAME != 'pow'
+  #: for KIND, TYPE in zip(kinds, types)
+    #: for RIGHT in ['var', 'expr']
+module function ${NAME}$_${KIND}$_${RIGHT}$(a, b) result(expr)
+  ${TYPE}$(${KIND}$), intent(in) :: a
+      #: if RIGHT == 'var'
+  type(variable_type), target, intent(in) :: b
+      #: else
+  type(expression_type), intent(in) :: b
+      #: endif
+  type(expression_type) :: expr
+
+  expr%operation = OP_${NAME.upper()}$
+  allocate (expr%left, expr%right)
+  expr%left%operation = OP_SCALAR_${KIND.upper()}$
+      #: if TYPE == 'integer'
+  expr%left%exp_int = int(a, int64)
+      #: else
+  expr%left%exp_real = real(a, real64)
+      #: endif
+      #: if RIGHT == 'var'
+  expr%right%operation = OP_LEAF
+  expr%right%leaf => b
+      #: else
+  call copy_expr(b, expr%right)
+      #: endif
+end function ${NAME}$_${KIND}$_${RIGHT}$${NEWLINE()}$
+    #: endfor
+  #: endfor
+  #: endif
+#: endfor
+#: for NAME in op_names
+  #: if NAME != 'pow'
+    #: for KIND, TYPE in zip(kinds, types)
+      #: for LEFT in ['var', 'expr']
+module function ${NAME}$_${LEFT}$_${KIND}$(a, b) result(expr)
+        #: if LEFT == 'var'
+  type(variable_type), target, intent(in) :: a
+        #: else
+  type(expression_type), intent(in) :: a
+        #: endif
+  ${TYPE}$(${KIND}$), intent(in) :: b
+  type(expression_type) :: expr
+
+  expr%operation = OP_${NAME.upper()}$
+  allocate (expr%left, expr%right)
+        #: if LEFT == 'var'
+  expr%left%operation = OP_LEAF
+  expr%left%leaf => a
+        #: else
+  call copy_expr(a, expr%left)
+        #: endif
+  expr%right%operation = OP_SCALAR_${KIND.upper()}$
+        #: if TYPE == 'integer'
+  expr%right%exp_int = int(b, int64)
+        #: else
+  expr%right%exp_real = real(b, real64)
+        #: endif
+end function ${NAME}$_${LEFT}$_${KIND}$${NEWLINE()}$
+      #: endfor
+    #: endfor
+  #: endif
+#: endfor
+recursive subroutine copy_expr(source, dest)
+  type(expression_type), intent(in) :: source
+  type(expression_type), intent(out) :: dest
+
+  dest%operation = source%operation
+  dest%exp_int = source%exp_int
+  dest%exp_real = source%exp_real
+  dest%leaf => source%leaf
+  if (allocated(source%left)) then
+    allocate (dest%left)
+    call copy_expr(source%left, dest%left)
+  end if
+  if (allocated(source%right)) then
+    allocate (dest%right)
+    call copy_expr(source%right, dest%right)
+  end if
+end subroutine copy_expr
+
+end submodule nc4f_data_arithmetic

@@ -259,3 +259,43 @@ specific errors or checking raw C status integers.
     if (reference == candidate) print *, "Values match."
     ```
 :::
+
+## Arithmetic Operators -- Build a Deferred Expression
+
+`+`, `-`, `*`, and `/` accept `variable_type` and `expression_type` operands,
+or a numeric scalar on either side of either derived type. `**` accepts two
+derived operands or a derived base with a numeric scalar exponent. Supported
+scalar kinds are `int8`, `int16`, `int32`, `int64`, `real32`, and `real64`.
+These operators produce a deferred expression. Assignment evaluates the tree.
+Alternatively, `call evaluate(expr, result, err)` reports validation errors
+without changing `result`. Binary variable and expression operands require
+matching numeric types and exactly matching ordered dimensions. A numeric
+scalar must have the same kind as its derived operand and applies to every
+element without adding a dimension. Division by
+zero and negative integer powers of integer data report errors. A zero base
+with a negative exponent also reports an error. A negative real base requires
+an integer scalar exponent. A real scalar exponent promotes the expression
+result to the wider of the base and exponent real kinds. Coordinates, units,
+and broadcasting between variables are not yet part of these operations.
+
+Expression leaves borrow their source variables. Declare operands with
+`TARGET`, and keep each variable and any target behind its borrowed `ptr`
+alive until evaluation completes. Value changes before evaluation are read at
+evaluation time. Do not deallocate, replace, or rebind operand storage while
+an expression refers to it. A missing buffer or pointer is reported as an
+error. A pointer to expired storage cannot be detected reliably.
+
+```fortran
+type(variable_type), target :: a, b, c
+type(variable_type) :: result
+type(expression_type) :: expr
+type(error_type) :: err
+
+expr = (a + b) * c**(-1)
+call evaluate(expr, result, err)
+if (err%code /= NC_NOERR) print *, error_msg(err)
+```
+
+Direct assignment (`result = expr`) terminates on validation failure because
+Fortran defined assignment has no error-result argument. Evaluation allocates
+the result buffer once and does not create full-sized intermediates.

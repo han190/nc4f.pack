@@ -52,6 +52,7 @@ target_link_libraries(nc4f_c_interface PUBLIC PkgConfig::NC4F_NETCDF)
 nc4f_compile_options(nc4f_c_interface)
 
 set(nc4f_generated_names
+  nc4f_data_arithmetic
   nc4f_data_attribute_constructor
   nc4f_data_variable_constructor
   nc4f_data_extract)
@@ -97,10 +98,11 @@ add_library(nc4f STATIC
   src/nc4f.f90
   "${nc4f_data_module}"
   ${nc4f_generated_sources}
-  src/nc4f_data_arithmetic.f90
+  src/nc4f_data_sum.f90
   src/nc4f_data_attribute.f90
   src/nc4f_data_clone.f90
   src/nc4f_data_dimension.f90
+  src/nc4f_data_expression.f90
   src/nc4f_data_group.f90
   src/nc4f_data_io.f90
   src/nc4f_data_utility.f90
@@ -165,6 +167,7 @@ if(NC4F_BUILD_TESTS)
     test/nc4f_test_data_clone.f90
     test/nc4f_test_data_dimension.f90
     test/nc4f_test_data_extract.f90
+    test/nc4f_test_data_expression.f90
     test/nc4f_test_data_group.f90
     test/nc4f_test_data_io.f90
     test/nc4f_test_data_utility.f90
@@ -194,7 +197,8 @@ if(NC4F_BUILD_TESTS)
       c_interface_dimension c_interface_error c_interface_group
       c_interface_io c_interface_utility c_interface_variable
       data_arithmetic data_attribute data_attribute_constructor data_clone
-      data_dimension data_extract data_group data_io data_utility data_validate
+      data_dimension data_extract data_expression data_group data_io
+      data_utility data_validate
       data_variable data_variable_constructor netcdf_attribute netcdf_dataset
       netcdf_dimension netcdf_error netcdf_group netcdf_utility netcdf_variable real_data)
     add_test(NAME "nc4f.${suite}" COMMAND nc4f_tests "${suite}")
@@ -209,7 +213,8 @@ if(NC4F_BUILD_EXAMPLES)
   set(nc4f_example_dir "${CMAKE_CURRENT_BINARY_DIR}/examples")
   file(MAKE_DIRECTORY "${nc4f_example_dir}")
   # read_netcdf consumes example.nc written by write_netcdf.
-  foreach(name IN ITEMS write_netcdf read_netcdf mandelbrot temperature)
+  foreach(name IN ITEMS write_netcdf read_netcdf mandelbrot temperature
+      potential_temperature)
     set(target "nc4f_example_${name}")
     add_executable(${target} "example/${name}.f90")
     target_link_libraries(${target} PRIVATE nc4f::nc4f)

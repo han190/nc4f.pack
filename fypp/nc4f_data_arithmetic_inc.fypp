@@ -1,0 +1,88 @@
+#: include 'common.fypp'
+#: for NAME, SYMBOL in zip(op_names, ops)
+interface operator(${SYMBOL}$)
+  module procedure :: ${NAME}$_var_var, ${NAME}$_expr_var, &
+    & ${NAME}$_var_expr, ${NAME}$_expr_expr
+  #: if NAME == 'pow'
+  #: for KIND in kinds
+  module procedure :: pow_var_${KIND}$, pow_expr_${KIND}$
+  #: endfor
+  #: endif
+  #: for KIND in kinds
+    #: if NAME != 'pow'
+  module procedure :: ${NAME}$_${KIND}$_var, ${NAME}$_${KIND}$_expr
+  module procedure :: ${NAME}$_var_${KIND}$, ${NAME}$_expr_${KIND}$
+    #: endif
+  #: endfor
+end interface operator(${SYMBOL}$)
+
+#: endfor
+interface
+#: for NAME in op_names
+  #: for LEFT in ['var', 'expr']
+    #: for RIGHT in ['var', 'expr']
+  module function ${NAME}$_${LEFT}$_${RIGHT}$(a, b) result(expr)
+    #: if LEFT == 'var'
+    type(variable_type), target, intent(in) :: a
+    #: else
+    type(expression_type), intent(in) :: a
+    #: endif
+    #: if RIGHT == 'var'
+    type(variable_type), target, intent(in) :: b
+    #: else
+    type(expression_type), intent(in) :: b
+    #: endif
+    type(expression_type) :: expr
+  end function ${NAME}$_${LEFT}$_${RIGHT}$${NEWLINE()}$
+    #: endfor
+  #: endfor
+#: endfor
+#: for KIND, TYPE in zip(kinds, types)
+  #: for LEFT in ['var', 'expr']
+  module function pow_${LEFT}$_${KIND}$(a, exponent) result(expr)
+    #: if LEFT == 'var'
+    type(variable_type), target, intent(in) :: a
+    #: else
+    type(expression_type), intent(in) :: a
+    #: endif
+    ${TYPE}$(${KIND}$), intent(in) :: exponent
+    type(expression_type) :: expr
+  end function pow_${LEFT}$_${KIND}$${NEWLINE()}$
+  #: endfor
+#: endfor
+#: for NAME in op_names
+  #: if NAME != 'pow'
+  #: for KIND, TYPE in zip(kinds, types)
+    #: for RIGHT in ['var', 'expr']
+  module function ${NAME}$_${KIND}$_${RIGHT}$(a, b) result(expr)
+    ${TYPE}$(${KIND}$), intent(in) :: a
+      #: if RIGHT == 'var'
+    type(variable_type), target, intent(in) :: b
+      #: else
+    type(expression_type), intent(in) :: b
+      #: endif
+    type(expression_type) :: expr
+  end function ${NAME}$_${KIND}$_${RIGHT}$${NEWLINE()}$
+    #: endfor
+  #: endfor
+  #: endif
+#: endfor
+#: for NAME in op_names
+  #: if NAME != 'pow'
+    #: for KIND, TYPE in zip(kinds, types)
+      #: for LEFT in ['var', 'expr']
+  module function ${NAME}$_${LEFT}$_${KIND}$(a, b) result(expr)
+        #: if LEFT == 'var'
+    type(variable_type), target, intent(in) :: a
+        #: else
+    type(expression_type), intent(in) :: a
+        #: endif
+    ${TYPE}$(${KIND}$), intent(in) :: b
+    type(expression_type) :: expr
+        #: set LAST = NAME == 'div' and KIND == 'real64' and LEFT == 'expr'
+  end function ${NAME}$_${LEFT}$_${KIND}$${NEWLINE(not LAST)}$
+      #: endfor
+    #: endfor
+  #: endif
+#: endfor
+end interface

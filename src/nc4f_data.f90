@@ -7,16 +7,43 @@ use, intrinsic :: iso_c_binding, only: &
 implicit none (type, external)
 
 public :: attribute_type, dimension_type, error_type, delete_attribute, &
-  & group_type, netcdf_type, variable_type, initialize, nameof, typeof, &
+  & group_type, netcdf_type, variable_type, expression_type, evaluate, &
+  & initialize, nameof, typeof, &
   & storage_type, set_storage, datarray, dataset, extract, &
   & rename_attribute, rename_variable, rename_group, rename_dimension, &
   & operator(.att.), operator(.and.), operator(.dim.), operator(.exists.), &
-  & operator(==), operator(/=), shape, size, sum, buffer_size, buffer2cptr, &
+  & operator(==), operator(/=), operator(+), operator(-), &
+  & operator(*), operator(/), operator(**), assignment(=), &
+  & shape, size, sum, buffer_size, buffer2cptr, &
   & validate, error_msg, return_err, has_err, compute_buffer_size, compute_size
 private
 
 integer(int32), parameter :: INVALID_INT32 = -2147483647_int32
 integer(int64), parameter :: INVALID_INT64 = -9223372036854775807_int64
+
+enum, bind(c)
+  !! Operations represented by nodes in a deferred expression.
+  enumerator :: OP_INVALID = -1
+  enumerator :: OP_LEAF = 0
+  enumerator :: OP_ADD = 1
+  enumerator :: OP_SUB = 2
+  enumerator :: OP_MUL = 3
+  enumerator :: OP_DIV = 4
+  enumerator :: OP_POW = 5
+  enumerator :: OP_INT32_POW = 6
+  enumerator :: OP_INT64_POW = 7
+  enumerator :: OP_REAL32_POW = 8
+  enumerator :: OP_REAL64_POW = 9
+  enumerator :: OP_INT8_POW = 10
+  enumerator :: OP_INT16_POW = 11
+  enumerator :: OP_SCALAR_INT8 = 12
+  enumerator :: OP_SCALAR_INT16 = 13
+  enumerator :: OP_SCALAR_INT32 = 14
+  enumerator :: OP_SCALAR_INT64 = 15
+  enumerator :: OP_SCALAR_REAL32 = 16
+  enumerator :: OP_SCALAR_REAL64 = 17
+end enum
+integer, parameter :: operation_kind = kind(OP_INVALID)
 
 enum, bind(c)
   !! Preserve the current NetCDF status values without importing the C binding.
@@ -171,6 +198,20 @@ contains
   generic, public :: write(formatted) => write_frmt_var
 end type variable_type
 
+type :: expression_type
+  !! Deferred arithmetic on variables with matching ordered dimensions.
+  !! Every referenced variable and borrowed target must remain alive. Values
+  !! may change before evaluation; storage must not be replaced or released.
+  private
+  integer(operation_kind) :: operation = OP_INVALID
+  !! Integer exponent or scalar operand, selected by `operation`.
+  integer(int64) :: exp_int = 1_int64
+  !! Real exponent or scalar operand, selected by `operation`.
+  real(real64) :: exp_real = 1.0_real64
+  type(variable_type), pointer :: leaf => null()
+  type(expression_type), allocatable :: left, right
+end type expression_type
+
 type :: group_type
   !! NetCDF group metadata.
   integer(c_int) :: id = INVALID_INT32
@@ -203,6 +244,7 @@ end type netcdf_type
 include "nc4f_data_attribute_constructor.inc"
 include "nc4f_data_variable_constructor.inc"
 include "nc4f_data_extract.inc"
+include "nc4f_data_arithmetic.inc"
 
 interface rename_dimension
   module procedure :: rename_dim_dim, rename_dim_var, rename_dim_grp
@@ -223,6 +265,10 @@ end interface rename_group
 interface rename_variable
   module procedure :: rename_var_var, rename_var_grp
 end interface rename_variable
+
+interface assignment(=)
+  module procedure :: assign_expr
+end interface assignment(=)
 
 interface operator(.exists.)
   module procedure :: has_err
@@ -297,6 +343,17 @@ interface dataset
 end interface dataset
 
 interface
+  module subroutine evaluate(expr, result, err)
+    type(expression_type), intent(in) :: expr
+    type(variable_type), target, intent(inout) :: result
+    type(error_type), intent(out), optional :: err
+  end subroutine evaluate
+
+  module subroutine assign_expr(result, expr)
+    type(variable_type), target, intent(inout) :: result
+    type(expression_type), intent(in) :: expr
+  end subroutine assign_expr
+
   pure module function nameof_att(att) result(name)
     type(attribute_type), intent(in) :: att
     character(len=:), allocatable :: name
