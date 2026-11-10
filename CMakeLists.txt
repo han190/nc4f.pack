@@ -58,6 +58,8 @@ set(nc4f_generated_names
   nc4f_data_extract)
 set(nc4f_data_dir "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(nc4f_data_module "${nc4f_data_dir}/nc4f_data.f90")
+set(nc4f_unary_intrinsic_inc
+    "${nc4f_data_dir}/nc4f_data_unary_intrinsic.inc")
 set(nc4f_generated_sources)
 
 if(NC4F_REGENERATE_SOURCES)
@@ -68,6 +70,10 @@ if(NC4F_REGENERATE_SOURCES)
   # so it includes the generated interfaces instead of the tracked copies.
   set(nc4f_data_module "${nc4f_generated_dir}/nc4f_data.f90")
   configure_file("${nc4f_data_dir}/nc4f_data.f90" "${nc4f_data_module}" COPYONLY)
+  set(nc4f_unary_intrinsic_inc
+      "${nc4f_generated_dir}/nc4f_data_unary_intrinsic.inc")
+  configure_file("${nc4f_data_dir}/nc4f_data_unary_intrinsic.inc"
+                 "${nc4f_unary_intrinsic_inc}" COPYONLY)
   foreach(name IN LISTS nc4f_generated_names)
     foreach(extension IN ITEMS f90 inc)
       if(extension STREQUAL "inc")
@@ -93,6 +99,8 @@ else()
     list(APPEND nc4f_generated_sources "${nc4f_data_dir}/${name}.f90")
   endforeach()
 endif()
+set_source_files_properties("${nc4f_data_module}" PROPERTIES
+  OBJECT_DEPENDS "${nc4f_unary_intrinsic_inc}")
 
 add_library(nc4f STATIC
   src/nc4f.f90
