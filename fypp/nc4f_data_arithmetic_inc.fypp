@@ -1,5 +1,8 @@
 #: include 'common.fypp'
+!! Arithmetic operators build deferred expression trees. Variable operands
+!! are borrowed, and scalar operands are stored by value in their nodes.
 #: for NAME, SYMBOL in zip(op_names, ops)
+!! ${SYMBOL}$ accepts variables, expressions, and supported scalars.
 interface operator(${SYMBOL}$)
   module procedure :: ${NAME}$_var_var, ${NAME}$_expr_var, &
     & ${NAME}$_var_expr, ${NAME}$_expr_expr
@@ -22,15 +25,20 @@ interface
   #: for LEFT in ['var', 'expr']
     #: for RIGHT in ['var', 'expr']
   module function ${NAME}$_${LEFT}$_${RIGHT}$(a, b) result(expr)
+    !! Return a deferred ${NAME}$ expression from ${LEFT}$ and ${RIGHT}$.
     #: if LEFT == 'var'
     type(variable_type), target, intent(in) :: a
+    !! Left variable borrowed by the resulting expression.
     #: else
     type(expression_type), intent(in) :: a
+    !! Left expression copied into the resulting tree.
     #: endif
     #: if RIGHT == 'var'
     type(variable_type), target, intent(in) :: b
+    !! Right variable borrowed by the resulting expression.
     #: else
     type(expression_type), intent(in) :: b
+    !! Right expression copied into the resulting tree.
     #: endif
     type(expression_type) :: expr
   end function ${NAME}$_${LEFT}$_${RIGHT}$${NEWLINE()}$
@@ -40,12 +48,16 @@ interface
 #: for KIND, TYPE in zip(kinds, types)
   #: for LEFT in ['var', 'expr']
   module function pow_${LEFT}$_${KIND}$(a, exponent) result(expr)
+    !! Return a deferred power with a ${KIND}$ scalar exponent.
     #: if LEFT == 'var'
     type(variable_type), target, intent(in) :: a
+    !! Base variable borrowed by the resulting expression.
     #: else
     type(expression_type), intent(in) :: a
+    !! Base expression copied into the resulting tree.
     #: endif
     ${TYPE}$(${KIND}$), intent(in) :: exponent
+    !! Scalar exponent stored by value for later evaluation.
     type(expression_type) :: expr
   end function pow_${LEFT}$_${KIND}$${NEWLINE()}$
   #: endfor
@@ -55,11 +67,15 @@ interface
   #: for KIND, TYPE in zip(kinds, types)
     #: for RIGHT in ['var', 'expr']
   module function ${NAME}$_${KIND}$_${RIGHT}$(a, b) result(expr)
+    !! Return a deferred ${NAME}$ expression with a left ${KIND}$ scalar.
     ${TYPE}$(${KIND}$), intent(in) :: a
+    !! Left scalar stored by value in the resulting expression.
       #: if RIGHT == 'var'
     type(variable_type), target, intent(in) :: b
+    !! Right variable borrowed by the resulting expression.
       #: else
     type(expression_type), intent(in) :: b
+    !! Right expression copied into the resulting tree.
       #: endif
     type(expression_type) :: expr
   end function ${NAME}$_${KIND}$_${RIGHT}$${NEWLINE()}$
@@ -72,12 +88,16 @@ interface
     #: for KIND, TYPE in zip(kinds, types)
       #: for LEFT in ['var', 'expr']
   module function ${NAME}$_${LEFT}$_${KIND}$(a, b) result(expr)
+    !! Return a deferred ${NAME}$ expression with a right ${KIND}$ scalar.
         #: if LEFT == 'var'
     type(variable_type), target, intent(in) :: a
+    !! Left variable borrowed by the resulting expression.
         #: else
     type(expression_type), intent(in) :: a
+    !! Left expression copied into the resulting tree.
         #: endif
     ${TYPE}$(${KIND}$), intent(in) :: b
+    !! Right scalar stored by value in the resulting expression.
     type(expression_type) :: expr
         #: set LAST = NAME == 'div' and KIND == 'real64' and LEFT == 'expr'
   end function ${NAME}$_${LEFT}$_${KIND}$${NEWLINE(not LAST)}$

@@ -1,10 +1,14 @@
 submodule(nc4f_data) nc4f_data_unary_intrinsic
-!! Build deferred elementwise intrinsic expressions.
+!! Build deferred element-wise intrinsic expressions. Variable leaves borrow
+!! their data; expression operands are copied into the new unary node.
+!! Numeric type and function domain checks occur during evaluation.
 implicit none (type, external)
 contains
 
 module function abs_var(a) result(expr)
+  !! Build a deferred ABS node from a borrowed variable.
   type(variable_type), target, intent(in) :: a
+  !! Input variable; its storage is borrowed until evaluation.
   type(expression_type) :: expr
 
   expr%operation = OP_ABS
@@ -14,7 +18,9 @@ module function abs_var(a) result(expr)
 end function abs_var
 
 module function abs_expr(a) result(expr)
+  !! Build a deferred ABS node from a copied expression.
   type(expression_type), intent(in) :: a
+  !! Input expression; its nodes are copied into the result.
   type(expression_type) :: expr
 
   expr%operation = OP_ABS
@@ -23,7 +29,9 @@ module function abs_expr(a) result(expr)
 end function abs_expr
 
 module function sqrt_var(a) result(expr)
+  !! Build a deferred SQRT node from a borrowed variable.
   type(variable_type), target, intent(in) :: a
+  !! Input variable; its storage is borrowed until evaluation.
   type(expression_type) :: expr
 
   expr%operation = OP_SQRT
@@ -33,7 +41,9 @@ module function sqrt_var(a) result(expr)
 end function sqrt_var
 
 module function sqrt_expr(a) result(expr)
+  !! Build a deferred SQRT node from a copied expression.
   type(expression_type), intent(in) :: a
+  !! Input expression; its nodes are copied into the result.
   type(expression_type) :: expr
 
   expr%operation = OP_SQRT
@@ -42,7 +52,9 @@ module function sqrt_expr(a) result(expr)
 end function sqrt_expr
 
 module function exp_var(a) result(expr)
+  !! Build a deferred EXP node from a borrowed variable.
   type(variable_type), target, intent(in) :: a
+  !! Input variable; its storage is borrowed until evaluation.
   type(expression_type) :: expr
 
   expr%operation = OP_EXP
@@ -52,7 +64,9 @@ module function exp_var(a) result(expr)
 end function exp_var
 
 module function exp_expr(a) result(expr)
+  !! Build a deferred EXP node from a copied expression.
   type(expression_type), intent(in) :: a
+  !! Input expression; its nodes are copied into the result.
   type(expression_type) :: expr
 
   expr%operation = OP_EXP
@@ -61,7 +75,9 @@ module function exp_expr(a) result(expr)
 end function exp_expr
 
 module function log_var(a) result(expr)
+  !! Build a deferred LOG node from a borrowed variable.
   type(variable_type), target, intent(in) :: a
+  !! Input variable; its storage is borrowed until evaluation.
   type(expression_type) :: expr
 
   expr%operation = OP_LOG
@@ -71,7 +87,9 @@ module function log_var(a) result(expr)
 end function log_var
 
 module function log_expr(a) result(expr)
+  !! Build a deferred LOG node from a copied expression.
   type(expression_type), intent(in) :: a
+  !! Input expression; its nodes are copied into the result.
   type(expression_type) :: expr
 
   expr%operation = OP_LOG
@@ -80,7 +98,9 @@ module function log_expr(a) result(expr)
 end function log_expr
 
 module function log10_var(a) result(expr)
+  !! Build a deferred LOG10 node from a borrowed variable.
   type(variable_type), target, intent(in) :: a
+  !! Input variable; its storage is borrowed until evaluation.
   type(expression_type) :: expr
 
   expr%operation = OP_LOG10
@@ -90,7 +110,9 @@ module function log10_var(a) result(expr)
 end function log10_var
 
 module function log10_expr(a) result(expr)
+  !! Build a deferred LOG10 node from a copied expression.
   type(expression_type), intent(in) :: a
+  !! Input expression; its nodes are copied into the result.
   type(expression_type) :: expr
 
   expr%operation = OP_LOG10
@@ -99,7 +121,9 @@ module function log10_expr(a) result(expr)
 end function log10_expr
 
 module function sin_var(a) result(expr)
+  !! Build a deferred SIN node from a borrowed variable.
   type(variable_type), target, intent(in) :: a
+  !! Input variable; its storage is borrowed until evaluation.
   type(expression_type) :: expr
 
   expr%operation = OP_SIN
@@ -109,7 +133,9 @@ module function sin_var(a) result(expr)
 end function sin_var
 
 module function sin_expr(a) result(expr)
+  !! Build a deferred SIN node from a copied expression.
   type(expression_type), intent(in) :: a
+  !! Input expression; its nodes are copied into the result.
   type(expression_type) :: expr
 
   expr%operation = OP_SIN
@@ -118,7 +144,9 @@ module function sin_expr(a) result(expr)
 end function sin_expr
 
 module function cos_var(a) result(expr)
+  !! Build a deferred COS node from a borrowed variable.
   type(variable_type), target, intent(in) :: a
+  !! Input variable; its storage is borrowed until evaluation.
   type(expression_type) :: expr
 
   expr%operation = OP_COS
@@ -128,7 +156,9 @@ module function cos_var(a) result(expr)
 end function cos_var
 
 module function cos_expr(a) result(expr)
+  !! Build a deferred COS node from a copied expression.
   type(expression_type), intent(in) :: a
+  !! Input expression; its nodes are copied into the result.
   type(expression_type) :: expr
 
   expr%operation = OP_COS
@@ -137,7 +167,9 @@ module function cos_expr(a) result(expr)
 end function cos_expr
 
 module function tan_var(a) result(expr)
+  !! Build a deferred TAN node from a borrowed variable.
   type(variable_type), target, intent(in) :: a
+  !! Input variable; its storage is borrowed until evaluation.
   type(expression_type) :: expr
 
   expr%operation = OP_TAN
@@ -147,7 +179,9 @@ module function tan_var(a) result(expr)
 end function tan_var
 
 module function tan_expr(a) result(expr)
+  !! Build a deferred TAN node from a copied expression.
   type(expression_type), intent(in) :: a
+  !! Input expression; its nodes are copied into the result.
   type(expression_type) :: expr
 
   expr%operation = OP_TAN
@@ -156,7 +190,9 @@ module function tan_expr(a) result(expr)
 end function tan_expr
 
 module function asin_var(a) result(expr)
+  !! Build a deferred ASIN node from a borrowed variable.
   type(variable_type), target, intent(in) :: a
+  !! Input variable; its storage is borrowed until evaluation.
   type(expression_type) :: expr
 
   expr%operation = OP_ASIN
@@ -166,7 +202,9 @@ module function asin_var(a) result(expr)
 end function asin_var
 
 module function asin_expr(a) result(expr)
+  !! Build a deferred ASIN node from a copied expression.
   type(expression_type), intent(in) :: a
+  !! Input expression; its nodes are copied into the result.
   type(expression_type) :: expr
 
   expr%operation = OP_ASIN
@@ -175,7 +213,9 @@ module function asin_expr(a) result(expr)
 end function asin_expr
 
 module function acos_var(a) result(expr)
+  !! Build a deferred ACOS node from a borrowed variable.
   type(variable_type), target, intent(in) :: a
+  !! Input variable; its storage is borrowed until evaluation.
   type(expression_type) :: expr
 
   expr%operation = OP_ACOS
@@ -185,7 +225,9 @@ module function acos_var(a) result(expr)
 end function acos_var
 
 module function acos_expr(a) result(expr)
+  !! Build a deferred ACOS node from a copied expression.
   type(expression_type), intent(in) :: a
+  !! Input expression; its nodes are copied into the result.
   type(expression_type) :: expr
 
   expr%operation = OP_ACOS
@@ -194,7 +236,9 @@ module function acos_expr(a) result(expr)
 end function acos_expr
 
 module function atan_var(a) result(expr)
+  !! Build a deferred ATAN node from a borrowed variable.
   type(variable_type), target, intent(in) :: a
+  !! Input variable; its storage is borrowed until evaluation.
   type(expression_type) :: expr
 
   expr%operation = OP_ATAN
@@ -204,7 +248,9 @@ module function atan_var(a) result(expr)
 end function atan_var
 
 module function atan_expr(a) result(expr)
+  !! Build a deferred ATAN node from a copied expression.
   type(expression_type), intent(in) :: a
+  !! Input expression; its nodes are copied into the result.
   type(expression_type) :: expr
 
   expr%operation = OP_ATAN
@@ -213,7 +259,9 @@ module function atan_expr(a) result(expr)
 end function atan_expr
 
 module function sinh_var(a) result(expr)
+  !! Build a deferred SINH node from a borrowed variable.
   type(variable_type), target, intent(in) :: a
+  !! Input variable; its storage is borrowed until evaluation.
   type(expression_type) :: expr
 
   expr%operation = OP_SINH
@@ -223,7 +271,9 @@ module function sinh_var(a) result(expr)
 end function sinh_var
 
 module function sinh_expr(a) result(expr)
+  !! Build a deferred SINH node from a copied expression.
   type(expression_type), intent(in) :: a
+  !! Input expression; its nodes are copied into the result.
   type(expression_type) :: expr
 
   expr%operation = OP_SINH
@@ -232,7 +282,9 @@ module function sinh_expr(a) result(expr)
 end function sinh_expr
 
 module function cosh_var(a) result(expr)
+  !! Build a deferred COSH node from a borrowed variable.
   type(variable_type), target, intent(in) :: a
+  !! Input variable; its storage is borrowed until evaluation.
   type(expression_type) :: expr
 
   expr%operation = OP_COSH
@@ -242,7 +294,9 @@ module function cosh_var(a) result(expr)
 end function cosh_var
 
 module function cosh_expr(a) result(expr)
+  !! Build a deferred COSH node from a copied expression.
   type(expression_type), intent(in) :: a
+  !! Input expression; its nodes are copied into the result.
   type(expression_type) :: expr
 
   expr%operation = OP_COSH
@@ -251,7 +305,9 @@ module function cosh_expr(a) result(expr)
 end function cosh_expr
 
 module function tanh_var(a) result(expr)
+  !! Build a deferred TANH node from a borrowed variable.
   type(variable_type), target, intent(in) :: a
+  !! Input variable; its storage is borrowed until evaluation.
   type(expression_type) :: expr
 
   expr%operation = OP_TANH
@@ -261,7 +317,9 @@ module function tanh_var(a) result(expr)
 end function tanh_var
 
 module function tanh_expr(a) result(expr)
+  !! Build a deferred TANH node from a copied expression.
   type(expression_type), intent(in) :: a
+  !! Input expression; its nodes are copied into the result.
   type(expression_type) :: expr
 
   expr%operation = OP_TANH
@@ -270,7 +328,9 @@ module function tanh_expr(a) result(expr)
 end function tanh_expr
 
 module function asinh_var(a) result(expr)
+  !! Build a deferred ASINH node from a borrowed variable.
   type(variable_type), target, intent(in) :: a
+  !! Input variable; its storage is borrowed until evaluation.
   type(expression_type) :: expr
 
   expr%operation = OP_ASINH
@@ -280,7 +340,9 @@ module function asinh_var(a) result(expr)
 end function asinh_var
 
 module function asinh_expr(a) result(expr)
+  !! Build a deferred ASINH node from a copied expression.
   type(expression_type), intent(in) :: a
+  !! Input expression; its nodes are copied into the result.
   type(expression_type) :: expr
 
   expr%operation = OP_ASINH
@@ -289,7 +351,9 @@ module function asinh_expr(a) result(expr)
 end function asinh_expr
 
 module function acosh_var(a) result(expr)
+  !! Build a deferred ACOSH node from a borrowed variable.
   type(variable_type), target, intent(in) :: a
+  !! Input variable; its storage is borrowed until evaluation.
   type(expression_type) :: expr
 
   expr%operation = OP_ACOSH
@@ -299,7 +363,9 @@ module function acosh_var(a) result(expr)
 end function acosh_var
 
 module function acosh_expr(a) result(expr)
+  !! Build a deferred ACOSH node from a copied expression.
   type(expression_type), intent(in) :: a
+  !! Input expression; its nodes are copied into the result.
   type(expression_type) :: expr
 
   expr%operation = OP_ACOSH
@@ -308,7 +374,9 @@ module function acosh_expr(a) result(expr)
 end function acosh_expr
 
 module function atanh_var(a) result(expr)
+  !! Build a deferred ATANH node from a borrowed variable.
   type(variable_type), target, intent(in) :: a
+  !! Input variable; its storage is borrowed until evaluation.
   type(expression_type) :: expr
 
   expr%operation = OP_ATANH
@@ -318,7 +386,9 @@ module function atanh_var(a) result(expr)
 end function atanh_var
 
 module function atanh_expr(a) result(expr)
+  !! Build a deferred ATANH node from a copied expression.
   type(expression_type), intent(in) :: a
+  !! Input expression; its nodes are copied into the result.
   type(expression_type) :: expr
 
   expr%operation = OP_ATANH
@@ -327,7 +397,9 @@ module function atanh_expr(a) result(expr)
 end function atanh_expr
 
 module function erf_var(a) result(expr)
+  !! Build a deferred ERF node from a borrowed variable.
   type(variable_type), target, intent(in) :: a
+  !! Input variable; its storage is borrowed until evaluation.
   type(expression_type) :: expr
 
   expr%operation = OP_ERF
@@ -337,7 +409,9 @@ module function erf_var(a) result(expr)
 end function erf_var
 
 module function erf_expr(a) result(expr)
+  !! Build a deferred ERF node from a copied expression.
   type(expression_type), intent(in) :: a
+  !! Input expression; its nodes are copied into the result.
   type(expression_type) :: expr
 
   expr%operation = OP_ERF
@@ -346,7 +420,9 @@ module function erf_expr(a) result(expr)
 end function erf_expr
 
 module function erfc_var(a) result(expr)
+  !! Build a deferred ERFC node from a borrowed variable.
   type(variable_type), target, intent(in) :: a
+  !! Input variable; its storage is borrowed until evaluation.
   type(expression_type) :: expr
 
   expr%operation = OP_ERFC
@@ -356,7 +432,9 @@ module function erfc_var(a) result(expr)
 end function erfc_var
 
 module function erfc_expr(a) result(expr)
+  !! Build a deferred ERFC node from a copied expression.
   type(expression_type), intent(in) :: a
+  !! Input expression; its nodes are copied into the result.
   type(expression_type) :: expr
 
   expr%operation = OP_ERFC
@@ -365,7 +443,9 @@ module function erfc_expr(a) result(expr)
 end function erfc_expr
 
 module function erfc_scaled_var(a) result(expr)
+  !! Build a deferred ERFC_SCALED node from a borrowed variable.
   type(variable_type), target, intent(in) :: a
+  !! Input variable; its storage is borrowed until evaluation.
   type(expression_type) :: expr
 
   expr%operation = OP_ERFC_SCALED
@@ -375,7 +455,9 @@ module function erfc_scaled_var(a) result(expr)
 end function erfc_scaled_var
 
 module function erfc_scaled_expr(a) result(expr)
+  !! Build a deferred ERFC_SCALED node from a copied expression.
   type(expression_type), intent(in) :: a
+  !! Input expression; its nodes are copied into the result.
   type(expression_type) :: expr
 
   expr%operation = OP_ERFC_SCALED
@@ -384,7 +466,9 @@ module function erfc_scaled_expr(a) result(expr)
 end function erfc_scaled_expr
 
 module function gamma_var(a) result(expr)
+  !! Build a deferred GAMMA node from a borrowed variable.
   type(variable_type), target, intent(in) :: a
+  !! Input variable; its storage is borrowed until evaluation.
   type(expression_type) :: expr
 
   expr%operation = OP_GAMMA
@@ -394,7 +478,9 @@ module function gamma_var(a) result(expr)
 end function gamma_var
 
 module function gamma_expr(a) result(expr)
+  !! Build a deferred GAMMA node from a copied expression.
   type(expression_type), intent(in) :: a
+  !! Input expression; its nodes are copied into the result.
   type(expression_type) :: expr
 
   expr%operation = OP_GAMMA
@@ -403,7 +489,9 @@ module function gamma_expr(a) result(expr)
 end function gamma_expr
 
 module function log_gamma_var(a) result(expr)
+  !! Build a deferred LOG_GAMMA node from a borrowed variable.
   type(variable_type), target, intent(in) :: a
+  !! Input variable; its storage is borrowed until evaluation.
   type(expression_type) :: expr
 
   expr%operation = OP_LOG_GAMMA
@@ -413,7 +501,9 @@ module function log_gamma_var(a) result(expr)
 end function log_gamma_var
 
 module function log_gamma_expr(a) result(expr)
+  !! Build a deferred LOG_GAMMA node from a copied expression.
   type(expression_type), intent(in) :: a
+  !! Input expression; its nodes are copied into the result.
   type(expression_type) :: expr
 
   expr%operation = OP_LOG_GAMMA
@@ -422,7 +512,9 @@ module function log_gamma_expr(a) result(expr)
 end function log_gamma_expr
 
 module function bessel_j0_var(a) result(expr)
+  !! Build a deferred BESSEL_J0 node from a borrowed variable.
   type(variable_type), target, intent(in) :: a
+  !! Input variable; its storage is borrowed until evaluation.
   type(expression_type) :: expr
 
   expr%operation = OP_BESSEL_J0
@@ -432,7 +524,9 @@ module function bessel_j0_var(a) result(expr)
 end function bessel_j0_var
 
 module function bessel_j0_expr(a) result(expr)
+  !! Build a deferred BESSEL_J0 node from a copied expression.
   type(expression_type), intent(in) :: a
+  !! Input expression; its nodes are copied into the result.
   type(expression_type) :: expr
 
   expr%operation = OP_BESSEL_J0
@@ -441,7 +535,9 @@ module function bessel_j0_expr(a) result(expr)
 end function bessel_j0_expr
 
 module function bessel_j1_var(a) result(expr)
+  !! Build a deferred BESSEL_J1 node from a borrowed variable.
   type(variable_type), target, intent(in) :: a
+  !! Input variable; its storage is borrowed until evaluation.
   type(expression_type) :: expr
 
   expr%operation = OP_BESSEL_J1
@@ -451,7 +547,9 @@ module function bessel_j1_var(a) result(expr)
 end function bessel_j1_var
 
 module function bessel_j1_expr(a) result(expr)
+  !! Build a deferred BESSEL_J1 node from a copied expression.
   type(expression_type), intent(in) :: a
+  !! Input expression; its nodes are copied into the result.
   type(expression_type) :: expr
 
   expr%operation = OP_BESSEL_J1
@@ -460,7 +558,9 @@ module function bessel_j1_expr(a) result(expr)
 end function bessel_j1_expr
 
 module function bessel_y0_var(a) result(expr)
+  !! Build a deferred BESSEL_Y0 node from a borrowed variable.
   type(variable_type), target, intent(in) :: a
+  !! Input variable; its storage is borrowed until evaluation.
   type(expression_type) :: expr
 
   expr%operation = OP_BESSEL_Y0
@@ -470,7 +570,9 @@ module function bessel_y0_var(a) result(expr)
 end function bessel_y0_var
 
 module function bessel_y0_expr(a) result(expr)
+  !! Build a deferred BESSEL_Y0 node from a copied expression.
   type(expression_type), intent(in) :: a
+  !! Input expression; its nodes are copied into the result.
   type(expression_type) :: expr
 
   expr%operation = OP_BESSEL_Y0
@@ -479,7 +581,9 @@ module function bessel_y0_expr(a) result(expr)
 end function bessel_y0_expr
 
 module function bessel_y1_var(a) result(expr)
+  !! Build a deferred BESSEL_Y1 node from a borrowed variable.
   type(variable_type), target, intent(in) :: a
+  !! Input variable; its storage is borrowed until evaluation.
   type(expression_type) :: expr
 
   expr%operation = OP_BESSEL_Y1
@@ -489,7 +593,9 @@ module function bessel_y1_var(a) result(expr)
 end function bessel_y1_var
 
 module function bessel_y1_expr(a) result(expr)
+  !! Build a deferred BESSEL_Y1 node from a copied expression.
   type(expression_type), intent(in) :: a
+  !! Input expression; its nodes are copied into the result.
   type(expression_type) :: expr
 
   expr%operation = OP_BESSEL_Y1

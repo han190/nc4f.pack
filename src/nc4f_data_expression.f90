@@ -1,21 +1,29 @@
 submodule(nc4f_data) nc4f_data_expression
-!! Deferred element-wise arithmetic. Leaves borrow their variables and read
-!! their values when evaluated; callers retain operand and target storage
-!! lifetimes.
+!! Evaluate deferred element-wise arithmetic and unary intrinsic expressions.
+!! Leaves borrow variables and read their values during evaluation; callers
+!! retain operand and target storage lifetimes.
 implicit none (type, external)
 contains
 
 module subroutine assign_expr(result, expr)
+  !! Evaluate an expression as defined assignment to a variable.
   type(variable_type), target, intent(inout) :: result
+  !! Destination variable, replaced by the evaluated values.
   type(expression_type), intent(in) :: expr
+  !! Deferred expression to assign.
 
   call evaluate(expr, result)
 end subroutine assign_expr
 
 module subroutine evaluate(expr, result, err)
+  !! Validate the tree, evaluate each element, and replace result on success.
+  !! A failed evaluation leaves result unchanged and reports through err.
   type(expression_type), intent(in) :: expr
+  !! Expression tree whose leaves are read during evaluation.
   type(variable_type), target, intent(inout) :: result
+  !! Destination variable, replaced only after successful evaluation.
   type(error_type), intent(out), optional :: err
+  !! Receives failure details; if omitted, failures terminate execution.
   type(error_type) :: op_err
   type(dimension_type), allocatable :: dims(:)
   type(variable_type), target :: staged
@@ -118,11 +126,18 @@ module subroutine evaluate(expr, result, err)
 end subroutine evaluate
 
 pure recursive subroutine validate_expr(expr, dtype, dims, n, err)
+  !! Check operand storage, types, and ordered dimensions before evaluation.
+  !! Scalar nodes inherit the dimensions of their array operand.
   type(expression_type), intent(in) :: expr
+  !! Expression subtree to validate.
   integer(data_type), intent(out) :: dtype
+  !! Data type inferred for the subtree result.
   type(dimension_type), allocatable, intent(out) :: dims(:)
+  !! Ordered dimensions inferred for the subtree result.
   integer(int64), intent(out) :: n
+  !! Element count; zero for a scalar node.
   type(error_type), intent(out) :: err
+  !! Receives validation failure details or a no-error value.
   type(dimension_type), allocatable :: right_dims(:)
   integer(data_type) :: right_type
   integer(int64) :: right_len
@@ -244,7 +259,9 @@ pure recursive subroutine validate_expr(expr, dtype, dims, n, err)
 end subroutine validate_expr
 
 pure logical function is_scalar_node(expr)
+  !! Identify a stored numeric scalar, which broadcasts over an array node.
   type(expression_type), intent(in) :: expr
+  !! Node to inspect for a stored scalar operation.
 
   select case (expr%operation)
   case (OP_SCALAR_INT8, OP_SCALAR_INT16, OP_SCALAR_INT32, &
@@ -256,9 +273,13 @@ pure logical function is_scalar_node(expr)
 end function is_scalar_node
 
 recursive function eval_int8(expr, i, err) result(value)
+  !! Evaluate element i of an integer(int8) expression tree.
   type(expression_type), intent(in) :: expr
+  !! Expression subtree to evaluate.
   integer(int64), intent(in) :: i
+  !! One-based element index in each array leaf.
   type(error_type), intent(out) :: err
+  !! Receives an evaluation or numeric-domain error.
   integer(int8) :: value, left, right
   integer(int8), pointer :: values(:)
 
@@ -351,9 +372,13 @@ recursive function eval_int8(expr, i, err) result(value)
 end function eval_int8
 
 recursive function eval_int16(expr, i, err) result(value)
+  !! Evaluate element i of an integer(int16) expression tree.
   type(expression_type), intent(in) :: expr
+  !! Expression subtree to evaluate.
   integer(int64), intent(in) :: i
+  !! One-based element index in each array leaf.
   type(error_type), intent(out) :: err
+  !! Receives an evaluation or numeric-domain error.
   integer(int16) :: value, left, right
   integer(int16), pointer :: values(:)
 
@@ -446,9 +471,13 @@ recursive function eval_int16(expr, i, err) result(value)
 end function eval_int16
 
 recursive function eval_int32(expr, i, err) result(value)
+  !! Evaluate element i of an integer(int32) expression tree.
   type(expression_type), intent(in) :: expr
+  !! Expression subtree to evaluate.
   integer(int64), intent(in) :: i
+  !! One-based element index in each array leaf.
   type(error_type), intent(out) :: err
+  !! Receives an evaluation or numeric-domain error.
   integer(int32) :: value, left, right
   integer(int32), pointer :: values(:)
 
@@ -541,9 +570,13 @@ recursive function eval_int32(expr, i, err) result(value)
 end function eval_int32
 
 recursive function eval_int64(expr, i, err) result(value)
+  !! Evaluate element i of an integer(int64) expression tree.
   type(expression_type), intent(in) :: expr
+  !! Expression subtree to evaluate.
   integer(int64), intent(in) :: i
+  !! One-based element index in each array leaf.
   type(error_type), intent(out) :: err
+  !! Receives an evaluation or numeric-domain error.
   integer(int64) :: value, left, right
   integer(int64), pointer :: values(:)
 
@@ -636,9 +669,13 @@ recursive function eval_int64(expr, i, err) result(value)
 end function eval_int64
 
 recursive function eval_real32(expr, i, err) result(value)
+  !! Evaluate element i of a real(real32) expression tree.
   type(expression_type), intent(in) :: expr
+  !! Expression subtree to evaluate.
   integer(int64), intent(in) :: i
+  !! One-based element index in each array leaf.
   type(error_type), intent(out) :: err
+  !! Receives an evaluation or numeric-domain error.
   real(real32) :: value, left, right
   real(real32), pointer :: values(:)
 
@@ -794,9 +831,13 @@ recursive function eval_real32(expr, i, err) result(value)
 end function eval_real32
 
 recursive function eval_real64(expr, i, err) result(value)
+  !! Evaluate element i of a real(real64) expression tree.
   type(expression_type), intent(in) :: expr
+  !! Expression subtree to evaluate.
   integer(int64), intent(in) :: i
+  !! One-based element index in each array leaf.
   type(error_type), intent(out) :: err
+  !! Receives an evaluation or numeric-domain error.
   real(real64) :: value, left, right
   real(real64), pointer :: values(:)
 
@@ -958,9 +999,13 @@ recursive function eval_real64(expr, i, err) result(value)
 end function eval_real64
 
 function apply_unary_real32(operation, x, err) result(value)
+  !! Apply one real32 intrinsic and report invalid input domains through err.
   integer(operation_kind), intent(in) :: operation
+  !! Intrinsic operation selected by the expression node.
   real(real32), intent(in) :: x
+  !! Scalar value to transform.
   type(error_type), intent(out) :: err
+  !! Receives an invalid-domain or unknown-operation error.
   real(real32) :: value
 
   err = error_type()
@@ -1081,9 +1126,13 @@ function apply_unary_real32(operation, x, err) result(value)
 end function apply_unary_real32
 
 function apply_unary_real64(operation, x, err) result(value)
+  !! Apply one real64 intrinsic and report invalid input domains through err.
   integer(operation_kind), intent(in) :: operation
+  !! Intrinsic operation selected by the expression node.
   real(real64), intent(in) :: x
+  !! Scalar value to transform.
   type(error_type), intent(out) :: err
+  !! Receives an invalid-domain or unknown-operation error.
   real(real64) :: value
 
   err = error_type()

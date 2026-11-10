@@ -1,6 +1,8 @@
 #: include 'common.fypp'
 submodule(nc4f_data) nc4f_data_arithmetic
-!! Build deferred arithmetic expressions from variables and expressions.
+!! Build deferred arithmetic expressions without evaluating their elements.
+!! Variable leaves borrow the original variables; nested expression nodes are
+!! copied into the tree. Scalar operands are stored in expression nodes.
 implicit none (type, external)
 contains
 
@@ -8,15 +10,20 @@ contains
   #: for LEFT in ['var', 'expr']
     #: for RIGHT in ['var', 'expr']
 module function ${NAME}$_${LEFT}$_${RIGHT}$(a, b) result(expr)
+  !! Build a deferred ${NAME}$ node from ${LEFT}$ and ${RIGHT}$ operands.
     #: if LEFT == 'var'
   type(variable_type), target, intent(in) :: a
+  !! Left operand; the expression borrows this variable.
     #: else
   type(expression_type), intent(in) :: a
+  !! Left operand; its tree is copied into the result.
     #: endif
     #: if RIGHT == 'var'
   type(variable_type), target, intent(in) :: b
+  !! Right operand; the expression borrows this variable.
     #: else
   type(expression_type), intent(in) :: b
+  !! Right operand; its tree is copied into the result.
     #: endif
   type(expression_type) :: expr
 
@@ -41,12 +48,16 @@ end function ${NAME}$_${LEFT}$_${RIGHT}$${NEWLINE()}$
 #: for KIND, TYPE in zip(kinds, types)
   #: for LEFT in ['var', 'expr']
 module function pow_${LEFT}$_${KIND}$(a, exponent) result(expr)
+  !! Raise a ${LEFT}$ operand to a stored ${KIND}$ scalar exponent later.
     #: if LEFT == 'var'
   type(variable_type), target, intent(in) :: a
+  !! Base variable; the expression borrows it.
     #: else
   type(expression_type), intent(in) :: a
+  !! Base expression; its tree is copied into the result.
     #: endif
   ${TYPE}$(${KIND}$), intent(in) :: exponent
+  !! Scalar exponent, stored by value for later evaluation.
   type(expression_type) :: expr
 
   expr%operation = OP_${KIND.upper()}$_POW
@@ -70,11 +81,15 @@ end function pow_${LEFT}$_${KIND}$${NEWLINE()}$
   #: for KIND, TYPE in zip(kinds, types)
     #: for RIGHT in ['var', 'expr']
 module function ${NAME}$_${KIND}$_${RIGHT}$(a, b) result(expr)
+  !! Build a deferred ${NAME}$ node with a ${KIND}$ scalar on the left.
   ${TYPE}$(${KIND}$), intent(in) :: a
+  !! Left scalar, stored by value in the expression.
       #: if RIGHT == 'var'
   type(variable_type), target, intent(in) :: b
+  !! Right variable; the expression borrows it.
       #: else
   type(expression_type), intent(in) :: b
+  !! Right expression; its tree is copied into the result.
       #: endif
   type(expression_type) :: expr
 
@@ -102,12 +117,16 @@ end function ${NAME}$_${KIND}$_${RIGHT}$${NEWLINE()}$
     #: for KIND, TYPE in zip(kinds, types)
       #: for LEFT in ['var', 'expr']
 module function ${NAME}$_${LEFT}$_${KIND}$(a, b) result(expr)
+  !! Build a deferred ${NAME}$ node with a ${KIND}$ scalar on the right.
         #: if LEFT == 'var'
   type(variable_type), target, intent(in) :: a
+  !! Left variable; the expression borrows it.
         #: else
   type(expression_type), intent(in) :: a
+  !! Left expression; its tree is copied into the result.
         #: endif
   ${TYPE}$(${KIND}$), intent(in) :: b
+  !! Right scalar, stored by value in the expression.
   type(expression_type) :: expr
 
   expr%operation = OP_${NAME.upper()}$
@@ -130,8 +149,11 @@ end function ${NAME}$_${LEFT}$_${KIND}$${NEWLINE()}$
   #: endif
 #: endfor
 recursive subroutine copy_expr(source, dest)
+  !! Copy the tree structure while retaining borrowed variable leaves.
   type(expression_type), intent(in) :: source
+  !! Expression tree to copy; its variable leaves remain borrowed.
   type(expression_type), intent(out) :: dest
+  !! Receives an independent node tree with the same variable leaves.
 
   dest%operation = source%operation
   dest%exp_int = source%exp_int
