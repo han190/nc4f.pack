@@ -117,7 +117,7 @@ module subroutine evaluate(expr, result, err)
   call return_err(op_err, err)
 end subroutine evaluate
 
-recursive subroutine validate_expr(expr, dtype, dims, n, err)
+pure recursive subroutine validate_expr(expr, dtype, dims, n, err)
   type(expression_type), intent(in) :: expr
   integer(data_type), intent(out) :: dtype
   type(dimension_type), allocatable, intent(out) :: dims(:)
@@ -173,6 +173,21 @@ recursive subroutine validate_expr(expr, dtype, dims, n, err)
       return
     end select
     allocate (dims(0))
+  case (OP_ABS, OP_SQRT, OP_EXP, OP_LOG, OP_LOG10, OP_SIN, OP_COS, OP_TAN, &
+    & OP_ASIN, OP_ACOS, OP_ATAN, OP_SINH, OP_COSH, OP_TANH, OP_ASINH, &
+    & OP_ACOSH, OP_ATANH, OP_ERF, OP_ERFC, OP_ERFC_SCALED, OP_GAMMA, &
+    & OP_LOG_GAMMA, OP_BESSEL_J0, OP_BESSEL_J1, OP_BESSEL_Y0, OP_BESSEL_Y1)
+    if (.not. allocated(expr%left)) then
+      err = error_type(INVALID, "evaluate", "Unary node is incomplete.")
+      return
+    end if
+    call validate_expr(expr%left, dtype, dims, n, err)
+    if (.exists. err) return
+    if (expr%operation /= OP_ABS .and. &
+      & dtype /= FLOAT_TYPE .and. dtype /= DOUBLE_TYPE) then
+      err = error_type(INVALID, "evaluate", &
+        & "Unary intrinsic requires real data.")
+    end if
   case (OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_POW)
     if (.not. allocated(expr%left) .or. .not. allocated(expr%right)) then
       err = error_type(INVALID, "evaluate", "Arithmetic node is incomplete.")
@@ -255,6 +270,15 @@ recursive function eval_int8(expr, i, err) result(value)
     value = values(i)
   case (OP_SCALAR_INT8)
     value = int(expr%exp_int, int8)
+  case (OP_ABS)
+    left = eval_int8(expr%left, i, err)
+    if (.exists. err) return
+    if (left == -huge(left) - 1_int8) then
+      err = error_type(INVALID, "evaluate", &
+        & "Integer absolute value is not representable.")
+      return
+    end if
+    value = abs(left)
   case (OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_POW)
     left = eval_int8(expr%left, i, err)
     if (.exists. err) return
@@ -341,6 +365,15 @@ recursive function eval_int16(expr, i, err) result(value)
     value = values(i)
   case (OP_SCALAR_INT16)
     value = int(expr%exp_int, int16)
+  case (OP_ABS)
+    left = eval_int16(expr%left, i, err)
+    if (.exists. err) return
+    if (left == -huge(left) - 1_int16) then
+      err = error_type(INVALID, "evaluate", &
+        & "Integer absolute value is not representable.")
+      return
+    end if
+    value = abs(left)
   case (OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_POW)
     left = eval_int16(expr%left, i, err)
     if (.exists. err) return
@@ -427,6 +460,15 @@ recursive function eval_int32(expr, i, err) result(value)
     value = values(i)
   case (OP_SCALAR_INT32)
     value = int(expr%exp_int, int32)
+  case (OP_ABS)
+    left = eval_int32(expr%left, i, err)
+    if (.exists. err) return
+    if (left == -huge(left) - 1_int32) then
+      err = error_type(INVALID, "evaluate", &
+        & "Integer absolute value is not representable.")
+      return
+    end if
+    value = abs(left)
   case (OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_POW)
     left = eval_int32(expr%left, i, err)
     if (.exists. err) return
@@ -513,6 +555,15 @@ recursive function eval_int64(expr, i, err) result(value)
     value = values(i)
   case (OP_SCALAR_INT64)
     value = int(expr%exp_int, int64)
+  case (OP_ABS)
+    left = eval_int64(expr%left, i, err)
+    if (.exists. err) return
+    if (left == -huge(left) - 1_int64) then
+      err = error_type(INVALID, "evaluate", &
+        & "Integer absolute value is not representable.")
+      return
+    end if
+    value = abs(left)
   case (OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_POW)
     left = eval_int64(expr%left, i, err)
     if (.exists. err) return
@@ -631,6 +682,13 @@ recursive function eval_real32(expr, i, err) result(value)
     value = real(expr%exp_int, real32)
   case (OP_SCALAR_REAL32, OP_SCALAR_REAL64)
     value = real(expr%exp_real, real32)
+  case (OP_ABS, OP_SQRT, OP_EXP, OP_LOG, OP_LOG10, OP_SIN, OP_COS, OP_TAN, &
+    & OP_ASIN, OP_ACOS, OP_ATAN, OP_SINH, OP_COSH, OP_TANH, OP_ASINH, &
+    & OP_ACOSH, OP_ATANH, OP_ERF, OP_ERFC, OP_ERFC_SCALED, OP_GAMMA, &
+    & OP_LOG_GAMMA, OP_BESSEL_J0, OP_BESSEL_J1, OP_BESSEL_Y0, OP_BESSEL_Y1)
+    left = eval_real32(expr%left, i, err)
+    if (.exists. err) return
+    value = apply_unary_real32(expr%operation, left, err)
   case (OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_POW)
     left = eval_real32(expr%left, i, err)
     if (.exists. err) return
@@ -788,6 +846,13 @@ recursive function eval_real64(expr, i, err) result(value)
     value = real(expr%exp_int, real64)
   case (OP_SCALAR_REAL32, OP_SCALAR_REAL64)
     value = real(expr%exp_real, real64)
+  case (OP_ABS, OP_SQRT, OP_EXP, OP_LOG, OP_LOG10, OP_SIN, OP_COS, OP_TAN, &
+    & OP_ASIN, OP_ACOS, OP_ATAN, OP_SINH, OP_COSH, OP_TANH, OP_ASINH, &
+    & OP_ACOSH, OP_ATANH, OP_ERF, OP_ERFC, OP_ERFC_SCALED, OP_GAMMA, &
+    & OP_LOG_GAMMA, OP_BESSEL_J0, OP_BESSEL_J1, OP_BESSEL_Y0, OP_BESSEL_Y1)
+    left = eval_real64(expr%left, i, err)
+    if (.exists. err) return
+    value = apply_unary_real64(expr%operation, left, err)
   case (OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_POW)
     left = eval_real64(expr%left, i, err)
     if (.exists. err) return
@@ -891,5 +956,250 @@ recursive function eval_real64(expr, i, err) result(value)
       & "Unknown expression operation.")
   end select
 end function eval_real64
+
+function apply_unary_real32(operation, x, err) result(value)
+  integer(operation_kind), intent(in) :: operation
+  real(real32), intent(in) :: x
+  type(error_type), intent(out) :: err
+  real(real32) :: value
+
+  err = error_type()
+  value = 0.0_real32
+  select case (operation)
+  case (OP_ABS)
+    value = abs(x)
+  case (OP_SQRT)
+    if (x < 0.0_real32) then
+      err = error_type(INVALID, "evaluate", &
+        & "Square root requires nonnegative data.")
+      return
+    end if
+    value = sqrt(x)
+  case (OP_EXP)
+    value = exp(x)
+  case (OP_LOG)
+    if (x <= 0.0_real32) then
+      err = error_type(INVALID, "evaluate", &
+        & "Logarithm requires positive data.")
+      return
+    end if
+    value = log(x)
+  case (OP_LOG10)
+    if (x <= 0.0_real32) then
+      err = error_type(INVALID, "evaluate", &
+        & "Logarithm requires positive data.")
+      return
+    end if
+    value = log10(x)
+  case (OP_SIN)
+    value = sin(x)
+  case (OP_COS)
+    value = cos(x)
+  case (OP_TAN)
+    value = tan(x)
+  case (OP_ASIN)
+    if (abs(x) > 1.0_real32) then
+      err = error_type(INVALID, "evaluate", &
+        & "Inverse sine requires values in [-1, 1].")
+      return
+    end if
+    value = asin(x)
+  case (OP_ACOS)
+    if (abs(x) > 1.0_real32) then
+      err = error_type(INVALID, "evaluate", &
+        & "Inverse cosine requires values in [-1, 1].")
+      return
+    end if
+    value = acos(x)
+  case (OP_ATAN)
+    value = atan(x)
+  case (OP_SINH)
+    value = sinh(x)
+  case (OP_COSH)
+    value = cosh(x)
+  case (OP_TANH)
+    value = tanh(x)
+  case (OP_ASINH)
+    value = asinh(x)
+  case (OP_ACOSH)
+    if (x < 1.0_real32) then
+      err = error_type(INVALID, "evaluate", &
+        & "Inverse hyperbolic cosine requires x >= 1.")
+      return
+    end if
+    value = acosh(x)
+  case (OP_ATANH)
+    if (abs(x) >= 1.0_real32) then
+      err = error_type(INVALID, "evaluate", &
+        & "Inverse hyperbolic tangent requires |x| < 1.")
+      return
+    end if
+    value = atanh(x)
+  case (OP_ERF)
+    value = erf(x)
+  case (OP_ERFC)
+    value = erfc(x)
+  case (OP_ERFC_SCALED)
+    value = erfc_scaled(x)
+  case (OP_GAMMA)
+    if (x <= 0.0_real32 .and. x == aint(x)) then
+      err = error_type(INVALID, "evaluate", &
+        & "Gamma has a pole at this value.")
+      return
+    end if
+    value = gamma(x)
+  case (OP_LOG_GAMMA)
+    if (x <= 0.0_real32 .and. x == aint(x)) then
+      err = error_type(INVALID, "evaluate", &
+        & "Log gamma has a pole at this value.")
+      return
+    end if
+    value = log_gamma(x)
+  case (OP_BESSEL_J0)
+    ! Some macOS Flang runtimes lack the real32 Bessel symbols.
+    value = real(bessel_j0(real(x, real64)), real32)
+  case (OP_BESSEL_J1)
+    value = real(bessel_j1(real(x, real64)), real32)
+  case (OP_BESSEL_Y0)
+    if (x <= 0.0_real32) then
+      err = error_type(INVALID, "evaluate", &
+        & "Bessel Y requires positive data.")
+      return
+    end if
+    value = real(bessel_y0(real(x, real64)), real32)
+  case (OP_BESSEL_Y1)
+    if (x <= 0.0_real32) then
+      err = error_type(INVALID, "evaluate", &
+        & "Bessel Y requires positive data.")
+      return
+    end if
+    value = real(bessel_y1(real(x, real64)), real32)
+  case default
+    err = error_type(INVALID, "evaluate", &
+      & "Unknown unary intrinsic operation.")
+  end select
+end function apply_unary_real32
+
+function apply_unary_real64(operation, x, err) result(value)
+  integer(operation_kind), intent(in) :: operation
+  real(real64), intent(in) :: x
+  type(error_type), intent(out) :: err
+  real(real64) :: value
+
+  err = error_type()
+  value = 0.0_real64
+  select case (operation)
+  case (OP_ABS)
+    value = abs(x)
+  case (OP_SQRT)
+    if (x < 0.0_real64) then
+      err = error_type(INVALID, "evaluate", &
+        & "Square root requires nonnegative data.")
+      return
+    end if
+    value = sqrt(x)
+  case (OP_EXP)
+    value = exp(x)
+  case (OP_LOG)
+    if (x <= 0.0_real64) then
+      err = error_type(INVALID, "evaluate", &
+        & "Logarithm requires positive data.")
+      return
+    end if
+    value = log(x)
+  case (OP_LOG10)
+    if (x <= 0.0_real64) then
+      err = error_type(INVALID, "evaluate", &
+        & "Logarithm requires positive data.")
+      return
+    end if
+    value = log10(x)
+  case (OP_SIN)
+    value = sin(x)
+  case (OP_COS)
+    value = cos(x)
+  case (OP_TAN)
+    value = tan(x)
+  case (OP_ASIN)
+    if (abs(x) > 1.0_real64) then
+      err = error_type(INVALID, "evaluate", &
+        & "Inverse sine requires values in [-1, 1].")
+      return
+    end if
+    value = asin(x)
+  case (OP_ACOS)
+    if (abs(x) > 1.0_real64) then
+      err = error_type(INVALID, "evaluate", &
+        & "Inverse cosine requires values in [-1, 1].")
+      return
+    end if
+    value = acos(x)
+  case (OP_ATAN)
+    value = atan(x)
+  case (OP_SINH)
+    value = sinh(x)
+  case (OP_COSH)
+    value = cosh(x)
+  case (OP_TANH)
+    value = tanh(x)
+  case (OP_ASINH)
+    value = asinh(x)
+  case (OP_ACOSH)
+    if (x < 1.0_real64) then
+      err = error_type(INVALID, "evaluate", &
+        & "Inverse hyperbolic cosine requires x >= 1.")
+      return
+    end if
+    value = acosh(x)
+  case (OP_ATANH)
+    if (abs(x) >= 1.0_real64) then
+      err = error_type(INVALID, "evaluate", &
+        & "Inverse hyperbolic tangent requires |x| < 1.")
+      return
+    end if
+    value = atanh(x)
+  case (OP_ERF)
+    value = erf(x)
+  case (OP_ERFC)
+    value = erfc(x)
+  case (OP_ERFC_SCALED)
+    value = erfc_scaled(x)
+  case (OP_GAMMA)
+    if (x <= 0.0_real64 .and. x == aint(x)) then
+      err = error_type(INVALID, "evaluate", &
+        & "Gamma has a pole at this value.")
+      return
+    end if
+    value = gamma(x)
+  case (OP_LOG_GAMMA)
+    if (x <= 0.0_real64 .and. x == aint(x)) then
+      err = error_type(INVALID, "evaluate", &
+        & "Log gamma has a pole at this value.")
+      return
+    end if
+    value = log_gamma(x)
+  case (OP_BESSEL_J0)
+    value = bessel_j0(x)
+  case (OP_BESSEL_J1)
+    value = bessel_j1(x)
+  case (OP_BESSEL_Y0)
+    if (x <= 0.0_real64) then
+      err = error_type(INVALID, "evaluate", &
+        & "Bessel Y requires positive data.")
+      return
+    end if
+    value = bessel_y0(x)
+  case (OP_BESSEL_Y1)
+    if (x <= 0.0_real64) then
+      err = error_type(INVALID, "evaluate", &
+        & "Bessel Y requires positive data.")
+      return
+    end if
+    value = bessel_y1(x)
+  case default
+    err = error_type(INVALID, "evaluate", &
+      & "Unknown unary intrinsic operation.")
+  end select
+end function apply_unary_real64
 
 end submodule nc4f_data_expression

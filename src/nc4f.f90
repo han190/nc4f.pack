@@ -17,6 +17,10 @@ public :: NC_BYTE, NC_CHAR, NC_SHORT, NC_INT, NC_INT64, NC_FLOAT, NC_DOUBLE
 
 public :: datarray, dataset, extract, initialize, set_storage
 public :: evaluate
+public :: abs, sqrt, exp, log, log10, sin, cos, tan
+public :: asin, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh
+public :: erf, erfc, erfc_scaled, gamma, log_gamma
+public :: bessel_j0, bessel_j1, bessel_y0, bessel_y1
 public :: nameof, typeof, shape, size, sum
 public :: operator(.att.), operator(.and.), operator(.dim.), operator(.exists.)
 public :: operator(==), operator(/=), operator(+), operator(-), &

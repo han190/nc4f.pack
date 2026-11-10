@@ -5,6 +5,30 @@ This page documents the public procedures re-exported by `nc4f`. Optional
 follows the library's fail-fast policy. See [Exposed NC
 Constants](exposed-nc-constants.md) for constants used with `error_type`.
 
+## Unary Elementwise Intrinsics -- Build a Deferred Expression
+
+`abs`, `sqrt`, `exp`, `log`, `log10`, `sin`, `cos`, `tan`, `asin`, `acos`,
+`atan`, `sinh`, `cosh`, `tanh`, `asinh`, `acosh`, `atanh`, `erf`, `erfc`,
+`erfc_scaled`, `gamma`, `log_gamma`, `bessel_j0`, `bessel_j1`, `bessel_y0`,
+and `bessel_y1` accept a `variable_type` or `expression_type` and return
+an `expression_type`. The intrinsic scalar forms remain available. `abs`
+accepts the supported integer and real kinds; the others require `real32`
+or `real64`. Evaluated results keep the operand's type and ordered dimensions.
+Trigonometric arguments and inverse results use radians. Inputs outside a
+function's real domain return an error from `evaluate`.
+
+```fortran
+type(variable_type), target :: theta
+type(variable_type) :: result
+real :: scale
+
+result = scale * cos(theta)
+```
+
+The expression borrows `theta`, so it must remain alive until evaluation.
+See [Arithmetic Operators](operators.md)
+for the shared expression lifetime and error rules.
+
 ## `ERROR_MSG` -- Format an Operation Result
 
 | Synopsis |

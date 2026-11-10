@@ -103,6 +103,7 @@ add_library(nc4f STATIC
   src/nc4f_data_clone.f90
   src/nc4f_data_dimension.f90
   src/nc4f_data_expression.f90
+  src/nc4f_data_unary_intrinsic.f90
   src/nc4f_data_group.f90
   src/nc4f_data_io.f90
   src/nc4f_data_utility.f90
@@ -168,6 +169,7 @@ if(NC4F_BUILD_TESTS)
     test/nc4f_test_data_dimension.f90
     test/nc4f_test_data_extract.f90
     test/nc4f_test_data_expression.f90
+    test/nc4f_test_data_unary_intrinsic.f90
     test/nc4f_test_data_group.f90
     test/nc4f_test_data_io.f90
     test/nc4f_test_data_utility.f90
@@ -197,7 +199,8 @@ if(NC4F_BUILD_TESTS)
       c_interface_dimension c_interface_error c_interface_group
       c_interface_io c_interface_utility c_interface_variable
       data_arithmetic data_attribute data_attribute_constructor data_clone
-      data_dimension data_extract data_expression data_group data_io
+      data_dimension data_extract data_expression data_unary_intrinsic
+      data_group data_io
       data_utility data_validate
       data_variable data_variable_constructor netcdf_attribute netcdf_dataset
       netcdf_dimension netcdf_error netcdf_group netcdf_utility netcdf_variable real_data)
