@@ -1,4 +1,4 @@
-submodule(nc4f_test_data) nc4f_test_data_unary_intrinsic
+submodule(nc4f_test_data) nc4f_test_data_intrinsic
 use, intrinsic :: iso_fortran_env, only: &
   & int8, int16, int32, int64, real32, real64
 use, non_intrinsic :: testdrive, only: &
@@ -12,11 +12,11 @@ use, non_intrinsic :: nc4f, only: &
   & cos, tan, asin, acos, atan, sinh, &
   & cosh, tanh, asinh, acosh, atanh, erf, &
   & erfc, erfc_scaled, gamma, log_gamma, bessel_j0, bessel_j1, &
-  & bessel_y0, bessel_y1
+  & bessel_y0, bessel_y1, dim, sign, mod, modulo, atan2, hypot
 implicit none (type, external)
 contains
 
-module subroutine collect_data_unary_intrinsic(tests)
+module subroutine collect_data_intrinsic(tests)
   type(unittest_type), allocatable, intent(out) :: tests(:)
 
   tests = [ &
@@ -25,8 +25,11 @@ module subroutine collect_data_unary_intrinsic(tests)
     & new_unittest("integer absolute value", test_integer_abs), &
     & new_unittest("nested unary", test_nested_unary), &
     & new_unittest("unary invalid kinds", test_invalid_kind), &
-    & new_unittest("unary domains", test_domains)]
-end subroutine collect_data_unary_intrinsic
+    & new_unittest("unary domains", test_domains), &
+    & new_unittest("real binary intrinsics", test_real_binary), &
+    & new_unittest("integer binary intrinsics", test_integer_binary), &
+    & new_unittest("binary domains and dimensions", test_binary_errors)]
+end subroutine collect_data_intrinsic
 
 subroutine test_real32_intrinsics(error)
   type(error_type), allocatable, intent(out) :: error
@@ -547,4 +550,174 @@ subroutine test_domains(error)
   if (allocated(error)) return
 end subroutine test_domains
 
-end submodule nc4f_test_data_unary_intrinsic
+subroutine test_real_binary(error)
+  !! Check both real kinds, nested expressions, and scalar operands.
+  type(error_type), allocatable, intent(out) :: error
+  type(variable_type), target :: xvar, yvar
+  real(real32) :: x(2), y(2)
+  real(real64) :: xd(2), yd(2)
+
+  x = [-2.5_real32, 3.5_real32]
+  y = [1.5_real32, -4.0_real32]
+  xvar = datarray("x", x, ["site".dim.2])
+  yvar = datarray("y", y, ["site".dim.2])
+  call check_real32_unary(dim(xvar, yvar), dim(x, y), &
+    & "dim real32", error)
+  if (allocated(error)) return
+  call check_real32_unary(sign(xvar + 0.0_real32, yvar), &
+    & sign(x, y), "sign real32", error)
+  if (allocated(error)) return
+  call check_real32_unary(mod(xvar, yvar + 0.0_real32), &
+    & mod(x, y), "mod real32", error)
+  if (allocated(error)) return
+  call check_real32_unary(modulo(xvar + 0.0_real32, &
+    & yvar + 0.0_real32), modulo(x, y), "modulo real32", error)
+  if (allocated(error)) return
+  call check_real32_unary(atan2(yvar, xvar), atan2(y, x), &
+    & "atan2 real32", error)
+  if (allocated(error)) return
+  call check_real32_unary(atan(yvar + 0.0_real32, xvar), &
+    & atan(y, x), "atan two arguments", error)
+  if (allocated(error)) return
+  call check_real32_unary(hypot(xvar, yvar + 0.0_real32), &
+    & hypot(x, y), "hypot real32", error)
+  if (allocated(error)) return
+  call check_real32_unary(dim(xvar, 1.0_real32), &
+    & dim(x, 1.0_real32), "dim right scalar", error)
+  if (allocated(error)) return
+  call check_real32_unary(sign(-2.0_real32, yvar), &
+    & sign(-2.0_real32, y), "sign left scalar", error)
+  if (allocated(error)) return
+  call check_real32_unary(mod(xvar, 2.0_real32), &
+    & mod(x, 2.0_real32), "mod right scalar", error)
+  if (allocated(error)) return
+  call check_real32_unary(modulo(-3.0_real32, yvar), &
+    & modulo(-3.0_real32, y), "modulo left scalar", error)
+  if (allocated(error)) return
+  call check_real32_unary(atan2(1.0_real32, xvar), &
+    & atan2(1.0_real32, x), "atan2 left scalar", error)
+  if (allocated(error)) return
+  call check_real32_unary(atan(yvar, 2.0_real32), &
+    & atan(y, 2.0_real32), "atan right scalar", error)
+  if (allocated(error)) return
+  call check_real32_unary(hypot(3.0_real32, yvar), &
+    & hypot(3.0_real32, y), "hypot left scalar", error)
+  if (allocated(error)) return
+
+  xd = [-2.5_real64, 3.5_real64]
+  yd = [1.5_real64, -4.0_real64]
+  xvar = datarray("x", xd, ["site".dim.2])
+  yvar = datarray("y", yd, ["site".dim.2])
+  call check_real64_unary(dim(xvar, yvar), dim(xd, yd), &
+    & "dim real64", error)
+  if (allocated(error)) return
+  call check_real64_unary(sign(xvar, yvar), sign(xd, yd), &
+    & "sign real64", error)
+  if (allocated(error)) return
+  call check_real64_unary(mod(xvar, yvar), mod(xd, yd), &
+    & "mod real64", error)
+  if (allocated(error)) return
+  call check_real64_unary(modulo(xvar, yvar), modulo(xd, yd), &
+    & "modulo real64", error)
+  if (allocated(error)) return
+  call check_real64_unary(atan2(yvar, xvar), atan2(yd, xd), &
+    & "atan2 real64", error)
+  if (allocated(error)) return
+  call check_real64_unary(atan(yvar, xvar), atan(yd, xd), &
+    & "atan two arguments real64", error)
+  if (allocated(error)) return
+  call check_real64_unary(hypot(xvar, yvar), hypot(xd, yd), &
+    & "hypot real64", error)
+end subroutine test_real_binary
+
+subroutine test_integer_binary(error)
+  !! Check integer operations across all supported storage kinds.
+  type(error_type), allocatable, intent(out) :: error
+  type(variable_type), target :: a, b, result
+  type(error_type_model) :: err
+  integer(int8), pointer :: v8(:)
+  integer(int16), pointer :: v16(:)
+  integer(int32), pointer :: v32(:)
+  integer(int64), pointer :: v64(:)
+
+  a = datarray("a", [-5_int8, 7_int8], ["site".dim.2])
+  b = datarray("b", [2_int8, -3_int8], ["site".dim.2])
+  call evaluate(dim(a, b), result, err)
+  call check(error, err%code == NC_NOERR, "int8 dim failed")
+  if (allocated(error)) return
+  call extract(result, v8)
+  call check(error, all(v8 == [0_int8, 10_int8]), &
+    & "int8 dim differs")
+  if (allocated(error)) return
+
+  a = datarray("a", [-5_int16, 7_int16], ["site".dim.2])
+  call evaluate(sign(a, -2_int16), result, err)
+  call check(error, err%code == NC_NOERR, "int16 sign failed")
+  if (allocated(error)) return
+  call extract(result, v16)
+  call check(error, all(v16 == [-5_int16, -7_int16]), &
+    & "int16 sign differs")
+  if (allocated(error)) return
+
+  a = datarray("a", [-5_int32, 7_int32], ["site".dim.2])
+  b = datarray("b", [2_int32, -3_int32], ["site".dim.2])
+  call evaluate(mod(a, b), result, err)
+  call check(error, err%code == NC_NOERR, "int32 mod failed")
+  if (allocated(error)) return
+  call extract(result, v32)
+  call check(error, all(v32 == mod([-5_int32, 7_int32], &
+    & [2_int32, -3_int32])), "int32 mod differs")
+  if (allocated(error)) return
+  call evaluate(modulo(a, b), result, err)
+  call check(error, err%code == NC_NOERR, "int32 modulo failed")
+  if (allocated(error)) return
+  call extract(result, v32)
+  call check(error, all(v32 == modulo([-5_int32, 7_int32], &
+    & [2_int32, -3_int32])), "int32 modulo differs")
+  if (allocated(error)) return
+
+  a = datarray("a", [-5_int64, 7_int64], ["site".dim.2])
+  call evaluate(modulo(a, 3_int64), result, err)
+  call check(error, err%code == NC_NOERR, "int64 modulo failed")
+  if (allocated(error)) return
+  call extract(result, v64)
+  call check(error, all(v64 == [1_int64, 1_int64]), &
+    & "int64 modulo differs")
+end subroutine test_integer_binary
+
+subroutine test_binary_errors(error)
+  !! Reject invalid kinds, unequal dimensions, and undefined input pairs.
+  type(error_type), allocatable, intent(out) :: error
+  type(variable_type), target :: a, b, result
+  type(error_type_model) :: err
+
+  a = datarray("a", [1.0_real32, 2.0_real32], ["x".dim.2])
+  b = datarray("b", [0.0_real32, 1.0_real32], ["x".dim.2])
+  call evaluate(mod(a, b), result, err)
+  call check(error, err%code == NC_EINVAL, &
+    & "mod accepted a zero divisor")
+  if (allocated(error)) return
+  call evaluate(modulo(a, b), result, err)
+  call check(error, err%code == NC_EINVAL, &
+    & "modulo accepted a zero divisor")
+  if (allocated(error)) return
+  call evaluate(atan2(b, b), result, err)
+  call check(error, err%code == NC_EINVAL, &
+    & "atan2 accepted a zero pair")
+  if (allocated(error)) return
+  b = datarray("b", [1.0_real32, 2.0_real32], ["y".dim.2])
+  call evaluate(hypot(a, b), result, err)
+  call check(error, err%code == NC_EINVAL, &
+    & "hypot accepted different dimensions")
+  if (allocated(error)) return
+  call evaluate(dim(a, 1.0_real64), result, err)
+  call check(error, err%code == NC_EINVAL, &
+    & "dim accepted a different scalar kind")
+  if (allocated(error)) return
+  a = datarray("a", [1_int32, 2_int32], ["x".dim.2])
+  call evaluate(hypot(a, a), result, err)
+  call check(error, err%code == NC_EINVAL, &
+    & "hypot accepted integer data")
+end subroutine test_binary_errors
+
+end submodule nc4f_test_data_intrinsic

@@ -18,6 +18,7 @@ public :: attribute_type, dimension_type, error_type, delete_attribute, &
   & asin, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh, &
   & erf, erfc, erfc_scaled, gamma, log_gamma, &
   & bessel_j0, bessel_j1, bessel_y0, bessel_y1, &
+  & dim, sign, mod, modulo, atan2, hypot, &
   & shape, size, sum, buffer_size, buffer2cptr, &
   & validate, error_msg, return_err, has_err, compute_buffer_size, compute_size
 private
@@ -72,6 +73,12 @@ enum, bind(c)
   enumerator :: OP_BESSEL_J1 = 41
   enumerator :: OP_BESSEL_Y0 = 42
   enumerator :: OP_BESSEL_Y1 = 43
+  enumerator :: OP_DIM = 44
+  enumerator :: OP_SIGN = 45
+  enumerator :: OP_MOD = 46
+  enumerator :: OP_MODULO = 47
+  enumerator :: OP_ATAN2 = 48
+  enumerator :: OP_HYPOT = 49
 end enum
 integer, parameter :: operation_kind = kind(OP_INVALID)
 
@@ -275,7 +282,7 @@ include "nc4f_data_attribute_constructor.inc"
 include "nc4f_data_variable_constructor.inc"
 include "nc4f_data_extract.inc"
 include "nc4f_data_arithmetic.inc"
-include "nc4f_data_unary_intrinsic.inc"
+include "nc4f_data_intrinsic.inc"
 
 interface rename_dimension
   module procedure :: rename_dim_dim, rename_dim_var, rename_dim_grp

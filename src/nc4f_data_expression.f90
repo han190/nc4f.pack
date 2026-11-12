@@ -203,7 +203,8 @@ pure recursive subroutine validate_expr(expr, dtype, dims, n, err)
       err = error_type(INVALID, "evaluate", &
         & "Unary intrinsic requires real data.")
     end if
-  case (OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_POW)
+  case (OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_POW, &
+    & OP_DIM, OP_SIGN, OP_MOD, OP_MODULO, OP_ATAN2, OP_HYPOT)
     if (.not. allocated(expr%left) .or. .not. allocated(expr%right)) then
       err = error_type(INVALID, "evaluate", "Arithmetic node is incomplete.")
       return
@@ -215,6 +216,13 @@ pure recursive subroutine validate_expr(expr, dtype, dims, n, err)
     if (dtype /= right_type) then
       err = error_type(INVALID, "evaluate", &
         & "Operand types differ.")
+      return
+    end if
+    if ((expr%operation == OP_ATAN2 .or. &
+      & expr%operation == OP_HYPOT) .and. &
+      & dtype /= FLOAT_TYPE .and. dtype /= DOUBLE_TYPE) then
+      err = error_type(INVALID, "evaluate", &
+        & "This intrinsic requires real data.")
       return
     end if
     if (is_scalar_node(expr%left)) then
@@ -300,7 +308,8 @@ recursive function eval_int8(expr, i, err) result(value)
       return
     end if
     value = abs(left)
-  case (OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_POW)
+  case (OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_POW, &
+    & OP_DIM, OP_SIGN, OP_MOD, OP_MODULO, OP_ATAN2, OP_HYPOT)
     left = eval_int8(expr%left, i, err)
     if (.exists. err) return
     right = eval_int8(expr%right, i, err)
@@ -325,6 +334,30 @@ recursive function eval_int8(expr, i, err) result(value)
         return
       end if
       value = left**right
+    case (OP_DIM)
+      value = dim(left, right)
+    case (OP_SIGN)
+      value = sign(left, right)
+    case (OP_MOD)
+      if (right == 0) then
+        err = error_type(INVALID, "evaluate", "MOD divisor is zero.")
+        return
+      end if
+      if (right == -1) then
+        value = 0
+      else
+        value = mod(left, right)
+      end if
+    case (OP_MODULO)
+      if (right == 0) then
+        err = error_type(INVALID, "evaluate", "MODULO divisor is zero.")
+        return
+      end if
+      if (right == -1) then
+        value = 0
+      else
+        value = modulo(left, right)
+      end if
     case default
       err = error_type(INVALID, "evaluate", &
         & "Unknown expression operation.")
@@ -399,7 +432,8 @@ recursive function eval_int16(expr, i, err) result(value)
       return
     end if
     value = abs(left)
-  case (OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_POW)
+  case (OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_POW, &
+    & OP_DIM, OP_SIGN, OP_MOD, OP_MODULO, OP_ATAN2, OP_HYPOT)
     left = eval_int16(expr%left, i, err)
     if (.exists. err) return
     right = eval_int16(expr%right, i, err)
@@ -424,6 +458,30 @@ recursive function eval_int16(expr, i, err) result(value)
         return
       end if
       value = left**right
+    case (OP_DIM)
+      value = dim(left, right)
+    case (OP_SIGN)
+      value = sign(left, right)
+    case (OP_MOD)
+      if (right == 0) then
+        err = error_type(INVALID, "evaluate", "MOD divisor is zero.")
+        return
+      end if
+      if (right == -1) then
+        value = 0
+      else
+        value = mod(left, right)
+      end if
+    case (OP_MODULO)
+      if (right == 0) then
+        err = error_type(INVALID, "evaluate", "MODULO divisor is zero.")
+        return
+      end if
+      if (right == -1) then
+        value = 0
+      else
+        value = modulo(left, right)
+      end if
     case default
       err = error_type(INVALID, "evaluate", &
         & "Unknown expression operation.")
@@ -498,7 +556,8 @@ recursive function eval_int32(expr, i, err) result(value)
       return
     end if
     value = abs(left)
-  case (OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_POW)
+  case (OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_POW, &
+    & OP_DIM, OP_SIGN, OP_MOD, OP_MODULO, OP_ATAN2, OP_HYPOT)
     left = eval_int32(expr%left, i, err)
     if (.exists. err) return
     right = eval_int32(expr%right, i, err)
@@ -523,6 +582,30 @@ recursive function eval_int32(expr, i, err) result(value)
         return
       end if
       value = left**right
+    case (OP_DIM)
+      value = dim(left, right)
+    case (OP_SIGN)
+      value = sign(left, right)
+    case (OP_MOD)
+      if (right == 0) then
+        err = error_type(INVALID, "evaluate", "MOD divisor is zero.")
+        return
+      end if
+      if (right == -1) then
+        value = 0
+      else
+        value = mod(left, right)
+      end if
+    case (OP_MODULO)
+      if (right == 0) then
+        err = error_type(INVALID, "evaluate", "MODULO divisor is zero.")
+        return
+      end if
+      if (right == -1) then
+        value = 0
+      else
+        value = modulo(left, right)
+      end if
     case default
       err = error_type(INVALID, "evaluate", &
         & "Unknown expression operation.")
@@ -597,7 +680,8 @@ recursive function eval_int64(expr, i, err) result(value)
       return
     end if
     value = abs(left)
-  case (OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_POW)
+  case (OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_POW, &
+    & OP_DIM, OP_SIGN, OP_MOD, OP_MODULO, OP_ATAN2, OP_HYPOT)
     left = eval_int64(expr%left, i, err)
     if (.exists. err) return
     right = eval_int64(expr%right, i, err)
@@ -622,6 +706,30 @@ recursive function eval_int64(expr, i, err) result(value)
         return
       end if
       value = left**right
+    case (OP_DIM)
+      value = dim(left, right)
+    case (OP_SIGN)
+      value = sign(left, right)
+    case (OP_MOD)
+      if (right == 0) then
+        err = error_type(INVALID, "evaluate", "MOD divisor is zero.")
+        return
+      end if
+      if (right == -1) then
+        value = 0
+      else
+        value = mod(left, right)
+      end if
+    case (OP_MODULO)
+      if (right == 0) then
+        err = error_type(INVALID, "evaluate", "MODULO divisor is zero.")
+        return
+      end if
+      if (right == -1) then
+        value = 0
+      else
+        value = modulo(left, right)
+      end if
     case default
       err = error_type(INVALID, "evaluate", &
         & "Unknown expression operation.")
@@ -726,7 +834,8 @@ recursive function eval_real32(expr, i, err) result(value)
     left = eval_real32(expr%left, i, err)
     if (.exists. err) return
     value = apply_unary_real32(expr%operation, left, err)
-  case (OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_POW)
+  case (OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_POW, &
+    & OP_DIM, OP_SIGN, OP_MOD, OP_MODULO, OP_ATAN2, OP_HYPOT)
     left = eval_real32(expr%left, i, err)
     if (.exists. err) return
     right = eval_real32(expr%right, i, err)
@@ -756,6 +865,31 @@ recursive function eval_real32(expr, i, err) result(value)
         return
       end if
       value = left**right
+    case (OP_DIM)
+      value = dim(left, right)
+    case (OP_SIGN)
+      value = sign(left, right)
+    case (OP_MOD)
+      if (right == 0.0) then
+        err = error_type(INVALID, "evaluate", "MOD divisor is zero.")
+        return
+      end if
+      value = mod(left, right)
+    case (OP_MODULO)
+      if (right == 0.0) then
+        err = error_type(INVALID, "evaluate", "MODULO divisor is zero.")
+        return
+      end if
+      value = modulo(left, right)
+    case (OP_ATAN2)
+      if (left == 0.0 .and. right == 0.0) then
+        err = error_type(INVALID, "evaluate", &
+          & "ATAN2 arguments cannot both be zero.")
+        return
+      end if
+      value = atan2(left, right)
+    case (OP_HYPOT)
+      value = hypot(left, right)
     case default
       err = error_type(INVALID, "evaluate", &
         & "Unknown expression operation.")
@@ -894,7 +1028,8 @@ recursive function eval_real64(expr, i, err) result(value)
     left = eval_real64(expr%left, i, err)
     if (.exists. err) return
     value = apply_unary_real64(expr%operation, left, err)
-  case (OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_POW)
+  case (OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_POW, &
+    & OP_DIM, OP_SIGN, OP_MOD, OP_MODULO, OP_ATAN2, OP_HYPOT)
     left = eval_real64(expr%left, i, err)
     if (.exists. err) return
     right = eval_real64(expr%right, i, err)
@@ -924,6 +1059,31 @@ recursive function eval_real64(expr, i, err) result(value)
         return
       end if
       value = left**right
+    case (OP_DIM)
+      value = dim(left, right)
+    case (OP_SIGN)
+      value = sign(left, right)
+    case (OP_MOD)
+      if (right == 0.0) then
+        err = error_type(INVALID, "evaluate", "MOD divisor is zero.")
+        return
+      end if
+      value = mod(left, right)
+    case (OP_MODULO)
+      if (right == 0.0) then
+        err = error_type(INVALID, "evaluate", "MODULO divisor is zero.")
+        return
+      end if
+      value = modulo(left, right)
+    case (OP_ATAN2)
+      if (left == 0.0 .and. right == 0.0) then
+        err = error_type(INVALID, "evaluate", &
+          & "ATAN2 arguments cannot both be zero.")
+        return
+      end if
+      value = atan2(left, right)
+    case (OP_HYPOT)
+      value = hypot(left, right)
     case default
       err = error_type(INVALID, "evaluate", &
         & "Unknown expression operation.")

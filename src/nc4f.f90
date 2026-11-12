@@ -21,10 +21,11 @@ public :: abs, sqrt, exp, log, log10, sin, cos, tan
 public :: asin, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh
 public :: erf, erfc, erfc_scaled, gamma, log_gamma
 public :: bessel_j0, bessel_j1, bessel_y0, bessel_y1
+public :: dim, sign, mod, modulo, atan2, hypot
 public :: nameof, typeof, shape, size, sum
 public :: operator(.att.), operator(.and.), operator(.dim.), operator(.exists.)
-public :: operator(==), operator(/=), operator(+), operator(-), &
-  & operator(*), operator(/), operator(**), assignment(=)
+public :: operator(==), operator(/=), operator(+), operator(-)
+public :: operator(*), operator(/), operator(**), assignment(=)
 
 public :: open_netcdf, close_netcdf, to_netcdf, define_variable, put_variable
 public :: inquire_dimensions, inquire_variable, inquire_subgroups, inquire_group

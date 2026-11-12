@@ -7,7 +7,7 @@ public :: collect_data_attribute_constructor
 public :: collect_data_clone
 public :: collect_data_dimension, collect_data_extract
 public :: collect_data_expression
-public :: collect_data_unary_intrinsic
+public :: collect_data_intrinsic
 public :: collect_data_group, collect_data_io
 public :: collect_data_utility, collect_data_validate
 public :: collect_data_variable
@@ -42,9 +42,9 @@ interface
     type(unittest_type), allocatable, intent(out) :: tests(:)
   end subroutine collect_data_expression
 
-  module subroutine collect_data_unary_intrinsic(tests)
+  module subroutine collect_data_intrinsic(tests)
     type(unittest_type), allocatable, intent(out) :: tests(:)
-  end subroutine collect_data_unary_intrinsic
+  end subroutine collect_data_intrinsic
 
   module subroutine collect_data_group(tests)
     type(unittest_type), allocatable, intent(out) :: tests(:)

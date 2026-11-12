@@ -217,7 +217,7 @@ $(BUILD_DIR)/%.o: %.f90
 # Object prerequisites enforce module/submodule order and propagate interface changes.
 $(BUILD_DIR)/nc4f_c_interface.o: $(C_INTERFACE_INC)
 $(BUILD_DIR)/nc4f_data.o: $(SRC_INC) \
-	$(SRC_DIR)/nc4f_data_unary_intrinsic.inc
+	$(SRC_DIR)/nc4f_data_intrinsic.inc
 $(filter $(BUILD_DIR)/nc4f_data_%.o,$(OBJ)): $(BUILD_DIR)/nc4f_data.o
 $(BUILD_DIR)/nc4f_netcdf.o: $(BUILD_DIR)/nc4f_data.o $(BUILD_DIR)/nc4f_c_interface.o
 $(filter $(BUILD_DIR)/nc4f_netcdf_%.o,$(OBJ)): $(BUILD_DIR)/nc4f_netcdf.o

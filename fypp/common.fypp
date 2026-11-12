@@ -6,6 +6,15 @@
 #: set kinds = ['int8', 'int16', 'int32', 'int64', 'real32', 'real64']
 #: set types = ['integer', 'integer', 'integer', 'integer', 'real', 'real']
 #: set dtypes = ['BYTE_TYPE', 'SHORT_TYPE', 'INT_TYPE', 'INT64_TYPE', 'FLOAT_TYPE', 'DOUBLE_TYPE']
+#: set unary_intrinsics = ['abs', 'sqrt', 'exp', 'log', 'log10']
+#: set unary_intrinsics = unary_intrinsics + ['sin', 'cos', 'tan', 'asin']
+#: set unary_intrinsics = unary_intrinsics + ['acos', 'atan', 'sinh', 'cosh']
+#: set unary_intrinsics = unary_intrinsics + ['tanh', 'asinh', 'acosh']
+#: set unary_intrinsics = unary_intrinsics + ['atanh', 'erf', 'erfc']
+#: set unary_intrinsics = unary_intrinsics + ['erfc_scaled', 'gamma']
+#: set unary_intrinsics = unary_intrinsics + ['log_gamma', 'bessel_j0']
+#: set unary_intrinsics = unary_intrinsics + ['bessel_j1', 'bessel_y0']
+#: set unary_intrinsics = unary_intrinsics + ['bessel_y1']
 
 #! Conditionally create a new line.
 #: def NEWLINE(cond=None)

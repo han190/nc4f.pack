@@ -4,9 +4,9 @@ use, intrinsic :: iso_fortran_env, only: real32
 use, non_intrinsic :: nc4f
 implicit none (type, external)
 
-integer, parameter :: nlon = 12, nlat = 7
+integer, parameter :: nlon = 83, nlat = 47
 ! Reference pressure (Pa) and dry-air constants (J kg-1 K-1).
-real, parameter :: P0 = 100000.0, R = 287.05, CP = 1004.0
+real, parameter :: P0 = 100000.0, R = 287.05, CP = 1004.0, TM = 273.15
 real, parameter :: PI = acos(-1.0)
 character(len=*), parameter :: file = "potential_temperature.nc"
 
@@ -20,17 +20,15 @@ type(variable_type) :: T, P, theta
 type(netcdf_type) :: nc
 integer :: i, j
 
-lon_vals = [(-165.0 + 30 * (i - 1), i=1, nlon)]
-lat_vals = [(-75.0 + 25 * (j - 1), j=1, nlat)]
+lon_vals = [(-180.0 + (i - 1) * 360.0 / nlon, i=1, nlon)]
+lat_vals = [(-90.0 + (j - 1) * 180.0 / (nlat - 1), j=1, nlat)]
 
 do concurrent (j=1:nlat, i=1:nlon)
   associate(phi => lat_vals(j) * PI / 180.0, &
     & lambda => lon_vals(i) * PI / 180.0)
 
-    tmp_vals(i, j) = 273.15 + 18.0 * cos(phi) &
-      & + 4.0 * sin(2.0 * lambda) * cos(phi)
-    pre_vals(i, j) = P0 - 7000.0 * sin(phi)**2 &
-      & + 600.0 * cos(3.0 * lambda) * cos(phi)
+    tmp_vals(i, j) = TM + sin(2.0 * lambda) * cos(phi) * 4.0
+    pre_vals(i, j) = P0 + cos(3.0 * lambda) * cos(phi) * 600.0
   end associate
 end do
 
@@ -45,7 +43,6 @@ tmp = datarray("temperature", tmp_vals, [lon_dim, lat_dim], &
   & atts=["units".att."K", "long_name".att."Air temperature"])
 pre = datarray("pressure", pre_vals, [lon_dim, lat_dim], &
   & atts=["units".att."Pa", "long_name".att."Air pressure"])
-
 call to_netcdf(file, [lat, lon, tmp, pre], &
   & atts=["title".att."Synthetic potential temperature example"])
 
@@ -54,11 +51,11 @@ T = get_variable(nc, "temperature")
 P = get_variable(nc, "pressure")
 call close_netcdf(nc)
 
-theta = T * (P0 / P)**(R / CP)
+theta = T*(P0/P)**(R/CP)
 theta%name = "theta"
 theta%atts = ["units".att."K", "long_name".att."Potential temperature"]
-
 call to_netcdf(file, theta, mode="a")
+
 print *, "Wrote to", file
 print *, theta
 
