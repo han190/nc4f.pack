@@ -6,4 +6,5 @@ data/
 !requirements-docs.txt
 !CMakeLists.txt
 site/
+reproducers/
 .DS_store

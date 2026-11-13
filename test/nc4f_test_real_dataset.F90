@@ -1,3 +1,9 @@
+#ifdef __LFORTRAN__
+#define NC4F_UNIT_KEYWORD unit
+#else
+#define NC4F_UNIT_KEYWORD newunit
+#endif
+
 submodule(nc4f_test_netcdf) nc4f_test_real_data
 use, intrinsic :: iso_fortran_env, only: int8, int16, int32, int64, &
   & real32, real64
@@ -342,7 +348,9 @@ subroutine nasa_cosp_read(passed)
     call inquire_group(nc, inq_dims=.true., inq_atts=.true., &
       & inq_vars=.true., inq_grps=.true., recur=.true., err=err)
     if ((err%code /= NC_NOERR)) exit nasa_read
-    open (newunit=file_unit, file=NETCDF_TYPE_RESULT_FILE, status="replace", &
+    file_unit = 92
+    open (NC4F_UNIT_KEYWORD=file_unit, file=NETCDF_TYPE_RESULT_FILE, &
+      & status="replace", &
       & action="write", iostat=iostat)
     if (iostat /= 0) exit nasa_read
     output_open = .true.
@@ -630,7 +638,8 @@ function render_sample_uddtio_(file, label, expected_dim, expected_var, &
   end if
 
   output_file = TEST_RESULTS_DIR//label//"_uddtio.txt"
-  open (newunit=file_unit, file=output_file, &
+  file_unit = 92
+  open (NC4F_UNIT_KEYWORD=file_unit, file=output_file, &
     & status="replace", action="write", iostat=iostat)
   if (iostat == 0) then
     write (file_unit, "(dt)", iostat=iostat) nc
@@ -647,7 +656,8 @@ function render_sample_uddtio_(file, label, expected_dim, expected_var, &
   variable_attribute_found = .false.
   attribute_found = .false.
   child_group_found = len(expected_group) == 0
-  open (newunit=file_unit, file=output_file, &
+  file_unit = 92
+  open (NC4F_UNIT_KEYWORD=file_unit, file=output_file, &
     & status="old", action="read", iostat=iostat)
   if (iostat == 0) then
     do

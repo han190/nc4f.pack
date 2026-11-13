@@ -177,9 +177,9 @@ if(NC4F_BUILD_TESTS)
     test/nc4f_test_data_dimension.f90
     test/nc4f_test_data_extract.f90
     test/nc4f_test_data_expression.f90
-    test/nc4f_test_data_intrinsic.f90
+    test/nc4f_test_data_intrinsics.F90
     test/nc4f_test_data_group.f90
-    test/nc4f_test_data_io.f90
+    test/nc4f_test_data_ios.F90
     test/nc4f_test_data_utility.f90
     test/nc4f_test_data_validate.f90
     test/nc4f_test_data_variable.f90
@@ -192,7 +192,7 @@ if(NC4F_BUILD_TESTS)
     test/nc4f_test_netcdf_group.f90
     test/nc4f_test_netcdf_utility.f90
     test/nc4f_test_netcdf_variable.f90
-    test/nc4f_test_real_data.f90)
+    test/nc4f_test_real_dataset.F90)
   set(nc4f_test_module_dir
     "${CMAKE_CURRENT_BINARY_DIR}/modules/tests")
   file(MAKE_DIRECTORY "${nc4f_test_module_dir}")

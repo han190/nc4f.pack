@@ -1,3 +1,9 @@
+#ifdef __LFORTRAN__
+#define NC4F_REFERENCE_ATAN atan2
+#else
+#define NC4F_REFERENCE_ATAN atan
+#endif
+
 submodule(nc4f_test_data) nc4f_test_data_intrinsic
 use, intrinsic :: iso_fortran_env, only: &
   & int8, int16, int32, int64, real32, real64
@@ -577,7 +583,7 @@ subroutine test_real_binary(error)
     & "atan2 real32", error)
   if (allocated(error)) return
   call check_real32_unary(atan(yvar + 0.0_real32, xvar), &
-    & atan(y, x), "atan two arguments", error)
+    & NC4F_REFERENCE_ATAN(y, x), "atan two arguments", error)
   if (allocated(error)) return
   call check_real32_unary(hypot(xvar, yvar + 0.0_real32), &
     & hypot(x, y), "hypot real32", error)
@@ -598,7 +604,8 @@ subroutine test_real_binary(error)
     & atan2(1.0_real32, x), "atan2 left scalar", error)
   if (allocated(error)) return
   call check_real32_unary(atan(yvar, 2.0_real32), &
-    & atan(y, 2.0_real32), "atan right scalar", error)
+    & NC4F_REFERENCE_ATAN(y, 2.0_real32), &
+    & "atan right scalar", error)
   if (allocated(error)) return
   call check_real32_unary(hypot(3.0_real32, yvar), &
     & hypot(3.0_real32, y), "hypot left scalar", error)
@@ -623,7 +630,8 @@ subroutine test_real_binary(error)
   call check_real64_unary(atan2(yvar, xvar), atan2(yd, xd), &
     & "atan2 real64", error)
   if (allocated(error)) return
-  call check_real64_unary(atan(yvar, xvar), atan(yd, xd), &
+  call check_real64_unary(atan(yvar, xvar), &
+    & NC4F_REFERENCE_ATAN(yd, xd), &
     & "atan two arguments real64", error)
   if (allocated(error)) return
   call check_real64_unary(hypot(xvar, yvar), hypot(xd, yd), &

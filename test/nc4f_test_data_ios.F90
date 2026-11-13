@@ -1,3 +1,9 @@
+#ifdef __LFORTRAN__
+#define NC4F_UNIT_KEYWORD unit
+#else
+#define NC4F_UNIT_KEYWORD newunit
+#endif
+
 submodule(nc4f_test_data) nc4f_test_data_io
 use, intrinsic :: iso_fortran_env, only: real32
 use, non_intrinsic :: testdrive, only: check, error_type, new_unittest, &
@@ -33,7 +39,8 @@ subroutine test_formatted(error)
   grp = dataset("root", [var], [att])
   nc%name = "/"
   nc%file = "model.nc"
-  open (newunit=unit, status="scratch", form="formatted")
+  unit = 91
+  open (NC4F_UNIT_KEYWORD=unit, status="scratch", form="formatted")
   write (unit, *, iostat=stat) att
   if (stat == 0) write (unit, *, iostat=stat) dim
   if (stat == 0) write (unit, *, iostat=stat) var
