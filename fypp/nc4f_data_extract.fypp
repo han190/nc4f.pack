@@ -4,63 +4,63 @@ implicit none (type, external)
 contains
 
 #: for D, T, K in zip(dtypes + ['CHAR_TYPE'], types + ['char'], kinds + ['char'])
-  #: for R in ('vector', 'scalar')
+#: for R in ('vector', 'scalar')
 module subroutine extract_att_${K}$_${R}$(att, ptr)
   !! Extract attribute data of kind `${K}$` as a `${R}$` from `att`.
   type(attribute_type), target, intent(in) :: att
   !! Source attribute to extract from.
-      #: if K == 'char' and R == 'scalar'
+#: if K == 'char' and R == 'scalar'
   character(len=:), pointer, intent(out) :: ptr
   !! Receives a newly allocated string copy; the caller must deallocate its target.
-      #: elif K == 'char' and R == 'vector'
+#: elif K == 'char' and R == 'vector'
   character, pointer, intent(out) :: ptr(:)
   !! Output vector of characters.
-      #: elif R == 'vector'
+#: elif R == 'vector'
   ${T}$(${K}$), pointer, intent(out) :: ptr(:)
   !! Output vector of `${T}$` of kind `${K}$`.
-      #: elif R == 'scalar'
+#: elif R == 'scalar'
   ${T}$(${K}$), pointer, intent(out) :: ptr
   !! Output scalar `${T}$` of kind `${K}$`.
-      #: endif
-      #: if (K == 'char' and R == 'scalar')
+#: endif
+#: if (K == 'char' and R == 'scalar')
   character, pointer :: ptrs(:)
   !! Temporary vector of characters used for scalar extraction.
   integer :: i
   !! Loop index for copying characters.
-      #: else
+#: else
   type(c_ptr) :: cptr
   !! C pointer used to map the attribute buffer into the Fortran pointer.
-      #: endif
+#: endif
 
   call validate(att, ${D}$, "[extract_att_${K}$_${R}$]")
-      #: if R == 'scalar' and T != 'char'
+#: if R == 'scalar' and T != 'char'
   if (att%len /= 1) error stop &
     & "[extract_att_${K}$_scalar] Not a scalar."
-      #: endif
-      #: if K == 'char' and R == 'scalar'
+#: endif
+#: if K == 'char' and R == 'scalar'
   allocate (character(len=att%len) :: ptr)
   if (att%len == 0) return
   call extract_att_char_vector(att, ptrs)
   do i = 1, size(ptrs)
     ptr(i:i) = ptrs(i)
   end do
-      #: elif R == 'vector'
+#: elif R == 'vector'
   if (att%len == 0) then
     nullify (ptr)
     return
   end if
   cptr = buffer2cptr(att)
   call c_f_pointer(cptr, ptr, [att%len])
-      #: elif R == 'scalar'
+#: elif R == 'scalar'
   cptr = buffer2cptr(att)
   call c_f_pointer(cptr, ptr)
-      #: endif
+#: endif
 end subroutine extract_att_${K}$_${R}$${NEWLINE(not (K == 'char' and R == 'scalar'))}$
-  #: endfor
+#: endfor
 #: endfor
 
 #: for D, T, K in zip(dtypes, types, kinds)
-  #: for R in range(1, MAX_RANK+1)
+#: for R in range(1, MAX_RANK+1)
 module subroutine extract_var_${K}$_${R}$d(var, ptr)
   !! Extract variable data of kind `${K}$` and rank ${R}$ into `ptr`.
   type(variable_type), target, intent(in) :: var
@@ -77,13 +77,13 @@ module subroutine extract_var_${K}$_${R}$d(var, ptr)
   end if
 
   cptr = buffer2cptr(var)
-      #: if R == 1
+#: if R == 1
   call c_f_pointer(cptr, ptr, [var%len])
-      #: else
+#: else
   call c_f_pointer(cptr, ptr, shape(var))
-      #: endif
+#: endif
 end subroutine extract_var_${K}$_${R}$d${NEWLINE(not (K == 'real64' and R == MAX_RANK))}$
-  #: endfor
+#: endfor
 #: endfor
 
 #: for R in range(1, MAX_RANK+1)
@@ -103,11 +103,11 @@ module subroutine extract_var_char_${R}$d(var, ptr)
   end if
 
   cptr = buffer2cptr(var)
-    #: if R == 1
+#: if R == 1
   call c_f_pointer(cptr, ptr, [var%len])
-    #: else
+#: else
   call c_f_pointer(cptr, ptr, shape(var))
-    #: endif
+#: endif
 end subroutine extract_var_char_${R}$d${NEWLINE(not (R == MAX_RANK))}$
 #: endfor
 

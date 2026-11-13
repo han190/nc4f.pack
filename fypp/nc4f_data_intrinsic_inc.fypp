@@ -3,107 +3,107 @@
 #: for NAME in unary_intrinsics
 interface ${NAME}$
   module procedure :: ${NAME}$_var, ${NAME}$_expr
-  #: if NAME == 'atan'
+#: if NAME == 'atan'
   module procedure :: atan_var_var, atan_var_expr, &
     & atan_expr_var, atan_expr_expr
-    #: for KIND in ['real32', 'real64']
+#: for KIND in ['real32', 'real64']
   module procedure :: atan_${KIND}$_var, atan_${KIND}$_expr
   module procedure :: atan_var_${KIND}$, atan_expr_${KIND}$
-    #: endfor
-  #: endif
+#: endfor
+#: endif
 end interface ${NAME}$
 
 #: endfor
 #: for NAME in binary_names
-  #: if NAME != 'atan'
+#: if NAME != 'atan'
 !! ${NAME.upper()} builds a deferred element-wise expression.
 interface ${NAME}$
   module procedure :: ${NAME}$_var_var, ${NAME}$_var_expr, &
     & ${NAME}$_expr_var, ${NAME}$_expr_expr
-    #: set allowed_kinds = kinds if NAME in ['dim', 'sign', 'mod', 'modulo'] else ['real32', 'real64']
-    #: for KIND in allowed_kinds
+#: set allowed_kinds = kinds if NAME in ['dim', 'sign', 'mod', 'modulo'] else ['real32', 'real64']
+#: for KIND in allowed_kinds
   module procedure :: ${NAME}$_${KIND}$_var, ${NAME}$_${KIND}$_expr
   module procedure :: ${NAME}$_var_${KIND}$, ${NAME}$_expr_${KIND}$
-    #: endfor
+#: endfor
 end interface ${NAME}$
 
-  #: endif
+#: endif
 #: endfor
 interface
 #: for NAME in unary_intrinsics
-  #: for SUFFIX in ['var', 'expr']
+#: for SUFFIX in ['var', 'expr']
   module function ${NAME}$_${SUFFIX}$(a) result(expr)
-    #: if SUFFIX == 'var'
+#: if SUFFIX == 'var'
     !! Build a deferred ${NAME.upper()}$ expression from a borrowed variable.
     type(variable_type), target, intent(in) :: a
     !! Input variable; its storage is borrowed until evaluation.
-    #: else
+#: else
     !! Build a deferred ${NAME.upper()}$ expression from an expression.
     type(expression_type), intent(in) :: a
     !! Input expression; its nodes are copied into the result.
-    #: endif
+#: endif
     type(expression_type) :: expr
   end function ${NAME}$_${SUFFIX}$
 
-  #: endfor
+#: endfor
 #: endfor
 #: for NAME in binary_names
-  #: for LEFT in ['var', 'expr']
-    #: for RIGHT in ['var', 'expr']
+#: for LEFT in ['var', 'expr']
+#: for RIGHT in ['var', 'expr']
   module function ${NAME}$_${LEFT}$_${RIGHT}$(a, b) result(expr)
     !! Build a deferred ${NAME.upper()}$ expression from two operands.
-      #: if LEFT == 'var'
+#: if LEFT == 'var'
     type(variable_type), target, intent(in) :: a
     !! Left variable, borrowed until evaluation.
-      #: else
+#: else
     type(expression_type), intent(in) :: a
     !! Left expression, copied into the result.
-      #: endif
-      #: if RIGHT == 'var'
+#: endif
+#: if RIGHT == 'var'
     type(variable_type), target, intent(in) :: b
     !! Right variable, borrowed until evaluation.
-      #: else
+#: else
     type(expression_type), intent(in) :: b
     !! Right expression, copied into the result.
-      #: endif
+#: endif
     type(expression_type) :: expr
   end function ${NAME}$_${LEFT}$_${RIGHT}$
 
-    #: endfor
-  #: endfor
-  #: set allowed_kinds = kinds if NAME in ['dim', 'sign', 'mod', 'modulo'] else ['real32', 'real64']
-  #: for KIND in allowed_kinds
-    #: set TYPE = 'integer' if KIND.startswith('int') else 'real'
-    #: for OTHER in ['var', 'expr']
+#: endfor
+#: endfor
+#: set allowed_kinds = kinds if NAME in ['dim', 'sign', 'mod', 'modulo'] else ['real32', 'real64']
+#: for KIND in allowed_kinds
+#: set TYPE = 'integer' if KIND.startswith('int') else 'real'
+#: for OTHER in ['var', 'expr']
   module function ${NAME}$_${KIND}$_${OTHER}$(a, b) result(expr)
     !! Build a deferred ${NAME.upper()}$ expression with a left scalar.
     ${TYPE}$(${KIND}$), intent(in) :: a
     !! Left scalar, stored by value in the expression.
-      #: if OTHER == 'var'
+#: if OTHER == 'var'
     type(variable_type), target, intent(in) :: b
     !! Right variable, borrowed until evaluation.
-      #: else
+#: else
     type(expression_type), intent(in) :: b
     !! Right expression, copied into the result.
-      #: endif
+#: endif
     type(expression_type) :: expr
   end function ${NAME}$_${KIND}$_${OTHER}$
 
   module function ${NAME}$_${OTHER}$_${KIND}$(a, b) result(expr)
     !! Build a deferred ${NAME.upper()}$ expression with a right scalar.
-      #: if OTHER == 'var'
+#: if OTHER == 'var'
     type(variable_type), target, intent(in) :: a
     !! Left variable, borrowed until evaluation.
-      #: else
+#: else
     type(expression_type), intent(in) :: a
     !! Left expression, copied into the result.
-      #: endif
+#: endif
     ${TYPE}$(${KIND}$), intent(in) :: b
     !! Right scalar, stored by value in the expression.
     type(expression_type) :: expr
-    #: set LAST = NAME == 'hypot' and KIND == 'real64' and OTHER == 'expr'
+#: set LAST = NAME == 'hypot' and KIND == 'real64' and OTHER == 'expr'
   end function ${NAME}$_${OTHER}$_${KIND}$${NEWLINE(not LAST)}$
-    #: endfor
-  #: endfor
+#: endfor
+#: endfor
 #: endfor
 end interface

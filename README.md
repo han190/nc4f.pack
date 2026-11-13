@@ -110,6 +110,14 @@ fpm test --profile debug --flag "$(pkg-config --cflags --libs netcdf)"
 
 Generated NetCDF test artifacts are written to `build/test-results/`.
 
+### MacOS + Homebrew
+
+If you use macos and homebrew there is a customized profile for fpm:
+
+```sh
+fpm test --profile macos-homebrew
+```
+
 ### Build and test with CMake
 
 CMake 3.24 or newer, a C compiler, and a supported Fortran compiler are required.

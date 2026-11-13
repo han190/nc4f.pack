@@ -7,135 +7,135 @@ implicit none (type, external)
 contains
 
 #: for NAME in unary_intrinsics
-  #: for SUFFIX in ['var', 'expr']
+#: for SUFFIX in ['var', 'expr']
 module function ${NAME}$_${SUFFIX}$(a) result(expr)
-  #: if SUFFIX == 'var'
+#: if SUFFIX == 'var'
   !! Build a deferred ${NAME.upper()}$ node from a borrowed variable.
   type(variable_type), target, intent(in) :: a
   !! Input variable; its storage is borrowed until evaluation.
-  #: else
+#: else
   !! Build a deferred ${NAME.upper()}$ node from a copied expression.
   type(expression_type), intent(in) :: a
   !! Input expression; its nodes are copied into the result.
-  #: endif
+#: endif
   type(expression_type) :: expr
 
   expr%operation = OP_${NAME.upper()}$
   allocate (expr%left)
-  #: if SUFFIX == 'var'
+#: if SUFFIX == 'var'
   expr%left%operation = OP_LEAF
   expr%left%leaf => a
-  #: else
+#: else
   expr%left = a
-  #: endif
+#: endif
 end function ${NAME}$_${SUFFIX}$
 
-  #: endfor
+#: endfor
 #: endfor
 #: set binary_names = ['dim', 'sign', 'mod', 'modulo', 'atan2', 'atan', 'hypot']
 #: for NAME in binary_names
-  #: set OPCODE = 'ATAN2' if NAME == 'atan' else NAME.upper()
-  #: for LEFT in ['var', 'expr']
-    #: for RIGHT in ['var', 'expr']
+#: set OPCODE = 'ATAN2' if NAME == 'atan' else NAME.upper()
+#: for LEFT in ['var', 'expr']
+#: for RIGHT in ['var', 'expr']
 module function ${NAME}$_${LEFT}$_${RIGHT}$(a, b) result(expr)
   !! Build a deferred ${NAME.upper()}$ node from two operands.
-    #: if LEFT == 'var'
+#: if LEFT == 'var'
   type(variable_type), target, intent(in) :: a
   !! Left variable, borrowed until evaluation.
-    #: else
+#: else
   type(expression_type), intent(in) :: a
   !! Left expression, copied into the result.
-    #: endif
-    #: if RIGHT == 'var'
+#: endif
+#: if RIGHT == 'var'
   type(variable_type), target, intent(in) :: b
   !! Right variable, borrowed until evaluation.
-    #: else
+#: else
   type(expression_type), intent(in) :: b
   !! Right expression, copied into the result.
-    #: endif
+#: endif
   type(expression_type) :: expr
 
   expr%operation = OP_${OPCODE}$
   allocate (expr%left, expr%right)
-    #: if LEFT == 'var'
+#: if LEFT == 'var'
   expr%left%operation = OP_LEAF
   expr%left%leaf => a
-    #: else
+#: else
   expr%left = a
-    #: endif
-    #: if RIGHT == 'var'
+#: endif
+#: if RIGHT == 'var'
   expr%right%operation = OP_LEAF
   expr%right%leaf => b
-    #: else
+#: else
   expr%right = b
-    #: endif
+#: endif
 end function ${NAME}$_${LEFT}$_${RIGHT}$
 
-    #: endfor
-  #: endfor
-  #: set allowed_kinds = kinds if NAME in ['dim', 'sign', 'mod', 'modulo'] else ['real32', 'real64']
-  #: for KIND in allowed_kinds
-    #: set TYPE = 'integer' if KIND.startswith('int') else 'real'
-    #: for OTHER in ['var', 'expr']
+#: endfor
+#: endfor
+#: set allowed_kinds = kinds if NAME in ['dim', 'sign', 'mod', 'modulo'] else ['real32', 'real64']
+#: for KIND in allowed_kinds
+#: set TYPE = 'integer' if KIND.startswith('int') else 'real'
+#: for OTHER in ['var', 'expr']
 module function ${NAME}$_${KIND}$_${OTHER}$(a, b) result(expr)
   !! Build a deferred ${NAME.upper()}$ node with a left scalar.
   ${TYPE}$(${KIND}$), intent(in) :: a
   !! Left scalar, stored by value in the expression.
-      #: if OTHER == 'var'
+#: if OTHER == 'var'
   type(variable_type), target, intent(in) :: b
   !! Right variable, borrowed until evaluation.
-      #: else
+#: else
   type(expression_type), intent(in) :: b
   !! Right expression, copied into the result.
-      #: endif
+#: endif
   type(expression_type) :: expr
 
   expr%operation = OP_${OPCODE}$
   allocate (expr%left, expr%right)
   expr%left%operation = OP_SCALAR_${KIND.upper()}$
-      #: if TYPE == 'integer'
+#: if TYPE == 'integer'
   expr%left%exp_int = int(a, int64)
-      #: else
+#: else
   expr%left%exp_real = real(a, real64)
-      #: endif
-      #: if OTHER == 'var'
+#: endif
+#: if OTHER == 'var'
   expr%right%operation = OP_LEAF
   expr%right%leaf => b
-      #: else
+#: else
   expr%right = b
-      #: endif
+#: endif
 end function ${NAME}$_${KIND}$_${OTHER}$
 
 module function ${NAME}$_${OTHER}$_${KIND}$(a, b) result(expr)
   !! Build a deferred ${NAME.upper()}$ node with a right scalar.
-      #: if OTHER == 'var'
+#: if OTHER == 'var'
   type(variable_type), target, intent(in) :: a
   !! Left variable, borrowed until evaluation.
-      #: else
+#: else
   type(expression_type), intent(in) :: a
   !! Left expression, copied into the result.
-      #: endif
+#: endif
   ${TYPE}$(${KIND}$), intent(in) :: b
   !! Right scalar, stored by value in the expression.
   type(expression_type) :: expr
 
   expr%operation = OP_${OPCODE}$
   allocate (expr%left, expr%right)
-      #: if OTHER == 'var'
+#: if OTHER == 'var'
   expr%left%operation = OP_LEAF
   expr%left%leaf => a
-      #: else
+#: else
   expr%left = a
-      #: endif
+#: endif
   expr%right%operation = OP_SCALAR_${KIND.upper()}$
-      #: if TYPE == 'integer'
+#: if TYPE == 'integer'
   expr%right%exp_int = int(b, int64)
-      #: else
+#: else
   expr%right%exp_real = real(b, real64)
-      #: endif
+#: endif
 end function ${NAME}$_${OTHER}$_${KIND}$
 
-    #: endfor
-  #: endfor
+#: endfor
+#: endfor
 #: endfor
 end submodule nc4f_data_intrinsic

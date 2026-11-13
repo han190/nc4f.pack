@@ -1,14 +1,14 @@
 #: include "common.fypp"
 interface operator(.att.)
-  #: for K in kinds
+#: for K in kinds
   module procedure :: new_att_${K}$
   module procedure :: new_att_${K}$_scalar
-  #: endfor
+#: endfor
   module procedure :: new_att_character
 end interface operator(.att.)
 
 interface
-  #: for T, K in zip(types, kinds)
+#: for T, K in zip(types, kinds)
   pure module function new_att_${K}$(name, values) result(att)
     !! Create an `attribute_type` from an array of `${T}$` of kind `${K}$`.
     character(len=*), intent(in) :: name
@@ -28,7 +28,7 @@ interface
     type(attribute_type) :: att
     !! Returned Attribute.
   end function new_att_${K}$_scalar${NEWLINE(not (K == 'real64'))}$
-  #: endfor
+#: endfor
 
   pure module function new_att_character(name, value) result(att)
     !! Create an `attribute_type` containing character data.

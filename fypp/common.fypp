@@ -18,9 +18,9 @@
 
 #! Conditionally create a new line.
 #: def NEWLINE(cond=None)
-  #: if cond is None or cond
+#: if cond is None or cond
     $: "\n"
-  #: endif
+#: endif
 #: enddef
 
 #! Generate colons for array.

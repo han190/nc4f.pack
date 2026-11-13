@@ -6,103 +6,103 @@
 interface operator(${SYMBOL}$)
   module procedure :: ${NAME}$_var_var, ${NAME}$_expr_var, &
     & ${NAME}$_var_expr, ${NAME}$_expr_expr
-  #: if NAME == 'pow'
-  #: for KIND in kinds
+#: if NAME == 'pow'
+#: for KIND in kinds
   module procedure :: pow_var_${KIND}$, pow_expr_${KIND}$
-  #: endfor
-  #: endif
-  #: for KIND in kinds
-    #: if NAME != 'pow'
+#: endfor
+#: endif
+#: for KIND in kinds
+#: if NAME != 'pow'
   module procedure :: ${NAME}$_${KIND}$_var, ${NAME}$_${KIND}$_expr
   module procedure :: ${NAME}$_var_${KIND}$, ${NAME}$_expr_${KIND}$
-    #: endif
-  #: endfor
+#: endif
+#: endfor
 end interface operator(${SYMBOL}$)
 
 #: endfor
 interface
 #: for NAME in op_names
-  #: for LEFT in ['var', 'expr']
-    #: for RIGHT in ['var', 'expr']
+#: for LEFT in ['var', 'expr']
+#: for RIGHT in ['var', 'expr']
   module function ${NAME}$_${LEFT}$_${RIGHT}$(a, b) result(expr)
     !! Return a deferred ${NAME}$ expression from ${LEFT}$ and ${RIGHT}$.
-    #: if LEFT == 'var'
+#: if LEFT == 'var'
     type(variable_type), target, intent(in) :: a
     !! Left variable borrowed by the resulting expression.
-    #: else
+#: else
     type(expression_type), intent(in) :: a
     !! Left expression copied into the resulting tree.
-    #: endif
-    #: if RIGHT == 'var'
+#: endif
+#: if RIGHT == 'var'
     type(variable_type), target, intent(in) :: b
     !! Right variable borrowed by the resulting expression.
-    #: else
+#: else
     type(expression_type), intent(in) :: b
     !! Right expression copied into the resulting tree.
-    #: endif
+#: endif
     type(expression_type) :: expr
   end function ${NAME}$_${LEFT}$_${RIGHT}$${NEWLINE()}$
-    #: endfor
-  #: endfor
+#: endfor
+#: endfor
 #: endfor
 #: for KIND, TYPE in zip(kinds, types)
-  #: for LEFT in ['var', 'expr']
+#: for LEFT in ['var', 'expr']
   module function pow_${LEFT}$_${KIND}$(a, exponent) result(expr)
     !! Return a deferred power with a ${KIND}$ scalar exponent.
-    #: if LEFT == 'var'
+#: if LEFT == 'var'
     type(variable_type), target, intent(in) :: a
     !! Base variable borrowed by the resulting expression.
-    #: else
+#: else
     type(expression_type), intent(in) :: a
     !! Base expression copied into the resulting tree.
-    #: endif
+#: endif
     ${TYPE}$(${KIND}$), intent(in) :: exponent
     !! Scalar exponent stored by value for later evaluation.
     type(expression_type) :: expr
   end function pow_${LEFT}$_${KIND}$${NEWLINE()}$
-  #: endfor
+#: endfor
 #: endfor
 #: for NAME in op_names
-  #: if NAME != 'pow'
-  #: for KIND, TYPE in zip(kinds, types)
-    #: for RIGHT in ['var', 'expr']
+#: if NAME != 'pow'
+#: for KIND, TYPE in zip(kinds, types)
+#: for RIGHT in ['var', 'expr']
   module function ${NAME}$_${KIND}$_${RIGHT}$(a, b) result(expr)
     !! Return a deferred ${NAME}$ expression with a left ${KIND}$ scalar.
     ${TYPE}$(${KIND}$), intent(in) :: a
     !! Left scalar stored by value in the resulting expression.
-      #: if RIGHT == 'var'
+#: if RIGHT == 'var'
     type(variable_type), target, intent(in) :: b
     !! Right variable borrowed by the resulting expression.
-      #: else
+#: else
     type(expression_type), intent(in) :: b
     !! Right expression copied into the resulting tree.
-      #: endif
+#: endif
     type(expression_type) :: expr
   end function ${NAME}$_${KIND}$_${RIGHT}$${NEWLINE()}$
-    #: endfor
-  #: endfor
-  #: endif
+#: endfor
+#: endfor
+#: endif
 #: endfor
 #: for NAME in op_names
-  #: if NAME != 'pow'
-    #: for KIND, TYPE in zip(kinds, types)
-      #: for LEFT in ['var', 'expr']
+#: if NAME != 'pow'
+#: for KIND, TYPE in zip(kinds, types)
+#: for LEFT in ['var', 'expr']
   module function ${NAME}$_${LEFT}$_${KIND}$(a, b) result(expr)
     !! Return a deferred ${NAME}$ expression with a right ${KIND}$ scalar.
-        #: if LEFT == 'var'
+#: if LEFT == 'var'
     type(variable_type), target, intent(in) :: a
     !! Left variable borrowed by the resulting expression.
-        #: else
+#: else
     type(expression_type), intent(in) :: a
     !! Left expression copied into the resulting tree.
-        #: endif
+#: endif
     ${TYPE}$(${KIND}$), intent(in) :: b
     !! Right scalar stored by value in the resulting expression.
     type(expression_type) :: expr
-        #: set LAST = NAME == 'div' and KIND == 'real64' and LEFT == 'expr'
+#: set LAST = NAME == 'div' and KIND == 'real64' and LEFT == 'expr'
   end function ${NAME}$_${LEFT}$_${KIND}$${NEWLINE(not LAST)}$
-      #: endfor
-    #: endfor
-  #: endif
+#: endfor
+#: endfor
+#: endif
 #: endfor
 end interface

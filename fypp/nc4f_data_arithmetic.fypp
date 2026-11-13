@@ -7,146 +7,146 @@ implicit none (type, external)
 contains
 
 #: for NAME in op_names
-  #: for LEFT in ['var', 'expr']
-    #: for RIGHT in ['var', 'expr']
+#: for LEFT in ['var', 'expr']
+#: for RIGHT in ['var', 'expr']
 module function ${NAME}$_${LEFT}$_${RIGHT}$(a, b) result(expr)
   !! Build a deferred ${NAME}$ node from ${LEFT}$ and ${RIGHT}$ operands.
-    #: if LEFT == 'var'
+#: if LEFT == 'var'
   type(variable_type), target, intent(in) :: a
   !! Left operand; the expression borrows this variable.
-    #: else
+#: else
   type(expression_type), intent(in) :: a
   !! Left operand; its tree is copied into the result.
-    #: endif
-    #: if RIGHT == 'var'
+#: endif
+#: if RIGHT == 'var'
   type(variable_type), target, intent(in) :: b
   !! Right operand; the expression borrows this variable.
-    #: else
+#: else
   type(expression_type), intent(in) :: b
   !! Right operand; its tree is copied into the result.
-    #: endif
+#: endif
   type(expression_type) :: expr
 
   expr%operation = OP_${NAME.upper()}$
   allocate (expr%left, expr%right)
-    #: if LEFT == 'var'
+#: if LEFT == 'var'
   expr%left%operation = OP_LEAF
   expr%left%leaf => a
-    #: else
+#: else
   call copy_expr(a, expr%left)
-    #: endif
-    #: if RIGHT == 'var'
+#: endif
+#: if RIGHT == 'var'
   expr%right%operation = OP_LEAF
   expr%right%leaf => b
-    #: else
+#: else
   call copy_expr(b, expr%right)
-    #: endif
+#: endif
 end function ${NAME}$_${LEFT}$_${RIGHT}$${NEWLINE()}$
-    #: endfor
-  #: endfor
+#: endfor
+#: endfor
 #: endfor
 #: for KIND, TYPE in zip(kinds, types)
-  #: for LEFT in ['var', 'expr']
+#: for LEFT in ['var', 'expr']
 module function pow_${LEFT}$_${KIND}$(a, exponent) result(expr)
   !! Raise a ${LEFT}$ operand to a stored ${KIND}$ scalar exponent later.
-    #: if LEFT == 'var'
+#: if LEFT == 'var'
   type(variable_type), target, intent(in) :: a
   !! Base variable; the expression borrows it.
-    #: else
+#: else
   type(expression_type), intent(in) :: a
   !! Base expression; its tree is copied into the result.
-    #: endif
+#: endif
   ${TYPE}$(${KIND}$), intent(in) :: exponent
   !! Scalar exponent, stored by value for later evaluation.
   type(expression_type) :: expr
 
   expr%operation = OP_${KIND.upper()}$_POW
-    #: if TYPE == 'integer'
+#: if TYPE == 'integer'
   expr%exp_int = int(exponent, int64)
-    #: else
+#: else
   expr%exp_real = real(exponent, real64)
-    #: endif
+#: endif
   allocate (expr%left)
-    #: if LEFT == 'var'
+#: if LEFT == 'var'
   expr%left%operation = OP_LEAF
   expr%left%leaf => a
-    #: else
+#: else
   call copy_expr(a, expr%left)
-    #: endif
+#: endif
 end function pow_${LEFT}$_${KIND}$${NEWLINE()}$
-  #: endfor
+#: endfor
 #: endfor
 #: for NAME in op_names
-  #: if NAME != 'pow'
-  #: for KIND, TYPE in zip(kinds, types)
-    #: for RIGHT in ['var', 'expr']
+#: if NAME != 'pow'
+#: for KIND, TYPE in zip(kinds, types)
+#: for RIGHT in ['var', 'expr']
 module function ${NAME}$_${KIND}$_${RIGHT}$(a, b) result(expr)
   !! Build a deferred ${NAME}$ node with a ${KIND}$ scalar on the left.
   ${TYPE}$(${KIND}$), intent(in) :: a
   !! Left scalar, stored by value in the expression.
-      #: if RIGHT == 'var'
+#: if RIGHT == 'var'
   type(variable_type), target, intent(in) :: b
   !! Right variable; the expression borrows it.
-      #: else
+#: else
   type(expression_type), intent(in) :: b
   !! Right expression; its tree is copied into the result.
-      #: endif
+#: endif
   type(expression_type) :: expr
 
   expr%operation = OP_${NAME.upper()}$
   allocate (expr%left, expr%right)
   expr%left%operation = OP_SCALAR_${KIND.upper()}$
-      #: if TYPE == 'integer'
+#: if TYPE == 'integer'
   expr%left%exp_int = int(a, int64)
-      #: else
+#: else
   expr%left%exp_real = real(a, real64)
-      #: endif
-      #: if RIGHT == 'var'
+#: endif
+#: if RIGHT == 'var'
   expr%right%operation = OP_LEAF
   expr%right%leaf => b
-      #: else
+#: else
   call copy_expr(b, expr%right)
-      #: endif
+#: endif
 end function ${NAME}$_${KIND}$_${RIGHT}$${NEWLINE()}$
-    #: endfor
-  #: endfor
-  #: endif
+#: endfor
+#: endfor
+#: endif
 #: endfor
 #: for NAME in op_names
-  #: if NAME != 'pow'
-    #: for KIND, TYPE in zip(kinds, types)
-      #: for LEFT in ['var', 'expr']
+#: if NAME != 'pow'
+#: for KIND, TYPE in zip(kinds, types)
+#: for LEFT in ['var', 'expr']
 module function ${NAME}$_${LEFT}$_${KIND}$(a, b) result(expr)
   !! Build a deferred ${NAME}$ node with a ${KIND}$ scalar on the right.
-        #: if LEFT == 'var'
+#: if LEFT == 'var'
   type(variable_type), target, intent(in) :: a
   !! Left variable; the expression borrows it.
-        #: else
+#: else
   type(expression_type), intent(in) :: a
   !! Left expression; its tree is copied into the result.
-        #: endif
+#: endif
   ${TYPE}$(${KIND}$), intent(in) :: b
   !! Right scalar, stored by value in the expression.
   type(expression_type) :: expr
 
   expr%operation = OP_${NAME.upper()}$
   allocate (expr%left, expr%right)
-        #: if LEFT == 'var'
+#: if LEFT == 'var'
   expr%left%operation = OP_LEAF
   expr%left%leaf => a
-        #: else
+#: else
   call copy_expr(a, expr%left)
-        #: endif
+#: endif
   expr%right%operation = OP_SCALAR_${KIND.upper()}$
-        #: if TYPE == 'integer'
+#: if TYPE == 'integer'
   expr%right%exp_int = int(b, int64)
-        #: else
+#: else
   expr%right%exp_real = real(b, real64)
-        #: endif
+#: endif
 end function ${NAME}$_${LEFT}$_${KIND}$${NEWLINE()}$
-      #: endfor
-    #: endfor
-  #: endif
+#: endfor
+#: endfor
+#: endif
 #: endfor
 recursive subroutine copy_expr(source, dest)
   !! Copy the tree structure while retaining borrowed variable leaves.
