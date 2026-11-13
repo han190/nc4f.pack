@@ -5,7 +5,7 @@ implicit none (type, external)
 contains
 
 pure module function nameof_var(var) result(name)
-  type(variable_type), intent(in) :: var
+  class(abstract_variable_type), intent(in) :: var
   character(len=:), allocatable :: name
 
   name = ""
@@ -13,7 +13,7 @@ pure module function nameof_var(var) result(name)
 end function nameof_var
 
 elemental module function typeof_var(var) result(dtype)
-  type(variable_type), intent(in) :: var
+  class(abstract_variable_type), intent(in) :: var
   integer(data_type) :: dtype
 
   dtype = var%dtype
@@ -221,11 +221,12 @@ module subroutine init_var_mold(var, name, mold, atts, deep)
       error stop "[init_var_mold] Mold has no storage."
     end if
   end if
+  if (allocated(mold%coords)) var%coords = mold%coords
 end subroutine init_var_mold
 
 pure module function get_size(var, dim) result(n)
   !! Return the element count of a variable or one of its dimensions.
-  type(variable_type), intent(in) :: var
+  class(abstract_variable_type), intent(in) :: var
   !! Variable to process.
   integer, intent(in), optional :: dim
   !! Dimension to process.
@@ -238,7 +239,7 @@ pure module function get_size(var, dim) result(n)
 end function get_size
 
 pure module subroutine compute_size(var, n, err, dim)
-  type(variable_type), intent(in) :: var
+  class(abstract_variable_type), intent(in) :: var
   integer(int64), intent(out) :: n
   type(error_type), intent(out) :: err
   integer, intent(in), optional :: dim
@@ -296,7 +297,7 @@ end subroutine compute_size
 
 pure module function get_shape(var) result(extents)
   !! Return variable dimension lengths in their stored Fortran order.
-  type(variable_type), intent(in) :: var
+  class(abstract_variable_type), intent(in) :: var
   !! Variable to process.
   integer, allocatable :: extents(:)
   !! Result produced by this operation.
@@ -348,6 +349,13 @@ logical elemental module function eq_var(x, y) result(is_equal)
     if (.not. is_equal) return
   end if
 
+  is_equal = allocated(x%coords) .eqv. allocated(y%coords)
+  if (.not. is_equal) return
+  if (allocated(x%coords)) then
+    is_equal = same_variable_coords(x%coords, y%coords)
+    if (.not. is_equal) return
+  end if
+
   if (x%len == 0) return
 
   if (allocated(x%buffer)) then
@@ -374,6 +382,23 @@ logical elemental module function eq_var(x, y) result(is_equal)
     is_equal = .false.
   end if
 end function eq_var
+
+pure logical function same_variable_coords(left, right) result(equal)
+  type(coordinate_type), intent(in) :: left(:), right(:)
+  integer :: i, j
+
+  equal = size(left) == size(right)
+  if (.not. equal) return
+  do i = 1, size(left)
+    equal = .false.
+    do j = 1, size(right)
+      if (left(i)%name /= right(j)%name) cycle
+      equal = left(i) == right(j)
+      exit
+    end do
+    if (.not. equal) return
+  end do
+end function same_variable_coords
 
 logical elemental module function neq_var(x, y) result(is_equal)
   !! Return true when two variables differ.

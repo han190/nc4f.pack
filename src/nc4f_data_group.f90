@@ -198,6 +198,7 @@ module subroutine init_var_(var, name, dtype, len, dims, atts, deep)
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
   if (allocated(var%buffer)) deallocate (var%buffer)
+  if (allocated(var%coords)) deallocate (var%coords)
   nullify (var%ptr)
   var%name = trim(name)
   var%dtype = dtype

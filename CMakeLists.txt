@@ -56,6 +56,7 @@ set(nc4f_generated_names
   nc4f_data_intrinsic
   nc4f_data_attribute_constructor
   nc4f_data_variable_constructor
+  nc4f_data_coordinate_constructor
   nc4f_data_extract)
 set(nc4f_data_dir "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(nc4f_data_module "${nc4f_data_dir}/nc4f_data.f90")
@@ -107,6 +108,7 @@ add_library(nc4f STATIC
   src/nc4f_data_sum.f90
   src/nc4f_data_attribute.f90
   src/nc4f_data_clone.f90
+  src/nc4f_data_coordinate.f90
   src/nc4f_data_dimension.f90
   src/nc4f_data_expression.f90
   src/nc4f_data_group.f90
@@ -171,6 +173,7 @@ if(NC4F_BUILD_TESTS)
     test/nc4f_test_data_attribute.f90
     test/nc4f_test_data_attribute_constructor.f90
     test/nc4f_test_data_clone.f90
+    test/nc4f_test_data_coordinate.f90
     test/nc4f_test_data_dimension.f90
     test/nc4f_test_data_extract.f90
     test/nc4f_test_data_expression.f90

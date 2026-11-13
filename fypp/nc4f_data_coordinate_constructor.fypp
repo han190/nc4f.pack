@@ -1,0 +1,34 @@
+#: include 'common.fypp'
+submodule(nc4f_data) nc4f_data_coordinate_constructor
+implicit none (type, external)
+contains
+
+#: for D, T, K in zip(dtypes, types, kinds)
+  #: for R in range(1, MAX_RANK+1)
+module function new_coord_${K}$_${R}$d(name, values, dims, atts) result(coord)
+  !! Construct one owned numeric coordinate array.
+  character(len=*), intent(in) :: name
+  #: if R >= 13
+  ${T}$(${K}$), intent(in) :: values(${COLONS(10)}$, &
+    & ${COLONS(R-10)}$)
+  #: else
+  ${T}$(${K}$), intent(in) :: values(${COLONS(R)}$)
+  #: endif
+  type(dimension_type), intent(in) :: dims(:)
+  type(attribute_type), intent(in), optional :: atts(:)
+  type(coordinate_type) :: coord
+  type(error_type) :: err
+
+  coord%name = trim(name)
+  coord%dtype = ${D}$
+  coord%len = size(values, kind=int64)
+  coord%dims = dims
+  if (present(atts)) coord%atts = atts
+  coord%buffer = transfer(values, 0_int8, &
+    & buffer_size(${D}$, coord%len))
+  call validate_coordinate(coord, err)
+  call return_err(err)
+end function new_coord_${K}$_${R}$d${NEWLINE()}$
+  #: endfor
+#: endfor
+end submodule nc4f_data_coordinate_constructor

@@ -5,7 +5,8 @@ contains
 
 #: for D, T, K in zip(dtypes, types, kinds)
   #: for R in range(1, MAX_RANK+1)
-module function new_var_${K}$_${R}$d(name, values, dims, atts, deep) result(var)
+module function new_var_${K}$_${R}$d(name, values, dims, atts, &
+  & deep, coords) result(var)
   !! Construct a `variable_type` of rank ${R}$ and kind ${K}$ from an array.
   character(len=*), intent(in) :: name
   !! Name of the variable to create (will be trimmed).
@@ -19,9 +20,12 @@ module function new_var_${K}$_${R}$d(name, values, dims, atts, deep) result(var)
   logical, intent(in), optional :: deep
   !! When true (default), copy values into owned storage.  When false,
   !! retain a borrowed view of this contiguous target array.
+  type(coordinate_type), intent(in), optional :: coords(:)
+  !! Owned coordinate mapping copied into the variable when present.
   type(variable_type) :: var
   !! Resulting `variable_type` initialized with metadata and buffer.
   type(c_ptr) :: cptr
+  type(error_type) :: coord_err
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
@@ -38,11 +42,17 @@ module function new_var_${K}$_${R}$d(name, values, dims, atts, deep) result(var)
         & [buffer_size(${D}$, size(values, kind=int64))])
     end if
   end if
+  if (present(coords)) then
+    call validate_coordinate_for_var(coords, var, coord_err)
+    call return_err(coord_err)
+    var%coords = coords
+  end if
 end function new_var_${K}$_${R}$d${NEWLINE()}$
   #: endfor
 #: endfor
 #: for R in range(1, MAX_RANK+1)
-module function new_var_char_${R}$d(name, values, dims, atts, deep) result(var)
+module function new_var_char_${R}$d(name, values, dims, atts, &
+  & deep, coords) result(var)
   !! Construct a `variable_type` of rank ${R}$ from a character array.
   character(len=*), intent(in) :: name
   !! Name of the variable to create (will be trimmed).
@@ -55,14 +65,22 @@ module function new_var_char_${R}$d(name, values, dims, atts, deep) result(var)
   logical, intent(in), optional :: deep
   !! When true (default), copy values into owned storage.  When false,
   !! retain a borrowed view of this contiguous target array.
+  type(coordinate_type), intent(in), optional :: coords(:)
+  !! Owned coordinate mapping copied into the variable when present.
   type(variable_type) :: var
   !! Resulting `variable_type` initialized with metadata and buffer.
+  type(error_type) :: coord_err
   logical :: deep_copy
   deep_copy = .true.
   if (present(deep)) deep_copy = deep
   if (.not. deep_copy) error stop "[datarray] Shallow character buffers are unsupported."
   call init_var_(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts, deep=.true.)
   if (size(values) > 0) var%buffer = transfer(values, 0_int8, size(var%buffer))
+  if (present(coords)) then
+    call validate_coordinate_for_var(coords, var, coord_err)
+    call return_err(coord_err)
+    var%coords = coords
+  end if
 end function new_var_char_${R}$d${NEWLINE(not (R == MAX_RANK))}$
 #: endfor
 end submodule nc4f_data_variable_constructor

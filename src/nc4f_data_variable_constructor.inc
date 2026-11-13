@@ -112,7 +112,8 @@ interface datarray
 end interface datarray
 
 interface
-  module function new_var_int8_1d(name, values, dims, atts, deep) result(var)
+  module function new_var_int8_1d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 1 and kind int8 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -125,11 +126,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int8_1d
 
-  module function new_var_int8_2d(name, values, dims, atts, deep) result(var)
+  module function new_var_int8_2d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 2 and kind int8 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -142,11 +146,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int8_2d
 
-  module function new_var_int8_3d(name, values, dims, atts, deep) result(var)
+  module function new_var_int8_3d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 3 and kind int8 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -159,11 +166,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int8_3d
 
-  module function new_var_int8_4d(name, values, dims, atts, deep) result(var)
+  module function new_var_int8_4d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 4 and kind int8 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -176,11 +186,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int8_4d
 
-  module function new_var_int8_5d(name, values, dims, atts, deep) result(var)
+  module function new_var_int8_5d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 5 and kind int8 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -193,11 +206,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int8_5d
 
-  module function new_var_int8_6d(name, values, dims, atts, deep) result(var)
+  module function new_var_int8_6d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 6 and kind int8 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -210,11 +226,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int8_6d
 
-  module function new_var_int8_7d(name, values, dims, atts, deep) result(var)
+  module function new_var_int8_7d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 7 and kind int8 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -227,11 +246,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int8_7d
 
-  module function new_var_int8_8d(name, values, dims, atts, deep) result(var)
+  module function new_var_int8_8d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 8 and kind int8 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -244,11 +266,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int8_8d
 
-  module function new_var_int8_9d(name, values, dims, atts, deep) result(var)
+  module function new_var_int8_9d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 9 and kind int8 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -261,11 +286,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int8_9d
 
-  module function new_var_int8_10d(name, values, dims, atts, deep) result(var)
+  module function new_var_int8_10d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 10 and kind int8 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -278,11 +306,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int8_10d
 
-  module function new_var_int8_11d(name, values, dims, atts, deep) result(var)
+  module function new_var_int8_11d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 11 and kind int8 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -295,11 +326,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int8_11d
 
-  module function new_var_int8_12d(name, values, dims, atts, deep) result(var)
+  module function new_var_int8_12d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 12 and kind int8 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -312,11 +346,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int8_12d
 
-  module function new_var_int8_13d(name, values, dims, atts, deep) result(var)
+  module function new_var_int8_13d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 13 and kind int8 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -329,11 +366,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int8_13d
 
-  module function new_var_int8_14d(name, values, dims, atts, deep) result(var)
+  module function new_var_int8_14d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 14 and kind int8 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -346,11 +386,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int8_14d
 
-  module function new_var_int8_15d(name, values, dims, atts, deep) result(var)
+  module function new_var_int8_15d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 15 and kind int8 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -363,11 +406,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int8_15d
 
-  module function new_var_int16_1d(name, values, dims, atts, deep) result(var)
+  module function new_var_int16_1d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 1 and kind int16 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -380,11 +426,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int16_1d
 
-  module function new_var_int16_2d(name, values, dims, atts, deep) result(var)
+  module function new_var_int16_2d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 2 and kind int16 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -397,11 +446,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int16_2d
 
-  module function new_var_int16_3d(name, values, dims, atts, deep) result(var)
+  module function new_var_int16_3d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 3 and kind int16 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -414,11 +466,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int16_3d
 
-  module function new_var_int16_4d(name, values, dims, atts, deep) result(var)
+  module function new_var_int16_4d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 4 and kind int16 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -431,11 +486,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int16_4d
 
-  module function new_var_int16_5d(name, values, dims, atts, deep) result(var)
+  module function new_var_int16_5d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 5 and kind int16 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -448,11 +506,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int16_5d
 
-  module function new_var_int16_6d(name, values, dims, atts, deep) result(var)
+  module function new_var_int16_6d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 6 and kind int16 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -465,11 +526,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int16_6d
 
-  module function new_var_int16_7d(name, values, dims, atts, deep) result(var)
+  module function new_var_int16_7d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 7 and kind int16 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -482,11 +546,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int16_7d
 
-  module function new_var_int16_8d(name, values, dims, atts, deep) result(var)
+  module function new_var_int16_8d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 8 and kind int16 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -499,11 +566,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int16_8d
 
-  module function new_var_int16_9d(name, values, dims, atts, deep) result(var)
+  module function new_var_int16_9d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 9 and kind int16 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -516,11 +586,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int16_9d
 
-  module function new_var_int16_10d(name, values, dims, atts, deep) result(var)
+  module function new_var_int16_10d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 10 and kind int16 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -533,11 +606,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int16_10d
 
-  module function new_var_int16_11d(name, values, dims, atts, deep) result(var)
+  module function new_var_int16_11d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 11 and kind int16 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -550,11 +626,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int16_11d
 
-  module function new_var_int16_12d(name, values, dims, atts, deep) result(var)
+  module function new_var_int16_12d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 12 and kind int16 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -567,11 +646,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int16_12d
 
-  module function new_var_int16_13d(name, values, dims, atts, deep) result(var)
+  module function new_var_int16_13d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 13 and kind int16 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -584,11 +666,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int16_13d
 
-  module function new_var_int16_14d(name, values, dims, atts, deep) result(var)
+  module function new_var_int16_14d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 14 and kind int16 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -601,11 +686,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int16_14d
 
-  module function new_var_int16_15d(name, values, dims, atts, deep) result(var)
+  module function new_var_int16_15d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 15 and kind int16 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -618,11 +706,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int16_15d
 
-  module function new_var_int32_1d(name, values, dims, atts, deep) result(var)
+  module function new_var_int32_1d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 1 and kind int32 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -635,11 +726,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int32_1d
 
-  module function new_var_int32_2d(name, values, dims, atts, deep) result(var)
+  module function new_var_int32_2d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 2 and kind int32 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -652,11 +746,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int32_2d
 
-  module function new_var_int32_3d(name, values, dims, atts, deep) result(var)
+  module function new_var_int32_3d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 3 and kind int32 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -669,11 +766,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int32_3d
 
-  module function new_var_int32_4d(name, values, dims, atts, deep) result(var)
+  module function new_var_int32_4d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 4 and kind int32 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -686,11 +786,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int32_4d
 
-  module function new_var_int32_5d(name, values, dims, atts, deep) result(var)
+  module function new_var_int32_5d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 5 and kind int32 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -703,11 +806,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int32_5d
 
-  module function new_var_int32_6d(name, values, dims, atts, deep) result(var)
+  module function new_var_int32_6d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 6 and kind int32 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -720,11 +826,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int32_6d
 
-  module function new_var_int32_7d(name, values, dims, atts, deep) result(var)
+  module function new_var_int32_7d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 7 and kind int32 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -737,11 +846,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int32_7d
 
-  module function new_var_int32_8d(name, values, dims, atts, deep) result(var)
+  module function new_var_int32_8d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 8 and kind int32 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -754,11 +866,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int32_8d
 
-  module function new_var_int32_9d(name, values, dims, atts, deep) result(var)
+  module function new_var_int32_9d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 9 and kind int32 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -771,11 +886,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int32_9d
 
-  module function new_var_int32_10d(name, values, dims, atts, deep) result(var)
+  module function new_var_int32_10d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 10 and kind int32 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -788,11 +906,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int32_10d
 
-  module function new_var_int32_11d(name, values, dims, atts, deep) result(var)
+  module function new_var_int32_11d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 11 and kind int32 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -805,11 +926,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int32_11d
 
-  module function new_var_int32_12d(name, values, dims, atts, deep) result(var)
+  module function new_var_int32_12d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 12 and kind int32 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -822,11 +946,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int32_12d
 
-  module function new_var_int32_13d(name, values, dims, atts, deep) result(var)
+  module function new_var_int32_13d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 13 and kind int32 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -839,11 +966,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int32_13d
 
-  module function new_var_int32_14d(name, values, dims, atts, deep) result(var)
+  module function new_var_int32_14d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 14 and kind int32 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -856,11 +986,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int32_14d
 
-  module function new_var_int32_15d(name, values, dims, atts, deep) result(var)
+  module function new_var_int32_15d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 15 and kind int32 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -873,11 +1006,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int32_15d
 
-  module function new_var_int64_1d(name, values, dims, atts, deep) result(var)
+  module function new_var_int64_1d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 1 and kind int64 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -890,11 +1026,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int64_1d
 
-  module function new_var_int64_2d(name, values, dims, atts, deep) result(var)
+  module function new_var_int64_2d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 2 and kind int64 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -907,11 +1046,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int64_2d
 
-  module function new_var_int64_3d(name, values, dims, atts, deep) result(var)
+  module function new_var_int64_3d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 3 and kind int64 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -924,11 +1066,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int64_3d
 
-  module function new_var_int64_4d(name, values, dims, atts, deep) result(var)
+  module function new_var_int64_4d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 4 and kind int64 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -941,11 +1086,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int64_4d
 
-  module function new_var_int64_5d(name, values, dims, atts, deep) result(var)
+  module function new_var_int64_5d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 5 and kind int64 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -958,11 +1106,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int64_5d
 
-  module function new_var_int64_6d(name, values, dims, atts, deep) result(var)
+  module function new_var_int64_6d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 6 and kind int64 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -975,11 +1126,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int64_6d
 
-  module function new_var_int64_7d(name, values, dims, atts, deep) result(var)
+  module function new_var_int64_7d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 7 and kind int64 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -992,11 +1146,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int64_7d
 
-  module function new_var_int64_8d(name, values, dims, atts, deep) result(var)
+  module function new_var_int64_8d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 8 and kind int64 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1009,11 +1166,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int64_8d
 
-  module function new_var_int64_9d(name, values, dims, atts, deep) result(var)
+  module function new_var_int64_9d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 9 and kind int64 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1026,11 +1186,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int64_9d
 
-  module function new_var_int64_10d(name, values, dims, atts, deep) result(var)
+  module function new_var_int64_10d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 10 and kind int64 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1043,11 +1206,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int64_10d
 
-  module function new_var_int64_11d(name, values, dims, atts, deep) result(var)
+  module function new_var_int64_11d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 11 and kind int64 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1060,11 +1226,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int64_11d
 
-  module function new_var_int64_12d(name, values, dims, atts, deep) result(var)
+  module function new_var_int64_12d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 12 and kind int64 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1077,11 +1246,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int64_12d
 
-  module function new_var_int64_13d(name, values, dims, atts, deep) result(var)
+  module function new_var_int64_13d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 13 and kind int64 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1094,11 +1266,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int64_13d
 
-  module function new_var_int64_14d(name, values, dims, atts, deep) result(var)
+  module function new_var_int64_14d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 14 and kind int64 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1111,11 +1286,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int64_14d
 
-  module function new_var_int64_15d(name, values, dims, atts, deep) result(var)
+  module function new_var_int64_15d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 15 and kind int64 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1128,11 +1306,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_int64_15d
 
-  module function new_var_real32_1d(name, values, dims, atts, deep) result(var)
+  module function new_var_real32_1d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 1 and kind real32 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1145,11 +1326,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_real32_1d
 
-  module function new_var_real32_2d(name, values, dims, atts, deep) result(var)
+  module function new_var_real32_2d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 2 and kind real32 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1162,11 +1346,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_real32_2d
 
-  module function new_var_real32_3d(name, values, dims, atts, deep) result(var)
+  module function new_var_real32_3d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 3 and kind real32 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1179,11 +1366,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_real32_3d
 
-  module function new_var_real32_4d(name, values, dims, atts, deep) result(var)
+  module function new_var_real32_4d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 4 and kind real32 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1196,11 +1386,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_real32_4d
 
-  module function new_var_real32_5d(name, values, dims, atts, deep) result(var)
+  module function new_var_real32_5d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 5 and kind real32 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1213,11 +1406,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_real32_5d
 
-  module function new_var_real32_6d(name, values, dims, atts, deep) result(var)
+  module function new_var_real32_6d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 6 and kind real32 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1230,11 +1426,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_real32_6d
 
-  module function new_var_real32_7d(name, values, dims, atts, deep) result(var)
+  module function new_var_real32_7d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 7 and kind real32 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1247,11 +1446,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_real32_7d
 
-  module function new_var_real32_8d(name, values, dims, atts, deep) result(var)
+  module function new_var_real32_8d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 8 and kind real32 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1264,11 +1466,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_real32_8d
 
-  module function new_var_real32_9d(name, values, dims, atts, deep) result(var)
+  module function new_var_real32_9d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 9 and kind real32 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1281,11 +1486,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_real32_9d
 
-  module function new_var_real32_10d(name, values, dims, atts, deep) result(var)
+  module function new_var_real32_10d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 10 and kind real32 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1298,11 +1506,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_real32_10d
 
-  module function new_var_real32_11d(name, values, dims, atts, deep) result(var)
+  module function new_var_real32_11d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 11 and kind real32 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1315,11 +1526,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_real32_11d
 
-  module function new_var_real32_12d(name, values, dims, atts, deep) result(var)
+  module function new_var_real32_12d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 12 and kind real32 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1332,11 +1546,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_real32_12d
 
-  module function new_var_real32_13d(name, values, dims, atts, deep) result(var)
+  module function new_var_real32_13d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 13 and kind real32 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1349,11 +1566,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_real32_13d
 
-  module function new_var_real32_14d(name, values, dims, atts, deep) result(var)
+  module function new_var_real32_14d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 14 and kind real32 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1366,11 +1586,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_real32_14d
 
-  module function new_var_real32_15d(name, values, dims, atts, deep) result(var)
+  module function new_var_real32_15d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 15 and kind real32 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1383,11 +1606,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_real32_15d
 
-  module function new_var_real64_1d(name, values, dims, atts, deep) result(var)
+  module function new_var_real64_1d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 1 and kind real64 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1400,11 +1626,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_real64_1d
 
-  module function new_var_real64_2d(name, values, dims, atts, deep) result(var)
+  module function new_var_real64_2d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 2 and kind real64 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1417,11 +1646,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_real64_2d
 
-  module function new_var_real64_3d(name, values, dims, atts, deep) result(var)
+  module function new_var_real64_3d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 3 and kind real64 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1434,11 +1666,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_real64_3d
 
-  module function new_var_real64_4d(name, values, dims, atts, deep) result(var)
+  module function new_var_real64_4d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 4 and kind real64 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1451,11 +1686,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_real64_4d
 
-  module function new_var_real64_5d(name, values, dims, atts, deep) result(var)
+  module function new_var_real64_5d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 5 and kind real64 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1468,11 +1706,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_real64_5d
 
-  module function new_var_real64_6d(name, values, dims, atts, deep) result(var)
+  module function new_var_real64_6d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 6 and kind real64 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1485,11 +1726,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_real64_6d
 
-  module function new_var_real64_7d(name, values, dims, atts, deep) result(var)
+  module function new_var_real64_7d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 7 and kind real64 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1502,11 +1746,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_real64_7d
 
-  module function new_var_real64_8d(name, values, dims, atts, deep) result(var)
+  module function new_var_real64_8d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 8 and kind real64 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1519,11 +1766,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_real64_8d
 
-  module function new_var_real64_9d(name, values, dims, atts, deep) result(var)
+  module function new_var_real64_9d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 9 and kind real64 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1536,11 +1786,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_real64_9d
 
-  module function new_var_real64_10d(name, values, dims, atts, deep) result(var)
+  module function new_var_real64_10d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 10 and kind real64 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1553,11 +1806,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_real64_10d
 
-  module function new_var_real64_11d(name, values, dims, atts, deep) result(var)
+  module function new_var_real64_11d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 11 and kind real64 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1570,11 +1826,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_real64_11d
 
-  module function new_var_real64_12d(name, values, dims, atts, deep) result(var)
+  module function new_var_real64_12d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 12 and kind real64 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1587,11 +1846,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_real64_12d
 
-  module function new_var_real64_13d(name, values, dims, atts, deep) result(var)
+  module function new_var_real64_13d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 13 and kind real64 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1604,11 +1866,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_real64_13d
 
-  module function new_var_real64_14d(name, values, dims, atts, deep) result(var)
+  module function new_var_real64_14d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 14 and kind real64 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1621,11 +1886,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_real64_14d
 
-  module function new_var_real64_15d(name, values, dims, atts, deep) result(var)
+  module function new_var_real64_15d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 15 and kind real64 from an array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1638,10 +1906,13 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Copy values into owned storage when true (default); otherwise borrow.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_real64_15d
-  module function new_var_char_1d(name, values, dims, atts, deep) result(var)
+  module function new_var_char_1d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 1 from a character array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1653,11 +1924,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Must be true (the default); borrowed character storage is unsupported.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_char_1d
 
-  module function new_var_char_2d(name, values, dims, atts, deep) result(var)
+  module function new_var_char_2d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 2 from a character array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1669,11 +1943,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Must be true (the default); borrowed character storage is unsupported.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_char_2d
 
-  module function new_var_char_3d(name, values, dims, atts, deep) result(var)
+  module function new_var_char_3d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 3 from a character array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1685,11 +1962,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Must be true (the default); borrowed character storage is unsupported.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_char_3d
 
-  module function new_var_char_4d(name, values, dims, atts, deep) result(var)
+  module function new_var_char_4d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 4 from a character array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1701,11 +1981,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Must be true (the default); borrowed character storage is unsupported.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_char_4d
 
-  module function new_var_char_5d(name, values, dims, atts, deep) result(var)
+  module function new_var_char_5d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 5 from a character array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1717,11 +2000,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Must be true (the default); borrowed character storage is unsupported.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_char_5d
 
-  module function new_var_char_6d(name, values, dims, atts, deep) result(var)
+  module function new_var_char_6d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 6 from a character array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1733,11 +2019,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Must be true (the default); borrowed character storage is unsupported.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_char_6d
 
-  module function new_var_char_7d(name, values, dims, atts, deep) result(var)
+  module function new_var_char_7d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 7 from a character array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1749,11 +2038,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Must be true (the default); borrowed character storage is unsupported.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_char_7d
 
-  module function new_var_char_8d(name, values, dims, atts, deep) result(var)
+  module function new_var_char_8d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 8 from a character array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1765,11 +2057,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Must be true (the default); borrowed character storage is unsupported.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_char_8d
 
-  module function new_var_char_9d(name, values, dims, atts, deep) result(var)
+  module function new_var_char_9d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 9 from a character array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1781,11 +2076,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Must be true (the default); borrowed character storage is unsupported.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_char_9d
 
-  module function new_var_char_10d(name, values, dims, atts, deep) result(var)
+  module function new_var_char_10d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 10 from a character array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1797,11 +2095,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Must be true (the default); borrowed character storage is unsupported.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_char_10d
 
-  module function new_var_char_11d(name, values, dims, atts, deep) result(var)
+  module function new_var_char_11d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 11 from a character array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1813,11 +2114,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Must be true (the default); borrowed character storage is unsupported.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_char_11d
 
-  module function new_var_char_12d(name, values, dims, atts, deep) result(var)
+  module function new_var_char_12d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 12 from a character array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1829,11 +2133,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Must be true (the default); borrowed character storage is unsupported.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_char_12d
 
-  module function new_var_char_13d(name, values, dims, atts, deep) result(var)
+  module function new_var_char_13d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 13 from a character array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1845,11 +2152,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Must be true (the default); borrowed character storage is unsupported.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_char_13d
 
-  module function new_var_char_14d(name, values, dims, atts, deep) result(var)
+  module function new_var_char_14d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 14 from a character array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1861,11 +2171,14 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Must be true (the default); borrowed character storage is unsupported.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_char_14d
 
-  module function new_var_char_15d(name, values, dims, atts, deep) result(var)
+  module function new_var_char_15d(name, values, dims, atts, &
+    & deep, coords) result(var)
     !! Construct a `variable_type` of rank 15 from a character array.
     character(len=*), intent(in) :: name
     !! Name of the variable to create (will be trimmed).
@@ -1877,6 +2190,8 @@ interface
     !! Optional list of attributes to attach to the variable.
     logical, intent(in), optional :: deep
     !! Must be true (the default); borrowed character storage is unsupported.
+    type(coordinate_type), intent(in), optional :: coords(:)
+    !! Owned coordinate mapping copied into the variable when present.
     type(variable_type) :: var
     !! Resulting `variable_type` initialized with metadata and buffer.
   end function new_var_char_15d

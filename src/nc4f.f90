@@ -7,6 +7,7 @@ implicit none (type, external)
 
 public :: netcdf_type, group_type
 public :: variable_type, dimension_type, attribute_type, expression_type
+public :: abstract_variable_type, coordinate_type
 public :: storage_type, error_type
 
 public :: NC_EBADID, NC_EBADDIM, NC_EBADGRPID, NC_EEDGE, NC_EBADTYPE, NC_EPERM
@@ -16,6 +17,8 @@ public :: NC_ENDIAN_NATIVE, NC_ENDIAN_LITTLE, NC_ENDIAN_BIG
 public :: NC_BYTE, NC_CHAR, NC_SHORT, NC_INT, NC_INT64, NC_FLOAT, NC_DOUBLE
 
 public :: datarray, dataset, extract, initialize, set_storage
+public :: validate
+public :: coordinate_at, coordinate_index
 public :: evaluate
 public :: abs, sqrt, exp, log, log10, sin, cos, tan
 public :: asin, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh

@@ -1,5 +1,8 @@
 #: include "common.fypp"
 interface extract
+  module procedure :: extract_coord_int8, extract_coord_int16, &
+    & extract_coord_int32, extract_coord_int64
+  module procedure :: extract_coord_real32, extract_coord_real64
   #: for K in kinds
   module procedure :: extract_att_${K}$_vector
   module procedure :: extract_att_${K}$_scalar

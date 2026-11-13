@@ -189,6 +189,8 @@ $(BUILD_DIR)/nc4f_test_data_%.o: \
 	$(TEST_DIR)/nc4f_test_data_%.f90 $(LIB) $(TEST_DRIVE_OBJ) | $(BUILD_DIR)
 	@$(FC) $(FFLAGS) $(MODULE_FLAGS) -c $< -o $@
 
+$(DS_TEST_OBJS): $(BUILD_DIR)/nc4f_test_data.o
+
 $(BUILD_DIR)/nc4f_test_netcdf_%.o: \
 	$(TEST_DIR)/nc4f_test_netcdf_%.f90 $(LIB) \
 	$(TEST_DRIVE_OBJ) | $(BUILD_DIR)

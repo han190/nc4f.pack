@@ -44,7 +44,7 @@ pure module subroutine rename_dim_var(var, old_name, new_name, err)
   !! Receives status; failures terminate execution when omitted.
   type(error_type) :: op_err
   type(dimension_type), allocatable :: staged(:)
-  integer :: i, lo
+  integer :: i, j, lo
 
   if (allocated(var%dims)) then
     allocate (staged(size(var%dims)))
@@ -63,6 +63,15 @@ pure module subroutine rename_dim_var(var, old_name, new_name, err)
     if (staged(i)%name /= trim(new_name)) cycle
     call move_alloc(staged(i)%name, var%dims(lo + i - 1)%name)
   end do
+  if (allocated(var%coords)) then
+    do i = 1, size(var%coords)
+      do j = 1, size(var%coords(i)%dims)
+        if (var%coords(i)%dims(j)%name == trim(old_name)) then
+          var%coords(i)%dims(j)%name = trim(new_name)
+        end if
+      end do
+    end do
+  end if
   call return_err(op_err, err)
 end subroutine rename_dim_var
 
@@ -78,7 +87,7 @@ pure module subroutine rename_dim_grp(grp, old_name, new_name, err)
   !! Receives status; failures terminate execution when omitted.
   type(error_type) :: op_err
   type(dimension_type), allocatable :: staged(:)
-  integer :: n, i, j, k, matches
+  integer :: n, i, j, k, m, matches
 
   call validate(old_name, context="rename_dimension", err=op_err)
   if (.exists. op_err) then
@@ -154,6 +163,16 @@ pure module subroutine rename_dim_grp(grp, old_name, new_name, err)
           call move_alloc(staged(k)%name, grp%vars(i)%dims(j)%name)
         end if
       end do
+      if (allocated(grp%vars(i)%coords)) then
+        do j = 1, size(grp%vars(i)%coords)
+          do m = 1, size(grp%vars(i)%coords(j)%dims)
+            if (grp%vars(i)%coords(j)%dims(m)%name == &
+              & trim(old_name)) then
+              grp%vars(i)%coords(j)%dims(m)%name = trim(new_name)
+            end if
+          end do
+        end do
+      end if
     end do
   end if
   call return_err(op_err, err)

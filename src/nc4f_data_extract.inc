@@ -1,4 +1,7 @@
 interface extract
+  module procedure :: extract_coord_int8, extract_coord_int16, &
+    & extract_coord_int32, extract_coord_int64
+  module procedure :: extract_coord_real32, extract_coord_real64
   module procedure :: extract_att_int8_vector
   module procedure :: extract_att_int8_scalar
   module procedure :: extract_att_int16_vector

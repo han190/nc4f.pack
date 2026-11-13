@@ -157,6 +157,9 @@ pure module subroutine validate_var(var, dtype, rank, context, err)
   if (associated(var%ptr)) ptr_size = size(var%ptr, kind=int64)
   call validate_(var%dtype, var%len, var%buffer, &
     & associated(var%ptr), ptr_size, dtype, ctx, "Variable", op_err)
+  if (.not. .exists. op_err .and. allocated(var%coords)) then
+    call validate_coordinate_for_var(var%coords, var, op_err)
+  end if
   call return_err(op_err, err)
 end subroutine validate_var
 

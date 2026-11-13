@@ -5,58 +5,93 @@ small in-memory model for NetCDF dimensions, attributes, variables, and groups.
 The library calls the NetCDF C API directly, thus the NetCDF Fortran library is
 not required.
 
-## What NC4F Can Do
-
-The main purpose of this library is to experiment the feasibility of
-an [xarray](https://xarray.dev/)-like programming style in modern Fortran that write and read through some unified routines. For example:
-
-- Build a [NetCDF data model](https://docs.unidata.ucar.edu/netcdf-c/4.10.0/netcdf_data_model.html) with `DATARRAY` and `DATASET`;
-- Write a data model to a NetCDF file with `TO_NETCDF`;
-- Define variables using `DEFINE_VARIABLE`, then write it with `PUT_VARIABLE`;
-- Open a NetCDF file and retrieve variables with `OPEN_NETCDF` and `GET_VARIABLE`;
-- Extract intrinsic Fortran data from an attribute or variable with `EXTRACT`;
-- Rename attributes, dimensions, variables, and groups with `RENAME_ATTRIBUTE`, `RENAME_DIMENSION`, `RENAME_VARIABLE`, and `RENAME_GROUP`;
-- Delete variable or group attributes with `DELETE_ATTRIBUTE`;
-- Configure storage controls of a variable such as chunking or endianness through `SET_STORAGE`.
-
 ## A First Program
 
-Here is a taste of how you can use this library:
+Here is a taste of what this library can do.
 
-```fortran-free-form
+Write data to a netcdf file
+
+```fortran
 program main
 
   use :: nc4f
   implicit none
-  
+
   real, parameter :: vals(3) = [289.4, 290.1, 288.7]
-  type(netcdf_type) :: nc
   type(variable_type) :: T
-  
+
   T = datarray("T", vals, dims=["station".dim.3], &
     & atts=["units".att."K", "long_name".att."Air temperature"])
   call to_netcdf("temperature.nc", T)
-  
+
+end program main
+```
+
+Read data from a netcdf file
+```fortran
+program main
+
+  use :: nc4f
+  implicit none
+
+  type(netcdf_type) :: nc
+  type(variable_type) :: T
+
   nc = open_netcdf("temperature.nc", "r")
-  T = get_variable(nc, "temperature")
-  call close_netcdf(nc)
-  
+  T = get_variable(nc, "T")
+  call closed_netcdf(nc)
   print *, T
 
 end program main
 ```
 
+## What NC4F Can Do
+
+NC4F provides a small in-memory data model and experiments with an
+[xarray](https://xarray.dev/)-like style for Fortran. Today it can:
+
+- Construct dimensions, attributes, variables, and groups with `DATARRAY`,
+  `DATASET`, and the `.dim.` and `.att.` operators;
+- Write variables and groups with `TO_NETCDF`, or define a variable's schema
+  with `DEFINE_VARIABLE` and write its values with `PUT_VARIABLE`;
+- Open files with `OPEN_NETCDF`, read variables with `GET_VARIABLE`, and
+  extract Fortran values with `EXTRACT`; diskless open modes are available;
+- Read selected hyperslabs and write contiguous or strided selections;
+- Set NetCDF-4 chunking, compression, checksums, byte order, and fill values
+  through `SET_STORAGE`;
+- Rename attributes, dimensions, variables, and groups, and delete attributes
+  in memory or explicitly in an open file;
+- Build deferred elementwise expressions from variables, numeric scalars,
+  arithmetic operators, and supported mathematical intrinsics. Assignment or
+  `EVALUATE` computes the result after checking types and ordered dimensions.
+
 ## What NC4F Cannot Do
 
-NC4F is not intended to replace the well-established [NetCDF Fortran library](https://docs.unidata.ucar.edu/netcdf-fortran/current/) or wrappers such as [nc4fortran](https://github.com/geospace-code/nc4fortran) and
-[neasy-f](https://github.com/PlasmaFAIR/neasy-f). NC4F is intentionally designed to focus on a small subset of the NetCDF data
-model. It does NOT currently support:
+NC4F is not intended as a replacement for the established
+[NetCDF Fortran library](https://docs.unidata.ucar.edu/netcdf-fortran/current/)
+or wrappers such as [nc4fortran](https://github.com/geospace-code/nc4fortran)
+and [neasy-f](https://github.com/PlasmaFAIR/neasy-f). Here are the limitations
+of NC4F.
 
-- classic NetCDF format;
-- user-defined types, the NetCDF `STRING` type and unsigned primitive types;
-- parallel I/O or importing/exporting caller-owned in-memory file images;
-- advanced variable access, such as mapped or multi-slab I/O;
-- deleting dimensions, variables, or groups from files.
+### NetCDF wrapper
+
+The high-level I/O interface does not currently support:
+
+- Parallel I/O or importing and exporting caller-owned in-memory file images;
+- Creating classic NetCDF files, or reading and writing user-defined types,
+  NetCDF `STRING` values, and unsigned primitive types;
+- Mapped or multi-slab I/O, or deleting dimensions, variables, and groups
+  from existing files.
+
+### In-memory data model
+
+The data model and expression evaluator do not currently support:
+
+- Automatic coordinate alignment, dimension reordering, or unit conversion
+  and propagation. Array operands must have matching types and dimensions in
+  the same order; numeric scalars can be broadcast;
+- Lazy file-backed or distributed calculations. Expressions defer computation
+  until assignment or `EVALUATE`, which materializes an in-memory result.
 
 See [ROADMAP.md](ROADMAP.md) for planned extensions.
 

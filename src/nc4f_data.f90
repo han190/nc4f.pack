@@ -7,7 +7,9 @@ use, intrinsic :: iso_c_binding, only: &
 implicit none (type, external)
 
 public :: attribute_type, dimension_type, error_type, delete_attribute, &
-  & group_type, netcdf_type, variable_type, expression_type, evaluate, &
+  & group_type, netcdf_type, variable_type, coordinate_type, &
+  & abstract_variable_type, expression_type, &
+  & coordinate_at, coordinate_index, evaluate, &
   & initialize, nameof, typeof, &
   & storage_type, set_storage, datarray, dataset, extract, &
   & rename_attribute, rename_variable, rename_group, rename_dimension, &
@@ -210,26 +212,31 @@ type :: storage_type
   !! supplied.
 end type storage_type
 
-type :: variable_type
+type, abstract :: abstract_variable_type
+  !! Shared metadata and owned storage for variables and coordinate mappings.
+  character(len=:), allocatable :: name
+  integer(data_type) :: dtype = NAT_TYPE
+  integer(int64) :: len = INVALID_INT64
+  !! Number of locations indexed by dims.
+  type(dimension_type), allocatable :: dims(:)
+  type(attribute_type), allocatable :: atts(:)
+  integer(int8), allocatable :: buffer(:)
+end type abstract_variable_type
+
+type, extends(abstract_variable_type) :: coordinate_type
+  !! One owned numeric coordinate array over its dims.
+end type coordinate_type
+
+type, extends(abstract_variable_type) :: variable_type
   !! NetCDF variable metadata, dimensions, attributes, and values.
   integer(c_int) :: id = INVALID_INT32
   !! NetCDF variable identifier; the initial value marks an unassigned variable.
-  character(len=:), allocatable :: name
-  !! Local variable name.
-  integer(data_type) :: dtype = NAT_TYPE
-  !! NetCDF external data-type code; NAT_TYPE marks an unspecified type.
-  integer(int64) :: len = INVALID_INT64
-  !! Number of variable elements; the initial value marks an unknown length.
-  type(dimension_type), allocatable :: dims(:)
-  !! Dimensions describing the variable shape, in Fortran order.
-  type(attribute_type), allocatable :: atts(:)
-  !! Attributes attached to this variable.
   type(storage_type), allocatable :: storage
   !! Optional per-variable chunking, filters, byte order, and fill settings.
-  integer(int8), allocatable :: buffer(:)
-  !! Owned bytes of copied variable data.
   integer(int8), contiguous, pointer :: ptr(:) => null()
   !! Borrowed contiguous data bytes; the caller retains ownership and lifetime.
+  type(coordinate_type), allocatable :: coords(:)
+  !! Optional owned mappings over ordered subsets of this variable's dims.
 contains
   procedure, private :: write_frmt_var
   generic, public :: write(formatted) => write_frmt_var
@@ -327,12 +334,14 @@ interface operator(==)
   module procedure :: eq_att
   module procedure :: eq_dim
   module procedure :: eq_var
+  module procedure :: eq_coord
 end interface operator(==)
 
 interface operator(/=)
   module procedure :: neq_att
   module procedure :: neq_dim
   module procedure :: neq_var
+  module procedure :: neq_coord
 end interface operator(/=)
 
 interface size
@@ -370,6 +379,7 @@ end interface buffer2cptr
 interface validate
   module procedure :: validate_att
   module procedure :: validate_var
+  module procedure :: validate_coordinate
   module procedure :: validate_nc_name
 end interface validate
 
@@ -379,6 +389,115 @@ interface dataset
   module procedure :: new_dataset_grps
   module procedure :: new_dataset_all
 end interface dataset
+
+include "nc4f_data_coordinate_constructor.inc"
+
+interface coordinate_at
+  module procedure :: coordinate_at_int8, coordinate_at_int16, &
+    & coordinate_at_int32, coordinate_at_int64, &
+    & coordinate_at_real32, coordinate_at_real64
+end interface coordinate_at
+
+interface
+  pure module subroutine validate_coordinate(coord, err)
+    type(coordinate_type), intent(in) :: coord
+    type(error_type), intent(out) :: err
+  end subroutine validate_coordinate
+
+  pure elemental module function eq_coord(a, b) result(equal)
+    type(coordinate_type), intent(in) :: a, b
+    logical :: equal
+  end function eq_coord
+
+  pure elemental module function neq_coord(a, b) result(unequal)
+    type(coordinate_type), intent(in) :: a, b
+    logical :: unequal
+  end function neq_coord
+
+  pure module subroutine validate_coordinate_for_var(coords, var, err)
+    type(coordinate_type), intent(in) :: coords(:)
+    type(variable_type), intent(in) :: var
+    type(error_type), intent(out) :: err
+  end subroutine validate_coordinate_for_var
+
+  pure module function coordinate_index(coords, name) result(index)
+    type(coordinate_type), intent(in) :: coords(:)
+    character(len=*), intent(in) :: name
+    integer :: index
+  end function coordinate_index
+
+  module subroutine coordinate_at_int8(coord, indices, value, err)
+    type(coordinate_type), target, intent(in) :: coord
+    integer, intent(in) :: indices(:)
+    integer(int8), intent(out) :: value
+    type(error_type), intent(out), optional :: err
+  end subroutine coordinate_at_int8
+
+  module subroutine coordinate_at_int16(coord, indices, value, err)
+    type(coordinate_type), target, intent(in) :: coord
+    integer, intent(in) :: indices(:)
+    integer(int16), intent(out) :: value
+    type(error_type), intent(out), optional :: err
+  end subroutine coordinate_at_int16
+
+  module subroutine coordinate_at_int32(coord, indices, value, err)
+    type(coordinate_type), target, intent(in) :: coord
+    integer, intent(in) :: indices(:)
+    integer(int32), intent(out) :: value
+    type(error_type), intent(out), optional :: err
+  end subroutine coordinate_at_int32
+
+  module subroutine coordinate_at_int64(coord, indices, value, err)
+    type(coordinate_type), target, intent(in) :: coord
+    integer, intent(in) :: indices(:)
+    integer(int64), intent(out) :: value
+    type(error_type), intent(out), optional :: err
+  end subroutine coordinate_at_int64
+
+  module subroutine coordinate_at_real32(coord, indices, value, err)
+    type(coordinate_type), target, intent(in) :: coord
+    integer, intent(in) :: indices(:)
+    real(real32), intent(out) :: value
+    type(error_type), intent(out), optional :: err
+  end subroutine coordinate_at_real32
+
+  module subroutine coordinate_at_real64(coord, indices, value, err)
+    type(coordinate_type), target, intent(in) :: coord
+    integer, intent(in) :: indices(:)
+    real(real64), intent(out) :: value
+    type(error_type), intent(out), optional :: err
+  end subroutine coordinate_at_real64
+
+  module subroutine extract_coord_int8(coord, ptr)
+    type(coordinate_type), target, intent(in) :: coord
+    integer(int8), pointer, intent(out) :: ptr(:)
+  end subroutine extract_coord_int8
+
+  module subroutine extract_coord_int16(coord, ptr)
+    type(coordinate_type), target, intent(in) :: coord
+    integer(int16), pointer, intent(out) :: ptr(:)
+  end subroutine extract_coord_int16
+
+  module subroutine extract_coord_int32(coord, ptr)
+    type(coordinate_type), target, intent(in) :: coord
+    integer(int32), pointer, intent(out) :: ptr(:)
+  end subroutine extract_coord_int32
+
+  module subroutine extract_coord_int64(coord, ptr)
+    type(coordinate_type), target, intent(in) :: coord
+    integer(int64), pointer, intent(out) :: ptr(:)
+  end subroutine extract_coord_int64
+
+  module subroutine extract_coord_real32(coord, ptr)
+    type(coordinate_type), target, intent(in) :: coord
+    real(real32), pointer, intent(out) :: ptr(:)
+  end subroutine extract_coord_real32
+
+  module subroutine extract_coord_real64(coord, ptr)
+    type(coordinate_type), target, intent(in) :: coord
+    real(real64), pointer, intent(out) :: ptr(:)
+  end subroutine extract_coord_real64
+end interface
 
 interface
   module subroutine evaluate(expr, result, err)
@@ -415,7 +534,7 @@ interface
 
   pure module function nameof_var(var) result(name)
     !! Return the local name of a variable, or an empty string if absent.
-    type(variable_type), intent(in) :: var
+    class(abstract_variable_type), intent(in) :: var
     !! Variable whose name is requested.
     character(len=:), allocatable :: name
   end function nameof_var
@@ -436,7 +555,7 @@ interface
 
   elemental module function typeof_var(var) result(dtype)
     !! Return the external data-type code of a variable.
-    type(variable_type), intent(in) :: var
+    class(abstract_variable_type), intent(in) :: var
     !! Variable whose data type is requested.
     integer(data_type) :: dtype
   end function typeof_var
@@ -1056,7 +1175,7 @@ interface
 
   pure module function get_size(var, dim) result(n)
     !! Query and return requested NetCDF metadata.
-    type(variable_type), intent(in) :: var
+    class(abstract_variable_type), intent(in) :: var
     !! Variable to process.
     integer, intent(in), optional :: dim
     !! Dimension to process.
@@ -1066,7 +1185,7 @@ interface
 
   pure module subroutine compute_size(var, n, err, dim)
     !! Return an element count or an error without terminating execution.
-    type(variable_type), intent(in) :: var
+    class(abstract_variable_type), intent(in) :: var
     !! Variable whose total size or selected dimension is queried.
     integer(int64), intent(out) :: n
     !! Total element count or length of the selected dimension.
@@ -1078,7 +1197,7 @@ interface
 
   pure module function get_shape(var) result(extents)
     !! Query and return requested NetCDF metadata.
-    type(variable_type), intent(in) :: var
+    class(abstract_variable_type), intent(in) :: var
     !! Variable to process.
     integer, allocatable :: extents(:)
     !! Result produced by this operation.

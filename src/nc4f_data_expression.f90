@@ -27,11 +27,17 @@ module subroutine evaluate(expr, result, err)
   type(error_type) :: op_err
   type(dimension_type), allocatable :: dims(:)
   type(variable_type), target :: staged
+  type(coordinate_type), allocatable :: coords(:)
   integer(data_type) :: dtype
   integer(int64) :: n, i
   integer :: nbytes
 
   call validate_expr(expr, dtype, dims, n, op_err)
+  if (.exists. op_err) then
+    call return_err(op_err, err)
+    return
+  end if
+  call infer_expr_coords(expr, coords, op_err)
   if (.exists. op_err) then
     call return_err(op_err, err)
     return
@@ -45,6 +51,7 @@ module subroutine evaluate(expr, result, err)
   staged%dtype = dtype
   staged%len = n
   staged%dims = dims
+  if (allocated(coords)) staged%coords = coords
   allocate (staged%buffer(nbytes))
   if (n > 0) then
     select case (dtype)
@@ -118,12 +125,72 @@ module subroutine evaluate(expr, result, err)
   result%dtype = staged%dtype
   result%len = staged%len
   result%dims = staged%dims
+  if (allocated(result%coords)) deallocate (result%coords)
+  if (allocated(staged%coords)) result%coords = staged%coords
   if (allocated(result%atts)) deallocate (result%atts)
   if (allocated(result%storage)) deallocate (result%storage)
   nullify (result%ptr)
   call move_alloc(staged%buffer, result%buffer)
   call return_err(op_err, err)
 end subroutine evaluate
+
+recursive subroutine infer_expr_coords(expr, coords, err)
+  !! Infer and compare coordinate mappings without evaluating data values.
+  type(expression_type), intent(in) :: expr
+  type(coordinate_type), allocatable, intent(out) :: coords(:)
+  type(error_type), intent(out) :: err
+  type(coordinate_type), allocatable :: right_coords(:)
+
+  err = error_type()
+  select case (expr%operation)
+  case (OP_LEAF)
+    if (allocated(expr%leaf%coords)) coords = expr%leaf%coords
+  case (OP_SCALAR_INT8, OP_SCALAR_INT16, OP_SCALAR_INT32, &
+    & OP_SCALAR_INT64, OP_SCALAR_REAL32, OP_SCALAR_REAL64)
+    return
+  case default
+    if (.not. allocated(expr%left)) return
+    call infer_expr_coords(expr%left, coords, err)
+    if (.exists. err) return
+    if (.not. allocated(expr%right)) return
+    call infer_expr_coords(expr%right, right_coords, err)
+    if (.exists. err) return
+    if (is_scalar_node(expr%left)) then
+      if (allocated(right_coords)) coords = right_coords
+      return
+    end if
+    if (is_scalar_node(expr%right)) return
+    if (allocated(coords) .neqv. allocated(right_coords)) then
+      err = error_type(INVALID, "evaluate", &
+        & "Only one operand has coordinates.")
+      return
+    end if
+    if (allocated(coords)) then
+      if (.not. same_coordinate_sets(coords, right_coords)) then
+        err = error_type(INVALID, "evaluate", &
+          & "Operand coordinates differ.")
+      end if
+    end if
+  end select
+end subroutine infer_expr_coords
+
+pure logical function same_coordinate_sets(left, right) result(equal)
+  !! Match coordinate mappings by name, independent of collection order.
+  type(coordinate_type), intent(in) :: left(:), right(:)
+  integer :: i, j
+
+  equal = size(left) == size(right)
+  if (.not. equal) return
+  do i = 1, size(left)
+    equal = .false.
+    do j = 1, size(right)
+      if (left(i)%name /= right(j)%name) cycle
+      equal = left(i) == right(j)
+      exit
+    end do
+    if (.not. equal) return
+  end do
+end function same_coordinate_sets
 
 pure recursive subroutine validate_expr(expr, dtype, dims, n, err)
   !! Check operand storage, types, and ordered dimensions before evaluation.

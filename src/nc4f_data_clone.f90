@@ -53,6 +53,7 @@ impure elemental module subroutine clone_var(src, dest)
   dest%dtype = src%dtype
   dest%len = src%len
   if (allocated(src%dims)) dest%dims = src%dims
+  if (allocated(src%coords)) dest%coords = src%coords
   if (allocated(src%storage)) then
     dest%storage = src%storage
     if (allocated(src%storage%fill_value)) then

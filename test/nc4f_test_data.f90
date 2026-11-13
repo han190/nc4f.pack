@@ -5,6 +5,7 @@ private
 public :: collect_data_arithmetic, collect_data_attribute
 public :: collect_data_attribute_constructor
 public :: collect_data_clone
+public :: collect_data_coordinate
 public :: collect_data_dimension, collect_data_extract
 public :: collect_data_expression
 public :: collect_data_intrinsic
@@ -29,6 +30,10 @@ interface
   module subroutine collect_data_clone(tests)
     type(unittest_type), allocatable, intent(out) :: tests(:)
   end subroutine collect_data_clone
+
+  module subroutine collect_data_coordinate(tests)
+    type(unittest_type), allocatable, intent(out) :: tests(:)
+  end subroutine collect_data_coordinate
 
   module subroutine collect_data_dimension(tests)
     type(unittest_type), allocatable, intent(out) :: tests(:)
