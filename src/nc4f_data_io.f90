@@ -84,6 +84,31 @@ module subroutine write_frmt_var(var, unit, iotype, v_list, iostat, iomsg)
   write (unit, "(a)", iostat=iostat, iomsg=iomsg) text
 end subroutine write_frmt_var
 
+module subroutine write_frmt_coord(coord, unit, iotype, v_list, &
+  & iostat, iomsg)
+  !! Write a formatted coordinate declaration and its attributes.
+  class(coordinate_type), intent(in) :: coord
+  !! Coordinate to format.
+  integer, intent(in) :: unit
+  !! Fortran output unit supplied by the invoking WRITE.
+  character(len=*), intent(in) :: iotype
+  !! Requested defined-I/O mode; LISTDIRECTED and DT are supported.
+  integer, intent(in) :: v_list(:)
+  !! Integer DT edit-descriptor parameters; currently ignored.
+  integer, intent(out) :: iostat
+  !! Receives zero on success or a nonzero I/O status on failure.
+  character(len=*), intent(inout) :: iomsg
+  !! Receives a diagnostic message when the underlying WRITE fails.
+  character(len=:), allocatable :: text
+
+  associate (ignored_v_list => v_list)
+  end associate
+  iostat = 1
+  if (iotype /= "LISTDIRECTED" .and. iotype /= "DT") return
+  text = render_var(coord, "")
+  write (unit, "(a)", iostat=iostat, iomsg=iomsg) text
+end subroutine write_frmt_coord
+
 module subroutine write_frmt_grp(grp, unit, iotype, v_list, iostat, iomsg)
   !! Write a formatted group representation to a Fortran I/O unit.
   class(group_type), intent(in) :: grp
@@ -663,15 +688,16 @@ pure function trim_trailing_zeros(text) result(trimmed)
 end function trim_trailing_zeros
 
 function render_var(var, indent) result(line)
-  !! Render a variable declaration and its attributes as indented text.
-  type(variable_type), intent(in) :: var
-  !! Variable to process.
+  !! Render a declaration, attributes, and attached coordinate names.
+  class(abstract_variable_type), intent(in) :: var
+  !! Variable or coordinate to format.
   character(len=*), intent(in) :: indent
   !! Indentation prefix for the rendered declarations.
   character(len=:), allocatable :: line
   !! Result produced by this operation.
   character(len=16) :: dtype
-  character(len=:), allocatable :: dims
+  character(len=:), allocatable :: dims, coord_names
+  logical :: has_coord_att
   integer :: i
 
   call type_name(var%dtype, dtype)
@@ -692,6 +718,25 @@ function render_var(var, indent) result(line)
       line = line//new_line("a")//render_att(var%atts(i), indent//"    ")
     end do
   end if
+  select type (var)
+  type is (variable_type)
+    if (.not. allocated(var%coords)) return
+    if (size(var%coords) == 0) return
+    has_coord_att = .false.
+    if (allocated(var%atts)) then
+      do i = 1, size(var%atts)
+        if (var%atts(i)%name == "coordinates") has_coord_att = .true.
+      end do
+    end if
+    if (has_coord_att) return
+    coord_names = ""
+    do i = 1, size(var%coords)
+      if (i > 1) coord_names = coord_names//" "
+      coord_names = coord_names//var%coords(i)%name
+    end do
+    line = line//new_line("a")//indent// &
+      & "    char:coordinates = """//coord_names//""" ;"
+  end select
 end function render_var
 
 pure subroutine type_name(dtype, name)

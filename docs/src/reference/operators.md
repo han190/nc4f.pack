@@ -271,19 +271,38 @@ Alternatively, `call evaluate(expr, result, err)` reports validation errors
 without changing `result`. Binary variable and expression operands require
 matching numeric types and exactly matching ordered dimensions. A numeric
 scalar must have the same kind as its derived operand and applies to every
-element without adding a dimension. Division by
-zero and negative integer powers of integer data report errors. A zero base
-with a negative exponent also reports an error. A negative real base requires
-an integer scalar exponent. A real scalar exponent promotes the expression
-result to the wider of the base and exponent real kinds. Coordinates, units,
-and broadcasting between variables are not yet part of these operations.
+element without adding a dimension. A real scalar exponent promotes the
+expression result to the wider of the base and exponent real kinds.
 
-Expression leaves borrow their source variables. Declare operands with
-`TARGET`, and keep each variable and any target behind its borrowed `ptr`
-alive until evaluation completes. Value changes before evaluation are read at
-evaluation time. Do not deallocate, replace, or rebind operand storage while
-an expression refers to it. A missing buffer or pointer is reported as an
-error. A pointer to expired storage cannot be detected reliably.
+Expression construction validates operand storage and binds typed value and
+metadata views once. Evaluation validates the tree, types, dimensions, and
+coordinates, then uses that same expression tree directly. Pure numerical
+routines dispatch operations once per block, exposing typed loops for compiler
+vectorization. Independent block ranges execute with `DO CONCURRENT`.
+Scratch buffers are sized from simultaneously live intermediates, reused
+within the expression and across blocks, and kept separate for concurrent
+ranges. Subexpressions do not create full-array intermediates. The compiler
+determines whether execution is vectorized or parallel. Results are staged before replacing the destination, supporting a
+destination that also appears among the operands.
+
+Numerical domains and exceptions follow Fortran arithmetic, intrinsic routines,
+and compiler/runtime settings. NC4F does not return `error_type` diagnostics
+for division by zero, invalid intrinsic arguments, or arithmetic overflow.
+Floating-point results may include NaN or infinity when supported and trapping
+is disabled. Intrinsics can also issue native diagnostics or terminate execution
+for invalid arguments. Callers are responsible for valid integer operations. Structural
+validation errors leave the destination unchanged; runtime traps are outside
+that guarantee. Unit conversion and broadcasting between array operands are
+not supported.
+
+Expression leaves borrow typed views of operand data and metadata. Declare
+operands with `TARGET`, and keep their data, dimensions, coordinates, and any
+target behind a borrowed `ptr` alive until evaluation completes. Numeric value
+changes before evaluation are read at evaluation time. Keep operand metadata
+unchanged, and do not deallocate, replace, or rebind borrowed data or metadata
+allocations while an expression refers to them. Missing storage at expression
+construction is recorded and reported by `evaluate`; pointers invalidated after
+construction cannot be detected reliably.
 
 ```fortran
 type(variable_type), target :: a, b, c

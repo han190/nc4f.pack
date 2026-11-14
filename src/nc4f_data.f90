@@ -225,6 +225,9 @@ end type abstract_variable_type
 
 type, extends(abstract_variable_type) :: coordinate_type
   !! One owned numeric coordinate array over its dims.
+contains
+  procedure, private :: write_frmt_coord
+  generic, public :: write(formatted) => write_frmt_coord
 end type coordinate_type
 
 type, extends(abstract_variable_type) :: variable_type
@@ -243,17 +246,44 @@ contains
 end type variable_type
 
 type :: expression_type
-  !! Deferred arithmetic on variables with matching ordered dimensions.
-  !! Every referenced variable and borrowed target must remain alive. Values
-  !! may change before evaluation; storage must not be replaced or released.
+  !! Owned deferred operation tree with borrowed typed data and metadata views.
+  !! Children are copied with the tree; flat values follow Fortran array order.
+  !! Operand data and metadata storage are borrowed rather than copied.
+  !! Numeric values may change before evaluation. Borrowed allocations must
+  !! remain alive, and operand metadata must stay unchanged while in use.
   private
   integer(operation_kind) :: operation = OP_INVALID
-  !! Integer exponent or scalar operand, selected by `operation`.
+  !! Arithmetic, intrinsic, scalar, or leaf tag; OP_INVALID marks an empty tree.
+  integer :: scratch_count = 0
+  !! Live scratch blocks needed per logical lane, excluding the output block.
   integer(int64) :: exp_int = 1_int64
-  !! Real exponent or scalar operand, selected by `operation`.
+  !! Stored integer scalar or scalar exponent, interpreted using operation.
   real(real64) :: exp_real = 1.0_real64
-  type(variable_type), pointer :: leaf => null()
+  !! Stored real scalar or scalar exponent, converted to the evaluation kind.
+  integer(data_type) :: dtype = NAT_TYPE
+  !! Original leaf NetCDF type captured when its views are bound.
+  integer(int64) :: len = 0_int64
+  !! Leaf element count; zero for empty leaves and unused on operator nodes.
+  type(dimension_type), pointer :: dims(:) => null()
+  !! Borrowed leaf dimensions in Fortran order; the owner retains storage.
+  type(coordinate_type), pointer :: coords(:) => null()
+  !! Borrowed ordered leaf coordinates; null when no mappings are present.
+  type(error_type) :: leaf_error
+  !! Structural binding failure deferred to evaluate instead of the builder.
+  integer(int8), contiguous, pointer :: values_int8(:) => null()
+  !! Borrowed flat int8 view; null unless this is a nonempty int8 leaf.
+  integer(int16), contiguous, pointer :: values_int16(:) => null()
+  !! Borrowed flat int16 view; null unless this is a nonempty int16 leaf.
+  integer(int32), contiguous, pointer :: values_int32(:) => null()
+  !! Borrowed flat int32 view; null unless this is a nonempty int32 leaf.
+  integer(int64), contiguous, pointer :: values_int64(:) => null()
+  !! Borrowed flat int64 view; null unless this is a nonempty int64 leaf.
+  real(real32), contiguous, pointer :: values_real32(:) => null()
+  !! Borrowed flat real32 view; null unless this is a nonempty real32 leaf.
+  real(real64), contiguous, pointer :: values_real64(:) => null()
+  !! Borrowed flat real64 view; null unless this is a nonempty real64 leaf.
   type(expression_type), allocatable :: left, right
+  !! Owned child nodes: left for unary/power operations, both for binary ones.
 end type expression_type
 
 type :: group_type
@@ -420,6 +450,14 @@ interface
     type(error_type), intent(out) :: err
   end subroutine validate_coordinate_for_var
 
+  pure module subroutine validate_coordinate_pair(left, right, err)
+    !! Compare two coordinates in corresponding collection positions.
+    type(coordinate_type), intent(in) :: left, right
+    !! Coordinates from the left and right operands, respectively.
+    type(error_type), intent(out) :: err
+    !! Mismatch result, including the coordinate name.
+  end subroutine validate_coordinate_pair
+
   pure module function coordinate_index(coords, name) result(index)
     type(coordinate_type), intent(in) :: coords(:)
     character(len=*), intent(in) :: name
@@ -500,6 +538,20 @@ interface
 end interface
 
 interface
+  pure module subroutine init_expr_workspace(expr)
+    !! Plan buffer reuse from the number of simultaneously live intermediates.
+    type(expression_type), intent(inout) :: expr
+    !! Node with populated children; updates its cached scratch_count.
+  end subroutine init_expr_workspace
+
+  module subroutine init_expr_leaf(var, expr)
+    !! Bind typed values and metadata once, retaining validation for evaluate.
+    type(variable_type), target, intent(in) :: var
+    !! Source operand whose data and metadata allocations remain borrowed.
+    type(expression_type), intent(out) :: expr
+    !! New leaf containing typed views or a deferred structural binding error.
+  end subroutine init_expr_leaf
+
   module subroutine evaluate(expr, result, err)
     !! Validate and evaluate a deferred expression into a variable.
     type(expression_type), intent(in) :: expr
@@ -507,7 +559,8 @@ interface
     type(variable_type), target, intent(inout) :: result
     !! Destination replaced only after a successful evaluation.
     type(error_type), intent(out), optional :: err
-    !! Receives failure details; if omitted, failures terminate execution.
+    !! Receives structural failures; numerical exceptions follow Fortran.
+    !! When omitted, structural failures terminate execution.
   end subroutine evaluate
 
   module subroutine assign_expr(result, expr)
@@ -1038,6 +1091,23 @@ interface
     character(len=*), intent(inout) :: iomsg
     !! Receives the diagnostic message if the underlying WRITE fails.
   end subroutine write_frmt_var
+
+  module subroutine write_frmt_coord(coord, unit, iotype, v_list, &
+    & iostat, iomsg)
+    !! Write a formatted coordinate declaration and its attributes.
+    class(coordinate_type), intent(in) :: coord
+    !! Coordinate to format.
+    integer, intent(in) :: unit
+    !! Fortran output unit supplied by the invoking WRITE.
+    character(len=*), intent(in) :: iotype
+    !! Requested defined-I/O mode; LISTDIRECTED and DT are supported.
+    integer, intent(in) :: v_list(:)
+    !! Integer DT edit-descriptor parameters; currently ignored.
+    integer, intent(out) :: iostat
+    !! Receives zero on success or a nonzero I/O status on failure.
+    character(len=*), intent(inout) :: iomsg
+    !! Receives a diagnostic message when the underlying WRITE fails.
+  end subroutine write_frmt_coord
 
   module subroutine write_frmt_grp(grp, unit, iotype, v_list, iostat, iomsg)
     !! Write a formatted group representation to a Fortran I/O unit.

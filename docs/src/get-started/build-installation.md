@@ -36,8 +36,9 @@ use, non_intrinsic :: nc4f
 
 ## Build from Make with fypp
 
-The Make build regenerates the constructor and extraction source files from
-the `fypp/` templates. Install [fypp](https://fypp.readthedocs.io/en/stable/fypp.html) 
+The Make build regenerates constructors, extraction routines, arithmetic and
+intrinsic expression builders, expression evaluators, and coordinate accessors
+from the `fypp/` templates. Install [fypp](https://fypp.readthedocs.io/en/stable/fypp.html)
 before building when you intend to edit
 or regenerate those templates.
 
@@ -48,6 +49,12 @@ python -m pip install fypp
 make library
 make test
 ```
+
+Use `make preprocess` to regenerate sources without compiling. Edit
+`fypp/nc4f_data_expression.fypp` for expression evaluation and
+`fypp/nc4f_data_coordinate.fypp` for coordinate access; their generated
+`src/*.f90` files are tracked alongside the templates. Public
+coordinate interface declarations remain in `src/nc4f_data.f90`.
 
 `make library` creates `build/makefile_<compiler>_<profile>/ncpack.a`;
 `make test` builds and runs the test executable. Set `PROFILE=release` for
@@ -118,7 +125,7 @@ are explicit; CMake does not download them during configuration or compilation.
 |:--|:--|:--|
 | `NC4F_BUILD_TESTS` | `ON` for a standalone build; `OFF` as a subproject | Build and register the regression suite with CTest. |
 | `NC4F_BUILD_EXAMPLES` | `OFF` | Build the examples and provide the `run-examples` target. |
-| `NC4F_REGENERATE_SOURCES` | `OFF` | Require fypp and regenerate constructor/extraction sources and interfaces in the build directory. |
+| `NC4F_REGENERATE_SOURCES` | `OFF` | Require fypp and regenerate all templated sources and interfaces in the build directory. |
 
 For example, to build and run all examples:
 

@@ -1,13 +1,16 @@
 submodule(nc4f_test_data) nc4f_test_data_expression
 use, intrinsic :: iso_fortran_env, only: &
   & int8, int16, int32, int64, real32, real64
+use, intrinsic :: ieee_arithmetic, only: ieee_is_finite, ieee_is_nan
+use, intrinsic :: ieee_exceptions, only: ieee_get_flag, ieee_set_flag, &
+  & ieee_invalid, ieee_divide_by_zero
 use, non_intrinsic :: testdrive, only: check, error_type, new_unittest, &
   & unittest_type
 use, non_intrinsic :: nc4f, only: datarray, evaluate, expression_type, &
   & extract, variable_type, dimension_type, &
   & error_type_model => error_type, &
   & operator(+), operator(-), operator(*), operator(/), operator(**), &
-  & operator(.dim.), assignment(=), NC_EINVAL
+  & operator(.dim.), assignment(=), NC_EINVAL, NC_NOERR
 implicit none (type, external)
 contains
 
@@ -53,7 +56,10 @@ module subroutine collect_data_expression(tests)
     & new_unittest("scalar zero divisor", test_scalar_zero_divisor), &
     & new_unittest("live borrowed values", test_live_values), &
     & new_unittest("missing operand storage", test_missing_storage), &
-    & new_unittest("destination alias", test_destination_alias)]
+    & new_unittest("destination alias", test_destination_alias), &
+    & new_unittest("fused borrowed matrix", test_fused_matrix), &
+    & new_unittest("empty expression", test_empty_expression), &
+    & new_unittest("blocked scratch reuse", test_blocked_scratch)]
 end subroutine collect_data_expression
 
 subroutine test_nested_addition(error)
@@ -364,21 +370,26 @@ subroutine test_expression_operands(error)
 end subroutine test_expression_operands
 
 subroutine test_division_by_zero(error)
+  !! Floating-point exceptions follow the runtime, rather than NC4F errors.
   type(error_type), allocatable, intent(out) :: error
   type(variable_type), target :: a, b
   type(variable_type) :: result
   type(error_type_model) :: err
+  logical :: saved_flags(2)
   real(real32), pointer :: values(:)
+  logical :: correct
 
-  a = datarray("a", [2.0_real32, 4.0_real32], ["x" .dim. 2], deep=.true.)
-  b = datarray("b", [1.0_real32, 0.0_real32], ["x" .dim. 2], deep=.true.)
-  result = datarray("result", [7.0_real32, 8.0_real32], &
-    & ["x" .dim. 2], deep=.true.)
+  a = datarray("a", [2.0_real32, 4.0_real32], ["x" .dim. 2])
+  b = datarray("b", [1.0_real32, 0.0_real32], ["x" .dim. 2])
+  ! Tests use the build's default nonhalting FP mode and restore raised flags.
+  call ieee_get_flag([ieee_invalid, ieee_divide_by_zero], saved_flags)
   call evaluate(a/b, result, err)
   call extract(result, values)
-  call check(error, err%code == NC_EINVAL .and. &
-    & all(abs(values - [7.0_real32, 8.0_real32]) < 1.0e-6_real32), &
-    & "Division by zero changed result")
+  correct = values(1) == 2.0_real32 .and. .not. ieee_is_finite(values(2))
+  correct = correct .and. .not. ieee_is_nan(values(2))
+  call ieee_set_flag([ieee_invalid, ieee_divide_by_zero], saved_flags)
+  call check(error, err%code == NC_NOERR .and. correct, &
+    & "Real division did not retain the runtime result")
 end subroutine test_division_by_zero
 
 subroutine test_negative_integer_power(error)
@@ -386,11 +397,17 @@ subroutine test_negative_integer_power(error)
   type(variable_type), target :: a
   type(variable_type) :: result
   type(error_type_model) :: err
+  integer(int32), pointer :: values(:)
+  integer :: exponent
 
-  a = datarray("a", [2_int32], ["x" .dim. 1], deep=.true.)
-  call evaluate(a**(-1), result, err)
-  call check(error, err%code == NC_EINVAL, &
-    & "Negative integer power was accepted")
+  exponent = -1
+  a = datarray("a", [2_int32, -1_int32, 1_int32], ["x" .dim. 3])
+  call evaluate(a**exponent, result, err)
+  call check(error, err%code == NC_NOERR, "Integer power failed")
+  if (allocated(error)) return
+  call extract(result, values)
+  call check(error, all(values == [2_int32, -1_int32, 1_int32]**exponent), &
+    & "Negative integer power differs from Fortran")
 end subroutine test_negative_integer_power
 
 subroutine test_zero_reciprocal(error)
@@ -398,11 +415,19 @@ subroutine test_zero_reciprocal(error)
   type(variable_type), target :: a
   type(variable_type) :: result
   type(error_type_model) :: err
+  logical :: saved_flags(2)
+  real(real32), pointer :: values(:)
+  logical :: correct
 
-  a = datarray("a", [0.0_real32], ["x" .dim. 1], deep=.true.)
+  a = datarray("a", [0.0_real32], ["x" .dim. 1])
+  ! Tests use the build's default nonhalting FP mode and restore raised flags.
+  call ieee_get_flag([ieee_invalid, ieee_divide_by_zero], saved_flags)
   call evaluate(a**(-1), result, err)
-  call check(error, err%code == NC_EINVAL, &
-    & "Zero reciprocal was accepted")
+  call extract(result, values)
+  correct = .not. ieee_is_finite(values(1)) .and. .not. ieee_is_nan(values(1))
+  call ieee_set_flag([ieee_invalid, ieee_divide_by_zero], saved_flags)
+  call check(error, err%code == NC_NOERR .and. correct, &
+    & "Zero reciprocal did not retain the runtime result")
 end subroutine test_zero_reciprocal
 
 subroutine test_uninitialized_expression(error)
@@ -478,12 +503,19 @@ subroutine test_scalar_zero_divisor(error)
   type(variable_type), target :: a
   type(variable_type) :: result
   type(error_type_model) :: err
+  logical :: saved_flags(2)
+  real(real64), pointer :: values(:)
+  logical :: correct
 
-  a = datarray("a", [1_int32, 2_int32], &
-    & ["x" .dim. 2], deep=.true.)
-  call evaluate(a/0_int32, result, err)
-  call check(error, err%code == NC_EINVAL, &
-    & "Scalar zero divisor was accepted")
+  a = datarray("a", [1.0_real64, 0.0_real64], ["x" .dim. 2])
+  ! Tests use the build's default nonhalting FP mode and restore raised flags.
+  call ieee_get_flag([ieee_invalid, ieee_divide_by_zero], saved_flags)
+  call evaluate(a/0.0_real64, result, err)
+  call extract(result, values)
+  correct = .not. ieee_is_finite(values(1)) .and. ieee_is_nan(values(2))
+  call ieee_set_flag([ieee_invalid, ieee_divide_by_zero], saved_flags)
+  call check(error, err%code == NC_NOERR .and. correct, &
+    & "Scalar division did not retain the runtime result")
 end subroutine test_scalar_zero_divisor
 
 subroutine test_live_values(error)
@@ -504,6 +536,16 @@ subroutine test_live_values(error)
   call extract(result, values)
   call check(error, all(values == [10.0_real32, 6.0_real32]), &
     & "Expression did not read current operand values")
+  if (allocated(error)) return
+  a = datarray("a", a_values, ["x" .dim. 2])
+  b = datarray("b", b_values, ["x" .dim. 2])
+  expr = a + b
+  call extract(a, values)
+  values(2) = 8.0_real32
+  result = expr
+  call extract(result, values)
+  call check(error, all(values == [10.0_real32, 12.0_real32]), &
+    & "Expression did not retain the owned-buffer view")
 end subroutine test_live_values
 
 subroutine test_missing_storage(error)
@@ -516,8 +558,10 @@ subroutine test_missing_storage(error)
   a = datarray("a", [1.0_real32], ["x" .dim. 1], deep=.true.)
   b = datarray("b", [2.0_real32], ["x" .dim. 1], deep=.true.)
   result = datarray("result", [9.0_real32], ["x" .dim. 1], deep=.true.)
-  expr = a + b
+  ! Missing storage is recorded at binding, before any pointer can expire.
   deallocate (a%buffer)
+  expr = a + b
+  expr = expr + 1.0_real32
   call evaluate(expr, result, err)
   call check(error, err%code == NC_EINVAL .and. &
     & result%name == "result", "Missing storage changed the result")
@@ -665,5 +709,98 @@ subroutine test_scalar_real64_arithmetic(error)
     & 8.0_real64]) < 1.0e-12_real64), &
     & "Scalar and expression arithmetic differs")
 end subroutine test_scalar_real64_arithmetic
+
+subroutine test_fused_matrix(error)
+  type(error_type), allocatable, intent(out) :: error
+  integer, parameter :: m = 37, n = 29
+  real(real64), target :: x(m,n), y(m,n), z(m,n)
+  real(real64), pointer :: values(:,:)
+  type(variable_type), target :: a, b, c, result
+  type(expression_type) :: expr
+  type(error_type_model) :: err
+  integer :: i, pass
+
+  x = reshape([(real(i, real64)/100, i=1,m*n)], [m,n])
+  y = 2.0_real64*x
+  z = 3.0_real64*x
+  a = datarray("a", x, ["x".dim.m, "y".dim.n], deep=.false.)
+  b = datarray("b", y, ["x".dim.m, "y".dim.n], deep=.false.)
+  c = datarray("c", z, ["x".dim.m, "y".dim.n], deep=.false.)
+  expr = a*(b+c)
+  do pass = 1, 2
+    call evaluate(expr, result, err)
+    call check(error, err%code == NC_NOERR, "Matrix evaluation failed")
+    if (allocated(error)) return
+    call extract(result, values)
+    call check(error, all(abs(values - x*(y+z)) < 1.0e-12_real64), &
+      & "Expression views lost matrix order or live values")
+    if (allocated(error)) return
+    y = y + 1.0_real64
+  end do
+  a = a*(b+c)
+  call extract(a, values)
+  call check(error, all(abs(values - x*(y+z)) < 1.0e-12_real64), &
+    & "Borrowed destination alias changed source values prematurely")
+end subroutine test_fused_matrix
+
+subroutine test_blocked_scratch(error)
+  !! Cross block/lane boundaries with two and three simultaneously live buffers.
+  type(error_type), allocatable, intent(out) :: error
+  integer, parameter :: n = 65553
+  type(variable_type), target :: a, b, c, d, e, f, g, h, result
+  type(expression_type) :: left, right
+  real(real64) :: x(n), expected_left(n), expected_right(n)
+  real(real64), pointer :: values(:)
+  integer :: i, pass
+
+  x = [(1.0_real64 + real(mod(i, 19), real64)/100, i=1,n)]
+  a = datarray("a", x, ["x".dim.n])
+  b = datarray("b", x+0.1_real64, ["x".dim.n])
+  c = datarray("c", x+0.2_real64, ["x".dim.n])
+  d = datarray("d", x+0.3_real64, ["x".dim.n])
+  e = datarray("e", x+0.4_real64, ["x".dim.n])
+  f = datarray("f", x+0.5_real64, ["x".dim.n])
+  g = datarray("g", x+0.6_real64, ["x".dim.n])
+  h = datarray("h", x+0.7_real64, ["x".dim.n])
+  left = (a+b)*(c+d) + (e+f)*(g+h)
+  right = (a+c)*(b+d) + (e+g)*(f+h)
+  expected_left = (x+(x+0.1_real64))*((x+0.2_real64)+(x+0.3_real64)) + &
+    & ((x+0.4_real64)+(x+0.5_real64))*((x+0.6_real64)+(x+0.7_real64))
+  expected_right = (x+(x+0.2_real64))*((x+0.1_real64)+(x+0.3_real64)) + &
+    & ((x+0.4_real64)+(x+0.6_real64))*((x+0.5_real64)+(x+0.7_real64))
+  do pass = 1, 2
+    result = left - right
+    call extract(result, values)
+    call check(error, all(abs(values-(expected_left-expected_right)) < &
+      & 1.0e-10_real64), "Balanced tree lost a live scratch buffer")
+    if (allocated(error)) return
+    result = (a+b)/right
+    call extract(result, values)
+    call check(error, all(abs(values-(x+(x+0.1_real64))/expected_right) < &
+      & 1.0e-12_real64), "Right-first division reversed its operands")
+    if (allocated(error)) return
+    result = left/(a+b)
+    call extract(result, values)
+    call check(error, all(abs(values-expected_left/(x+(x+0.1_real64))) < &
+      & 1.0e-10_real64), "Left-first division reversed its operands")
+    if (allocated(error)) return
+  end do
+end subroutine test_blocked_scratch
+
+subroutine test_empty_expression(error)
+  type(error_type), allocatable, intent(out) :: error
+  type(variable_type), target :: a, b
+  type(variable_type) :: result
+  type(error_type_model) :: err
+  real(real64) :: empty(0,3)
+
+  a = datarray("a", empty, ["x".dim.0, "y".dim.3])
+  b = datarray("b", empty, ["x".dim.0, "y".dim.3])
+  call evaluate(a*b, result, err)
+  call check(error, err%code == NC_NOERR .and. result%len == 0, &
+    & "Empty expression attempted to map a leaf")
+  if (allocated(error)) return
+  call check(error, allocated(result%buffer), "Empty output is not owned")
+end subroutine test_empty_expression
 
 end submodule nc4f_test_data_expression

@@ -1,0 +1,623 @@
+#: include 'common.fypp'
+submodule(nc4f_data) nc4f_data_expression
+!! Evaluate deferred arithmetic and mathematical intrinsic expressions.
+!! Leaves borrow variables and read their values during evaluation; callers
+!! retain operand and target storage lifetimes.
+implicit none (type, external)
+
+integer, parameter :: BLOCK_SIZE = 1024
+!! Maximum elements per numerical block; the final block may be shorter.
+integer, parameter :: MAX_BLOCK_LANES = 32
+!! Maximum independent output ranges, each with its own reusable scratch bank.
+!! Bounds scratch memory independently of array length; execution may be serial.
+
+contains
+
+module subroutine assign_expr(result, expr)
+  !! Evaluate an expression as defined assignment to a variable.
+  type(variable_type), target, intent(inout) :: result
+  !! Destination variable, replaced by the evaluated values.
+  type(expression_type), intent(in) :: expr
+  !! Deferred expression to assign.
+
+  call evaluate(expr, result)
+end subroutine assign_expr
+
+module subroutine evaluate(expr, result, err)
+  !! Validate the expression, evaluate blocks, and commit the staged result.
+  !! Structural failures leave result unchanged and report through err.
+  !! Numerical domains and exceptions follow Fortran and runtime settings.
+  type(expression_type), intent(in) :: expr
+  !! Expression tree whose leaves are read during evaluation.
+  type(variable_type), target, intent(inout) :: result
+  !! Destination variable, replaced only after successful evaluation.
+  type(error_type), intent(out), optional :: err
+  !! Receives structural failures; when omitted, they terminate execution.
+  type(error_type) :: op_err
+  !! Structural validation status returned before numerical execution.
+  type(dimension_type), allocatable :: dims(:)
+  !! Owned copy of the inferred output dimensions in Fortran order.
+  type(variable_type), target :: staged
+  !! Owned output storage committed only after evaluation finishes.
+  type(coordinate_type), allocatable :: coords(:)
+  !! Compatible coordinate mappings to propagate to the staged result.
+  integer(data_type) :: dtype
+  !! Numeric type selected for the output and kind-specific kernel.
+  integer(int64) :: n
+  !! Total output element count, including zero for an empty array.
+  integer :: nbytes
+  !! Checked byte count used to allocate the staged output buffer.
+
+  call validate_expr(expr, dtype, dims, n, op_err)
+  if (.exists. op_err) then
+    call return_err(op_err, err)
+    return
+  end if
+  call infer_expr_coords(expr, coords, op_err)
+  if (.exists. op_err) then
+    call return_err(op_err, err)
+    return
+  end if
+  call compute_buffer_size(dtype, n, nbytes, op_err)
+  if (.exists. op_err) then
+    call return_err(op_err, err)
+    return
+  end if
+  staged%name = ""
+  staged%dtype = dtype
+  staged%len = n
+  staged%dims = dims
+  if (allocated(coords)) staged%coords = coords
+  allocate (staged%buffer(nbytes))
+  if (n > 0) then
+    select case (dtype)
+#: for D, T, K in zip(dtypes, types, kinds)
+    case (${D}$)
+      block
+        ${T}$(${K}$), contiguous, pointer :: values(:)
+        !! Flat typed view of the staged output, in Fortran array order.
+        call extract(staged, values)
+        call evaluate_${K}$(expr, values)
+      end block
+#: endfor
+    case default
+      op_err = error_type(INVALID, "evaluate", &
+        & "Unsupported operand type.")
+      call return_err(op_err, err)
+      return
+    end select
+  end if
+  result%id = INVALID_INT32
+  result%name = staged%name
+  result%dtype = staged%dtype
+  result%len = staged%len
+  result%dims = staged%dims
+  if (allocated(result%coords)) deallocate (result%coords)
+  if (allocated(staged%coords)) result%coords = staged%coords
+  if (allocated(result%atts)) deallocate (result%atts)
+  if (allocated(result%storage)) deallocate (result%storage)
+  nullify (result%ptr)
+  call move_alloc(staged%buffer, result%buffer)
+  call return_err(op_err, err)
+end subroutine evaluate
+
+recursive subroutine infer_expr_coords(expr, coords, err)
+  !! Infer and compare coordinate mappings without evaluating data values.
+  type(expression_type), intent(in) :: expr
+  !! Deferred expression whose leaves supply coordinate collections.
+  type(coordinate_type), allocatable, intent(out) :: coords(:)
+  !! Ordered coordinates propagated to the evaluated result.
+  type(error_type), intent(out) :: err
+  !! Validation result for coordinate compatibility.
+  type(coordinate_type), allocatable :: right_coords(:)
+  !! Coordinate mappings inferred from the right subtree for comparison.
+  integer :: i
+  !! Position in the ordered coordinate collection.
+
+  err = error_type()
+  select case (expr%operation)
+  case (OP_LEAF)
+    if (associated(expr%coords)) coords = expr%coords
+  case (OP_SCALAR_INT8, OP_SCALAR_INT16, OP_SCALAR_INT32, &
+    & OP_SCALAR_INT64, OP_SCALAR_REAL32, OP_SCALAR_REAL64)
+    return
+  case default
+    if (.not. allocated(expr%left)) return
+    call infer_expr_coords(expr%left, coords, err)
+    if (.exists. err) return
+    if (.not. allocated(expr%right)) return
+    call infer_expr_coords(expr%right, right_coords, err)
+    if (.exists. err) return
+    if (is_scalar_node(expr%left)) then
+      if (allocated(right_coords)) coords = right_coords
+      return
+    end if
+    if (is_scalar_node(expr%right)) return
+    if (allocated(coords) .neqv. allocated(right_coords)) then
+      err = error_type(INVALID, "evaluate", &
+        & "Only one operand has coordinates.")
+      return
+    end if
+    if (.not. allocated(coords)) return
+    if (size(coords) /= size(right_coords)) then
+      err = error_type(INVALID, "evaluate", &
+        & "Operand coordinate counts differ.")
+      return
+    end if
+    do i = 1, size(coords)
+      call validate_coordinate_pair(coords(i), right_coords(i), err)
+      if (.exists. err) return
+    end do
+  end select
+end subroutine infer_expr_coords
+
+pure recursive subroutine validate_expr(expr, dtype, dims, n, err)
+  !! Check operand storage, types, and ordered dimensions before evaluation.
+  !! Scalar nodes inherit the dimensions of their array operand.
+  type(expression_type), intent(in) :: expr
+  !! Expression subtree to validate.
+  integer(data_type), intent(out) :: dtype
+  !! Data type inferred for the subtree result.
+  type(dimension_type), allocatable, intent(out) :: dims(:)
+  !! Ordered dimensions inferred for the subtree result.
+  integer(int64), intent(out) :: n
+  !! Element count; zero for a scalar node.
+  type(error_type), intent(out) :: err
+  !! Receives validation failure details or a no-error value.
+  type(dimension_type), allocatable :: right_dims(:)
+  !! Right-subtree dimensions used to check binary operand compatibility.
+  integer(data_type) :: right_type
+  !! Numeric type inferred for the right subtree.
+  integer(int64) :: right_len
+  !! Element count inferred for the right subtree.
+
+  err = error_type()
+  dtype = NAT_TYPE
+  n = 0
+  select case (expr%operation)
+  case (OP_LEAF)
+    if (.exists. expr%leaf_error) then
+      err = expr%leaf_error
+      return
+    end if
+    if (.not. associated(expr%dims)) then
+      err = error_type(INVALID, "evaluate", "Expression dimensions are absent.")
+      return
+    end if
+    dtype = expr%dtype
+    n = expr%len
+    select case (dtype)
+#: for D, K in zip(dtypes, kinds)
+    case (${D}$)
+      if (n > 0) then
+        if (.not. associated(expr%values_${K}$)) then
+          err = error_type(INVALID, "evaluate", "Operand storage is absent.")
+          return
+        end if
+        if (size(expr%values_${K}$, kind=int64) /= n) then
+          err = error_type(INVALID, "evaluate", "Operand length differs.")
+          return
+        end if
+      end if
+#: endfor
+    case default
+      err = error_type(INVALID, "evaluate", "Unsupported operand type.")
+      return
+    end select
+    dims = expr%dims
+  case (OP_SCALAR_INT8, OP_SCALAR_INT16, OP_SCALAR_INT32, &
+    & OP_SCALAR_INT64, OP_SCALAR_REAL32, OP_SCALAR_REAL64)
+    select case (expr%operation)
+#: for D, K in zip(dtypes, kinds)
+    case (OP_SCALAR_${K.upper()}$)
+      dtype = ${D}$
+#: endfor
+    case default
+      err = error_type(INVALID, "evaluate", &
+        & "Unknown scalar expression operation.")
+      return
+    end select
+    allocate (dims(0))
+  case (OP_ABS, OP_SQRT, OP_EXP, OP_LOG, OP_LOG10, OP_SIN, OP_COS, OP_TAN, &
+    & OP_ASIN, OP_ACOS, OP_ATAN, OP_SINH, OP_COSH, OP_TANH, OP_ASINH, &
+    & OP_ACOSH, OP_ATANH, OP_ERF, OP_ERFC, OP_ERFC_SCALED, OP_GAMMA, &
+    & OP_LOG_GAMMA, OP_BESSEL_J0, OP_BESSEL_J1, OP_BESSEL_Y0, OP_BESSEL_Y1)
+    if (.not. allocated(expr%left)) then
+      err = error_type(INVALID, "evaluate", "Unary node is incomplete.")
+      return
+    end if
+    call validate_expr(expr%left, dtype, dims, n, err)
+    if (.exists. err) return
+    if (expr%operation /= OP_ABS .and. &
+      & dtype /= FLOAT_TYPE .and. dtype /= DOUBLE_TYPE) then
+      err = error_type(INVALID, "evaluate", &
+        & "Unary intrinsic requires real data.")
+    end if
+  case (OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_POW, &
+    & OP_DIM, OP_SIGN, OP_MOD, OP_MODULO, OP_ATAN2, OP_HYPOT)
+    if (.not. allocated(expr%left) .or. .not. allocated(expr%right)) then
+      err = error_type(INVALID, "evaluate", "Arithmetic node is incomplete.")
+      return
+    end if
+    call validate_expr(expr%left, dtype, dims, n, err)
+    if (.exists. err) return
+    call validate_expr(expr%right, right_type, right_dims, right_len, err)
+    if (.exists. err) return
+    if (dtype /= right_type) then
+      err = error_type(INVALID, "evaluate", &
+        & "Operand types differ.")
+      return
+    end if
+    if ((expr%operation == OP_ATAN2 .or. &
+      & expr%operation == OP_HYPOT) .and. &
+      & dtype /= FLOAT_TYPE .and. dtype /= DOUBLE_TYPE) then
+      err = error_type(INVALID, "evaluate", &
+        & "This intrinsic requires real data.")
+      return
+    end if
+    if (is_scalar_node(expr%left)) then
+      dims = right_dims
+      n = right_len
+      return
+    end if
+    if (is_scalar_node(expr%right)) return
+    if (n /= right_len) then
+      err = error_type(INVALID, "evaluate", &
+        & "Operand lengths differ.")
+      return
+    end if
+    if (size(dims) /= size(right_dims)) then
+      err = error_type(INVALID, "evaluate", &
+        & "Operand dimension counts differ.")
+      return
+    end if
+    if (.not. all(dims == right_dims)) then
+      err = error_type(INVALID, "evaluate", &
+        & "Operand dimensions differ in name, length, or order.")
+      return
+    end if
+  case (OP_INT8_POW, OP_INT16_POW, OP_INT32_POW, OP_INT64_POW, &
+    & OP_REAL32_POW, OP_REAL64_POW)
+    if (.not. allocated(expr%left)) then
+      err = error_type(INVALID, "evaluate", "Power node is incomplete.")
+      return
+    end if
+    call validate_expr(expr%left, dtype, dims, n, err)
+    if (.exists. err) return
+    select case (expr%operation)
+    case (OP_REAL32_POW)
+      if (dtype /= DOUBLE_TYPE) dtype = FLOAT_TYPE
+    case (OP_REAL64_POW)
+      dtype = DOUBLE_TYPE
+    case default
+    end select
+  case default
+    err = error_type(INVALID, "evaluate", "Unknown expression operation.")
+  end select
+end subroutine validate_expr
+
+pure logical function is_scalar_node(expr)
+  !! Return true for a stored numeric scalar that broadcasts over an array.
+  type(expression_type), intent(in) :: expr
+  !! Node to inspect for a stored scalar operation.
+
+  select case (expr%operation)
+  case (OP_SCALAR_INT8, OP_SCALAR_INT16, OP_SCALAR_INT32, &
+    & OP_SCALAR_INT64, OP_SCALAR_REAL32, OP_SCALAR_REAL64)
+    is_scalar_node = .true.
+  case default
+    is_scalar_node = .false.
+  end select
+end function is_scalar_node
+
+module subroutine init_expr_leaf(var, expr)
+  !! Validate and bind views while the operand is available; never copy data.
+  !! Invalid leaves retain a diagnostic returned later by evaluate.
+  type(variable_type), target, intent(in) :: var
+  !! Source operand; its data and metadata allocations must remain valid.
+  type(expression_type), intent(out) :: expr
+  !! New borrowed leaf, including any structural binding error for evaluate.
+
+  expr%operation = OP_LEAF
+  expr%dtype = var%dtype
+  expr%len = var%len
+  call validate(var, context="evaluate", err=expr%leaf_error)
+  if (.exists. expr%leaf_error) return
+  expr%dims => var%dims
+  if (allocated(var%coords)) expr%coords => var%coords
+  if (var%len == 0) return
+  select case (var%dtype)
+#: for D, K in zip(dtypes, kinds)
+  case (${D}$)
+    call extract(var, expr%values_${K}$)
+#: endfor
+  end select
+end subroutine init_expr_leaf
+
+pure logical function is_direct_operand(expr) result(direct)
+  !! Return true for leaves and scalars readable without subtree evaluation.
+  type(expression_type), intent(in) :: expr
+  !! Operand node to classify; numerical values are not inspected.
+  direct = expr%operation == OP_LEAF .or. is_scalar_node(expr)
+end function is_direct_operand
+
+pure module subroutine init_expr_workspace(expr)
+  !! Cache scratch needs for evaluating the more demanding branch first.
+  !! Operand order is preserved; direct leaves and scalars need no work block.
+  type(expression_type), intent(inout) :: expr
+  !! Node with populated children; only its scratch_count is updated.
+  integer :: left, right
+  !! Scratch requirements of the left and right child subtrees.
+
+  expr%scratch_count = 0
+  if (.not. allocated(expr%left)) return
+  expr%scratch_count = expr%left%scratch_count
+  if (.not. allocated(expr%right)) return
+  if (is_direct_operand(expr%right)) return
+  if (is_direct_operand(expr%left)) then
+    expr%scratch_count = expr%right%scratch_count
+    return
+  end if
+  left = expr%left%scratch_count
+  right = expr%right%scratch_count
+  expr%scratch_count = max(left, right)
+  if (left == right) expr%scratch_count = left + 1
+end subroutine init_expr_workspace
+
+#: for T, K in zip(types, kinds)
+pure subroutine evaluate_${K}$(expr, values)
+  !! Concurrent lanes own disjoint output ranges and reusable scratch banks.
+  type(expression_type), intent(in) :: expr
+  !! Validated expression with bound leaves and a cached scratch requirement.
+  ${T}$(${K}$), contiguous, intent(out) :: values(:)
+  !! Flat output partitioned into disjoint lanes; must not alias leaf storage.
+  ${T}$(${K}$), allocatable :: scratch(:,:,:)
+  !! Work banks indexed by block element, live intermediate, and lane.
+  integer(int64) :: n, blocks, lanes, lane
+  !! Output size, block count, lane count, and current logical lane index.
+
+  n = size(values, kind=int64)
+  blocks = (n + BLOCK_SIZE - 1)/BLOCK_SIZE
+  lanes = min(blocks, int(MAX_BLOCK_LANES, int64))
+  allocate (scratch(min(n, int(BLOCK_SIZE, int64)), expr%scratch_count, lanes))
+  do concurrent (lane=1:lanes)
+    block
+      integer(int64) :: first, last
+      !! Inclusive one-based output bounds owned by this logical lane.
+      first = ((lane - 1)*blocks/lanes)*BLOCK_SIZE + 1
+      last = min(n, (lane*blocks/lanes)*BLOCK_SIZE)
+      call evaluate_lane_${K}$(expr, first, values(first:last), scratch(:,:,lane))
+    end block
+  end do
+end subroutine evaluate_${K}$
+
+pure subroutine evaluate_lane_${K}$(expr, first, values, scratch)
+  !! Scratch is allocated once by the caller, then reused for every block.
+  type(expression_type), intent(in) :: expr
+  !! Validated expression shared read-only by all logical lanes.
+  integer(int64), intent(in) :: first
+  !! One-based index in each leaf corresponding to values(1).
+  ${T}$(${K}$), contiguous, intent(out) :: values(:)
+  !! This lane's disjoint contiguous segment of the complete output array.
+  ${T}$(${K}$), contiguous, intent(inout) :: scratch(:,:)
+  !! Lane-private work bank; columns are reused as intermediates expire.
+  integer(int64) :: offset, last
+  !! Inclusive block bounds within this lane's local output segment.
+
+  do offset = 1, size(values, kind=int64), BLOCK_SIZE
+    last = min(size(values, kind=int64), offset + BLOCK_SIZE - 1)
+    call eval_block_${K}$(expr, first + offset - 1, values(offset:last), scratch)
+  end do
+end subroutine evaluate_lane_${K}$
+
+pure recursive subroutine eval_block_${K}$(node, first, values, scratch)
+  !! Dispatch once per block; inner loops contain only typed numerical work.
+  type(expression_type), intent(in) :: node
+  !! Validated subtree to evaluate for the current block.
+  integer(int64), intent(in) :: first
+  !! One-based starting element in the original flat leaf arrays.
+  ${T}$(${K}$), contiguous, intent(out) :: values(:)
+  !! Destination block, reused for child results; must not alias leaf storage.
+  ${T}$(${K}$), contiguous, intent(inout) :: scratch(:,:)
+  !! Work columns beyond values; requires at least node%scratch_count columns.
+  !! Active scratch sections and values must not overlap.
+  integer :: n, i
+  !! Block length and element index for scalar-exponent loops.
+
+  n = size(values)
+  select case (node%operation)
+  case (OP_LEAF)
+#: if T == 'integer'
+    values = node%values_${K}$(first:first+n-1)
+#: else
+    select case (node%dtype)
+#: for D, SOURCE_KIND in zip(dtypes[:kinds.index(K)+1], kinds[:kinds.index(K)+1])
+    case (${D}$)
+      values = real(node%values_${SOURCE_KIND}$(first:first+n-1), ${K}$)
+#: endfor
+    end select
+#: endif
+#: if T == 'integer'
+  case (OP_SCALAR_${K.upper()}$)
+    values = int(node%exp_int, ${K}$)
+  case (OP_ABS)
+    call eval_block_${K}$(node%left, first, values, scratch)
+    values = abs(values)
+#: else
+  case (OP_SCALAR_INT8, OP_SCALAR_INT16, OP_SCALAR_INT32, OP_SCALAR_INT64)
+    values = real(node%exp_int, ${K}$)
+  case (OP_SCALAR_REAL32, OP_SCALAR_REAL64)
+    values = real(node%exp_real, ${K}$)
+  case (OP_ABS, OP_SQRT, OP_EXP, OP_LOG, OP_LOG10, OP_SIN, OP_COS, OP_TAN, &
+    & OP_ASIN, OP_ACOS, OP_ATAN, OP_SINH, OP_COSH, OP_TANH, OP_ASINH, &
+    & OP_ACOSH, OP_ATANH, OP_ERF, OP_ERFC, OP_ERFC_SCALED, OP_GAMMA, &
+    & OP_LOG_GAMMA, OP_BESSEL_J0, OP_BESSEL_J1, OP_BESSEL_Y0, OP_BESSEL_Y1)
+    call eval_block_${K}$(node%left, first, values, scratch)
+    call apply_unary_${K}$(node%operation, values)
+#: endif
+  case (OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_POW, &
+    & OP_DIM, OP_SIGN, OP_MOD, OP_MODULO, OP_ATAN2, OP_HYPOT)
+    if (is_direct_operand(node%right)) then
+      call eval_block_${K}$(node%left, first, values, scratch)
+      call apply_operand_${K}$(node%operation, node%right, first, values, .false.)
+    else if (is_direct_operand(node%left)) then
+      call eval_block_${K}$(node%right, first, values, scratch)
+      call apply_operand_${K}$(node%operation, node%left, first, values, .true.)
+    else if (node%left%scratch_count >= node%right%scratch_count) then
+      call eval_block_${K}$(node%left, first, values, scratch)
+      call eval_block_${K}$(node%right, first, scratch(:n,1), scratch(:,2:))
+      call apply_array_${K}$_${K}$(node%operation, scratch(:n,1), values, .false.)
+    else
+      call eval_block_${K}$(node%right, first, values, scratch)
+      call eval_block_${K}$(node%left, first, scratch(:n,1), scratch(:,2:))
+      call apply_array_${K}$_${K}$(node%operation, scratch(:n,1), values, .true.)
+    end if
+  case (OP_INT8_POW, OP_INT16_POW, OP_INT32_POW, OP_INT64_POW)
+    call eval_block_${K}$(node%left, first, values, scratch)
+    select case (node%operation)
+#: for E in kinds[:4]
+    case (OP_${E.upper()}$_POW)
+    do i = 1, n
+#: if T == 'integer'
+      values(i) = int(values(i)**int(node%exp_int, ${E}$), ${K}$)
+#: else
+      values(i) = values(i)**int(node%exp_int, ${E}$)
+#: endif
+    end do
+#: endfor
+    end select
+#: if T == 'real'
+  case (OP_REAL32_POW, OP_REAL64_POW)
+    call eval_block_${K}$(node%left, first, values, scratch)
+    values = values**real(node%exp_real, ${K}$)
+#: endif
+  end select
+end subroutine eval_block_${K}$
+
+pure subroutine apply_operand_${K}$(operation, operand, first, values, reverse)
+  !! Combine a direct leaf or scalar with an already evaluated ${K}$ block.
+  integer(operation_kind), intent(in) :: operation
+  !! Validated binary arithmetic or intrinsic operation code.
+  type(expression_type), intent(in) :: operand
+  !! Bound leaf or stored scalar; its storage must not overlap values.
+  integer(int64), intent(in) :: first
+  !! One-based leaf offset; ignored when operand is a broadcast scalar.
+  ${T}$(${K}$), contiguous, intent(inout) :: values(:)
+  !! Existing child result replaced in place by the binary operation result.
+  logical, intent(in) :: reverse
+  !! True places operand on the left; false places it on the right.
+  integer :: n
+  !! Number of elements read from a direct array operand.
+
+  n = size(values)
+  select case (operand%operation)
+  case (OP_LEAF)
+    select case (operand%dtype)
+#: set SOURCE_KINDS = [K] if T == 'integer' else kinds[:kinds.index(K)+1]
+#: for SOURCE_KIND in SOURCE_KINDS
+#: set D = dtypes[kinds.index(SOURCE_KIND)]
+    case (${D}$)
+      call apply_array_${K}$_${SOURCE_KIND}$(operation, &
+        & operand%values_${SOURCE_KIND}$(first:first+n-1), values, reverse)
+#: endfor
+    end select
+#: if T == 'integer'
+  case (OP_SCALAR_${K.upper()}$)
+    call apply_scalar_${K}$(operation, int(operand%exp_int, ${K}$), values, reverse)
+#: else
+  case (OP_SCALAR_INT8, OP_SCALAR_INT16, OP_SCALAR_INT32, OP_SCALAR_INT64)
+    call apply_scalar_${K}$(operation, real(operand%exp_int, ${K}$), values, reverse)
+  case (OP_SCALAR_REAL32, OP_SCALAR_REAL64)
+    call apply_scalar_${K}$(operation, real(operand%exp_real, ${K}$), values, reverse)
+#: endif
+  end select
+end subroutine apply_operand_${K}$
+
+#! Each helper has one read/write destination argument, so in-place reuse does
+#! not alias separate input/output dummies. Dispatch stays outside the loop.
+#: for SOURCE_KIND in SOURCE_KINDS + ['scalar']
+pure subroutine apply_${'scalar' if SOURCE_KIND == 'scalar' else 'array'}$_${K}$#{if SOURCE_KIND != 'scalar'}#_${SOURCE_KIND}$#{endif}#(operation, other, values, reverse)
+#: if SOURCE_KIND == 'scalar'
+  !! Apply a broadcast ${K}$ scalar to a ${K}$ destination block in place.
+#: else
+  !! Combine a ${SOURCE_KIND}$ array with a ${K}$ block in place.
+  !! Source elements are converted to the destination type when needed.
+#: endif
+  integer(operation_kind), intent(in) :: operation
+  !! Validated binary operation, dispatched before the concurrent loop.
+#: if SOURCE_KIND == 'scalar'
+  ${T}$(${K}$), intent(in) :: other
+  !! Read-only scalar broadcast to every destination element.
+#: else
+#: set SOURCE_TYPE = types[kinds.index(SOURCE_KIND)]
+  ${SOURCE_TYPE}$(${SOURCE_KIND}$), contiguous, intent(in) :: other(:)
+  !! Read-only source block; must match values in size and not overlap it.
+#: endif
+  ${T}$(${K}$), contiguous, intent(inout) :: values(:)
+  !! Input block replaced by the result; each iteration owns one element.
+  logical, intent(in) :: reverse
+  !! True uses other as the left operand; false uses it as the right operand.
+  integer :: i
+  !! Independent element index local to each concurrent iteration.
+
+  select case (operation)
+#: set BINARY_NAMES = ['add', 'sub', 'mul', 'div', 'pow', 'dim', 'sign', 'mod', 'modulo']
+#: set BINARY_NAMES = BINARY_NAMES + (['atan2', 'hypot'] if T == 'real' else [])
+#: for NAME in BINARY_NAMES
+  case (OP_${NAME.upper()}$)
+    if (reverse) then
+#: for REVERSE in [True, False]
+#: if not REVERSE
+    else
+#: endif
+      do concurrent (i=1:size(values))
+#: set OTHER = 'other' if SOURCE_KIND == 'scalar' else 'other(i)'
+#: if SOURCE_KIND not in [K, 'scalar']
+#: set OTHER = 'real(' + OTHER + ', ' + K + ')'
+#: endif
+#: set LEFT, RIGHT = (OTHER, 'values(i)') if REVERSE else ('values(i)', OTHER)
+#: if NAME in op_names
+#: set VALUE = LEFT + ' ' + ops[op_names.index(NAME)] + ' ' + RIGHT
+#: else
+#: set VALUE = NAME + '(' + LEFT + ', ' + RIGHT + ')'
+#: endif
+        values(i) = ${VALUE}$
+      end do
+#: endfor
+    end if
+#: endfor
+  end select
+end subroutine apply_${'scalar' if SOURCE_KIND == 'scalar' else 'array'}$_${K}$#{if SOURCE_KIND != 'scalar'}#_${SOURCE_KIND}$#{endif}#
+
+#: endfor
+#: endfor
+#: for K in kinds[4:]
+pure subroutine apply_unary_${K}$(operation, values)
+  !! Apply one real ${K}$ intrinsic to a block in place.
+  !! Numerical domains and exceptions follow the Fortran intrinsic backend.
+  integer(operation_kind), intent(in) :: operation
+  !! Validated unary intrinsic operation code.
+  real(${K}$), contiguous, intent(inout) :: values(:)
+  !! Input block replaced elementwise by the selected intrinsic result.
+  integer :: i
+  !! Element index within the current block.
+
+  select case (operation)
+#: for NAME in unary_intrinsics
+  case (OP_${NAME.upper()}$)
+#: if NAME == 'bessel_j0' and K == 'real32'
+    ! Some macOS Flang runtimes lack the real32 Bessel symbols.
+#: endif
+    do i = 1, size(values)
+#: if NAME.startswith('bessel_') and K == 'real32'
+      values(i) = real(${NAME}$(real(values(i), real64)), ${K}$)
+#: else
+      values(i) = ${NAME}$(values(i))
+#: endif
+    end do
+#: endfor
+  end select
+end subroutine apply_unary_${K}$
+
+#: endfor
+end submodule nc4f_data_expression

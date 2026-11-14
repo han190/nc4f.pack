@@ -1,7 +1,7 @@
 #: include 'common.fypp'
 submodule(nc4f_data) nc4f_data_arithmetic
 !! Build deferred arithmetic expressions without evaluating their elements.
-!! Variable leaves borrow the original variables; nested expression nodes are
+!! Variable leaves bind typed data and metadata views; nested nodes are
 !! copied into the tree. Scalar operands are stored in expression nodes.
 implicit none (type, external)
 contains
@@ -30,17 +30,16 @@ module function ${NAME}$_${LEFT}$_${RIGHT}$(a, b) result(expr)
   expr%operation = OP_${NAME.upper()}$
   allocate (expr%left, expr%right)
 #: if LEFT == 'var'
-  expr%left%operation = OP_LEAF
-  expr%left%leaf => a
+  call init_expr_leaf(a, expr%left)
 #: else
   call copy_expr(a, expr%left)
 #: endif
 #: if RIGHT == 'var'
-  expr%right%operation = OP_LEAF
-  expr%right%leaf => b
+  call init_expr_leaf(b, expr%right)
 #: else
   call copy_expr(b, expr%right)
 #: endif
+  call init_expr_workspace(expr)
 end function ${NAME}$_${LEFT}$_${RIGHT}$${NEWLINE()}$
 #: endfor
 #: endfor
@@ -68,11 +67,11 @@ module function pow_${LEFT}$_${KIND}$(a, exponent) result(expr)
 #: endif
   allocate (expr%left)
 #: if LEFT == 'var'
-  expr%left%operation = OP_LEAF
-  expr%left%leaf => a
+  call init_expr_leaf(a, expr%left)
 #: else
   call copy_expr(a, expr%left)
 #: endif
+  call init_expr_workspace(expr)
 end function pow_${LEFT}$_${KIND}$${NEWLINE()}$
 #: endfor
 #: endfor
@@ -102,11 +101,11 @@ module function ${NAME}$_${KIND}$_${RIGHT}$(a, b) result(expr)
   expr%left%exp_real = real(a, real64)
 #: endif
 #: if RIGHT == 'var'
-  expr%right%operation = OP_LEAF
-  expr%right%leaf => b
+  call init_expr_leaf(b, expr%right)
 #: else
   call copy_expr(b, expr%right)
 #: endif
+  call init_expr_workspace(expr)
 end function ${NAME}$_${KIND}$_${RIGHT}$${NEWLINE()}$
 #: endfor
 #: endfor
@@ -132,8 +131,7 @@ module function ${NAME}$_${LEFT}$_${KIND}$(a, b) result(expr)
   expr%operation = OP_${NAME.upper()}$
   allocate (expr%left, expr%right)
 #: if LEFT == 'var'
-  expr%left%operation = OP_LEAF
-  expr%left%leaf => a
+  call init_expr_leaf(a, expr%left)
 #: else
   call copy_expr(a, expr%left)
 #: endif
@@ -143,22 +141,31 @@ module function ${NAME}$_${LEFT}$_${KIND}$(a, b) result(expr)
 #: else
   expr%right%exp_real = real(b, real64)
 #: endif
+  call init_expr_workspace(expr)
 end function ${NAME}$_${LEFT}$_${KIND}$${NEWLINE()}$
 #: endfor
 #: endfor
 #: endif
 #: endfor
 recursive subroutine copy_expr(source, dest)
-  !! Copy the tree structure while retaining borrowed variable leaves.
+  !! Copy the tree structure while retaining borrowed operand views.
   type(expression_type), intent(in) :: source
-  !! Expression tree to copy; its variable leaves remain borrowed.
+  !! Expression tree to copy; its data and metadata remain borrowed.
   type(expression_type), intent(out) :: dest
-  !! Receives an independent node tree with the same variable leaves.
+  !! Receives an independent node tree with the same operand views.
 
   dest%operation = source%operation
+  dest%scratch_count = source%scratch_count
   dest%exp_int = source%exp_int
   dest%exp_real = source%exp_real
-  dest%leaf => source%leaf
+  dest%dtype = source%dtype
+  dest%len = source%len
+  dest%dims => source%dims
+  dest%coords => source%coords
+  dest%leaf_error = source%leaf_error
+#: for K in kinds
+  dest%values_${K}$ => source%values_${K}$
+#: endfor
   if (allocated(source%left)) then
     allocate (dest%left)
     call copy_expr(source%left, dest%left)

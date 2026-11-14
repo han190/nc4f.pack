@@ -11,12 +11,13 @@ real, parameter :: PI = acos(-1.0)
 character(len=*), parameter :: file = "potential_temperature.nc"
 
 real :: lat_vals(nlat), lon_vals(nlon)
-real, dimension(nlon, nlat) :: tmp_vals, pre_vals, expected
-real :: lat_rad, lon_rad
+real, dimension(nlon, nlat) :: tmp_vals, pre_vals
 
 type(dimension_type) :: lat_dim, lon_dim
-type(variable_type) :: lat, lon, tmp, pre
-type(variable_type) :: T, P, theta
+type(coordinate_type) :: lat, lon
+type(variable_type) :: tmp, pre
+type(variable_type), target :: T, P
+type(variable_type) :: theta
 type(netcdf_type) :: nc
 integer :: i, j
 
@@ -32,31 +33,44 @@ do concurrent (j=1:nlat, i=1:nlon)
   end associate
 end do
 
+! Dimensions
 lat_dim = "latitude".dim.nlat
 lon_dim = "longitude".dim.nlon
 
-lat = datarray("latitude", lat_vals, [lat_dim], &
-  & atts=["units".att."degrees_north", "long_name".att."Latitude"])
-lon = datarray("longitude", lon_vals, [lon_dim], &
-  & atts=["units".att."degrees_east", "long_name".att."Longitude"])
-tmp = datarray("temperature", tmp_vals, [lon_dim, lat_dim], &
+! Coordinate
+lat = coordinate_type("latitude", lat_vals, [lat_dim], &
+  & atts=["units".att."degrees_north", &
+  & "standard_name".att."latitude", "axis".att."Y"])
+lon = coordinate_type("longitude", lon_vals, [lon_dim], &
+  & atts=["units".att."degrees_east", &
+  & "standard_name".att."longitude", "axis".att."X"])
+
+! Variables
+tmp = datarray("temperature", tmp_vals, &
+  & dims=[lon_dim, lat_dim], coords=[lon, lat], &
   & atts=["units".att."K", "long_name".att."Air temperature"])
-pre = datarray("pressure", pre_vals, [lon_dim, lat_dim], &
+pre = datarray("pressure", pre_vals, &
+  & dims=[lon_dim, lat_dim], coords=[lon, lat], &
   & atts=["units".att."Pa", "long_name".att."Air pressure"])
-call to_netcdf(file, [lat, lon, tmp, pre], &
+
+! Write to netcdf
+call to_netcdf(file, [tmp, pre], &
   & atts=["title".att."Synthetic potential temperature example"])
 
+! Read from netcdf
 nc = open_netcdf(file, "r")
 T = get_variable(nc, "temperature")
 P = get_variable(nc, "pressure")
 call close_netcdf(nc)
+if (.not. allocated(T%coords) .or. .not. allocated(P%coords)) then
+  error stop "Coordinate round trip failed."
+end if
 
+! Append to netcdf
 theta = T*(P0/P)**(R/CP)
 theta%name = "theta"
 theta%atts = ["units".att."K", "long_name".att."Potential temperature"]
-call to_netcdf(file, theta, mode="a")
-
-print *, "Wrote to", file
 print *, theta
+call to_netcdf(file, theta, mode="a")
 
 end program potential_temperature_example

@@ -57,6 +57,8 @@ NC4F provides a small in-memory data model and experiments with an
 - Open files with `OPEN_NETCDF`, read variables with `GET_VARIABLE`, and
   extract Fortran values with `EXTRACT`; diskless open modes are available;
 - Read selected hyperslabs and write contiguous or strided selections;
+- Round-trip complete numeric coordinate arrays through CF coordinate
+  variables and an ordered `coordinates` attribute;
 - Set NetCDF-4 chunking, compression, checksums, byte order, and fill values
   through `SET_STORAGE`;
 - Rename attributes, dimensions, variables, and groups, and delete attributes
@@ -81,7 +83,9 @@ The high-level I/O interface does not currently support:
 - Creating classic NetCDF files, or reading and writing user-defined types,
   NetCDF `STRING` values, and unsigned primitive types;
 - Mapped or multi-slab I/O, or deleting dimensions, variables, and groups
-  from existing files.
+  from existing files;
+- Coordinate-aware hyperslab reads or updates to existing coordinate-bearing
+  variables.
 
 ### In-memory data model
 

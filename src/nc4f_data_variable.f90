@@ -384,18 +384,15 @@ logical elemental module function eq_var(x, y) result(is_equal)
 end function eq_var
 
 pure logical function same_variable_coords(left, right) result(equal)
+  !! Compare variable coordinate collections in their stored order.
   type(coordinate_type), intent(in) :: left(:), right(:)
-  integer :: i, j
+  !! Coordinate collections from the two variables.
+  integer :: i
 
   equal = size(left) == size(right)
   if (.not. equal) return
   do i = 1, size(left)
-    equal = .false.
-    do j = 1, size(right)
-      if (left(i)%name /= right(j)%name) cycle
-      equal = left(i) == right(j)
-      exit
-    end do
+    equal = left(i) == right(i)
     if (.not. equal) return
   end do
 end function same_variable_coords

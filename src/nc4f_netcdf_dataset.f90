@@ -291,25 +291,131 @@ subroutine write_item_(nc, var, append, err, start, count, stride)
   integer, intent(in), optional :: stride(:)
   !! Optional positive destination strides in Fortran order; defaults to ones.
   integer(c_int) :: stat, varid
+  type(variable_type) :: staged
+
+  staged = var
+  if (allocated(var%coords)) then
+    if (append) then
+      stat = nc_inq_varid(nc%id, f2cstr(var%name), varid)
+      if (stat == NC_NOERR) then
+        err = error_type(NC_EINVAL, "to_netcdf", &
+          & "Updating an existing coordinate-bearing variable is unsupported.")
+        return
+      else if (stat /= NC_ENOTVAR) then
+        err = netcdf_err(stat, "to_netcdf", &
+          & "Find destination: "//var%name)
+        return
+      end if
+    end if
+    if (present(start) .or. present(count) .or. present(stride)) then
+      err = error_type(NC_EINVAL, "to_netcdf", &
+        & "Coordinate-bearing selections are not supported.")
+      return
+    end if
+    call write_coordinates_(nc, staged, err)
+    if (has_err(err)) return
+  end if
 
   if (.not. append) then
-    call define_variable(nc, var, err=err)
+    call define_variable(nc, staged, err=err)
     if (has_err(err)) return
-    call put_variable(nc, var, err=err)
+    call put_variable(nc, staged, err=err)
     return
   end if
   stat = nc_inq_varid(nc%id, f2cstr(var%name), varid)
   if (stat == NC_ENOTVAR .and. .not. &
     & (present(start) .or. present(count) .or. present(stride))) then
-    call define_variable(nc, var, err=err)
+    call define_variable(nc, staged, err=err)
     if (has_err(err)) return
-    call put_variable(nc, var, err=err)
+    call put_variable(nc, staged, err=err)
     return
   end if
   err = netcdf_err(stat, "to_netcdf", "Find destination: "//var%name)
   if (has_err(err)) return
-  call put_variable(nc, var, start, count, stride, err)
+  call put_variable(nc, staged, start, count, stride, err)
 end subroutine write_item_
+
+subroutine write_coordinates_(nc, var, err)
+  !! Write coordinate variables and record their ordered names on the parent.
+  class(group_type), intent(in) :: nc
+  !! Destination group shared by the parent and coordinates.
+  type(variable_type), intent(inout) :: var
+  !! Parent variable receiving the CF coordinates attribute.
+  type(error_type), intent(out) :: err
+  !! Write or compatibility error.
+  type(variable_type) :: coord_var, existing
+  character(len=:), allocatable :: names
+  integer(c_int) :: stat, varid
+  integer :: i
+
+  call validate(var, context="to_netcdf", err=err)
+  if (has_err(err)) return
+  if (allocated(var%atts)) then
+    do i = 1, size(var%atts)
+      if (var%atts(i)%name == "coordinates") then
+        err = error_type(NC_EINVAL, "to_netcdf", &
+          & "The coordinates attribute is managed by NC4F.")
+        return
+      end if
+    end do
+  end if
+  names = ""
+  do i = 1, size(var%coords)
+    if (var%coords(i)%name == var%name) then
+      err = error_type(NC_EINVAL, "to_netcdf", &
+        & "Coordinate and parent variable names must differ.")
+      return
+    end if
+    if (i > 1) names = names//" "
+    names = names//var%coords(i)%name
+    coord_var%name = var%coords(i)%name
+    coord_var%dtype = var%coords(i)%dtype
+    coord_var%len = var%coords(i)%len
+    coord_var%dims = var%coords(i)%dims
+    coord_var%buffer = var%coords(i)%buffer
+    if (allocated(var%coords(i)%atts)) then
+      coord_var%atts = var%coords(i)%atts
+    end if
+    stat = nc_inq_varid(nc%id, f2cstr(coord_var%name), varid)
+    if (stat == NC_ENOTVAR) then
+      call define_variable(nc, coord_var, err=err)
+      if (has_err(err)) return
+      call put_variable(nc, coord_var, err=err)
+      if (has_err(err)) return
+    else if (stat == NC_NOERR) then
+      existing = get_variable(nc, coord_var%name, err=err)
+      if (has_err(err)) return
+      if (existing%dtype /= coord_var%dtype .or. &
+        & existing%len /= coord_var%len) then
+        err = error_type(NC_EINVAL, "to_netcdf", &
+          & "Existing coordinate differs: "//coord_var%name)
+        return
+      end if
+      if (size(existing%dims) /= size(coord_var%dims) .or. &
+        & size(existing%buffer) /= size(coord_var%buffer)) then
+        err = error_type(NC_EINVAL, "to_netcdf", &
+          & "Existing coordinate differs: "//coord_var%name)
+        return
+      end if
+      if (.not. all(existing%dims == coord_var%dims) .or. &
+        & .not. all(existing%buffer == coord_var%buffer)) then
+        err = error_type(NC_EINVAL, "to_netcdf", &
+          & "Existing coordinate differs: "//coord_var%name)
+        return
+      end if
+    else
+      err = netcdf_err(stat, "to_netcdf", &
+        & "Find coordinate: "//coord_var%name)
+      return
+    end if
+    if (allocated(coord_var%atts)) deallocate (coord_var%atts)
+  end do
+  if (allocated(var%atts)) then
+    var%atts = [var%atts, "coordinates".att.names]
+  else
+    var%atts = ["coordinates".att.names]
+  end if
+end subroutine write_coordinates_
 
 module subroutine to_netcdf_grp(file, grp, atts, err, mode, start, count, &
   & stride)

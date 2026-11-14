@@ -58,6 +58,10 @@ set(nc4f_generated_names
   nc4f_data_variable_constructor
   nc4f_data_coordinate_constructor
   nc4f_data_extract)
+set(nc4f_generated_f90_only_names
+  nc4f_data_expression
+  nc4f_data_coordinate)
+list(APPEND nc4f_generated_names ${nc4f_generated_f90_only_names})
 set(nc4f_data_dir "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(nc4f_data_module "${nc4f_data_dir}/nc4f_data.f90")
 set(nc4f_intrinsic_inc "${nc4f_data_dir}/nc4f_data_intrinsic.inc")
@@ -74,7 +78,11 @@ if(NC4F_REGENERATE_SOURCES)
   set(nc4f_intrinsic_inc
       "${nc4f_generated_dir}/nc4f_data_intrinsic.inc")
   foreach(name IN LISTS nc4f_generated_names)
-    foreach(extension IN ITEMS f90 inc)
+    set(extensions f90)
+    if(NOT name IN_LIST nc4f_generated_f90_only_names)
+      list(APPEND extensions inc)
+    endif()
+    foreach(extension IN LISTS extensions)
       if(extension STREQUAL "inc")
         set(template "${name}_inc.fypp")
       else()
@@ -108,9 +116,7 @@ add_library(nc4f STATIC
   src/nc4f_data_sum.f90
   src/nc4f_data_attribute.f90
   src/nc4f_data_clone.f90
-  src/nc4f_data_coordinate.f90
   src/nc4f_data_dimension.f90
-  src/nc4f_data_expression.f90
   src/nc4f_data_group.f90
   src/nc4f_data_io.f90
   src/nc4f_data_utility.f90
@@ -207,7 +213,7 @@ if(NC4F_BUILD_TESTS)
       c_interface_dimension c_interface_error c_interface_group
       c_interface_io c_interface_utility c_interface_variable
       data_arithmetic data_attribute data_attribute_constructor data_clone
-      data_dimension data_extract data_expression data_intrinsic
+      data_dimension data_coordinate data_extract data_expression data_intrinsic
       data_group data_io
       data_utility data_validate
       data_variable data_variable_constructor netcdf_attribute netcdf_dataset

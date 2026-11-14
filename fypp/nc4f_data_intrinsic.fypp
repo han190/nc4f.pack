@@ -2,7 +2,7 @@
 submodule(nc4f_data) nc4f_data_intrinsic
 !! Build deferred element-wise intrinsic expressions. Variable leaves borrow
 !! their data; expression operands are copied into the new unary node.
-!! Numeric type and function domain checks occur during evaluation.
+!! Metadata checks precede evaluation; numerical domains follow Fortran.
 implicit none (type, external)
 contains
 
@@ -23,11 +23,11 @@ module function ${NAME}$_${SUFFIX}$(a) result(expr)
   expr%operation = OP_${NAME.upper()}$
   allocate (expr%left)
 #: if SUFFIX == 'var'
-  expr%left%operation = OP_LEAF
-  expr%left%leaf => a
+  call init_expr_leaf(a, expr%left)
 #: else
   expr%left = a
 #: endif
+  call init_expr_workspace(expr)
 end function ${NAME}$_${SUFFIX}$
 
 #: endfor
@@ -58,17 +58,16 @@ module function ${NAME}$_${LEFT}$_${RIGHT}$(a, b) result(expr)
   expr%operation = OP_${OPCODE}$
   allocate (expr%left, expr%right)
 #: if LEFT == 'var'
-  expr%left%operation = OP_LEAF
-  expr%left%leaf => a
+  call init_expr_leaf(a, expr%left)
 #: else
   expr%left = a
 #: endif
 #: if RIGHT == 'var'
-  expr%right%operation = OP_LEAF
-  expr%right%leaf => b
+  call init_expr_leaf(b, expr%right)
 #: else
   expr%right = b
 #: endif
+  call init_expr_workspace(expr)
 end function ${NAME}$_${LEFT}$_${RIGHT}$
 
 #: endfor
@@ -99,11 +98,11 @@ module function ${NAME}$_${KIND}$_${OTHER}$(a, b) result(expr)
   expr%left%exp_real = real(a, real64)
 #: endif
 #: if OTHER == 'var'
-  expr%right%operation = OP_LEAF
-  expr%right%leaf => b
+  call init_expr_leaf(b, expr%right)
 #: else
   expr%right = b
 #: endif
+  call init_expr_workspace(expr)
 end function ${NAME}$_${KIND}$_${OTHER}$
 
 module function ${NAME}$_${OTHER}$_${KIND}$(a, b) result(expr)
@@ -122,8 +121,7 @@ module function ${NAME}$_${OTHER}$_${KIND}$(a, b) result(expr)
   expr%operation = OP_${OPCODE}$
   allocate (expr%left, expr%right)
 #: if OTHER == 'var'
-  expr%left%operation = OP_LEAF
-  expr%left%leaf => a
+  call init_expr_leaf(a, expr%left)
 #: else
   expr%left = a
 #: endif
@@ -133,6 +131,7 @@ module function ${NAME}$_${OTHER}$_${KIND}$(a, b) result(expr)
 #: else
   expr%right%exp_real = real(b, real64)
 #: endif
+  call init_expr_workspace(expr)
 end function ${NAME}$_${OTHER}$_${KIND}$
 
 #: endfor

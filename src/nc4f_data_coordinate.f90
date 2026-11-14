@@ -4,8 +4,11 @@ implicit none (type, external)
 contains
 
 pure module subroutine validate_coordinate(coord, err)
+  !! Check that a coordinate has valid numeric storage and shape.
   type(coordinate_type), intent(in) :: coord
+  !! Coordinate to validate.
   type(error_type), intent(out) :: err
+  !! Validation result.
   integer(int64) :: count
   integer :: i, bytes
 
@@ -61,7 +64,9 @@ pure module subroutine validate_coordinate(coord, err)
 end subroutine validate_coordinate
 
 pure elemental module function eq_coord(a, b) result(equal)
+  !! Compare coordinate metadata and values in their stored order.
   type(coordinate_type), intent(in) :: a, b
+  !! Coordinates to compare.
   logical :: equal
 
   equal = a%dtype == b%dtype .and. a%len == b%len
@@ -97,7 +102,9 @@ pure elemental module function eq_coord(a, b) result(equal)
 end function eq_coord
 
 pure elemental module function neq_coord(a, b) result(unequal)
+  !! Report whether two coordinates differ.
   type(coordinate_type), intent(in) :: a, b
+  !! Coordinates to compare.
   logical :: unequal
 
   unequal = .not. eq_coord(a, b)
@@ -106,8 +113,11 @@ end function neq_coord
 pure module subroutine validate_coordinate_for_var(coords, var, err)
   !! Require unique names and ordered dimension subsets.
   type(coordinate_type), intent(in) :: coords(:)
+  !! Coordinates attached to the variable.
   type(variable_type), intent(in) :: var
+  !! Variable whose dimensions must contain each coordinate dimension.
   type(error_type), intent(out) :: err
+  !! Validation result.
   integer :: i, j, axis
 
   err = error_type()
@@ -142,9 +152,47 @@ pure module subroutine validate_coordinate_for_var(coords, var, err)
   end do
 end subroutine validate_coordinate_for_var
 
+pure module subroutine validate_coordinate_pair(left, right, err)
+  !! Compare two coordinates at the same position in operand collections.
+  !! Attributes are descriptive metadata and need not match.
+  type(coordinate_type), intent(in) :: left, right
+  !! Coordinates from the left and right operands, respectively.
+  type(error_type), intent(out) :: err
+  !! Mismatch result, including the coordinate name.
+
+  err = error_type()
+  call validate_coordinate(left, err)
+  if (.exists. err) return
+  call validate_coordinate(right, err)
+  if (.exists. err) return
+  if (left%name /= right%name) then
+    err = error_type(INVALID, "evaluate", &
+      & "Coordinate name differs: "//left%name//" and "//right%name)
+  else if (size(left%dims) /= size(right%dims)) then
+    err = error_type(INVALID, "evaluate", &
+      & "Coordinate dimensions differ: "//left%name)
+  else if (.not. all(left%dims == right%dims)) then
+    err = error_type(INVALID, "evaluate", &
+      & "Coordinate dimensions differ: "//left%name)
+  else if (left%dtype /= right%dtype) then
+    err = error_type(INVALID, "evaluate", &
+      & "Coordinate type differs: "//left%name)
+  else if (left%len /= right%len .or. &
+    & size(left%buffer) /= size(right%buffer)) then
+    err = error_type(INVALID, "evaluate", &
+      & "Coordinate length differs: "//left%name)
+  else if (.not. all(left%buffer == right%buffer)) then
+    err = error_type(INVALID, "evaluate", &
+      & "Coordinate values differ: "//left%name)
+  end if
+end subroutine validate_coordinate_pair
+
 pure module function coordinate_index(coords, name) result(index)
+  !! Find a coordinate by name in a collection.
   type(coordinate_type), intent(in) :: coords(:)
+  !! Coordinate collection to search.
   character(len=*), intent(in) :: name
+  !! Name of the requested coordinate.
   integer :: index, i
 
   index = 0
@@ -158,11 +206,17 @@ pure module function coordinate_index(coords, name) result(index)
 end function coordinate_index
 
 pure subroutine coordinate_byte_offset(coord, indices, dtype, pos, err)
+  !! Find the byte position of a coordinate element.
   type(coordinate_type), intent(in) :: coord
+  !! Coordinate containing the requested values.
   integer, intent(in) :: indices(:)
+  !! One-based index for each coordinate dimension.
   integer(data_type), intent(in) :: dtype
+  !! Expected numeric storage type.
   integer(int64), intent(out) :: pos
+  !! One-based byte position of the selected value.
   type(error_type), intent(out) :: err
+  !! Optional error result for an invalid coordinate or index.
   integer(int64) :: location, stride
   integer :: i
 
@@ -189,10 +243,15 @@ pure subroutine coordinate_byte_offset(coord, indices, dtype, pos, err)
 end subroutine coordinate_byte_offset
 
 module subroutine coordinate_at_int8(coord, indices, value, err)
+  !! Read one coordinate element at its multidimensional indices.
   type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate containing the requested values.
   integer, intent(in) :: indices(:)
+  !! One-based index for each coordinate dimension.
   integer(int8), intent(out) :: value
+  !! Selected coordinate value.
   type(error_type), intent(out), optional :: err
+  !! Optional error result for an invalid coordinate or index.
   type(error_type) :: op_err
   integer(int64) :: pos
 
@@ -206,8 +265,11 @@ module subroutine coordinate_at_int8(coord, indices, value, err)
 end subroutine coordinate_at_int8
 
 module subroutine extract_coord_int8(coord, ptr)
+  !! Expose the coordinate values as a typed pointer view.
   type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate containing the requested values.
   integer(int8), pointer, intent(out) :: ptr(:)
+  !! Pointer view of the coordinate values.
   type(error_type) :: err
   type(c_ptr) :: cptr
 
@@ -224,10 +286,15 @@ module subroutine extract_coord_int8(coord, ptr)
 end subroutine extract_coord_int8
 
 module subroutine coordinate_at_int16(coord, indices, value, err)
+  !! Read one coordinate element at its multidimensional indices.
   type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate containing the requested values.
   integer, intent(in) :: indices(:)
+  !! One-based index for each coordinate dimension.
   integer(int16), intent(out) :: value
+  !! Selected coordinate value.
   type(error_type), intent(out), optional :: err
+  !! Optional error result for an invalid coordinate or index.
   type(error_type) :: op_err
   integer(int64) :: pos
 
@@ -241,8 +308,11 @@ module subroutine coordinate_at_int16(coord, indices, value, err)
 end subroutine coordinate_at_int16
 
 module subroutine extract_coord_int16(coord, ptr)
+  !! Expose the coordinate values as a typed pointer view.
   type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate containing the requested values.
   integer(int16), pointer, intent(out) :: ptr(:)
+  !! Pointer view of the coordinate values.
   type(error_type) :: err
   type(c_ptr) :: cptr
 
@@ -259,10 +329,15 @@ module subroutine extract_coord_int16(coord, ptr)
 end subroutine extract_coord_int16
 
 module subroutine coordinate_at_int32(coord, indices, value, err)
+  !! Read one coordinate element at its multidimensional indices.
   type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate containing the requested values.
   integer, intent(in) :: indices(:)
+  !! One-based index for each coordinate dimension.
   integer(int32), intent(out) :: value
+  !! Selected coordinate value.
   type(error_type), intent(out), optional :: err
+  !! Optional error result for an invalid coordinate or index.
   type(error_type) :: op_err
   integer(int64) :: pos
 
@@ -276,8 +351,11 @@ module subroutine coordinate_at_int32(coord, indices, value, err)
 end subroutine coordinate_at_int32
 
 module subroutine extract_coord_int32(coord, ptr)
+  !! Expose the coordinate values as a typed pointer view.
   type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate containing the requested values.
   integer(int32), pointer, intent(out) :: ptr(:)
+  !! Pointer view of the coordinate values.
   type(error_type) :: err
   type(c_ptr) :: cptr
 
@@ -294,10 +372,15 @@ module subroutine extract_coord_int32(coord, ptr)
 end subroutine extract_coord_int32
 
 module subroutine coordinate_at_int64(coord, indices, value, err)
+  !! Read one coordinate element at its multidimensional indices.
   type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate containing the requested values.
   integer, intent(in) :: indices(:)
+  !! One-based index for each coordinate dimension.
   integer(int64), intent(out) :: value
+  !! Selected coordinate value.
   type(error_type), intent(out), optional :: err
+  !! Optional error result for an invalid coordinate or index.
   type(error_type) :: op_err
   integer(int64) :: pos
 
@@ -311,8 +394,11 @@ module subroutine coordinate_at_int64(coord, indices, value, err)
 end subroutine coordinate_at_int64
 
 module subroutine extract_coord_int64(coord, ptr)
+  !! Expose the coordinate values as a typed pointer view.
   type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate containing the requested values.
   integer(int64), pointer, intent(out) :: ptr(:)
+  !! Pointer view of the coordinate values.
   type(error_type) :: err
   type(c_ptr) :: cptr
 
@@ -329,10 +415,15 @@ module subroutine extract_coord_int64(coord, ptr)
 end subroutine extract_coord_int64
 
 module subroutine coordinate_at_real32(coord, indices, value, err)
+  !! Read one coordinate element at its multidimensional indices.
   type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate containing the requested values.
   integer, intent(in) :: indices(:)
+  !! One-based index for each coordinate dimension.
   real(real32), intent(out) :: value
+  !! Selected coordinate value.
   type(error_type), intent(out), optional :: err
+  !! Optional error result for an invalid coordinate or index.
   type(error_type) :: op_err
   integer(int64) :: pos
 
@@ -346,8 +437,11 @@ module subroutine coordinate_at_real32(coord, indices, value, err)
 end subroutine coordinate_at_real32
 
 module subroutine extract_coord_real32(coord, ptr)
+  !! Expose the coordinate values as a typed pointer view.
   type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate containing the requested values.
   real(real32), pointer, intent(out) :: ptr(:)
+  !! Pointer view of the coordinate values.
   type(error_type) :: err
   type(c_ptr) :: cptr
 
@@ -364,10 +458,15 @@ module subroutine extract_coord_real32(coord, ptr)
 end subroutine extract_coord_real32
 
 module subroutine coordinate_at_real64(coord, indices, value, err)
+  !! Read one coordinate element at its multidimensional indices.
   type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate containing the requested values.
   integer, intent(in) :: indices(:)
+  !! One-based index for each coordinate dimension.
   real(real64), intent(out) :: value
+  !! Selected coordinate value.
   type(error_type), intent(out), optional :: err
+  !! Optional error result for an invalid coordinate or index.
   type(error_type) :: op_err
   integer(int64) :: pos
 
@@ -381,8 +480,11 @@ module subroutine coordinate_at_real64(coord, indices, value, err)
 end subroutine coordinate_at_real64
 
 module subroutine extract_coord_real64(coord, ptr)
+  !! Expose the coordinate values as a typed pointer view.
   type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate containing the requested values.
   real(real64), pointer, intent(out) :: ptr(:)
+  !! Pointer view of the coordinate values.
   type(error_type) :: err
   type(c_ptr) :: cptr
 

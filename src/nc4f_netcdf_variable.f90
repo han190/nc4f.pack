@@ -134,8 +134,83 @@ module function get_variable(nc, name, start, count, stride, err) result(var)
   type(error_type) :: op_err
 
   var = get_var_(nc, name, start, count, stride, op_err)
+  if (.not. has_err(op_err) .and. .not. present(start) .and. &
+    & .not. present(count) .and. .not. present(stride)) then
+    call attach_coordinates_(nc, var, op_err)
+  end if
   call return_err(op_err, err)
 end function get_variable
+
+subroutine attach_coordinates_(nc, var, err)
+  !! Rebuild ordered coordinate mappings from the CF coordinates attribute.
+  class(group_type), intent(in) :: nc
+  !! Dataset containing the parent and coordinate variables.
+  type(variable_type), target, intent(inout) :: var
+  !! Parent variable that receives its owned coordinate arrays.
+  type(error_type), intent(out) :: err
+  !! Read or validation error.
+  type(variable_type) :: source
+  type(coordinate_type) :: coord
+  character(len=:), pointer :: names
+  character(len=:), allocatable :: missing_names
+  integer :: i, first, last, end_pos
+
+  err = error_type()
+  missing_names = ""
+  if (.not. allocated(var%atts)) return
+  do i = 1, size(var%atts)
+    if (var%atts(i)%name /= "coordinates") cycle
+    call extract(var%atts(i), names)
+    end_pos = len(names)
+    if (index(names, c_null_char) > 0) then
+      end_pos = index(names, c_null_char) - 1
+    end if
+    first = 1
+    do while (first <= end_pos)
+      do while (first <= end_pos)
+        if (names(first:first) /= " ") exit
+        first = first + 1
+      end do
+      if (first > end_pos) exit
+      last = first
+      do while (last <= end_pos)
+        if (names(last:last) == " ") exit
+        last = last + 1
+      end do
+      source = get_var_(nc, names(first:last-1), err=err)
+      if (err%code == NC_ENOTVAR) then
+        if (len(missing_names) > 0) missing_names = missing_names//" "
+        missing_names = missing_names//names(first:last-1)// &
+          & " (not found)"
+        err = error_type()
+        first = last + 1
+        cycle
+      end if
+      if (has_err(err)) exit
+      if (allocated(coord%atts)) deallocate (coord%atts)
+      if (allocated(coord%buffer)) deallocate (coord%buffer)
+      coord%name = source%name
+      coord%dtype = source%dtype
+      coord%len = source%len
+      coord%dims = source%dims
+      if (allocated(source%atts)) coord%atts = source%atts
+      if (allocated(source%buffer)) coord%buffer = source%buffer
+      if (allocated(var%coords)) then
+        var%coords = [var%coords, coord]
+      else
+        var%coords = [coord]
+      end if
+      first = last + 1
+    end do
+    deallocate (names)
+    if (has_err(err)) return
+    if (len(missing_names) > 0) then
+      var%atts = [var%atts, "coordinate".att.missing_names]
+    end if
+    call validate(var, context="get_variable", err=err)
+    return
+  end do
+end subroutine attach_coordinates_
 
 function get_var_(nc, name, start, count, stride, err) result(var)
   !! Read data with a required error result for the public wrapper to handle.

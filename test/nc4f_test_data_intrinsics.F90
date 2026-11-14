@@ -7,6 +7,9 @@
 submodule(nc4f_test_data) nc4f_test_data_intrinsic
 use, intrinsic :: iso_fortran_env, only: &
   & int8, int16, int32, int64, real32, real64
+use, intrinsic :: ieee_arithmetic, only: ieee_is_nan
+use, intrinsic :: ieee_exceptions, only: ieee_get_flag, ieee_set_flag, &
+  & ieee_invalid, ieee_divide_by_zero
 use, non_intrinsic :: testdrive, only: &
   & check, error_type, new_unittest, unittest_type
 use, non_intrinsic :: nc4f, only: &
@@ -34,7 +37,7 @@ module subroutine collect_data_intrinsic(tests)
     & new_unittest("unary domains", test_domains), &
     & new_unittest("real binary intrinsics", test_real_binary), &
     & new_unittest("integer binary intrinsics", test_integer_binary), &
-    & new_unittest("binary domains and dimensions", test_binary_errors)]
+    & new_unittest("binary kinds and dimensions", test_binary_errors)]
 end subroutine collect_data_intrinsic
 
 subroutine test_real32_intrinsics(error)
@@ -469,11 +472,6 @@ subroutine test_integer_abs(error)
   call check(error, all(values_int64 == &
     & [2_int64, 3_int64]), "int64 abs differs")
   if (allocated(error)) return
-  a = datarray("a", [-huge(0_int8) - 1_int8], &
-    & ["x" .dim. 1], deep=.true.)
-  call evaluate(abs(a), result, err)
-  call check(error, err%code == NC_EINVAL, &
-    & "Unrepresentable int8 absolute value was accepted")
 end subroutine test_integer_abs
 
 subroutine test_nested_unary(error)
@@ -504,57 +502,58 @@ subroutine test_invalid_kind(error)
 end subroutine test_invalid_kind
 
 subroutine test_domains(error)
+  !! Compare exceptional real results with the Fortran intrinsic backend.
   type(error_type), allocatable, intent(out) :: error
-  type(variable_type), target :: a, result
-  type(error_type_model) :: err
+  type(variable_type), target :: a
+  logical :: saved_flags(2)
+  real(real32) :: x(2)
 
-  a = datarray("a", [-2.0_real32, 0.0_real32], &
-    & ["x" .dim. 2], deep=.true.)
-  call evaluate(sqrt(a), result, err)
-  call check(error, err%code == NC_EINVAL, &
-    & "sqrt accepted out-of-domain input")
-  if (allocated(error)) return
-  call evaluate(log(a), result, err)
-  call check(error, err%code == NC_EINVAL, &
-    & "log accepted out-of-domain input")
-  if (allocated(error)) return
-  call evaluate(log10(a), result, err)
-  call check(error, err%code == NC_EINVAL, &
-    & "log10 accepted out-of-domain input")
-  if (allocated(error)) return
-  call evaluate(asin(a), result, err)
-  call check(error, err%code == NC_EINVAL, &
-    & "asin accepted out-of-domain input")
-  if (allocated(error)) return
-  call evaluate(acos(a), result, err)
-  call check(error, err%code == NC_EINVAL, &
-    & "acos accepted out-of-domain input")
-  if (allocated(error)) return
-  call evaluate(acosh(a), result, err)
-  call check(error, err%code == NC_EINVAL, &
-    & "acosh accepted out-of-domain input")
-  if (allocated(error)) return
-  call evaluate(atanh(a), result, err)
-  call check(error, err%code == NC_EINVAL, &
-    & "atanh accepted out-of-domain input")
-  if (allocated(error)) return
-  call evaluate(gamma(a), result, err)
-  call check(error, err%code == NC_EINVAL, &
-    & "gamma accepted out-of-domain input")
-  if (allocated(error)) return
-  call evaluate(log_gamma(a), result, err)
-  call check(error, err%code == NC_EINVAL, &
-    & "log_gamma accepted out-of-domain input")
-  if (allocated(error)) return
-  call evaluate(bessel_y0(a), result, err)
-  call check(error, err%code == NC_EINVAL, &
-    & "bessel_y0 accepted out-of-domain input")
-  if (allocated(error)) return
-  call evaluate(bessel_y1(a), result, err)
-  call check(error, err%code == NC_EINVAL, &
-    & "bessel_y1 accepted out-of-domain input")
-  if (allocated(error)) return
+  x = [-2.0_real32, 0.0_real32]
+  a = datarray("a", x, ["x" .dim. 2])
+  ! Tests use the build's default nonhalting FP mode and restore raised flags.
+  call ieee_get_flag([ieee_invalid, ieee_divide_by_zero], saved_flags)
+  domains: block
+    call check_backend_result(sqrt(a), sqrt(x), error)
+    if (allocated(error)) exit domains
+    call check_backend_result(log(a), log(x), error)
+    if (allocated(error)) exit domains
+    call check_backend_result(log10(a), log10(x), error)
+    if (allocated(error)) exit domains
+    call check_backend_result(asin(a), asin(x), error)
+    if (allocated(error)) exit domains
+    call check_backend_result(acos(a), acos(x), error)
+    if (allocated(error)) exit domains
+    call check_backend_result(acosh(a), acosh(x), error)
+    if (allocated(error)) exit domains
+    call check_backend_result(atanh(a), atanh(x), error)
+    if (allocated(error)) exit domains
+    call check_backend_result(gamma(a), gamma(x), error)
+    if (allocated(error)) exit domains
+    call check_backend_result(log_gamma(a), log_gamma(x), error)
+    if (allocated(error)) exit domains
+    call check_backend_result(bessel_y0(a), real(bessel_y0(real(x, real64)), real32), error)
+    if (allocated(error)) exit domains
+    call check_backend_result(bessel_y1(a), real(bessel_y1(real(x, real64)), real32), error)
+    if (allocated(error)) exit domains
+  end block domains
+  call ieee_set_flag([ieee_invalid, ieee_divide_by_zero], saved_flags)
 end subroutine test_domains
+
+subroutine check_backend_result(expr, expected, error)
+  type(expression_type), intent(in) :: expr
+  real(real32), intent(in) :: expected(:)
+  type(error_type), allocatable, intent(out) :: error
+  type(variable_type), target :: result
+  type(error_type_model) :: err
+  real(real32), pointer :: values(:)
+
+  call evaluate(expr, result, err)
+  call check(error, err%code == NC_NOERR, "Numerical domain became a model error")
+  if (allocated(error)) return
+  call extract(result, values)
+  call check(error, all((ieee_is_nan(values) .and. ieee_is_nan(expected)) .or. &
+    & values == expected), "Exceptional result differs from the backend")
+end subroutine check_backend_result
 
 subroutine test_real_binary(error)
   !! Check both real kinds, nested expressions, and scalar operands.
@@ -694,25 +693,12 @@ subroutine test_integer_binary(error)
 end subroutine test_integer_binary
 
 subroutine test_binary_errors(error)
-  !! Reject invalid kinds, unequal dimensions, and undefined input pairs.
+  !! Structural checks remain outside numerical evaluation.
   type(error_type), allocatable, intent(out) :: error
   type(variable_type), target :: a, b, result
   type(error_type_model) :: err
 
   a = datarray("a", [1.0_real32, 2.0_real32], ["x".dim.2])
-  b = datarray("b", [0.0_real32, 1.0_real32], ["x".dim.2])
-  call evaluate(mod(a, b), result, err)
-  call check(error, err%code == NC_EINVAL, &
-    & "mod accepted a zero divisor")
-  if (allocated(error)) return
-  call evaluate(modulo(a, b), result, err)
-  call check(error, err%code == NC_EINVAL, &
-    & "modulo accepted a zero divisor")
-  if (allocated(error)) return
-  call evaluate(atan2(b, b), result, err)
-  call check(error, err%code == NC_EINVAL, &
-    & "atan2 accepted a zero pair")
-  if (allocated(error)) return
   b = datarray("b", [1.0_real32, 2.0_real32], ["y".dim.2])
   call evaluate(hypot(a, b), result, err)
   call check(error, err%code == NC_EINVAL, &

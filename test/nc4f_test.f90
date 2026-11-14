@@ -99,7 +99,9 @@ do i = 1, size(suites)
     call run_selected(suites(i)%collect, trim(selected_test), &
       & error_unit, stat)
   else
-    call run_testsuite(suites(i)%collect, error_unit, stat)
+    ! NetCDF tests share fixtures and a non-thread-safe library. Numerical
+    ! kernels may still use threads inside each independently run test.
+    call run_testsuite(suites(i)%collect, error_unit, stat, parallel=.false.)
   end if
 end do
 if (.not. found) error stop "Unknown test suite."
