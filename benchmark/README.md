@@ -1,54 +1,59 @@
 # Expression evaluation benchmark
 
-Build a release library and compile the standalone benchmark with the same
-compiler. For GNU Fortran:
+Run all square extents from `2^1` through `2^13` with fpm:
 
 ```sh
-cmake -S . -B build/benchmark -DCMAKE_Fortran_COMPILER=gfortran \
-  -DCMAKE_BUILD_TYPE=Release -DNC4F_BUILD_TESTS=OFF \
-  -DNC4F_REGENERATE_SOURCES=ON
-cmake --build build/benchmark --parallel 4
-gfortran -O3 -fcoarray=single \
-  -Ibuild/benchmark/modules/nc4f -Ibuild/benchmark/modules/c_interface \
-  benchmark/expression.f90 benchmark/intrinsic_fused.f90 \
-  build/benchmark/libnc4f.a \
-  build/benchmark/libnc4f_c_interface.a $(pkg-config --libs netcdf) \
-  -o build/benchmark/expression
-./build/benchmark/expression 1024 5
+fpm run --example expression-benchmark \
+  --profile macos-homebrew-release -- 3
 ```
 
-The optional arguments are the square matrix extent and repetition count.
-The program measures wall time per evaluation after a warm-up and prints a
-checksum. It covers real64 fused arithmetic, a deeper arithmetic/unary tree,
-a unary expression, a balanced tree requiring two scratch buffers, and int32
-fused arithmetic. Two intrinsic-array cases
-measure the same real64 `D = A*(B+C)`: one reuses a preallocated destination;
-the other allocates a staged destination on each evaluation, like NC4F.
-Intrinsic results are compared element by element against NC4F. The balanced
-tree is also checked against intrinsic-array arithmetic with a relative
-tolerance of `1e-12`.
+Save the benchmark output and plot all three timing paths:
 
-Inputs use borrowed contiguous buffers; expression construction (including
-typed leaf binding) and input
-initialization are outside the timer. Tree validation, output allocation,
-evaluation, and result replacement are timed.
+```sh
+fpm run --example expression-benchmark \
+  --profile macos-homebrew-release -- 3 > benchmark/expression.txt
+python3 benchmark/plot_expression.py benchmark/expression.txt
+```
 
-The intrinsic kernel is a separate compilation unit. Compile without link-time
-optimization (LTO) so the caller cannot eliminate identical repeated calls.
+The plot is saved as `benchmark/expression.svg`. It uses extent on a base-2
+horizontal axis and time in units of `10^-3 ms` on a vertical axis that is
+linear through zero and logarithmic above 1 unit. A zero timing is shown at
+zero; it means the benchmark clock did not resolve that measurement.
+The shared vertical axis ends at `10^5` in these units; larger measurements
+are clipped from the figure.
+Three side-by-side panels show OP = 2, 8, and 32. Each panel uses white-filled
+circles: red for RAW, green for EXTR, and blue for EXPR. The panels share both
+axes for direct comparison.
+The plotting script requires Matplotlib.
 
-Use identical compilers, optimization settings, dimensions, and repetition
-counts when comparing revisions. Check checksums as well as timings. The
-`DO CONCURRENT` kernels do not guarantee SIMD or multithreaded execution;
-compiler options and implementation determine the execution strategy.
+The optional argument is the number of repetitions per expression and extent;
+it defaults to 3. The benchmark evaluates these real64 expressions:
 
-For Flang host parallelization, use a separate build directory with
-`-DCMAKE_Fortran_COMPILER=flang` and
-`-DCMAKE_Fortran_FLAGS="-fopenmp -fdo-concurrent-to-openmp=host"`.
-Compile the benchmark with `flang -O3 -fopenmp` against that build's modules
-and libraries. Set `OMP_NUM_THREADS` to control the host thread count.
+- `a*(b+c)` (OP = 2)
+- `(a*(b+c))/(a+1.0_real64) + sqrt(b*c) + c` (OP = 8)
+- `((a*(b+c))/(a+1.0_real64) + sqrt(b*c) + c)`
+  `+ ((a+b)*(b+c) + (a+c)*(a+b))`
+  `+ (((a*b+c)/(b+1.0_real64))*sqrt(a+c))`
+  `+ ((a+c)*(b+c) + (a+b)*(a+c))` (OP = 32)
 
-The block evaluator currently uses 1024-element blocks and up to 32 logical
-lanes. Each lane reuses its scratch bank across its assigned blocks. The number
-of scratch buffers per lane comes from expression liveness, rather than a
-fixed reservation or one buffer per operation. Simple expressions such as
-`A*(B+C)` reuse the output block and require no additional scratch buffers.
+`OP` counts arithmetic operations and `sqrt` calls per element as written;
+repeated subexpressions count each time they appear. One aligned row is printed
+for each extent and OP count. Each row averages milliseconds per evaluation
+across repetitions of that expression. The three timing paths are: `EXPR`
+uses NC4F expressions, `EXTR` uses `EXTRACT` followed by direct array
+calculation, and `RAW` calculates directly from `x`, `y`, and `z`.
+`EXPR/RAW` and `EXTR/RAW` both use raw-array time as the baseline. The last
+column is the accumulated NC4F checksum. All paths use the same inputs.
+Each ratio is the arithmetic mean of the per-repetition path/RAW ratios for
+that expression. If any RAW repetition measures zero clock ticks, both ratio
+columns display `N/A` for that row.
+The timer excludes input initialization, expression construction, warm-up,
+and the full-array checksum after each repetition. Checksums make every result
+observable and are compared across all three paths. Final arrays are also
+compared element by element.
+
+At extent 8192, each real64 array occupies about 0.5 GiB. The three inputs,
+direct output, and NC4F result alone require about 2.5 GiB; expression
+temporaries and runtime overhead require more. Allow ample memory and time.
+Run with the same compiler, profile, and repetition count when comparing
+changes.

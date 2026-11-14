@@ -58,6 +58,11 @@ name = "potential-temperature"
 source-dir = "example"
 main = "potential_temperature.f90"
 
+[[example]]
+name = "expression-benchmark"
+source-dir = "benchmark"
+main = "expression.f90"
+
 [[test]]
 name = "test-suite"
 source-dir = "test"

@@ -264,27 +264,6 @@ module subroutine coordinate_at_int8(coord, indices, value, err)
   call return_err(op_err, err)
 end subroutine coordinate_at_int8
 
-module subroutine extract_coord_int8(coord, ptr)
-  !! Expose the coordinate values as a typed pointer view.
-  type(coordinate_type), target, intent(in) :: coord
-  !! Coordinate containing the requested values.
-  integer(int8), pointer, intent(out) :: ptr(:)
-  !! Pointer view of the coordinate values.
-  type(error_type) :: err
-  type(c_ptr) :: cptr
-
-  call validate_coordinate(coord, err)
-  call return_err(err)
-  if (coord%dtype /= BYTE_TYPE) error stop &
-    & "[extract] Coordinate kind differs."
-  if (coord%len == 0) then
-    nullify (ptr)
-    return
-  end if
-  cptr = c_loc(coord%buffer(1))
-  call c_f_pointer(cptr, ptr, [int(coord%len)])
-end subroutine extract_coord_int8
-
 module subroutine coordinate_at_int16(coord, indices, value, err)
   !! Read one coordinate element at its multidimensional indices.
   type(coordinate_type), target, intent(in) :: coord
@@ -306,27 +285,6 @@ module subroutine coordinate_at_int16(coord, indices, value, err)
   value = transfer(coord%buffer(pos:pos + 2 - 1), 0_int16)
   call return_err(op_err, err)
 end subroutine coordinate_at_int16
-
-module subroutine extract_coord_int16(coord, ptr)
-  !! Expose the coordinate values as a typed pointer view.
-  type(coordinate_type), target, intent(in) :: coord
-  !! Coordinate containing the requested values.
-  integer(int16), pointer, intent(out) :: ptr(:)
-  !! Pointer view of the coordinate values.
-  type(error_type) :: err
-  type(c_ptr) :: cptr
-
-  call validate_coordinate(coord, err)
-  call return_err(err)
-  if (coord%dtype /= SHORT_TYPE) error stop &
-    & "[extract] Coordinate kind differs."
-  if (coord%len == 0) then
-    nullify (ptr)
-    return
-  end if
-  cptr = c_loc(coord%buffer(1))
-  call c_f_pointer(cptr, ptr, [int(coord%len)])
-end subroutine extract_coord_int16
 
 module subroutine coordinate_at_int32(coord, indices, value, err)
   !! Read one coordinate element at its multidimensional indices.
@@ -350,27 +308,6 @@ module subroutine coordinate_at_int32(coord, indices, value, err)
   call return_err(op_err, err)
 end subroutine coordinate_at_int32
 
-module subroutine extract_coord_int32(coord, ptr)
-  !! Expose the coordinate values as a typed pointer view.
-  type(coordinate_type), target, intent(in) :: coord
-  !! Coordinate containing the requested values.
-  integer(int32), pointer, intent(out) :: ptr(:)
-  !! Pointer view of the coordinate values.
-  type(error_type) :: err
-  type(c_ptr) :: cptr
-
-  call validate_coordinate(coord, err)
-  call return_err(err)
-  if (coord%dtype /= INT_TYPE) error stop &
-    & "[extract] Coordinate kind differs."
-  if (coord%len == 0) then
-    nullify (ptr)
-    return
-  end if
-  cptr = c_loc(coord%buffer(1))
-  call c_f_pointer(cptr, ptr, [int(coord%len)])
-end subroutine extract_coord_int32
-
 module subroutine coordinate_at_int64(coord, indices, value, err)
   !! Read one coordinate element at its multidimensional indices.
   type(coordinate_type), target, intent(in) :: coord
@@ -392,27 +329,6 @@ module subroutine coordinate_at_int64(coord, indices, value, err)
   value = transfer(coord%buffer(pos:pos + 8 - 1), 0_int64)
   call return_err(op_err, err)
 end subroutine coordinate_at_int64
-
-module subroutine extract_coord_int64(coord, ptr)
-  !! Expose the coordinate values as a typed pointer view.
-  type(coordinate_type), target, intent(in) :: coord
-  !! Coordinate containing the requested values.
-  integer(int64), pointer, intent(out) :: ptr(:)
-  !! Pointer view of the coordinate values.
-  type(error_type) :: err
-  type(c_ptr) :: cptr
-
-  call validate_coordinate(coord, err)
-  call return_err(err)
-  if (coord%dtype /= INT64_TYPE) error stop &
-    & "[extract] Coordinate kind differs."
-  if (coord%len == 0) then
-    nullify (ptr)
-    return
-  end if
-  cptr = c_loc(coord%buffer(1))
-  call c_f_pointer(cptr, ptr, [int(coord%len)])
-end subroutine extract_coord_int64
 
 module subroutine coordinate_at_real32(coord, indices, value, err)
   !! Read one coordinate element at its multidimensional indices.
@@ -436,27 +352,6 @@ module subroutine coordinate_at_real32(coord, indices, value, err)
   call return_err(op_err, err)
 end subroutine coordinate_at_real32
 
-module subroutine extract_coord_real32(coord, ptr)
-  !! Expose the coordinate values as a typed pointer view.
-  type(coordinate_type), target, intent(in) :: coord
-  !! Coordinate containing the requested values.
-  real(real32), pointer, intent(out) :: ptr(:)
-  !! Pointer view of the coordinate values.
-  type(error_type) :: err
-  type(c_ptr) :: cptr
-
-  call validate_coordinate(coord, err)
-  call return_err(err)
-  if (coord%dtype /= FLOAT_TYPE) error stop &
-    & "[extract] Coordinate kind differs."
-  if (coord%len == 0) then
-    nullify (ptr)
-    return
-  end if
-  cptr = c_loc(coord%buffer(1))
-  call c_f_pointer(cptr, ptr, [int(coord%len)])
-end subroutine extract_coord_real32
-
 module subroutine coordinate_at_real64(coord, indices, value, err)
   !! Read one coordinate element at its multidimensional indices.
   type(coordinate_type), target, intent(in) :: coord
@@ -478,26 +373,5 @@ module subroutine coordinate_at_real64(coord, indices, value, err)
   value = transfer(coord%buffer(pos:pos + 8 - 1), 0.0_real64)
   call return_err(op_err, err)
 end subroutine coordinate_at_real64
-
-module subroutine extract_coord_real64(coord, ptr)
-  !! Expose the coordinate values as a typed pointer view.
-  type(coordinate_type), target, intent(in) :: coord
-  !! Coordinate containing the requested values.
-  real(real64), pointer, intent(out) :: ptr(:)
-  !! Pointer view of the coordinate values.
-  type(error_type) :: err
-  type(c_ptr) :: cptr
-
-  call validate_coordinate(coord, err)
-  call return_err(err)
-  if (coord%dtype /= DOUBLE_TYPE) error stop &
-    & "[extract] Coordinate kind differs."
-  if (coord%len == 0) then
-    nullify (ptr)
-    return
-  end if
-  cptr = c_loc(coord%buffer(1))
-  call c_f_pointer(cptr, ptr, [int(coord%len)])
-end subroutine extract_coord_real64
 
 end submodule nc4f_data_coordinate

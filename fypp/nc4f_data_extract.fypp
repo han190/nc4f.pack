@@ -3,6 +3,39 @@ submodule(nc4f_data) nc4f_data_extract
 implicit none (type, external)
 contains
 
+#: for D, T, K in zip(dtypes, types, kinds)
+#: for R in range(1, MAX_RANK+1)
+module subroutine extract_coord_${K}$_${R}$d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  ${T}$(${K}$), pointer, intent(out) :: ptr(${COLONS(R)}$)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= ${D}$) error stop &
+    & "[extract] Coordinate kind differs."
+#: if R > 1
+  if (size(coord%dims) /= ${R}$) error stop &
+    & "[extract] Coordinate rank differs."
+#: endif
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+#: if R == 1
+  call c_f_pointer(cptr, ptr, [coord%len])
+#: else
+  call c_f_pointer(cptr, ptr, shape(coord))
+#: endif
+end subroutine extract_coord_${K}$_${R}$d${NEWLINE()}$
+#: endfor
+#: endfor
+
 #: for D, T, K in zip(dtypes + ['CHAR_TYPE'], types + ['char'], kinds + ['char'])
 #: for R in ('vector', 'scalar')
 module subroutine extract_att_${K}$_${R}$(att, ptr)

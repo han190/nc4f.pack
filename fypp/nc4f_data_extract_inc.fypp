@@ -1,8 +1,10 @@
 #: include "common.fypp"
 interface extract
-  module procedure :: extract_coord_int8, extract_coord_int16, &
-    & extract_coord_int32, extract_coord_int64
-  module procedure :: extract_coord_real32, extract_coord_real64
+#: for K in kinds
+#: for R in range(1, MAX_RANK+1)
+  module procedure :: extract_coord_${K}$_${R}$d
+#: endfor
+#: endfor
 #: for K in kinds
   module procedure :: extract_att_${K}$_vector
   module procedure :: extract_att_${K}$_scalar
@@ -20,6 +22,17 @@ interface extract
 end interface extract
 
 interface
+#: for T, K in zip(types, kinds)
+#: for R in range(1, MAX_RANK+1)
+  module subroutine extract_coord_${K}$_${R}$d(coord, ptr)
+    !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+    type(coordinate_type), target, intent(in) :: coord
+    !! Coordinate whose storage must remain valid while the view is used.
+    ${T}$(${K}$), pointer, intent(out) :: ptr(${COLONS(R)}$)
+    !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  end subroutine extract_coord_${K}$_${R}$d${NEWLINE()}$
+#: endfor
+#: endfor
 #: for T, K in zip(types, kinds)
   module subroutine extract_att_${K}$_vector(att, ptr)
     !! Extract attribute data of kind `${K}$` as a vector.

@@ -505,36 +505,6 @@ interface
     real(real64), intent(out) :: value
     type(error_type), intent(out), optional :: err
   end subroutine coordinate_at_real64
-
-  module subroutine extract_coord_int8(coord, ptr)
-    type(coordinate_type), target, intent(in) :: coord
-    integer(int8), pointer, intent(out) :: ptr(:)
-  end subroutine extract_coord_int8
-
-  module subroutine extract_coord_int16(coord, ptr)
-    type(coordinate_type), target, intent(in) :: coord
-    integer(int16), pointer, intent(out) :: ptr(:)
-  end subroutine extract_coord_int16
-
-  module subroutine extract_coord_int32(coord, ptr)
-    type(coordinate_type), target, intent(in) :: coord
-    integer(int32), pointer, intent(out) :: ptr(:)
-  end subroutine extract_coord_int32
-
-  module subroutine extract_coord_int64(coord, ptr)
-    type(coordinate_type), target, intent(in) :: coord
-    integer(int64), pointer, intent(out) :: ptr(:)
-  end subroutine extract_coord_int64
-
-  module subroutine extract_coord_real32(coord, ptr)
-    type(coordinate_type), target, intent(in) :: coord
-    real(real32), pointer, intent(out) :: ptr(:)
-  end subroutine extract_coord_real32
-
-  module subroutine extract_coord_real64(coord, ptr)
-    type(coordinate_type), target, intent(in) :: coord
-    real(real64), pointer, intent(out) :: ptr(:)
-  end subroutine extract_coord_real64
 end interface
 
 interface

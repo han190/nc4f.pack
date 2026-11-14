@@ -2,6 +2,2065 @@ submodule(nc4f_data) nc4f_data_extract
 implicit none (type, external)
 contains
 
+module subroutine extract_coord_int8_1d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int8), pointer, intent(out) :: ptr(:)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= BYTE_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, [coord%len])
+end subroutine extract_coord_int8_1d
+
+module subroutine extract_coord_int8_2d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int8), pointer, intent(out) :: ptr(:, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= BYTE_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 2) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int8_2d
+
+module subroutine extract_coord_int8_3d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int8), pointer, intent(out) :: ptr(:, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= BYTE_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 3) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int8_3d
+
+module subroutine extract_coord_int8_4d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int8), pointer, intent(out) :: ptr(:, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= BYTE_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 4) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int8_4d
+
+module subroutine extract_coord_int8_5d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int8), pointer, intent(out) :: ptr(:, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= BYTE_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 5) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int8_5d
+
+module subroutine extract_coord_int8_6d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int8), pointer, intent(out) :: ptr(:, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= BYTE_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 6) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int8_6d
+
+module subroutine extract_coord_int8_7d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int8), pointer, intent(out) :: ptr(:, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= BYTE_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 7) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int8_7d
+
+module subroutine extract_coord_int8_8d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int8), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= BYTE_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 8) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int8_8d
+
+module subroutine extract_coord_int8_9d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int8), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= BYTE_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 9) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int8_9d
+
+module subroutine extract_coord_int8_10d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int8), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= BYTE_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 10) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int8_10d
+
+module subroutine extract_coord_int8_11d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int8), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= BYTE_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 11) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int8_11d
+
+module subroutine extract_coord_int8_12d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int8), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= BYTE_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 12) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int8_12d
+
+module subroutine extract_coord_int8_13d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int8), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= BYTE_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 13) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int8_13d
+
+module subroutine extract_coord_int8_14d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int8), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= BYTE_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 14) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int8_14d
+
+module subroutine extract_coord_int8_15d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int8), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= BYTE_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 15) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int8_15d
+
+module subroutine extract_coord_int16_1d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int16), pointer, intent(out) :: ptr(:)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= SHORT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, [coord%len])
+end subroutine extract_coord_int16_1d
+
+module subroutine extract_coord_int16_2d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int16), pointer, intent(out) :: ptr(:, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= SHORT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 2) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int16_2d
+
+module subroutine extract_coord_int16_3d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int16), pointer, intent(out) :: ptr(:, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= SHORT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 3) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int16_3d
+
+module subroutine extract_coord_int16_4d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int16), pointer, intent(out) :: ptr(:, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= SHORT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 4) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int16_4d
+
+module subroutine extract_coord_int16_5d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int16), pointer, intent(out) :: ptr(:, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= SHORT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 5) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int16_5d
+
+module subroutine extract_coord_int16_6d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int16), pointer, intent(out) :: ptr(:, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= SHORT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 6) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int16_6d
+
+module subroutine extract_coord_int16_7d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int16), pointer, intent(out) :: ptr(:, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= SHORT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 7) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int16_7d
+
+module subroutine extract_coord_int16_8d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int16), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= SHORT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 8) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int16_8d
+
+module subroutine extract_coord_int16_9d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int16), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= SHORT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 9) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int16_9d
+
+module subroutine extract_coord_int16_10d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int16), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= SHORT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 10) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int16_10d
+
+module subroutine extract_coord_int16_11d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int16), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= SHORT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 11) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int16_11d
+
+module subroutine extract_coord_int16_12d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int16), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= SHORT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 12) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int16_12d
+
+module subroutine extract_coord_int16_13d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int16), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= SHORT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 13) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int16_13d
+
+module subroutine extract_coord_int16_14d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int16), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= SHORT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 14) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int16_14d
+
+module subroutine extract_coord_int16_15d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int16), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= SHORT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 15) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int16_15d
+
+module subroutine extract_coord_int32_1d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int32), pointer, intent(out) :: ptr(:)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= INT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, [coord%len])
+end subroutine extract_coord_int32_1d
+
+module subroutine extract_coord_int32_2d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int32), pointer, intent(out) :: ptr(:, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= INT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 2) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int32_2d
+
+module subroutine extract_coord_int32_3d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int32), pointer, intent(out) :: ptr(:, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= INT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 3) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int32_3d
+
+module subroutine extract_coord_int32_4d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int32), pointer, intent(out) :: ptr(:, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= INT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 4) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int32_4d
+
+module subroutine extract_coord_int32_5d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int32), pointer, intent(out) :: ptr(:, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= INT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 5) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int32_5d
+
+module subroutine extract_coord_int32_6d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int32), pointer, intent(out) :: ptr(:, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= INT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 6) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int32_6d
+
+module subroutine extract_coord_int32_7d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= INT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 7) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int32_7d
+
+module subroutine extract_coord_int32_8d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= INT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 8) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int32_8d
+
+module subroutine extract_coord_int32_9d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= INT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 9) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int32_9d
+
+module subroutine extract_coord_int32_10d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= INT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 10) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int32_10d
+
+module subroutine extract_coord_int32_11d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= INT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 11) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int32_11d
+
+module subroutine extract_coord_int32_12d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= INT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 12) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int32_12d
+
+module subroutine extract_coord_int32_13d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= INT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 13) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int32_13d
+
+module subroutine extract_coord_int32_14d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= INT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 14) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int32_14d
+
+module subroutine extract_coord_int32_15d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= INT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 15) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int32_15d
+
+module subroutine extract_coord_int64_1d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int64), pointer, intent(out) :: ptr(:)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= INT64_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, [coord%len])
+end subroutine extract_coord_int64_1d
+
+module subroutine extract_coord_int64_2d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int64), pointer, intent(out) :: ptr(:, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= INT64_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 2) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int64_2d
+
+module subroutine extract_coord_int64_3d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int64), pointer, intent(out) :: ptr(:, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= INT64_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 3) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int64_3d
+
+module subroutine extract_coord_int64_4d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int64), pointer, intent(out) :: ptr(:, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= INT64_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 4) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int64_4d
+
+module subroutine extract_coord_int64_5d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int64), pointer, intent(out) :: ptr(:, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= INT64_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 5) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int64_5d
+
+module subroutine extract_coord_int64_6d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int64), pointer, intent(out) :: ptr(:, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= INT64_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 6) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int64_6d
+
+module subroutine extract_coord_int64_7d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= INT64_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 7) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int64_7d
+
+module subroutine extract_coord_int64_8d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= INT64_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 8) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int64_8d
+
+module subroutine extract_coord_int64_9d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= INT64_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 9) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int64_9d
+
+module subroutine extract_coord_int64_10d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= INT64_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 10) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int64_10d
+
+module subroutine extract_coord_int64_11d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= INT64_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 11) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int64_11d
+
+module subroutine extract_coord_int64_12d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= INT64_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 12) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int64_12d
+
+module subroutine extract_coord_int64_13d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= INT64_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 13) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int64_13d
+
+module subroutine extract_coord_int64_14d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= INT64_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 14) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int64_14d
+
+module subroutine extract_coord_int64_15d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  integer(int64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= INT64_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 15) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_int64_15d
+
+module subroutine extract_coord_real32_1d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  real(real32), pointer, intent(out) :: ptr(:)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= FLOAT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, [coord%len])
+end subroutine extract_coord_real32_1d
+
+module subroutine extract_coord_real32_2d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  real(real32), pointer, intent(out) :: ptr(:, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= FLOAT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 2) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_real32_2d
+
+module subroutine extract_coord_real32_3d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  real(real32), pointer, intent(out) :: ptr(:, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= FLOAT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 3) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_real32_3d
+
+module subroutine extract_coord_real32_4d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  real(real32), pointer, intent(out) :: ptr(:, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= FLOAT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 4) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_real32_4d
+
+module subroutine extract_coord_real32_5d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  real(real32), pointer, intent(out) :: ptr(:, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= FLOAT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 5) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_real32_5d
+
+module subroutine extract_coord_real32_6d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  real(real32), pointer, intent(out) :: ptr(:, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= FLOAT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 6) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_real32_6d
+
+module subroutine extract_coord_real32_7d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  real(real32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= FLOAT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 7) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_real32_7d
+
+module subroutine extract_coord_real32_8d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  real(real32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= FLOAT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 8) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_real32_8d
+
+module subroutine extract_coord_real32_9d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  real(real32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= FLOAT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 9) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_real32_9d
+
+module subroutine extract_coord_real32_10d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  real(real32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= FLOAT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 10) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_real32_10d
+
+module subroutine extract_coord_real32_11d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  real(real32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= FLOAT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 11) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_real32_11d
+
+module subroutine extract_coord_real32_12d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  real(real32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= FLOAT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 12) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_real32_12d
+
+module subroutine extract_coord_real32_13d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  real(real32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= FLOAT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 13) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_real32_13d
+
+module subroutine extract_coord_real32_14d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  real(real32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= FLOAT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 14) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_real32_14d
+
+module subroutine extract_coord_real32_15d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  real(real32), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= FLOAT_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 15) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_real32_15d
+
+module subroutine extract_coord_real64_1d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  real(real64), pointer, intent(out) :: ptr(:)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= DOUBLE_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, [coord%len])
+end subroutine extract_coord_real64_1d
+
+module subroutine extract_coord_real64_2d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  real(real64), pointer, intent(out) :: ptr(:, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= DOUBLE_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 2) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_real64_2d
+
+module subroutine extract_coord_real64_3d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  real(real64), pointer, intent(out) :: ptr(:, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= DOUBLE_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 3) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_real64_3d
+
+module subroutine extract_coord_real64_4d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  real(real64), pointer, intent(out) :: ptr(:, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= DOUBLE_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 4) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_real64_4d
+
+module subroutine extract_coord_real64_5d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  real(real64), pointer, intent(out) :: ptr(:, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= DOUBLE_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 5) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_real64_5d
+
+module subroutine extract_coord_real64_6d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  real(real64), pointer, intent(out) :: ptr(:, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= DOUBLE_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 6) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_real64_6d
+
+module subroutine extract_coord_real64_7d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  real(real64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= DOUBLE_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 7) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_real64_7d
+
+module subroutine extract_coord_real64_8d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  real(real64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= DOUBLE_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 8) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_real64_8d
+
+module subroutine extract_coord_real64_9d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  real(real64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= DOUBLE_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 9) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_real64_9d
+
+module subroutine extract_coord_real64_10d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  real(real64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= DOUBLE_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 10) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_real64_10d
+
+module subroutine extract_coord_real64_11d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  real(real64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= DOUBLE_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 11) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_real64_11d
+
+module subroutine extract_coord_real64_12d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  real(real64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= DOUBLE_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 12) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_real64_12d
+
+module subroutine extract_coord_real64_13d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  real(real64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= DOUBLE_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 13) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_real64_13d
+
+module subroutine extract_coord_real64_14d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  real(real64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= DOUBLE_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 14) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_real64_14d
+
+module subroutine extract_coord_real64_15d(coord, ptr)
+  !! Borrow coordinate storage as a flat or dimension-shaped numeric view.
+  type(coordinate_type), target, intent(in) :: coord
+  !! Coordinate whose storage must remain valid while the view is used.
+  real(real64), pointer, intent(out) :: ptr(:, :, :, :, :, :, :, :, :, :, :, :, :, :, :)
+  !! Rank one covers all elements; higher ranks match the coordinate dimensions.
+  type(error_type) :: err
+  type(c_ptr) :: cptr
+
+  call validate_coordinate(coord, err)
+  call return_err(err)
+  if (coord%dtype /= DOUBLE_TYPE) error stop &
+    & "[extract] Coordinate kind differs."
+  if (size(coord%dims) /= 15) error stop &
+    & "[extract] Coordinate rank differs."
+  if (coord%len == 0) then
+    nullify (ptr)
+    return
+  end if
+  cptr = c_loc(coord%buffer(1))
+  call c_f_pointer(cptr, ptr, shape(coord))
+end subroutine extract_coord_real64_15d
+
+
 module subroutine extract_att_int8_vector(att, ptr)
   !! Extract attribute data of kind `int8` as a `vector` from `att`.
   type(attribute_type), target, intent(in) :: att

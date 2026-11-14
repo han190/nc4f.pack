@@ -219,7 +219,7 @@ if (.exists. err) print '(a)', error_msg(err)
 
 | Synopsis |
 |:--|
-| <span class="ind3">`CALL EXTRACT(ATT, VALUES)`</span><br><span class="ind3">`CALL EXTRACT(VAR, VALUES)`</span> |
+| <span class="ind3">`CALL EXTRACT(ATT, VALUES)`</span><br><span class="ind3">`CALL EXTRACT(VAR, VALUES)`</span><br><span class="ind3">`CALL EXTRACT(COORD, VALUES)`</span> |
 
 | Class |
 |:--|
@@ -227,12 +227,13 @@ if (.exists. err) print '(a)', error_msg(err)
 
 | Description |
 |:--|
-| <span class="ind3">Associate a typed Fortran pointer with an attribute or variable's active byte storage. The pointer's type and rank must match the stored NetCDF data and remains valid only while the source storage remains valid.</span> |
+| <span class="ind3">Associate a typed Fortran pointer with an attribute, variable, or coordinate's storage without copying numeric values. The pointer's numeric kind must match the stored NetCDF data. For variables and numeric coordinates, a rank-one pointer covers all elements in Fortran order; pointers of rank two through fifteen must match the source rank and receive its dimension shape. Empty storage returns a null pointer. Keep the source storage alive and unchanged in allocation while using the view; do not deallocate the borrowed target. Scalar character attribute extraction returns an allocated string copy.</span> |
 
 | Arguments |
 |:--|
 | <span class="grid"><span>`ATT`</span><span>`type(attribute_type), TARGET, INTENT(in)`</span></span><br><span class="ind6">Attribute supplying storage.</span> |
 | <span class="grid"><span>`VAR`</span><span>`type(variable_type), TARGET, INTENT(in)`</span></span><br><span class="ind6">Variable supplying storage.</span> |
+| <span class="grid"><span>`COORD`</span><span>`type(coordinate_type), TARGET, INTENT(in)`</span></span><br><span class="ind6">Numeric coordinate supplying storage.</span> |
 | <span class="grid"><span>`VALUES`</span><span>`TYPE(INTEGER(INT8, INT16, INT32, INT64), REAL(REAL32, REAL64), CHARACTER), RANK(0:15), POINTER, INTENT(OUT)`</span></span><br><span class="ind6">Type- and rank-compatible pointer receiving the association.</span> |
 
 :::{list-table}
