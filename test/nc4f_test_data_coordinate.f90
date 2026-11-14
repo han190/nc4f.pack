@@ -4,9 +4,9 @@ use, intrinsic :: iso_fortran_env, only: &
 use, non_intrinsic :: testdrive, only: check, error_type, &
   & new_unittest, unittest_type
 use, non_intrinsic :: nc4f, only: coordinate_type, variable_type, &
-  & coordinate_at, coordinate_index, datarray, evaluate, &
+  & coordinate_at, coordinate_index, datarray, &
   & extract, validate, rename_dimension, nameof, typeof, size, shape, &
-  & operator(.att.), operator(.dim.), operator(+), operator(*), &
+  & operator(.att.), operator(.dim.), &
   & operator(==), &
   & NC_NOERR, NC_EINVAL, NC_FLOAT
 implicit none (type, external)
@@ -16,9 +16,7 @@ module subroutine collect_data_coordinate(tests)
   type(unittest_type), allocatable, intent(out) :: tests(:)
   tests = [ &
     & new_unittest("time, lon, and lat coordinates", test_mapping), &
-    & new_unittest("integer coordinate kinds", test_integer_kinds), &
-    & new_unittest("coordinate expression propagation", test_expression), &
-    & new_unittest("nested coordinate assignment", test_nested_assignment) &
+    & new_unittest("integer coordinate kinds", test_integer_kinds) &
     & ]
 end subroutine collect_data_coordinate
 
@@ -26,7 +24,7 @@ subroutine test_mapping(error)
   use, non_intrinsic :: nc4f, only: model_error => error_type
   type(error_type), allocatable, intent(out) :: error
   type(coordinate_type) :: time_coord, lon, lat
-  type(variable_type), target :: var, copy, result
+  type(variable_type) :: var, copy
   type(model_error) :: err
   real(real32) :: lon_vals(2, 3), lat_vals(2, 3), value
   real(real32), pointer :: view(:)
@@ -71,11 +69,6 @@ subroutine test_mapping(error)
     & "Dimension rename did not update coordinates")
   if (allocated(error)) return
   copy = var
-  call evaluate(var + copy, result, err)
-  call check(error, err%code == NC_NOERR .and. &
-    & allocated(result%coords), &
-    & "Three-dimensional variable coordinate evaluation failed")
-  if (allocated(error)) return
   lon%buffer = 0
   call coordinate_at(copy%coords(2), [2, 3], value)
   call check(error, value == 6.0_real32 .and. &
@@ -114,116 +107,5 @@ subroutine test_integer_kinds(error)
   call coordinate_at(coord, [2], value64)
   call check(error, value64 == 2_int64, "int64 time differs")
 end subroutine test_integer_kinds
-
-subroutine test_expression(error)
-  use, non_intrinsic :: nc4f, only: model_error => error_type
-  type(error_type), allocatable, intent(out) :: error
-  type(coordinate_type) :: lon, lat
-  type(variable_type), target :: a, b, result
-  type(model_error) :: err
-  real(real64) :: value
-
-  lon = coordinate_type("lon", reshape([1.0_real64, 2.0_real64, &
-    & 3.0_real64, 4.0_real64], [2, 2]), &
-    & ["west_east".dim.2, "south_north".dim.2])
-  lat = coordinate_type("lat", reshape([10.0_real64, 20.0_real64, &
-    & 30.0_real64, 40.0_real64], [2, 2]), lon%dims)
-  a = datarray("a", reshape([1.0_real32, 2.0_real32, &
-    & 3.0_real32, 4.0_real32], [2, 2]), lon%dims, coords=[lon, lat])
-  b = datarray("b", reshape([5.0_real32, 6.0_real32, &
-    & 7.0_real32, 8.0_real32], [2, 2]), lon%dims, coords=[lon, lat])
-  result = a
-  result%coords = [lat, lon]
-  call check(error, .not. (result == a), &
-    & "Coordinate collection order did not affect variable equality")
-  if (allocated(error)) return
-  call evaluate(a + b, result, err)
-  call check(error, err%code == NC_NOERR, &
-    & "Matching coordinates were rejected")
-  if (allocated(error)) return
-  b%coords(1)%atts = ["units".att."degrees_east"]
-  call evaluate(a + b, result, err)
-  call check(error, err%code == NC_NOERR, &
-    & "Different coordinate attributes were rejected")
-  if (allocated(error)) return
-  b%coords = [lat, lon]
-  call evaluate(a + b, result, err)
-  call check(error, err%code == NC_EINVAL, &
-    & "Reordered coordinates were accepted")
-  if (allocated(error)) return
-  b%coords = [lon, lat]
-  call evaluate(a + b, result, err)
-  call check(error, err%code == NC_NOERR .and. &
-    & allocated(result%coords), "Expression lost coordinates")
-  if (allocated(error)) return
-  call coordinate_at(result%coords(1), [2, 2], value)
-  call check(error, value == 4.0_real64, &
-    & "Expression changed coordinates")
-  if (allocated(error)) return
-  call evaluate(a + 1.0_real32, result, err)
-  call check(error, err%code == NC_NOERR .and. &
-    & allocated(result%coords), "Scalar arithmetic lost coordinates")
-  if (allocated(error)) return
-  b%coords(2)%buffer(1) = b%coords(2)%buffer(1) + 1
-  call evaluate(a + b, result, err)
-  call check(error, err%code == NC_EINVAL, &
-    & "Mismatched coordinates were accepted")
-  if (allocated(error)) return
-  call check(error, index(err%msg, "lat") > 0, &
-    & "Coordinate error did not name the mismatched coordinate")
-  if (allocated(error)) return
-  b%coords = [lon, lat]
-  deallocate (b%coords)
-  call evaluate(a + b, result, err)
-  call check(error, err%code == NC_EINVAL, &
-    & "One missing coordinate collection was accepted")
-  if (allocated(error)) return
-  deallocate (a%coords)
-  call evaluate(a + b, result, err)
-  call check(error, err%code == NC_NOERR .and. &
-    & .not. allocated(result%coords), &
-    & "Two coordinate-free variables were rejected")
-end subroutine test_expression
-
-subroutine test_nested_assignment(error)
-  use, non_intrinsic :: nc4f, only: model_error => error_type
-  type(error_type), allocatable, intent(out) :: error
-  type(coordinate_type) :: lon
-  type(variable_type), target :: a, b
-  type(variable_type) :: result, before
-  type(model_error) :: err
-  real(real32), pointer :: values(:)
-
-  lon = coordinate_type("lon", [10.0_real32, 20.0_real32], &
-    & ["x".dim.2], atts=["units".att."degrees_east"])
-  a = datarray("a", [1.0_real32, 2.0_real32], &
-    & ["x".dim.2], coords=[lon], atts=["units".att."K"])
-  b = datarray("b", [3.0_real32, 4.0_real32], &
-    & ["x".dim.2], coords=[lon])
-  b%coords(1)%atts = ["long_name".att."Longitude"]
-  result = datarray("sentinel", [-1.0_real32, -2.0_real32], &
-    & ["x".dim.2], atts=["units".att."old"])
-  call evaluate((a + b)*2.0_real32, result, err)
-  call check(error, err%code == NC_NOERR, &
-    & "Nested expression rejected compatible coordinates")
-  if (allocated(error)) return
-  call extract(result, values)
-  call check(error, all(values == [8.0_real32, 12.0_real32]) &
-    & .and. allocated(result%coords) .and. &
-    & .not. allocated(result%atts), &
-    & "Nested result data or metadata differs")
-  if (allocated(error)) return
-  call check(error, allocated(result%coords(1)%atts), &
-    & "Nested result lost coordinate attributes")
-  if (allocated(error)) return
-  call check(error, result%coords(1)%atts(1) == lon%atts(1), &
-    & "Nested result lost left operand coordinate attributes")
-  if (allocated(error)) return
-  before = result
-  b%coords(1)%buffer(1) = b%coords(1)%buffer(1) + 1
-  call evaluate((a + b)*2.0_real32, result, err)
-  call check(error, err%code == NC_EINVAL .and. result == before, &
-    & "Failed nested assignment changed its destination")
-end subroutine test_nested_assignment
 
 end submodule nc4f_test_data_coordinate

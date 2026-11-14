@@ -8,81 +8,17 @@ implicit none (type, external)
 
 public :: attribute_type, dimension_type, error_type, delete_attribute, &
   & group_type, netcdf_type, variable_type, coordinate_type, &
-  & abstract_variable_type, expression_type, &
-  & coordinate_at, coordinate_index, evaluate, &
-  & initialize, nameof, typeof, &
+  & coordinate_at, coordinate_index, initialize, nameof, typeof, &
   & storage_type, set_storage, datarray, dataset, extract, &
   & rename_attribute, rename_variable, rename_group, rename_dimension, &
   & operator(.att.), operator(.and.), operator(.dim.), operator(.exists.), &
-  & operator(==), operator(/=), operator(+), operator(-), &
-  & operator(*), operator(/), operator(**), assignment(=), &
-  & abs, sqrt, exp, log, log10, sin, cos, tan, &
-  & asin, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh, &
-  & erf, erfc, erfc_scaled, gamma, log_gamma, &
-  & bessel_j0, bessel_j1, bessel_y0, bessel_y1, &
-  & dim, sign, mod, modulo, atan2, hypot, &
-  & shape, size, sum, buffer_size, buffer2cptr, &
+  & operator(==), operator(/=), &
+  & shape, size, buffer_size, buffer2cptr, &
   & validate, error_msg, return_err, has_err, compute_buffer_size, compute_size
 private
 
 integer(int32), parameter :: INVALID_INT32 = -2147483647_int32
 integer(int64), parameter :: INVALID_INT64 = -9223372036854775807_int64
-
-enum, bind(c)
-  !! Operations represented by nodes in a deferred expression.
-  enumerator :: OP_INVALID = -1
-  enumerator :: OP_LEAF = 0
-  enumerator :: OP_ADD = 1
-  enumerator :: OP_SUB = 2
-  enumerator :: OP_MUL = 3
-  enumerator :: OP_DIV = 4
-  enumerator :: OP_POW = 5
-  enumerator :: OP_INT32_POW = 6
-  enumerator :: OP_INT64_POW = 7
-  enumerator :: OP_REAL32_POW = 8
-  enumerator :: OP_REAL64_POW = 9
-  enumerator :: OP_INT8_POW = 10
-  enumerator :: OP_INT16_POW = 11
-  enumerator :: OP_SCALAR_INT8 = 12
-  enumerator :: OP_SCALAR_INT16 = 13
-  enumerator :: OP_SCALAR_INT32 = 14
-  enumerator :: OP_SCALAR_INT64 = 15
-  enumerator :: OP_SCALAR_REAL32 = 16
-  enumerator :: OP_SCALAR_REAL64 = 17
-  enumerator :: OP_ABS = 18
-  enumerator :: OP_SQRT = 19
-  enumerator :: OP_EXP = 20
-  enumerator :: OP_LOG = 21
-  enumerator :: OP_LOG10 = 22
-  enumerator :: OP_SIN = 23
-  enumerator :: OP_COS = 24
-  enumerator :: OP_TAN = 25
-  enumerator :: OP_ASIN = 26
-  enumerator :: OP_ACOS = 27
-  enumerator :: OP_ATAN = 28
-  enumerator :: OP_SINH = 29
-  enumerator :: OP_COSH = 30
-  enumerator :: OP_TANH = 31
-  enumerator :: OP_ASINH = 32
-  enumerator :: OP_ACOSH = 33
-  enumerator :: OP_ATANH = 34
-  enumerator :: OP_ERF = 35
-  enumerator :: OP_ERFC = 36
-  enumerator :: OP_ERFC_SCALED = 37
-  enumerator :: OP_GAMMA = 38
-  enumerator :: OP_LOG_GAMMA = 39
-  enumerator :: OP_BESSEL_J0 = 40
-  enumerator :: OP_BESSEL_J1 = 41
-  enumerator :: OP_BESSEL_Y0 = 42
-  enumerator :: OP_BESSEL_Y1 = 43
-  enumerator :: OP_DIM = 44
-  enumerator :: OP_SIGN = 45
-  enumerator :: OP_MOD = 46
-  enumerator :: OP_MODULO = 47
-  enumerator :: OP_ATAN2 = 48
-  enumerator :: OP_HYPOT = 49
-end enum
-integer, parameter :: operation_kind = kind(OP_INVALID)
 
 enum, bind(c)
   !! Preserve the current NetCDF status values without importing the C binding.
@@ -212,7 +148,7 @@ type :: storage_type
   !! supplied.
 end type storage_type
 
-type, abstract :: abstract_variable_type
+type, abstract, private :: abstract_variable_type
   !! Shared metadata and owned storage for variables and coordinate mappings.
   character(len=:), allocatable :: name
   integer(data_type) :: dtype = NAT_TYPE
@@ -244,47 +180,6 @@ contains
   procedure, private :: write_frmt_var
   generic, public :: write(formatted) => write_frmt_var
 end type variable_type
-
-type :: expression_type
-  !! Owned deferred operation tree with borrowed typed data and metadata views.
-  !! Children are copied with the tree; flat values follow Fortran array order.
-  !! Operand data and metadata storage are borrowed rather than copied.
-  !! Numeric values may change before evaluation. Borrowed allocations must
-  !! remain alive, and operand metadata must stay unchanged while in use.
-  private
-  integer(operation_kind) :: operation = OP_INVALID
-  !! Arithmetic, intrinsic, scalar, or leaf tag; OP_INVALID marks an empty tree.
-  integer :: scratch_count = 0
-  !! Live scratch blocks needed per logical lane, excluding the output block.
-  integer(int64) :: exp_int = 1_int64
-  !! Stored integer scalar or scalar exponent, interpreted using operation.
-  real(real64) :: exp_real = 1.0_real64
-  !! Stored real scalar or scalar exponent, converted to the evaluation kind.
-  integer(data_type) :: dtype = NAT_TYPE
-  !! Original leaf NetCDF type captured when its views are bound.
-  integer(int64) :: len = 0_int64
-  !! Leaf element count; zero for empty leaves and unused on operator nodes.
-  type(dimension_type), pointer :: dims(:) => null()
-  !! Borrowed leaf dimensions in Fortran order; the owner retains storage.
-  type(coordinate_type), pointer :: coords(:) => null()
-  !! Borrowed ordered leaf coordinates; null when no mappings are present.
-  type(error_type) :: leaf_error
-  !! Structural binding failure deferred to evaluate instead of the builder.
-  integer(int8), contiguous, pointer :: values_int8(:) => null()
-  !! Borrowed flat int8 view; null unless this is a nonempty int8 leaf.
-  integer(int16), contiguous, pointer :: values_int16(:) => null()
-  !! Borrowed flat int16 view; null unless this is a nonempty int16 leaf.
-  integer(int32), contiguous, pointer :: values_int32(:) => null()
-  !! Borrowed flat int32 view; null unless this is a nonempty int32 leaf.
-  integer(int64), contiguous, pointer :: values_int64(:) => null()
-  !! Borrowed flat int64 view; null unless this is a nonempty int64 leaf.
-  real(real32), contiguous, pointer :: values_real32(:) => null()
-  !! Borrowed flat real32 view; null unless this is a nonempty real32 leaf.
-  real(real64), contiguous, pointer :: values_real64(:) => null()
-  !! Borrowed flat real64 view; null unless this is a nonempty real64 leaf.
-  type(expression_type), allocatable :: left, right
-  !! Owned child nodes: left for unary/power operations, both for binary ones.
-end type expression_type
 
 type :: group_type
   !! NetCDF group metadata.
@@ -318,8 +213,6 @@ end type netcdf_type
 include "nc4f_data_attribute_constructor.inc"
 include "nc4f_data_variable_constructor.inc"
 include "nc4f_data_extract.inc"
-include "nc4f_data_arithmetic.inc"
-include "nc4f_data_intrinsic.inc"
 
 interface rename_dimension
   module procedure :: rename_dim_dim, rename_dim_var, rename_dim_grp
@@ -340,10 +233,6 @@ end interface rename_group
 interface rename_variable
   module procedure :: rename_var_var, rename_var_grp
 end interface rename_variable
-
-interface assignment(=)
-  module procedure :: assign_expr
-end interface assignment(=)
 
 interface operator(.exists.)
   module procedure :: has_err
@@ -389,10 +278,6 @@ end interface nameof
 interface typeof
   module procedure :: typeof_att, typeof_var
 end interface typeof
-
-interface sum
-  module procedure :: sum_vars
-end interface sum
 
 interface initialize
   module procedure :: init_att
@@ -508,39 +393,6 @@ interface
 end interface
 
 interface
-  pure module subroutine init_expr_workspace(expr)
-    !! Plan buffer reuse from the number of simultaneously live intermediates.
-    type(expression_type), intent(inout) :: expr
-    !! Node with populated children; updates its cached scratch_count.
-  end subroutine init_expr_workspace
-
-  module subroutine init_expr_leaf(var, expr)
-    !! Bind typed values and metadata once, retaining validation for evaluate.
-    type(variable_type), target, intent(in) :: var
-    !! Source operand whose data and metadata allocations remain borrowed.
-    type(expression_type), intent(out) :: expr
-    !! New leaf containing typed views or a deferred structural binding error.
-  end subroutine init_expr_leaf
-
-  module subroutine evaluate(expr, result, err)
-    !! Validate and evaluate a deferred expression into a variable.
-    type(expression_type), intent(in) :: expr
-    !! Expression tree whose operand values are read during evaluation.
-    type(variable_type), target, intent(inout) :: result
-    !! Destination replaced only after a successful evaluation.
-    type(error_type), intent(out), optional :: err
-    !! Receives structural failures; numerical exceptions follow Fortran.
-    !! When omitted, structural failures terminate execution.
-  end subroutine evaluate
-
-  module subroutine assign_expr(result, expr)
-    !! Evaluate an expression through defined assignment.
-    type(variable_type), target, intent(inout) :: result
-    !! Destination variable for the evaluated values.
-    type(expression_type), intent(in) :: expr
-    !! Deferred expression to assign.
-  end subroutine assign_expr
-
   pure module function nameof_att(att) result(name)
     !! Return the local name of an attribute, or an empty string if absent.
     type(attribute_type), intent(in) :: att
@@ -1242,14 +1094,6 @@ interface
     integer, allocatable :: extents(:)
     !! Result produced by this operation.
   end function get_shape
-
-  module function sum_vars(vars) result(total)
-    !! Return the element-wise sum of compatible variables in `vars`.
-    type(variable_type), intent(in) :: vars(:)
-    !! Variables to process or add to the dataset.
-    type(variable_type) :: total
-    !! Result produced by this operation.
-  end function sum_vars
 
   pure module subroutine compute_buffer_size(dtype, len, nbytes, err)
     !! Return a byte count or an error without terminating execution.

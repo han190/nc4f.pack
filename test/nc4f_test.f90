@@ -18,12 +18,9 @@ use, non_intrinsic :: nc4f_test_data, only: &
   & collect_data_attribute, &
   & collect_data_variable_constructor, &
   & collect_data_extract, &
-  & collect_data_expression, &
   & collect_data_coordinate, &
-  & collect_data_intrinsic, &
   & collect_data_variable, &
   & collect_data_group, &
-  & collect_data_arithmetic, &
   & collect_data_clone, &
   & collect_data_io, &
   & collect_data_validate
@@ -63,14 +60,9 @@ suites = [ &
   & new_testsuite("data_variable_constructor", &
   & collect_data_variable_constructor), &
   & new_testsuite("data_extract", collect_data_extract), &
-  & new_testsuite("data_expression", collect_data_expression), &
   & new_testsuite("data_coordinate", collect_data_coordinate), &
-  & new_testsuite("data_intrinsic", &
-  & collect_data_intrinsic), &
   & new_testsuite("data_variable", collect_data_variable), &
   & new_testsuite("data_group", collect_data_group), &
-  & new_testsuite("data_arithmetic", &
-  & collect_data_arithmetic), &
   & new_testsuite("data_clone", collect_data_clone), &
   & new_testsuite("data_io", collect_data_io), &
   & new_testsuite("data_validate", collect_data_validate), &

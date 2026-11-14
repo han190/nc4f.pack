@@ -62,10 +62,7 @@ NC4F provides a small in-memory data model and experiments with an
 - Set NetCDF-4 chunking, compression, checksums, byte order, and fill values
   through `SET_STORAGE`;
 - Rename attributes, dimensions, variables, and groups, and delete attributes
-  in memory or explicitly in an open file;
-- Build deferred elementwise expressions from variables, numeric scalars,
-  arithmetic operators, and supported mathematical intrinsics. Assignment or
-  `EVALUATE` computes the result after checking types and ordered dimensions.
+  in memory or explicitly in an open file.
 
 ## What NC4F Cannot Do
 
@@ -89,13 +86,14 @@ The high-level I/O interface does not currently support:
 
 ### In-memory data model
 
-The data model and expression evaluator do not currently support:
+The in-memory model does not currently provide built-in arithmetic,
+mathematical expressions, automatic coordinate alignment, dimension
+reordering, or unit conversion. Use `EXTRACT` to access typed Fortran arrays
+for calculations, then `DATARRAY` to construct a result variable. File-backed
+or distributed calculations are also not available.
 
-- Automatic coordinate alignment, dimension reordering, or unit conversion
-  and propagation. Array operands must have matching types and dimensions in
-  the same order; numeric scalars can be broadcast;
-- Lazy file-backed or distributed calculations. Expressions defer computation
-  until assignment or `EVALUATE`, which materializes an in-memory result.
+The former expression implementation, tests, benchmark, and example are
+preserved in `backup/expression/` for future investigation.
 
 See [ROADMAP.md](ROADMAP.md) for planned extensions.
 

@@ -36,11 +36,10 @@ use, non_intrinsic :: nc4f
 
 ## Build from Make with fypp
 
-The Make build regenerates constructors, extraction routines, arithmetic and
-intrinsic expression builders, expression evaluators, and coordinate accessors
-from the `fypp/` templates. Install [fypp](https://fypp.readthedocs.io/en/stable/fypp.html)
-before building when you intend to edit
-or regenerate those templates.
+The Make build regenerates constructors, extraction routines, and coordinate
+accessors from the `fypp/` templates. Install
+[fypp](https://fypp.readthedocs.io/en/stable/fypp.html) before building when
+you intend to edit or regenerate those templates.
 
 ```sh
 git clone https://github.com/han190/nc4f.pack.git
@@ -51,8 +50,7 @@ make test
 ```
 
 Use `make preprocess` to regenerate sources without compiling. Edit
-`fypp/nc4f_data_expression.fypp` for expression evaluation and
-`fypp/nc4f_data_coordinate.fypp` for coordinate access; their generated
+`fypp/nc4f_data_coordinate.fypp` for coordinate access; its generated
 `src/*.f90` files are tracked alongside the templates. Public
 coordinate interface declarations remain in `src/nc4f_data.f90`.
 

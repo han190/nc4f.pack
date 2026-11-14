@@ -26,7 +26,6 @@ module subroutine collect_real_data(tests)
     & exitstat=status)
   if (status /= 0) error stop "Cannot create test-results directory."
   tests = [ &
-    & new_unittest("sum_vars_test", test_sum_vars_test), &
     & new_unittest("sfc_pres_temp_wr", test_sfc_pres_temp_wr), &
     & new_unittest("sfc_pres_temp_rd", test_sfc_pres_temp_rd), &
     & new_unittest("extensive_wr", test_extensive_wr), &
@@ -41,13 +40,6 @@ module subroutine collect_real_data(tests)
     & ]
 end subroutine collect_real_data
 
-subroutine test_sum_vars_test(error)
-  type(test_error_type), allocatable, intent(out) :: error
-  logical :: passed
-
-  call sum_vars_test(passed)
-  call check(error, passed, "sum_vars_test failed")
-end subroutine test_sum_vars_test
 
 subroutine test_sfc_pres_temp_wr(error)
   type(test_error_type), allocatable, intent(out) :: error
@@ -143,30 +135,6 @@ subroutine test_echam_spectral_read(error)
   call check(error, passed, "echam_spectral_read failed")
 end subroutine test_echam_spectral_read
 
-
-subroutine sum_vars_test(passed)
-  !! Verify element-wise summation of compatible variable objects.
-  logical, intent(inout) :: passed
-  !! Whether the test case has passed.
-  real(real64), parameter :: a(2, 3) = reshape([ &
-    & 1.0_real64, 2.0_real64, 3.0_real64, 4.0_real64, &
-    & 5.0_real64, 6.0_real64], [2, 3])
-  real(real64), parameter :: b(2, 3) = reshape([ &
-    & 10.0_real64, 20.0_real64, 30.0_real64, 40.0_real64, &
-    & 50.0_real64, 60.0_real64], [2, 3])
-  real(real64), parameter :: c(2, 3) = -a
-  real(real64), pointer :: actual(:, :)
-  type(variable_type) :: result, vars(3)
-
-  vars(1) = datarray("a", a, ["x".dim.2, "y".dim.3])
-  vars(2) = datarray("b", b, ["x".dim.2, "y".dim.3])
-  vars(3) = datarray("c", c, ["x".dim.2, "y".dim.3])
-  result = sum(vars)
-  call extract(result, actual)
-
-  passed = all(abs(actual - b) <= epsilon(b)) .and. &
-    & all(result%dims == vars(1)%dims)
-end subroutine sum_vars_test
 
 subroutine sfc_pres_temp_wr(passed)
   !! Write the surface pressure and temperature example with dimensions and

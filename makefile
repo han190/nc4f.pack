@@ -24,7 +24,6 @@ DS_TEST_SRC := $(wildcard $(TEST_DIR)/nc4f_test_data_*.f90)
 NC_TEST_SRC := $(wildcard $(TEST_DIR)/nc4f_test_netcdf_*.f90)
 CI_TEST_OBJS := $(addprefix $(BUILD_DIR)/,$(notdir $(CI_TEST_SRC:.f90=.o)))
 DS_TEST_OBJS := $(addprefix $(BUILD_DIR)/,$(notdir $(DS_TEST_SRC:.f90=.o))) \
-	$(BUILD_DIR)/nc4f_test_data_intrinsic.o \
 	$(BUILD_DIR)/nc4f_test_data_io.o
 NC_TEST_OBJS := $(addprefix $(BUILD_DIR)/,$(notdir $(NC_TEST_SRC:.f90=.o)))
 TEST_OBJS := $(BUILD_DIR)/nc4f_test_utility.o \
@@ -47,6 +46,10 @@ ifneq (,$(findstring gfortran,$(COMPILER_NAME)))
   COMPILER_FFLAGS := -fmax-errors=1 -fcoarray=single
   DEBUG_FFLAGS := -O0 -g -Wall -Wextra -fcheck=bounds -fcheck=array-temps -fbacktrace
   RELEASE_FFLAGS := -O3 -funroll-loops -Wimplicit-interface
+else ifneq (,$(findstring lfortran,$(COMPILER_NAME)))
+  COMPILER_FFLAGS := --cpp --realloc-lhs-arrays
+  DEBUG_FFLAGS := -O0
+  RELEASE_FFLAGS := -O3
 else ifneq (,$(findstring flang,$(COMPILER_NAME)))
   COMPILER_FFLAGS := -funroll-loops -fimplicit-none
   DEBUG_FFLAGS := -O0 -g
@@ -150,11 +153,6 @@ $(BUILD_DIR)/nc4f_test_data_%.o: \
 	$(TEST_DIR)/nc4f_test_data_%.f90 $(LIB) $(TEST_DRIVE_OBJ) | $(BUILD_DIR)
 	@$(FC) $(FFLAGS) $(MODULE_FLAGS) -c $< -o $@
 
-$(BUILD_DIR)/nc4f_test_data_intrinsic.o: \
-	$(TEST_DIR)/nc4f_test_data_intrinsics.F90 $(LIB) \
-	$(TEST_DRIVE_OBJ) | $(BUILD_DIR)
-	@$(FC) $(FFLAGS) $(MODULE_FLAGS) -c $< -o $@
-
 $(BUILD_DIR)/nc4f_test_data_io.o: \
 	$(TEST_DIR)/nc4f_test_data_ios.F90 $(LIB) \
 	$(TEST_DRIVE_OBJ) | $(BUILD_DIR)
@@ -187,12 +185,19 @@ $(BUILD_DIR)/%.o: %.f90
 
 # Object prerequisites enforce module/submodule order and propagate interface changes.
 $(BUILD_DIR)/nc4f_c_interface.o: $(C_INTERFACE_INC)
-$(BUILD_DIR)/nc4f_data.o: $(SRC_INC) \
-	$(SRC_DIR)/nc4f_data_intrinsic.inc
+$(BUILD_DIR)/nc4f_data.o: $(SRC_INC)
 $(filter $(BUILD_DIR)/nc4f_data_%.o,$(OBJ)): $(BUILD_DIR)/nc4f_data.o
 $(BUILD_DIR)/nc4f_netcdf.o: $(BUILD_DIR)/nc4f_data.o $(BUILD_DIR)/nc4f_c_interface.o
 $(filter $(BUILD_DIR)/nc4f_netcdf_%.o,$(OBJ)): $(BUILD_DIR)/nc4f_netcdf.o
 $(BUILD_DIR)/nc4f.o: $(BUILD_DIR)/nc4f_data.o $(BUILD_DIR)/nc4f_netcdf.o
+
+# LFortran 0.69 emits submodule procedure bodies when compiling a caller.
+# Its caller objects therefore need every implementation compiled first.
+ifneq (,$(findstring lfortran,$(COMPILER_NAME)))
+$(BUILD_DIR)/nc4f.o: $(filter $(BUILD_DIR)/nc4f_data_%.o \
+	$(BUILD_DIR)/nc4f_netcdf_%.o,$(OBJ))
+$(BUILD_DIR)/nc4f_test.o: $(filter-out $(BUILD_DIR)/nc4f_test.o,$(TEST_OBJS))
+endif
 
 # Explicit targets let vpath locate generated sources before they exist.
 $(SRC_INC): $(SRC_DIR)/%.inc: $(FYPP_DIR)/%_inc.fypp $(FYPP_DIR)/common.fypp

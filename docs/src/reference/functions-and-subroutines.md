@@ -5,32 +5,6 @@ This page documents the public procedures re-exported by `nc4f`. Optional
 follows the library's fail-fast policy. See [Exposed NC
 Constants](exposed-nc-constants.md) for constants used with `error_type`.
 
-## Unary Elementwise Intrinsics -- Build a Deferred Expression
-
-`abs`, `sqrt`, `exp`, `log`, `log10`, `sin`, `cos`, `tan`, `asin`, `acos`,
-`atan`, `sinh`, `cosh`, `tanh`, `asinh`, `acosh`, `atanh`, `erf`, `erfc`,
-`erfc_scaled`, `gamma`, `log_gamma`, `bessel_j0`, `bessel_j1`, `bessel_y0`,
-and `bessel_y1` accept a `variable_type` or `expression_type` and return
-an `expression_type`. The intrinsic scalar forms remain available. `abs`
-accepts the supported integer and real kinds; the others require `real32`
-or `real64`. Evaluated results keep the operand's type and ordered dimensions.
-Trigonometric arguments and inverse results use radians. Numerical domains
-and exceptions follow the Fortran intrinsic backend and compiler/runtime
-settings; they are not returned as NC4F errors by `evaluate`. Type, dimension,
-coordinate, and storage validation happens before numerical evaluation.
-
-```fortran
-type(variable_type), target :: theta
-type(variable_type) :: result
-real :: scale
-
-result = scale * cos(theta)
-```
-
-The expression borrows `theta`, so it must remain alive until evaluation.
-See [Arithmetic Operators](operators.md)
-for the shared expression lifetime and error rules.
-
 ## `ERROR_MSG` -- Format an Operation Result
 
 | Synopsis |
@@ -1092,46 +1066,6 @@ if (typeof(var) == NC_FLOAT) print '(a)', "floating-point variable"
 
     elements = size(var)
     print *, size(var), size(var, dim=1)
-    ```
-:::
-
-## `SUM` -- Add Compatible Variables
-
-| Synopsis |
-|:--|
-| <span class="ind3">`TOTAL = SUM(VARS)`</span> |
-
-| Class |
-|:--|
-| <span class="ind3">Function.</span> |
-
-| Description |
-|:--|
-| <span class="ind3">Return the element-wise sum of a rank-one array of compatible, materialized variables. The result uses the first variable's metadata.</span> |
-
-| Arguments |
-|:--|
-| <span class="grid"><span>`VARS`</span><span>`type(variable_type), DIMENSION(:), INTENT(in)`</span></span><br><span class="ind6">Compatible variables with materialized data.</span> |
-
-| Return |
-|:--|
-| <span class="grid"><span>`TOTAL`</span><span>`type(variable_type)`</span></span><br><span class="ind6">Element-wise sum with the first variable's metadata.</span> |
-
-:::{list-table}
-:class: example-table
-:header-rows: 1
-
-*
-  - Example
-*
-  -
-    ```fortran
-    use, non_intrinsic :: nc4f
-    implicit none (type, external)
-    
-    type(variable_type) :: pressure, base_pressure, total
-
-    total = sum([pressure, base_pressure])
     ```
 :::
 

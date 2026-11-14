@@ -25,7 +25,7 @@ NetCDF format support is excluded from this assessment.
 | Multi-slab I/O | Medium | Under consideration | Compose slab operations and define result ordering, shapes, and partial-failure behavior. |
 | Mapped I/O | Medium–high | Under consideration | Reconcile memory mappings with the contiguous buffer model; validate mappings and memory bounds. |
 | In-memory file images | Medium–high | Under consideration | Define ownership and lifetime rules for importing and exporting file byte buffers. |
-| Unsigned primitive types | Medium–high | Under consideration | Choose portable Fortran representations and extend constructors, extraction, arithmetic, and validation, including full-range unsigned 64-bit values. |
+| Unsigned primitive types | Medium–high | Under consideration | Choose portable Fortran representations and extend constructors, extraction, and validation, including full-range unsigned 64-bit values. |
 | NetCDF `STRING` | High | Under consideration | Add an owned string-array representation with C conversion, copying, and cleanup rules. |
 | User-defined types | High–very high | Under consideration | Add type descriptions and serialization; enum/opaque types are smaller starting points than compound and variable-length types. |
 | Parallel I/O | Very high | Under consideration | Add MPI interoperability, parallel-enabled dependencies, collective-operation rules, and multi-process tests. |
