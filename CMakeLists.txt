@@ -6,6 +6,7 @@ include(CMakePackageConfigHelpers)
 
 option(NC4F_BUILD_TESTS "Build the NC4F regression suite" ${PROJECT_IS_TOP_LEVEL})
 option(NC4F_BUILD_EXAMPLES "Build the NC4F examples" OFF)
+option(NC4F_BUILD_BENCHMARK "Build the netcdf-fortran I/O benchmark" OFF)
 option(NC4F_REGENERATE_SOURCES "Regenerate tracked Fortran sources with fypp" OFF)
 
 find_package(PkgConfig REQUIRED)
@@ -122,6 +123,13 @@ add_library(nc4f STATIC
   src/nc4f_netcdf_utility.f90
   src/nc4f_netcdf_variable.f90)
 add_library(nc4f::nc4f ALIAS nc4f)
+if(NC4F_BUILD_BENCHMARK)
+  pkg_check_modules(NC4F_NETCDFF REQUIRED IMPORTED_TARGET GLOBAL netcdf-fortran)
+  add_executable(nc4f_benchmark benchmark/benchmark.f90)
+  target_link_libraries(nc4f_benchmark PRIVATE nc4f::nc4f
+    PkgConfig::NC4F_NETCDFF)
+  nc4f_compile_options(nc4f_benchmark)
+endif()
 set_target_properties(nc4f PROPERTIES
   Fortran_MODULE_DIRECTORY "${nc4f_module_dir}"
   POSITION_INDEPENDENT_CODE ON)

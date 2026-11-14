@@ -97,6 +97,9 @@ preserved in `backup/expression/` for future investigation.
 
 See [ROADMAP.md](ROADMAP.md) for planned extensions.
 
+An optional [NetCDF I/O benchmark](benchmark/README.md) compares the same
+potential-temperature workflow through NC4F and netcdf-fortran.
+
 ## Build and Installation
 
 NC4F requires a modern Fortran compiler, the NetCDF C library,

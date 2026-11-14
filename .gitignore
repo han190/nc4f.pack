@@ -3,6 +3,7 @@ build/
 data/
 *.log
 *.txt
+benchmark/benchmark.svg
 !requirements-docs.txt
 !CMakeLists.txt
 site/

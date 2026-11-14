@@ -38,6 +38,9 @@ EXAMPLE_BUILD_DIR := $(BUILD_DIR)/examples
 EXAMPLE_NAMES := write_netcdf read_netcdf $(filter-out write_netcdf read_netcdf,\
   $(basename $(notdir $(wildcard $(EXAMPLE_DIR)/*.f90))))
 EXAMPLE_TARGETS := $(addprefix $(EXAMPLE_BUILD_DIR)/,$(EXAMPLE_NAMES))
+BENCHMARK_TARGET := $(BUILD_DIR)/benchmark
+NF_FFLAGS = $(shell pkg-config --cflags netcdf-fortran)
+NF_LIBS = $(shell pkg-config --libs netcdf-fortran)
 NC_CFLAGS := $(shell pkg-config --cflags netcdf)
 NC_LIBS := $(shell pkg-config --libs netcdf)
 MODULE_OUTPUT_FLAG := -J$(BUILD_DIR)
@@ -82,7 +85,7 @@ SRC := $(sort $(wildcard $(SRC_DIR)/*.f90) $(SRC_F90))
 OBJ := $(addprefix $(BUILD_DIR)/,$(notdir $(SRC:.f90=.o)))
 vpath %.f90 $(SRC_DIR) $(TEST_DIR)
 
-.PHONY: all build library c-interface examples preprocess download-test-data test clean
+.PHONY: all build library c-interface examples benchmark preprocess download-test-data test clean
 all library: $(LIB)
 build: $(OBJ)
 # The archive and nc4f_c_interface.mod are emitted into BUILD_DIR.
@@ -94,6 +97,7 @@ examples: $(EXAMPLE_TARGETS)
 	  printf "[example] run example: %s\n" "$$example"; \
 	  ./$$example; \
 	done
+benchmark: $(BENCHMARK_TARGET)
 preprocess: $(SRC_INC) $(SRC_F90)
 download-test-data:
 	@./scripts/download_test_data.sh
@@ -113,6 +117,10 @@ $(C_INTERFACE_LIB): $(C_INTERFACE_OBJ)
 $(EXAMPLE_BUILD_DIR)/%: $(EXAMPLE_DIR)/%.f90 $(LIB) makefile | $(EXAMPLE_BUILD_DIR)
 	@printf "[link] create example: $@\n"
 	@$(FC) $(FFLAGS) $(MODULE_FLAGS) $(LDFLAGS) -o $@ $< $(LIB) $(NC_LIBS) $(LDLIBS)
+
+$(BENCHMARK_TARGET): benchmark/benchmark.f90 $(LIB) makefile
+	@$(FC) $(FFLAGS) $(MODULE_FLAGS) $(NF_FFLAGS) $(LDFLAGS) \
+		-o $@ $< $(LIB) $(NF_LIBS) $(NC_LIBS) $(LDLIBS)
 
 $(TEST_DRIVE_SRC):
 	@mkdir -p $(BUILD_DIR)
