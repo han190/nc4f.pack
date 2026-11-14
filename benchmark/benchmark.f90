@@ -148,7 +148,8 @@ contains
     integer :: id_tmp, id_pre, id_theta
     real(real32), allocatable, target :: t_data(:,:), p_data(:,:)
     real(real32), allocatable, target :: theta_data(:,:)
-    real(real32), allocatable :: lon_read(:,:), lat_read(:,:)
+    real(real32), allocatable :: lon_tmp(:,:), lat_tmp(:,:)
+    real(real32), allocatable :: lon_pre(:,:), lat_pre(:,:)
     real(real32), pointer :: t(:,:), p(:,:), theta(:,:)
 
     m = n
@@ -185,18 +186,23 @@ contains
 
     call system_clock(tick0)
     allocate (t_data(m,n), p_data(m,n), &
-      & lon_read(m,n), lat_read(m,n))
+      & lon_tmp(m,n), lat_tmp(m,n), &
+      & lon_pre(m,n), lat_pre(m,n))
     call check(nf90_open(nf90_file, nf90_nowrite, ncid))
     call check(nf90_inq_dimid(ncid, "west_east", dim_west))
     call check(nf90_inq_dimid(ncid, "south_north", dim_south))
     call check(nf90_inq_varid(ncid, "temperature", id_tmp))
-    call check(nf90_inq_varid(ncid, "pressure", id_pre))
     call check(nf90_inq_varid(ncid, "lon", id_lon))
     call check(nf90_inq_varid(ncid, "lat", id_lat))
     call check(nf90_get_var(ncid, id_tmp, t_data))
+    call check(nf90_get_var(ncid, id_lon, lon_tmp))
+    call check(nf90_get_var(ncid, id_lat, lat_tmp))
+    call check(nf90_inq_varid(ncid, "pressure", id_pre))
+    call check(nf90_inq_varid(ncid, "lon", id_lon))
+    call check(nf90_inq_varid(ncid, "lat", id_lat))
     call check(nf90_get_var(ncid, id_pre, p_data))
-    call check(nf90_get_var(ncid, id_lon, lon_read))
-    call check(nf90_get_var(ncid, id_lat, lat_read))
+    call check(nf90_get_var(ncid, id_lon, lon_pre))
+    call check(nf90_get_var(ncid, id_lat, lat_pre))
     call check(nf90_close(ncid))
     t => t_data
     p => p_data
