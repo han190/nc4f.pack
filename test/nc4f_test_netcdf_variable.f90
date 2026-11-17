@@ -165,6 +165,71 @@ subroutine test_extract_values(error)
     call check(error, err%code == NC_EINVAL, &
       & "Wrong-rank extraction was accepted")
   end if
+  if (.not. allocated(error)) then
+    call extract(nc, "values", values, err, start=[1, 2, 1], &
+      & count=[2, 1, 2], stride=[1, 1, 2])
+    call check(error, err%code == NC_NOERR, "Strided extraction failed")
+  end if
+  if (.not. allocated(error)) then
+    call check(error, all(shape(values) == [2, 1, 2]), "Wrong hyperslab shape")
+  end if
+  if (.not. allocated(error)) then
+    call check(error, all(values == expected(:, 2:2, 1:4:2)), "Wrong hyperslab values")
+  end if
+  if (.not. allocated(error)) then
+    call extract(nc, "values", converted, start=[2, 2, 3], err=err)
+    call check(error, err%code == NC_NOERR, "Start-only extraction failed")
+  end if
+  if (.not. allocated(error)) then
+    call check(error, all(shape(converted) == [1, 2, 2]), "Wrong start-only shape")
+  end if
+  if (.not. allocated(error)) then
+    call check(error, all(converted == real(expected(2:2, 2:3, 3:4), real32)), &
+      & "Wrong start-only values")
+  end if
+  if (.not. allocated(error)) then
+    call extract(nc, "values", values, err, start=[1, 1, 2], count=[2, 3, 2])
+    call check(error, err%code == NC_NOERR, "Contiguous hyperslab failed")
+  end if
+  if (.not. allocated(error)) then
+    call check(error, all(shape(values) == [2, 3, 2]), "Wrong contiguous shape")
+  end if
+  if (.not. allocated(error)) then
+    call check(error, all(values == expected(:, :, 2:3)), "Wrong contiguous values")
+  end if
+  do i = 1, 10
+    if (allocated(error)) exit
+    select case (i)
+    case (1)
+      call extract(nc, "values", values, err, count=[1, 1, 1])
+    case (2)
+      call extract(nc, "values", values, err, stride=[1, 1, 1])
+    case (3)
+      call extract(nc, "values", values, err, start=[1, 1])
+    case (4)
+      call extract(nc, "values", values, err, start=[1, 1, 1], count=[1, 1])
+    case (5)
+      call extract(nc, "values", values, err, start=[1, 1, 1], &
+        & count=[1, 1, 1], stride=[1, 1])
+    case (6)
+      call extract(nc, "values", values, err, start=[0, 1, 1])
+    case (7)
+      call extract(nc, "values", values, err, start=[1, 1, 1], count=[0, 1, 1])
+    case (8)
+      call extract(nc, "values", values, err, start=[1, 1, 1], &
+        & count=[1, 1, 1], stride=[1, -1, 1])
+    case (9)
+      call extract(nc, "values", values, err, start=[3, 1, 1])
+    case (10)
+      call extract(nc, "values", values, err, start=[1, 1, 1], &
+        & count=[2, 1, 1], stride=[huge(1), 1, 1])
+    end select
+    call check(error, err%code /= NC_NOERR, "Invalid hyperslab was accepted")
+    if (allocated(error)) exit
+    call check(error, allocated(values), "Invalid hyperslab deallocated output")
+    if (allocated(error)) exit
+    call check(error, all(values == expected(:, :, 2:3)), "Invalid hyperslab changed output")
+  end do
   call close_temp(error, nc)
 end subroutine test_extract_values
 

@@ -189,7 +189,7 @@ if (.exists. err) print '(a)', error_msg(err)
     ```
 :::
 
-## `EXTRACT` -- Access Model Data
+## `EXTRACT` -- Access Model Data or Read File Values
 
 | Synopsis |
 |:--|
@@ -231,6 +231,56 @@ if (.exists. err) print '(a)', error_msg(err)
     var = datarray("temperature", source, [point])
     call extract(var, values)
     values = values + 273.15
+    ```
+:::
+
+### Direct file reads
+
+| Synopsis |
+|:--|
+| <span class="ind3">`CALL EXTRACT(NC, NAME, VALUES[, ERR, START, COUNT, STRIDE])`</span> |
+
+| Class |
+|:--|
+| <span class="ind3">Generic subroutine.</span> |
+
+| Description |
+|:--|
+| <span class="ind3">Read stored numeric values directly from an open NetCDF dataset or group into an allocatable array of rank one through fifteen. The output rank must match the file variable. NetCDF-C converts numeric values to the requested kind; NC4F does not apply packing attributes such as `scale_factor`. A matching output allocation is reused, and a different shape is resized. Empty reads and inquiry errors leave the output unchanged; a failed value read deallocates it. Failures stop execution when `ERR` is omitted.</span> |
+
+| Arguments |
+|:--|
+| <span class="grid"><span>`NC`</span><span>`class(group_type), INTENT(in)`</span></span><br><span class="ind6">Open dataset or group containing the variable.</span> |
+| <span class="grid"><span>`NAME`</span><span>`character(len=*), INTENT(in)`</span></span><br><span class="ind6">Variable name.</span> |
+| <span class="grid"><span>`VALUES`</span><span>`TYPE(INTEGER(INT8, INT16, INT32, INT64), REAL(REAL32, REAL64)), ALLOCATABLE, TARGET, RANK(1:15), INTENT(inout)`</span></span><br><span class="ind6">Array receiving the stored values in Fortran dimension order.</span> |
+| <span class="grid"><span>`ERR`</span><span>`type(error_type), OPTIONAL, INTENT(out)`</span></span><br><span class="ind6">Receives an inquiry, selection, or read error.</span> |
+| <span class="grid"><span>`START`</span><span>`integer, DIMENSION(:), OPTIONAL, INTENT(in)`</span></span><br><span class="ind6">One-based starting indices in Fortran dimension order. Alone, reads to the end of every dimension.</span> |
+| <span class="grid"><span>`COUNT`</span><span>`integer, DIMENSION(:), OPTIONAL, INTENT(in)`</span></span><br><span class="ind6">Selected lengths in Fortran order; requires `START`.</span> |
+| <span class="grid"><span>`STRIDE`</span><span>`integer, DIMENSION(:), OPTIONAL, INTENT(in)`</span></span><br><span class="ind6">Positive spacing in Fortran order; requires `START` and `COUNT`. Defaults to ones.</span> |
+
+Selections must fit the variable dimensions. Omitting `START`, `COUNT`, and
+`STRIDE` reads the whole variable. `ERR` remains the fourth positional argument.
+
+:::{list-table}
+:class: example-table
+:header-rows: 1
+
+*
+  - Example
+*
+  -
+    ```fortran
+    use, intrinsic :: iso_fortran_env, only: real32
+    use, non_intrinsic :: nc4f
+    implicit none (type, external)
+
+    type(netcdf_type) :: nc
+    real(real32), allocatable :: values(:,:)
+
+    nc = open_netcdf("temperature.nc")
+    call extract(nc, "temperature", values, start=[1, 1], &
+      & count=[10, 20], stride=[2, 1])
+    call close_netcdf(nc)
     ```
 :::
 

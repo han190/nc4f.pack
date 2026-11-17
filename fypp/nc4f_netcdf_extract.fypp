@@ -1,15 +1,16 @@
 #: include 'common.fypp'
 #: set chunks = lambda xs, n: [xs[i:i+n] for i in range(0, len(xs), n)]
 #: set wrap = lambda x,n: ', &\n    & '.join(', '.join(y) for y in chunks(x,n))
-#: set dims = lambda R: wrap([':'] * R, 5)
 #: set cs = lambda r: wrap([f'counts({i})' for i in range(r,0,-1)],4)
 #: set ones = lambda R: wrap(['1'] * R, 8)
 submodule(nc4f_netcdf) nc4f_netcdf_extract
 implicit none (type, external)
 contains
 
-subroutine prepare_extract_(nc, name, expected_rank, varid, counts, err)
-  !! Resolve a variable and its C-order shape without loading its metadata.
+subroutine prepare_extract_(nc, name, expected_rank, varid, &
+  & starts, counts, strides, err, start, count, stride)
+  !! Resolve a variable and an optional hyperslab without loading attributes,
+  !! storage settings, or values. Return selection vectors in NetCDF-C order.
   class(group_type), intent(in) :: nc
   !! Open dataset or group containing the variable.
   character(len=*), intent(in) :: name
@@ -17,14 +18,25 @@ subroutine prepare_extract_(nc, name, expected_rank, varid, counts, err)
   integer, intent(in) :: expected_rank
   !! Rank required by the selected extraction procedure.
   integer(c_int), intent(out) :: varid
-  !! NetCDF-C variable identifier.
+  !! Variable identifier used by the typed NetCDF-C reader.
+  integer(c_size_t), intent(out) :: starts(:)
+  !! Zero-based selection starts in NetCDF-C dimension order.
   integer(c_size_t), intent(out) :: counts(:)
-  !! Dimension lengths in NetCDF-C order.
+  !! Selected element counts in NetCDF-C dimension order; zeroed on failure.
+  integer(c_ptrdiff_t), intent(out) :: strides(:)
+  !! Positive selection strides in NetCDF-C dimension order.
   type(error_type), intent(out) :: err
-  !! Inquiry or rank error.
+  !! Inquiry or invalid selection error.
+  integer, intent(in), optional :: start(:)
+  !! One-based starting indices in Fortran dimension order.
+  integer, intent(in), optional :: count(:)
+  !! Selected lengths in Fortran order; requires start.
+  integer, intent(in), optional :: stride(:)
+  !! Positive spacing in Fortran order; requires start and count.
   integer(c_int), allocatable :: dimids(:)
   integer(c_int) :: rank, stat
-  integer :: i
+  integer :: i, j
+  integer(c_size_t) :: first, step, length
 
   counts = 0_c_size_t
   err = error_type()
@@ -48,29 +60,108 @@ subroutine prepare_extract_(nc, name, expected_rank, varid, counts, err)
     err = netcdf_err(stat, "extract", name)
     if (has_err(err)) return
   end do
+  starts = 0_c_size_t
+  strides = 1_c_ptrdiff_t
+  if (present(count) .and. .not. present(start) .or. present(stride) .and. ( &
+    & .not. present(start) .or. .not. present(count))) then
+    err = error_type(NC_EINVAL, "extract", &
+      & "count requires start; stride requires start and count.")
+    return
+  end if
+  if (present(start)) then
+    if (size(start) /= rank) then
+      err = error_type(NC_EINVAL, "extract", &
+        & "start must have one entry per dimension.")
+      return
+    end if
+  end if
+  if (present(count)) then
+    if (size(count) /= rank) then
+      err = error_type(NC_EINVAL, "extract", &
+        & "count must have one entry per dimension.")
+      return
+    end if
+  end if
+  if (present(stride)) then
+    if (size(stride) /= rank) then
+      err = error_type(NC_EINVAL, "extract", &
+        & "stride must have one entry per dimension.")
+      return
+    end if
+  end if
+  if (.not. present(start)) return
+  do i = 1, rank
+    j = rank - i + 1
+    if (start(j) < 1) then
+      err = error_type(NC_EINVALCOORDS, "extract", &
+        & "start indices must be positive.")
+      return
+    end if
+    first = int(start(j), c_size_t)
+    step = 1_c_size_t
+    if (present(stride)) then
+      if (stride(j) < 1) then
+        err = error_type(NC_EINVAL, "extract", &
+          & "stride entries must be positive.")
+        return
+      end if
+      step = int(stride(j), c_size_t)
+    end if
+    if (first > counts(i)) then
+      err = error_type(NC_EEDGE, "extract", &
+        & "Requested hyperslab exceeds a dimension bound.")
+      return
+    end if
+    length = counts(i) - first + 1_c_size_t
+    if (present(count)) then
+      if (count(j) < 1) then
+        err = error_type(NC_EINVAL, "extract", &
+          & "count entries must be positive.")
+        return
+      end if
+      length = int(count(j), c_size_t)
+    end if
+    if (length - 1_c_size_t > (counts(i) - first) / step) then
+      err = error_type(NC_EEDGE, "extract", &
+        & "Requested hyperslab exceeds a dimension bound.")
+      return
+    end if
+    starts(i) = first - 1_c_size_t
+    counts(i) = length
+    strides(i) = int(step, c_ptrdiff_t)
+  end do
 end subroutine prepare_extract_
 
 #: set getters = ['schar', 'short', 'int', 'longlong', 'float', 'double']
 #: for T, K, GETTER in zip(types, kinds, getters)
 #: for R in range(1, MAX_RANK+1)
-module subroutine extract_val_${K}$_${R}$d(nc, name, val, err)
-  !! Read stored variable values directly into a ${K}$ rank-${R}$ array.
+module subroutine extract_val_${K}$_${R}$d(nc, name, val, err, &
+  & start, count, stride)
+  !! Read stored values into a ${K}$ rank-${R}$ array without a variable_type.
+  !! NetCDF-C converts numeric types; packing attributes are not applied.
   class(group_type), intent(in) :: nc
   !! Open dataset or group containing the variable.
   character(len=*), intent(in) :: name
   !! Name of the variable to read.
   ${T}$(${K}$), allocatable, target, intent(inout) :: &
-    & val(${dims(R)}$)
-  !! Reused when its shape matches; allocated or resized otherwise.
-  !! Empty variables leave the output unchanged.
-  !! Inquiry errors preserve it; read errors deallocate it.
+    & val(${COLONS(R)}$)
+  !! Output reused when its shape matches or resized otherwise. Empty reads
+  !! and inquiry errors preserve it; a failed value read deallocates it.
   type(error_type), intent(out), optional :: err
   !! Optional error result; failures stop execution when omitted.
+  integer, intent(in), optional :: start(:)
+  !! One-based starting indices in Fortran order; alone reads to the end.
+  integer, intent(in), optional :: count(:)
+  !! Selected lengths in Fortran order; requires start.
+  integer, intent(in), optional :: stride(:)
+  !! Positive spacing in Fortran order; requires start and count.
   integer(c_int) :: varid, stat
   integer(c_size_t), target :: starts(${R}$), counts(${R}$)
+  integer(c_ptrdiff_t), target :: strides(${R}$)
   type(error_type) :: op_err
 
-  call prepare_extract_(nc, name, ${R}$, varid, counts, op_err)
+  call prepare_extract_(nc, name, ${R}$, varid, &
+    & starts, counts, strides, op_err, start, count, stride)
   if (has_err(op_err) .or. any(counts == 0_c_size_t)) then
     call return_err(op_err, err)
     return
@@ -81,9 +172,8 @@ module subroutine extract_val_${K}$_${R}$d(nc, name, val, err)
     deallocate (val)
     allocate (val(${cs(R)}$))
   end if
-  starts = 0_c_size_t
-  stat = nc_get_vara_${GETTER}$(nc%id, varid, c_loc(starts(1)), &
-    & c_loc(counts(1)), c_loc(val(${ones(R)}$)))
+  stat = nc_get_vars_${GETTER}$(nc%id, varid, c_loc(starts(1)), &
+    & c_loc(counts(1)), c_loc(strides(1)), c_loc(val(${ones(R)}$)))
   op_err = netcdf_err(stat, "extract", name)
   if (has_err(op_err)) deallocate (val)
   call return_err(op_err, err)
