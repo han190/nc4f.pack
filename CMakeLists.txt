@@ -56,12 +56,14 @@ set(nc4f_generated_names
   nc4f_data_attribute_constructor
   nc4f_data_variable_constructor
   nc4f_data_coordinate_constructor
-  nc4f_data_extract)
+  nc4f_data_extract
+  nc4f_netcdf_extract)
 set(nc4f_generated_f90_only_names
   nc4f_data_coordinate)
 list(APPEND nc4f_generated_names ${nc4f_generated_f90_only_names})
 set(nc4f_data_dir "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(nc4f_data_module "${nc4f_data_dir}/nc4f_data.f90")
+set(nc4f_netcdf_module "${nc4f_data_dir}/nc4f_netcdf.f90")
 set(nc4f_generated_sources)
 
 if(NC4F_REGENERATE_SOURCES)
@@ -72,6 +74,8 @@ if(NC4F_REGENERATE_SOURCES)
   # so it includes the generated interfaces instead of the tracked copies.
   set(nc4f_data_module "${nc4f_generated_dir}/nc4f_data.f90")
   configure_file("${nc4f_data_dir}/nc4f_data.f90" "${nc4f_data_module}" COPYONLY)
+  set(nc4f_netcdf_module "${nc4f_generated_dir}/nc4f_netcdf.f90")
+  configure_file("${nc4f_data_dir}/nc4f_netcdf.f90" "${nc4f_netcdf_module}" COPYONLY)
   foreach(name IN LISTS nc4f_generated_names)
     set(extensions f90)
     if(NOT name IN_LIST nc4f_generated_f90_only_names)
@@ -114,7 +118,7 @@ add_library(nc4f STATIC
   src/nc4f_data_utility.f90
   src/nc4f_data_validate.f90
   src/nc4f_data_variable.f90
-  src/nc4f_netcdf.f90
+  "${nc4f_netcdf_module}"
   src/nc4f_netcdf_attribute.f90
   src/nc4f_netcdf_dataset.f90
   src/nc4f_netcdf_dimension.f90

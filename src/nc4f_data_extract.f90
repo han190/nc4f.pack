@@ -11,7 +11,7 @@ module subroutine extract_coord_int8_1d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= BYTE_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -32,7 +32,7 @@ module subroutine extract_coord_int8_2d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= BYTE_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -55,7 +55,7 @@ module subroutine extract_coord_int8_3d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= BYTE_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -78,7 +78,7 @@ module subroutine extract_coord_int8_4d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= BYTE_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -101,7 +101,7 @@ module subroutine extract_coord_int8_5d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= BYTE_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -124,7 +124,7 @@ module subroutine extract_coord_int8_6d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= BYTE_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -147,7 +147,7 @@ module subroutine extract_coord_int8_7d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= BYTE_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -170,7 +170,7 @@ module subroutine extract_coord_int8_8d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= BYTE_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -193,7 +193,7 @@ module subroutine extract_coord_int8_9d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= BYTE_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -216,7 +216,7 @@ module subroutine extract_coord_int8_10d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= BYTE_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -239,7 +239,7 @@ module subroutine extract_coord_int8_11d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= BYTE_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -262,7 +262,7 @@ module subroutine extract_coord_int8_12d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= BYTE_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -285,7 +285,7 @@ module subroutine extract_coord_int8_13d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= BYTE_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -308,7 +308,7 @@ module subroutine extract_coord_int8_14d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= BYTE_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -331,7 +331,7 @@ module subroutine extract_coord_int8_15d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= BYTE_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -354,7 +354,7 @@ module subroutine extract_coord_int16_1d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= SHORT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -375,7 +375,7 @@ module subroutine extract_coord_int16_2d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= SHORT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -398,7 +398,7 @@ module subroutine extract_coord_int16_3d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= SHORT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -421,7 +421,7 @@ module subroutine extract_coord_int16_4d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= SHORT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -444,7 +444,7 @@ module subroutine extract_coord_int16_5d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= SHORT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -467,7 +467,7 @@ module subroutine extract_coord_int16_6d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= SHORT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -490,7 +490,7 @@ module subroutine extract_coord_int16_7d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= SHORT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -513,7 +513,7 @@ module subroutine extract_coord_int16_8d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= SHORT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -536,7 +536,7 @@ module subroutine extract_coord_int16_9d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= SHORT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -559,7 +559,7 @@ module subroutine extract_coord_int16_10d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= SHORT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -582,7 +582,7 @@ module subroutine extract_coord_int16_11d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= SHORT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -605,7 +605,7 @@ module subroutine extract_coord_int16_12d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= SHORT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -628,7 +628,7 @@ module subroutine extract_coord_int16_13d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= SHORT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -651,7 +651,7 @@ module subroutine extract_coord_int16_14d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= SHORT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -674,7 +674,7 @@ module subroutine extract_coord_int16_15d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= SHORT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -697,7 +697,7 @@ module subroutine extract_coord_int32_1d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= INT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -718,7 +718,7 @@ module subroutine extract_coord_int32_2d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= INT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -741,7 +741,7 @@ module subroutine extract_coord_int32_3d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= INT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -764,7 +764,7 @@ module subroutine extract_coord_int32_4d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= INT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -787,7 +787,7 @@ module subroutine extract_coord_int32_5d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= INT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -810,7 +810,7 @@ module subroutine extract_coord_int32_6d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= INT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -833,7 +833,7 @@ module subroutine extract_coord_int32_7d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= INT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -856,7 +856,7 @@ module subroutine extract_coord_int32_8d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= INT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -879,7 +879,7 @@ module subroutine extract_coord_int32_9d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= INT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -902,7 +902,7 @@ module subroutine extract_coord_int32_10d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= INT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -925,7 +925,7 @@ module subroutine extract_coord_int32_11d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= INT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -948,7 +948,7 @@ module subroutine extract_coord_int32_12d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= INT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -971,7 +971,7 @@ module subroutine extract_coord_int32_13d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= INT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -994,7 +994,7 @@ module subroutine extract_coord_int32_14d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= INT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1017,7 +1017,7 @@ module subroutine extract_coord_int32_15d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= INT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1040,7 +1040,7 @@ module subroutine extract_coord_int64_1d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= INT64_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1061,7 +1061,7 @@ module subroutine extract_coord_int64_2d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= INT64_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1084,7 +1084,7 @@ module subroutine extract_coord_int64_3d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= INT64_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1107,7 +1107,7 @@ module subroutine extract_coord_int64_4d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= INT64_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1130,7 +1130,7 @@ module subroutine extract_coord_int64_5d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= INT64_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1153,7 +1153,7 @@ module subroutine extract_coord_int64_6d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= INT64_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1176,7 +1176,7 @@ module subroutine extract_coord_int64_7d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= INT64_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1199,7 +1199,7 @@ module subroutine extract_coord_int64_8d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= INT64_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1222,7 +1222,7 @@ module subroutine extract_coord_int64_9d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= INT64_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1245,7 +1245,7 @@ module subroutine extract_coord_int64_10d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= INT64_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1268,7 +1268,7 @@ module subroutine extract_coord_int64_11d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= INT64_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1291,7 +1291,7 @@ module subroutine extract_coord_int64_12d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= INT64_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1314,7 +1314,7 @@ module subroutine extract_coord_int64_13d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= INT64_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1337,7 +1337,7 @@ module subroutine extract_coord_int64_14d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= INT64_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1360,7 +1360,7 @@ module subroutine extract_coord_int64_15d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= INT64_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1383,7 +1383,7 @@ module subroutine extract_coord_real32_1d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= FLOAT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1404,7 +1404,7 @@ module subroutine extract_coord_real32_2d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= FLOAT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1427,7 +1427,7 @@ module subroutine extract_coord_real32_3d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= FLOAT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1450,7 +1450,7 @@ module subroutine extract_coord_real32_4d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= FLOAT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1473,7 +1473,7 @@ module subroutine extract_coord_real32_5d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= FLOAT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1496,7 +1496,7 @@ module subroutine extract_coord_real32_6d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= FLOAT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1519,7 +1519,7 @@ module subroutine extract_coord_real32_7d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= FLOAT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1542,7 +1542,7 @@ module subroutine extract_coord_real32_8d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= FLOAT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1565,7 +1565,7 @@ module subroutine extract_coord_real32_9d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= FLOAT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1588,7 +1588,7 @@ module subroutine extract_coord_real32_10d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= FLOAT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1611,7 +1611,7 @@ module subroutine extract_coord_real32_11d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= FLOAT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1634,7 +1634,7 @@ module subroutine extract_coord_real32_12d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= FLOAT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1657,7 +1657,7 @@ module subroutine extract_coord_real32_13d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= FLOAT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1680,7 +1680,7 @@ module subroutine extract_coord_real32_14d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= FLOAT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1703,7 +1703,7 @@ module subroutine extract_coord_real32_15d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= FLOAT_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1726,7 +1726,7 @@ module subroutine extract_coord_real64_1d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= DOUBLE_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1747,7 +1747,7 @@ module subroutine extract_coord_real64_2d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= DOUBLE_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1770,7 +1770,7 @@ module subroutine extract_coord_real64_3d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= DOUBLE_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1793,7 +1793,7 @@ module subroutine extract_coord_real64_4d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= DOUBLE_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1816,7 +1816,7 @@ module subroutine extract_coord_real64_5d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= DOUBLE_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1839,7 +1839,7 @@ module subroutine extract_coord_real64_6d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= DOUBLE_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1862,7 +1862,7 @@ module subroutine extract_coord_real64_7d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= DOUBLE_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1885,7 +1885,7 @@ module subroutine extract_coord_real64_8d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= DOUBLE_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1908,7 +1908,7 @@ module subroutine extract_coord_real64_9d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= DOUBLE_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1931,7 +1931,7 @@ module subroutine extract_coord_real64_10d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= DOUBLE_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1954,7 +1954,7 @@ module subroutine extract_coord_real64_11d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= DOUBLE_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -1977,7 +1977,7 @@ module subroutine extract_coord_real64_12d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= DOUBLE_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -2000,7 +2000,7 @@ module subroutine extract_coord_real64_13d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= DOUBLE_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -2023,7 +2023,7 @@ module subroutine extract_coord_real64_14d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= DOUBLE_TYPE) error stop &
     & "[extract] Coordinate kind differs."
@@ -2046,7 +2046,7 @@ module subroutine extract_coord_real64_15d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= DOUBLE_TYPE) error stop &
     & "[extract] Coordinate kind differs."

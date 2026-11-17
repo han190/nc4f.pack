@@ -43,7 +43,7 @@ module function new_var_${K}$_${R}$d(name, values, dims, atts, &
     end if
   end if
   if (present(coords)) then
-    call validate_coordinate_for_var(coords, var, coord_err)
+    call validate(coords, var, coord_err)
     call return_err(coord_err)
     var%coords = coords
   end if
@@ -77,7 +77,7 @@ module function new_var_char_${R}$d(name, values, dims, atts, &
   call init_var_(var, name, CHAR_TYPE, size(values, kind=int64), dims, atts, deep=.true.)
   if (size(values) > 0) var%buffer = transfer(values, 0_int8, size(var%buffer))
   if (present(coords)) then
-    call validate_coordinate_for_var(coords, var, coord_err)
+    call validate(coords, var, coord_err)
     call return_err(coord_err)
     var%coords = coords
   end if

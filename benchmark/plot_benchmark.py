@@ -85,13 +85,14 @@ def main() -> None:
                 marker="o",
                 markerfacecolor="white",
                 markeredgecolor=color,
-                markeredgewidth=1.5,
+                markeredgewidth=2,
+                markersize=7,
                 linewidth=1.7,
                 label=label,
             )
         ax.set_title(title, loc='left')
         ax.set_xscale("log", base=2)
-        ax.set_yscale("symlog", linthresh=1e-3)
+        ax.set_yscale("log", base=10)
         times = [time for row in points for time in row[1:]]
         minimum, maximum = min(times), max(times)
         lower = 0 if minimum == 0 else minimum / 1.3
@@ -102,7 +103,7 @@ def main() -> None:
         ax.tick_params(axis="x", labelrotation=90)
         ax.set_xlabel("Grid size (n × n)")
         ax.set_ylabel("Time (ms)")
-        # ax.grid(True, which="both", alpha=0.25)
+        ax.grid(True, which="major", alpha=0.2)
         ax.legend(loc="upper left")
 
     args.output.parent.mkdir(parents=True, exist_ok=True)

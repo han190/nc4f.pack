@@ -3,13 +3,13 @@ program benchmark_netcdf_io
   use, intrinsic :: iso_fortran_env, only: int64, real32, real64
   use, non_intrinsic :: nc4f, only: coordinate_type, dimension_type, &
     & variable_type, netcdf_type, datarray, extract, get_variable, initialize, &
-    & open_netcdf, close_netcdf, to_netcdf, &
-    & operator(.att.), operator(.dim.)
+    & open_netcdf, close_netcdf, to_netcdf, operator(.att.), operator(.dim.)
   use, non_intrinsic :: netcdf, only: nf90_noerr, nf90_strerror, &
     & nf90_create, nf90_open, nf90_close, nf90_def_dim, nf90_def_var, &
     & nf90_put_att, nf90_enddef, nf90_put_var, nf90_inq_varid, &
     & nf90_get_var, nf90_redef, nf90_clobber, nf90_netcdf4, &
-    & nf90_write, nf90_nowrite, nf90_float, nf90_inq_dimid
+    & nf90_write, nf90_nowrite, nf90_float, nf90_inq_dimid, &
+    & nf90_inquire_variable, nf90_inquire_dimension, nf90_get_att
   implicit none (type, external)
 
   real(real32), parameter :: p0 = 100000.0_real32
@@ -36,7 +36,7 @@ program benchmark_netcdf_io
   call system_clock(count_rate=rate)
   if (rate <= 0_int64) error stop "SYSTEM_CLOCK is unavailable."
 
-  do exponent = 1, 13
+  do exponent = 2, 13
     n = 2**exponent
     allocate (lon_values(n,n), lat_values(n,n), &
       & tmp_values(n,n), pre_values(n,n))
@@ -180,29 +180,16 @@ contains
     call check(nf90_put_var(ncid, id_lon, lon_values))
     call check(nf90_put_var(ncid, id_lat, lat_values))
     call check(nf90_put_var(ncid, id_tmp, tmp_values))
+    call verify_nf90_coord(ncid, "lon", lon_values)
+    call verify_nf90_coord(ncid, "lat", lat_values)
     call check(nf90_put_var(ncid, id_pre, pre_values))
     call check(nf90_close(ncid))
     call record(nf90_time, 1)
 
     call system_clock(tick0)
-    allocate (t_data(m,n), p_data(m,n), &
-      & lon_tmp(m,n), lat_tmp(m,n), &
-      & lon_pre(m,n), lat_pre(m,n))
     call check(nf90_open(nf90_file, nf90_nowrite, ncid))
-    call check(nf90_inq_dimid(ncid, "west_east", dim_west))
-    call check(nf90_inq_dimid(ncid, "south_north", dim_south))
-    call check(nf90_inq_varid(ncid, "temperature", id_tmp))
-    call check(nf90_inq_varid(ncid, "lon", id_lon))
-    call check(nf90_inq_varid(ncid, "lat", id_lat))
-    call check(nf90_get_var(ncid, id_tmp, t_data))
-    call check(nf90_get_var(ncid, id_lon, lon_tmp))
-    call check(nf90_get_var(ncid, id_lat, lat_tmp))
-    call check(nf90_inq_varid(ncid, "pressure", id_pre))
-    call check(nf90_inq_varid(ncid, "lon", id_lon))
-    call check(nf90_inq_varid(ncid, "lat", id_lat))
-    call check(nf90_get_var(ncid, id_pre, p_data))
-    call check(nf90_get_var(ncid, id_lon, lon_pre))
-    call check(nf90_get_var(ncid, id_lat, lat_pre))
+    call read_nf90_var(ncid, "temperature", t_data, lon_tmp, lat_tmp)
+    call read_nf90_var(ncid, "pressure", p_data, lon_pre, lat_pre)
     call check(nf90_close(ncid))
     t => t_data
     p => p_data
@@ -210,7 +197,6 @@ contains
 
     call system_clock(tick0)
     allocate (theta_data(m,n))
-    theta_data = 0.0_real32
     theta => theta_data
     theta = t*(p0/p)**(gas_r/cp)
     call record(nf90_time, 3)
@@ -218,6 +204,8 @@ contains
 
     call system_clock(tick0)
     call check(nf90_open(nf90_file, nf90_write, ncid))
+    call verify_nf90_coord(ncid, "lon", lon_tmp)
+    call verify_nf90_coord(ncid, "lat", lat_tmp)
     call check(nf90_redef(ncid))
     call check(nf90_inq_dimid(ncid, "west_east", dim_west))
     call check(nf90_inq_dimid(ncid, "south_north", dim_south))
@@ -232,6 +220,111 @@ contains
     call check(nf90_close(ncid))
     call record(nf90_time, 4)
   end subroutine run_nf90
+
+  subroutine read_nf90_coord(ncid, name, values, dims, dim_names)
+    !! Read coordinate data and all its dimension and attribute metadata.
+    integer, intent(in) :: ncid
+    !! Open NetCDF file identifier.
+    character(len=*), intent(in) :: name
+    !! Name of the coordinate variable to read.
+    real(real32), allocatable, intent(out) :: values(:,:)
+    !! Coordinate values read from the file.
+    integer, intent(out) :: dims(2)
+    !! Dimension lengths in Fortran order.
+    character(len=256), intent(out) :: dim_names(2)
+    !! Dimension names in Fortran order.
+    integer :: varid, dtype, ndims, natts, dimids(2), axis
+    character(len=256) :: found_name, attribute
+
+    call check(nf90_inq_varid(ncid, name, varid))
+    call check(nf90_inquire_variable(ncid, varid, name=found_name, &
+      & xtype=dtype, ndims=ndims, natts=natts))
+    if (trim(found_name) /= name .or. ndims /= 2 .or. &
+      & natts /= 2 .or. dtype /= nf90_float) then
+      error stop "Unexpected NF90 coordinate metadata."
+    end if
+    call check(nf90_inquire_variable(ncid, varid, dimids=dimids))
+    do axis = 1, 2
+      call check(nf90_inquire_dimension(ncid, dimids(axis), &
+        & name=dim_names(axis), len=dims(axis)))
+    end do
+    attribute = ""
+    call check(nf90_get_att(ncid, varid, "units", attribute))
+    attribute = ""
+    call check(nf90_get_att(ncid, varid, "standard_name", attribute))
+    allocate (values(dims(1),dims(2)))
+    call check(nf90_get_var(ncid, varid, values))
+  end subroutine read_nf90_coord
+
+  subroutine read_nf90_var(ncid, name, values, lon, lat)
+    !! Read a variable, its dimensions and attributes, and both coordinates.
+    integer, intent(in) :: ncid
+    !! Open NetCDF file identifier.
+    character(len=*), intent(in) :: name
+    !! Name of the parent variable to read.
+    real(real32), allocatable, intent(out) :: values(:,:), lon(:,:), lat(:,:)
+    !! Parent values and its two coordinate arrays.
+    integer :: varid, dtype, ndims, natts, dimids(2), dims(2)
+    integer :: coord_dims(2), axis, status
+    character(len=256) :: found_name, dim_names(2), coord_dim_names(2)
+    character(len=256) :: attribute, coord_names(2)
+
+    call check(nf90_inq_varid(ncid, name, varid))
+    call check(nf90_inquire_variable(ncid, varid, name=found_name, &
+      & xtype=dtype, ndims=ndims, natts=natts))
+    if (trim(found_name) /= name .or. ndims /= 2 .or. &
+      & natts /= 3 .or. dtype /= nf90_float) then
+      error stop "Unexpected NF90 parent metadata."
+    end if
+    call check(nf90_inquire_variable(ncid, varid, dimids=dimids))
+    do axis = 1, 2
+      call check(nf90_inquire_dimension(ncid, dimids(axis), &
+        & name=dim_names(axis), len=dims(axis)))
+    end do
+    attribute = ""
+    call check(nf90_get_att(ncid, varid, "units", attribute))
+    attribute = ""
+    call check(nf90_get_att(ncid, varid, "long_name", attribute))
+    attribute = ""
+    call check(nf90_get_att(ncid, varid, "coordinates", attribute))
+    read (attribute, *, iostat=status) coord_names
+    if (status /= 0) error stop "Invalid NF90 coordinates attribute."
+    allocate (values(dims(1),dims(2)))
+    call check(nf90_get_var(ncid, varid, values))
+    call read_nf90_coord(ncid, trim(coord_names(1)), &
+      & lon, coord_dims, coord_dim_names)
+    if (any(coord_dims /= dims) .or. &
+      & any(coord_dim_names /= dim_names)) then
+      error stop "NF90 longitude dimensions differ from parent."
+    end if
+    call read_nf90_coord(ncid, trim(coord_names(2)), &
+      & lat, coord_dims, coord_dim_names)
+    if (any(coord_dims /= dims) .or. &
+      & any(coord_dim_names /= dim_names)) then
+      error stop "NF90 latitude dimensions differ from parent."
+    end if
+  end subroutine read_nf90_var
+
+  subroutine verify_nf90_coord(ncid, name, expected)
+    !! Compare an existing file coordinate with the supplied array.
+    integer, intent(in) :: ncid
+    !! Open NetCDF file identifier.
+    character(len=*), intent(in) :: name
+    !! Name of the coordinate variable to compare.
+    real(real32), intent(in) :: expected(:,:)
+    !! In-memory coordinate values to compare with the file.
+    real(real32), allocatable :: actual(:,:)
+    integer :: dims(2)
+    character(len=256) :: dim_names(2)
+
+    call read_nf90_coord(ncid, name, actual, dims, dim_names)
+    if (any(dims /= shape(expected)) .or. &
+      & trim(dim_names(1)) /= "west_east" .or. &
+      & trim(dim_names(2)) /= "south_north" .or. &
+      & .not. all(actual == expected)) then
+      error stop "Existing NF90 coordinate differs."
+    end if
+  end subroutine verify_nf90_coord
 
   subroutine check(status)
     !! Stop on a netcdf-fortran error.

@@ -11,7 +11,7 @@ public :: open_netcdf, close_netcdf, to_netcdf, define_variable, &
   & put_variable, inquire_dimensions, inquire_variable, &
   & get_attribute, get_variable, get_group, delete_attribute, &
   & rename_attribute, rename_variable, rename_group, rename_dimension, &
-  & inquire_subgroups, inquire_group, operator(.exists.)
+  & inquire_subgroups, inquire_group, extract, operator(.exists.)
 private
 
 integer, parameter :: MAX_CHAR_LEN = 1024
@@ -56,6 +56,8 @@ end interface to_netcdf
 interface initialize
   module procedure :: initialize_att, initialize_var
 end interface initialize
+
+include "nc4f_netcdf_extract.inc"
 
 interface
   module subroutine def_var(nc, var, err)

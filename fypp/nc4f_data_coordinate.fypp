@@ -5,7 +5,7 @@ submodule(nc4f_data) nc4f_data_coordinate
 implicit none (type, external)
 contains
 
-pure module subroutine validate_coordinate(coord, err)
+pure module subroutine validate_coord(coord, err)
   !! Check that a coordinate has valid numeric storage and shape.
   type(coordinate_type), intent(in) :: coord
   !! Coordinate to validate.
@@ -63,7 +63,7 @@ pure module subroutine validate_coordinate(coord, err)
     err = error_type(INVALID, "coordinate", &
       & "Coordinate buffer size differs.")
   end if
-end subroutine validate_coordinate
+end subroutine validate_coord
 
 pure elemental module function eq_coord(a, b) result(equal)
   !! Compare coordinate metadata and values in their stored order.
@@ -112,7 +112,7 @@ pure elemental module function neq_coord(a, b) result(unequal)
   unequal = .not. eq_coord(a, b)
 end function neq_coord
 
-pure module subroutine validate_coordinate_for_var(coords, var, err)
+pure module subroutine validate_coord4var(coords, var, err)
   !! Require unique names and ordered dimension subsets.
   type(coordinate_type), intent(in) :: coords(:)
   !! Coordinates attached to the variable.
@@ -129,7 +129,7 @@ pure module subroutine validate_coordinate_for_var(coords, var, err)
     return
   end if
   do i = 1, size(coords)
-    call validate_coordinate(coords(i), err)
+    call validate_coord(coords(i), err)
     if (.exists. err) return
     do j = 1, i - 1
       if (coords(i)%name == coords(j)%name) then
@@ -152,7 +152,7 @@ pure module subroutine validate_coordinate_for_var(coords, var, err)
       axis = axis + 1
     end do
   end do
-end subroutine validate_coordinate_for_var
+end subroutine validate_coord4var
 
 pure module subroutine validate_coordinate_pair(left, right, err)
   !! Compare two coordinates at the same position in operand collections.
@@ -163,9 +163,9 @@ pure module subroutine validate_coordinate_pair(left, right, err)
   !! Mismatch result, including the coordinate name.
 
   err = error_type()
-  call validate_coordinate(left, err)
+  call validate_coord(left, err)
   if (.exists. err) return
-  call validate_coordinate(right, err)
+  call validate_coord(right, err)
   if (.exists. err) return
   if (left%name /= right%name) then
     err = error_type(INVALID, "evaluate", &
@@ -222,7 +222,7 @@ pure subroutine coordinate_byte_offset(coord, indices, dtype, pos, err)
   integer(int64) :: location, stride
   integer :: i
 
-  call validate_coordinate(coord, err)
+  call validate_coord(coord, err)
   pos = 0
   if (.exists. err) return
   if (coord%dtype /= dtype .or. size(indices) /= size(coord%dims)) then

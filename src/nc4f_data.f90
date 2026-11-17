@@ -12,8 +12,7 @@ public :: attribute_type, dimension_type, error_type, delete_attribute, &
   & storage_type, set_storage, datarray, dataset, extract, &
   & rename_attribute, rename_variable, rename_group, rename_dimension, &
   & operator(.att.), operator(.and.), operator(.dim.), operator(.exists.), &
-  & operator(==), operator(/=), &
-  & shape, size, buffer_size, buffer2cptr, &
+  & operator(==), operator(/=), shape, size, buffer_size, buffer2cptr, &
   & validate, error_msg, return_err, has_err, compute_buffer_size, compute_size
 private
 
@@ -151,12 +150,17 @@ end type storage_type
 type, abstract, private :: abstract_variable_type
   !! Shared metadata and owned storage for variables and coordinate mappings.
   character(len=:), allocatable :: name
+  !! Variable/coordinate name.
   integer(data_type) :: dtype = NAT_TYPE
+  !! Type of buffer.
   integer(int64) :: len = INVALID_INT64
   !! Number of locations indexed by dims.
   type(dimension_type), allocatable :: dims(:)
+  !! Dimensions associated with a variable/coordinate.
   type(attribute_type), allocatable :: atts(:)
+  !! Optional attributes attached to a variable/coordinate.
   integer(int8), allocatable :: buffer(:)
+  !! Owned bytes of a copied value.
 end type abstract_variable_type
 
 type, extends(abstract_variable_type) :: coordinate_type
@@ -212,6 +216,7 @@ end type netcdf_type
 
 include "nc4f_data_attribute_constructor.inc"
 include "nc4f_data_variable_constructor.inc"
+include "nc4f_data_coordinate_constructor.inc"
 include "nc4f_data_extract.inc"
 
 interface rename_dimension
@@ -239,28 +244,20 @@ interface operator(.exists.)
 end interface operator(.exists.)
 
 interface operator(.dim.)
-  module procedure :: new_dim_len_int32
-  module procedure :: new_dim_len_int64
+  module procedure :: new_dim_len_int32, new_dim_len_int64
   module procedure :: new_dim_args
 end interface operator(.dim.)
 
 interface operator(.and.)
-  module procedure :: new_dim_arg_int32
-  module procedure :: new_dim_arg_int64
+  module procedure :: new_dim_arg_int32, new_dim_arg_int64
 end interface operator(.and.)
 
 interface operator(==)
-  module procedure :: eq_att
-  module procedure :: eq_dim
-  module procedure :: eq_var
-  module procedure :: eq_coord
+  module procedure :: eq_att, eq_dim, eq_var, eq_coord
 end interface operator(==)
 
 interface operator(/=)
-  module procedure :: neq_att
-  module procedure :: neq_dim
-  module procedure :: neq_var
-  module procedure :: neq_coord
+  module procedure :: neq_att, neq_dim, neq_var, neq_coord
 end interface operator(/=)
 
 interface size
@@ -280,44 +277,34 @@ interface typeof
 end interface typeof
 
 interface initialize
-  module procedure :: init_att
-  module procedure :: init_att_mold
-  module procedure :: init_var
-  module procedure :: init_var_mold
+  module procedure :: init_att, init_att_mold, init_var, init_var_mold
 end interface initialize
 
 interface buffer2cptr
-  module procedure :: buffer2cptr_att
-  module procedure :: buffer2cptr_var
+  module procedure :: buffer2cptr_att, buffer2cptr_var
 end interface buffer2cptr
 
 interface validate
-  module procedure :: validate_att
-  module procedure :: validate_var
-  module procedure :: validate_coordinate
-  module procedure :: validate_nc_name
+  module procedure :: validate_att, validate_var
+  module procedure :: validate_coord, validate_coord4var, validate_nc_name
 end interface validate
 
 interface dataset
-  module procedure :: new_dataset_empty
-  module procedure :: new_dataset_vars
-  module procedure :: new_dataset_grps
-  module procedure :: new_dataset_all
+  module procedure :: new_dataset_empty, new_dataset_vars
+  module procedure :: new_dataset_grps, new_dataset_all
 end interface dataset
 
-include "nc4f_data_coordinate_constructor.inc"
-
 interface coordinate_at
-  module procedure :: coordinate_at_int8, coordinate_at_int16, &
-    & coordinate_at_int32, coordinate_at_int64, &
-    & coordinate_at_real32, coordinate_at_real64
+  module procedure :: coordinate_at_int8, coordinate_at_int16
+  module procedure :: coordinate_at_int32, coordinate_at_int64
+  module procedure :: coordinate_at_real32, coordinate_at_real64
 end interface coordinate_at
 
 interface
-  pure module subroutine validate_coordinate(coord, err)
+  pure module subroutine validate_coord(coord, err)
     type(coordinate_type), intent(in) :: coord
     type(error_type), intent(out) :: err
-  end subroutine validate_coordinate
+  end subroutine validate_coord
 
   pure elemental module function eq_coord(a, b) result(equal)
     type(coordinate_type), intent(in) :: a, b
@@ -329,11 +316,11 @@ interface
     logical :: unequal
   end function neq_coord
 
-  pure module subroutine validate_coordinate_for_var(coords, var, err)
+  pure module subroutine validate_coord4var(coords, var, err)
     type(coordinate_type), intent(in) :: coords(:)
     type(variable_type), intent(in) :: var
     type(error_type), intent(out) :: err
-  end subroutine validate_coordinate_for_var
+  end subroutine validate_coord4var
 
   pure module subroutine validate_coordinate_pair(left, right, err)
     !! Compare two coordinates in corresponding collection positions.

@@ -30,7 +30,7 @@ module function new_coord_${K}$_${R}$d(name, values, dims, atts) result(coord)
   if (present(atts)) coord%atts = atts
   coord%buffer = transfer(values, 0_int8, &
     & buffer_size(${D}$, coord%len))
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
 end function new_coord_${K}$_${R}$d${NEWLINE()}$
 #: endfor

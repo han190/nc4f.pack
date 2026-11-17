@@ -5,8 +5,10 @@ and with the NetCDF Fortran API. Both paths write two-dimensional longitude,
 latitude, temperature, and pressure; reopen and read them; calculate
 `theta = T * (P0 / P) ** (R / Cp)` through pointers; and append `theta` with
 its attributes and CF `coordinates` reference.
-The NetCDF Fortran path reads lon and lat once for temperature and again for
-pressure, matching NC4F's per-variable coordinate reads.
+The NetCDF Fortran path reads dimension and attribute metadata along with lon
+and lat for each parent variable. It also checks existing coordinate values
+before writing pressure and theta. This uses direct NF90 calls and plain
+Fortran arrays, without constructing an additional data model.
 
 The benchmark reports mean milliseconds for four phases and their total:
 create/write, open/read, calculate, and append. The calculate phase includes

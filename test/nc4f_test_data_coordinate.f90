@@ -41,6 +41,10 @@ subroutine test_mapping(error)
   lat = coordinate_type("lat", lat_vals, &
     & ["west_east".dim.2, "south_north".dim.3], &
     & atts=["units".att."degrees_north"])
+  call validate(lon, err)
+  call check(error, err%code == NC_NOERR, &
+    & "Coordinate validation through generic failed")
+  if (allocated(error)) return
   call check(error, size(lon) == 6 .and. &
     & all(shape(lon) == [2, 3]) .and. &
     & nameof(lon) == "lon" .and. typeof(lon) == NC_FLOAT, &

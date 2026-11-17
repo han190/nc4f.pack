@@ -14,7 +14,7 @@ module subroutine extract_coord_${K}$_${R}$d(coord, ptr)
   type(error_type) :: err
   type(c_ptr) :: cptr
 
-  call validate_coordinate(coord, err)
+  call validate(coord, err)
   call return_err(err)
   if (coord%dtype /= ${D}$) error stop &
     & "[extract] Coordinate kind differs."

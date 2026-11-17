@@ -1,0 +1,32 @@
+#: include 'common.fypp'
+#: set chunks = lambda xs, n: [xs[i:i+n] for i in range(0, len(xs), n)]
+#: set wrap = lambda x,n: ', &\n      & '.join(map(', '.join,chunks(x,n)))
+#: set dims = lambda R: wrap([':'] * R, 5)
+interface extract
+#: for K in kinds
+#: for R in range(1, MAX_RANK+1)
+  module procedure :: extract_val_${K}$_${R}$d
+#: endfor
+#: endfor
+end interface extract
+
+interface
+#: for T, K in zip(types, kinds)
+#: for R in range(1, MAX_RANK+1)
+  module subroutine extract_val_${K}$_${R}$d(nc, name, val, err)
+    !! Read stored variable values into a ${K}$ rank-${R}$ array.
+    class(group_type), intent(in) :: nc
+    !! Open dataset or group containing the variable.
+    character(len=*), intent(in) :: name
+    !! Name of the variable to read.
+    ${T}$(${K}$), allocatable, target, intent(inout) :: &
+      & val(${dims(R)}$)
+    !! Reused when its shape matches; allocated or resized otherwise.
+    !! Empty variables leave the output unchanged.
+    !! Inquiry errors preserve it; read errors deallocate it.
+    type(error_type), intent(out), optional :: err
+    !! Optional error result; failures stop execution when omitted.
+  end subroutine extract_val_${K}$_${R}$d${NEWLINE()}$
+#: endfor
+#: endfor
+end interface

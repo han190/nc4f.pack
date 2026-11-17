@@ -73,7 +73,7 @@ endif
 FFLAGS ?= -fPIC $(COMPILER_FFLAGS) $(PROFILE_FFLAGS)
 MODULE_FLAGS := $(MODULE_OUTPUT_FLAG) -I$(BUILD_DIR) -I$(SRC_DIR) $(NC_CFLAGS)
 
-# All current templates generate data_structure sources; common.fypp is a helper.
+# Templates generate the tracked sources; common.fypp is a helper.
 FYPP_INC := $(wildcard $(FYPP_DIR)/*_inc.fypp)
 FYPP_F90 := $(filter-out $(FYPP_INC) $(FYPP_DIR)/common.fypp,$(wildcard $(FYPP_DIR)/*.fypp))
 SRC_INC := $(patsubst $(FYPP_DIR)/%_inc.fypp,$(SRC_DIR)/%.inc,$(FYPP_INC))
@@ -193,9 +193,10 @@ $(BUILD_DIR)/%.o: %.f90
 
 # Object prerequisites enforce module/submodule order and propagate interface changes.
 $(BUILD_DIR)/nc4f_c_interface.o: $(C_INTERFACE_INC)
-$(BUILD_DIR)/nc4f_data.o: $(SRC_INC)
+$(BUILD_DIR)/nc4f_data.o: $(filter $(SRC_DIR)/nc4f_data_%.inc,$(SRC_INC))
 $(filter $(BUILD_DIR)/nc4f_data_%.o,$(OBJ)): $(BUILD_DIR)/nc4f_data.o
-$(BUILD_DIR)/nc4f_netcdf.o: $(BUILD_DIR)/nc4f_data.o $(BUILD_DIR)/nc4f_c_interface.o
+$(BUILD_DIR)/nc4f_netcdf.o: $(BUILD_DIR)/nc4f_data.o \
+	$(BUILD_DIR)/nc4f_c_interface.o $(SRC_DIR)/nc4f_netcdf_extract.inc
 $(filter $(BUILD_DIR)/nc4f_netcdf_%.o,$(OBJ)): $(BUILD_DIR)/nc4f_netcdf.o
 $(BUILD_DIR)/nc4f.o: $(BUILD_DIR)/nc4f_data.o $(BUILD_DIR)/nc4f_netcdf.o
 
